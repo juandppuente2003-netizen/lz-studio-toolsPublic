@@ -14,5 +14,5 @@ await rm('dist',{recursive:true,force:true});await mkdir('dist/server',{recursiv
 await writeFile('dist/server/asset-map.js','export const assets='+JSON.stringify(assets)+';\n');
 await writeFile('dist/server/entry.js',"import {assets} from './asset-map.js'; import {createHandler} from '../../worker/account-worker.js'; export default createHandler({assets});\n");
 await build({entryPoints:['dist/server/entry.js'],bundle:true,format:'esm',platform:'browser',target:'es2022',outfile:'dist/server/index.js',minify:true,logLevel:'info'});
-await rm('dist/server/entry.js');await rm('dist/server/asset-map.js');await mkdir('dist/.openai',{recursive:true});await copyFile('.openai/hosting.json','dist/.openai/hosting.json');
+await rm('dist/server/entry.js');await rm('dist/server/asset-map.js');await mkdir('dist/.openai',{recursive:true});try{await copyFile('.openai/hosting.json','dist/.openai/hosting.json');}catch(error){if(error.code!=='ENOENT')throw error;}
 console.log('Built server-protected tools; public assets contain no tool HTML or processing scripts.');

@@ -1,0 +1,24 @@
+LZ Studio Tools · versión de Sites 38 adaptada para Vercel
+
+Sube TODO el contenido de este paquete a la raíz del repositorio nuevo.
+No subas la carpeta exterior ni el ZIP.
+
+En Vercel > Settings > Build and Deployment:
+Root Directory: vacío (la raíz del repositorio), NO dist.
+Framework Preset: Other.
+Build Command: desactiva Override (vercel.json usa npm run build:vercel).
+Output Directory: desactiva Override (vercel.json usa dist/client).
+Install Command: desactiva Override.
+Guarda cada sección.
+
+Haz un nuevo commit en el repositorio conectado para generar un nuevo despliegue.
+No vuelvas a desplegar un commit del repositorio anterior.
+
+Incluye api/site.js y dist ya compilados, además del código fuente.
+Las páginas y scripts de herramientas se sirven por la función de Vercel, con la misma verificación de sesión y suspensión que Sites.
+No publiques web como carpeta estática: se perdería esa protección.
+Supabase sigue siendo el mismo proyecto; no elimina cuentas ni cambia roles.
+Las URL de recuperación y confirmación deben permitir /account.html en tu dominio actual en Supabase.
+
+Verificación local: build + pruebas de acceso y adaptador de rutas.
+El despliegue final en tu proyecto de Vercel todavía debe comprobarse tras subirlo.
