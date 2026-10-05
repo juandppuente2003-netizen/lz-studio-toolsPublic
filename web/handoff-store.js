@@ -2,10 +2,10 @@
 export const TRANSFER_TTL=2*60*60*1000;
 export const DESTINATIONS=[
   ['crop','Recortar imagen','crop.html','crop'],
-  ['halftone','Crear semitonos','editor.html?tool=halftone','editor'],
+  ['halftone','Semitonos','editor.html?tool=halftone','editor'],
   ['color','Mejorar colores','color-enhance.html','color'],
-  ['editor','Editor DTF','editor.html','editor'],
-  ['recolor','Recolorizador DTF','editor.html?tool=recolor','editor'],
+  ['editor','Quitar fondo color','editor.html?tool=remove','editor'],
+  ['recolor','Reemplazar color','editor.html?tool=recolor','editor'],
   ['thickness','Auditor de grosor','thickness.html','thickness'],
   ['opacity','Semitransparencias','opacity.html','opacity'],
   ['texture','Texturas','textures.html','texture'],
@@ -17,9 +17,9 @@ export const DESTINATIONS=[
 ];
 export function validateArtifact(artifact,destination){
   if(!artifact?.blob||artifact.blob.type!=='image/png'||!artifact.blob.size)throw Error('Carga una imagen y prepara el resultado antes de continuar.');
-  const {width,height}=artifact,maxPixels=['thickness','opacity'].includes(destination?.[0])?16e6:destination?.[0]==='analyzer'?24e6:32e6;
+  const {width,height}=artifact,maxPixels=140e6;
   if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1)throw Error('No se pudo comprobar el tamaño de la imagen.');
-  if(width*height>maxPixels||Math.max(width,height)>8192||artifact.blob.size>40*1024*1024)throw Error(`Esta herramienta admite hasta ${maxPixels/1e6} MP, 8192 px por lado y 40 MB. Reduce la medida o resolución de salida para enviarla.`);
+  if(width*height>maxPixels||Math.max(width,height)>24000||artifact.blob.size>150*1024*1024)throw Error(`Esta herramienta admite hasta ${maxPixels/1e6} MP, 24,000 px por lado y 150 MB. Reduce la medida o resolución de salida para enviarla.`);
   if(!Number.isFinite(artifact.widthCm)||artifact.widthCm<=0||!Number.isFinite(artifact.dpi)||artifact.dpi<=0)throw Error('No se pudo comprobar la medida de la imagen.');
   if(['editor','halftone','recolor','color','opacity','texture','thickness'].includes(destination?.[0])&&(artifact.widthCm<.5||artifact.widthCm>100||artifact.dpi>9600))throw Error('Esta herramienta admite un ancho de 0.5 a 100 cm. Ajusta la medida de salida antes de enviarla.');
   return artifact;

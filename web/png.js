@@ -7,3 +7,10 @@ export function pngDensity(bytes,dpi){
  while(o<bytes.length){if(o+12>bytes.length)throw Error('PNG incompleto.');const len=new DataView(bytes.buffer,bytes.byteOffset+o,4).getUint32(0),end=o+len+12;if(end>bytes.length)throw Error('PNG incompleto.');const type=String.fromCharCode(...bytes.subarray(o+4,o+8));if(type!=='pHYs')parts.push(bytes.subarray(o,end));if(type==='IHDR'){parts.push(chunk);added=true;}o=end;if(type==='IEND')break;}
  if(!added)throw Error('PNG sin cabecera.');const out=new Uint8Array(parts.reduce((s,p)=>s+p.length,0));let at=0;for(const p of parts){out.set(p,at);at+=p.length;}return out;
 }
+// Patch density without copying the compressed pixel data into a new array.
+export async function pngBlobDensity(blob,dpi){
+ const start=new Uint8Array(await blob.slice(0,33).arrayBuffer());if(start.length<33||start[0]!==137||start[1]!==80)throw Error('PNG inválido.');
+ const density=pngDensity(start,dpi).subarray(33,54),parts=[blob.slice(0,33),density];let offset=33;
+ while(offset<blob.size){const header=new Uint8Array(await blob.slice(offset,offset+8).arrayBuffer());if(header.length!==8)throw Error('PNG incompleto.');const length=new DataView(header.buffer).getUint32(0),end=offset+length+12;if(end>blob.size)throw Error('PNG incompleto.');const type=String.fromCharCode(...header.subarray(4));if(type!=='pHYs')parts.push(blob.slice(offset,end));offset=end;if(type==='IEND')break;}
+ return new Blob(parts,{type:'image/png'});
+}

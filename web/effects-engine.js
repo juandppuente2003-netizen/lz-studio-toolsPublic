@@ -8,6 +8,7 @@ const fract=n=>n-Math.floor(n);
 // Absolute physical coordinates keep textures and opacity screens continuous
 // across export tiles, independent of the preview and output pixel density.
 export function processDesignEffect(data,w,h,p,pixelsPerCm,offsetX=0,offsetY=0){
+  if(p.effectOn===false)return data;
   if(!Number.isFinite(pixelsPerCm)||pixelsPerCm<=0)throw Error('Medida de impresión inválida.');
   // Recover faint tiny source details before the screen can drop them; then
   // reinforce the resulting solid halftone dots below, using the same minimum.

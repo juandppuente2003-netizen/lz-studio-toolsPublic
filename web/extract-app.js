@@ -1,3 +1,5 @@
+import {canvasArtifact,requireTransferImage} from './transfer-export.js';
+import {decodeImageFile,validateImportSize} from './upscale-import.js';
 import {setupViewport} from './viewport.js';
 import {registerStudioModule} from './studio-shell.js';
 import {pngDensity} from './png.js';
@@ -9,7 +11,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function status(message,error=false){$('extractStatus').textContent=message;$('extractStatus').classList.toggle('error',error);}
 function sync(){
   const blocked=busy||loading||exporting;
-  $('extractFile').disabled=blocked;$('cropControls').disabled=!source||blocked;$('backgroundControls').disabled=!raw||blocked;$('brushControls').disabled=!pixels||blocked;$('exportControls').disabled=!pixels||blocked;
+  $('extractFile').disabled=blocked;$('cropControls').disabled=!source||blocked;$('backgroundControls').disabled=!source||blocked;$('autoFabric').disabled=!raw||blocked;$('brushControls').disabled=!pixels||blocked;$('exportControls').disabled=!pixels||blocked;
   $('downloadExtract').disabled=!pixels||blocked;$('undoBrush').disabled=!undo.length||blocked;$('restoreAll').disabled=!pixels||blocked;
   for(const id of ['selectAll','resetSelection','pickSource'])$(id).disabled=!source||blocked;
   $('cancelExtraction').hidden=!busy;$('extractButton').textContent=busy?'Procesando…':'Extraer diseño';
@@ -36,18 +38,18 @@ function updateMeta(){
   if(!bounds){$('resultInfo').textContent='El resultado está vacío. Baja la tolerancia o recupera el diseño con el pincel.';return;}
   const dpi=Number($('extractDpi').value);$('resultInfo').textContent=`${bounds.width.toLocaleString()} × ${bounds.height.toLocaleString()} px · ${(bounds.width/dpi*2.54).toFixed(2)} × ${(bounds.height/dpi*2.54).toFixed(2)} cm a ${dpi} ppp`;
 }
-async function upload(file){
+async function upload(file,preserveSettings=false){
   if(!file||busy||loading||exporting)return;loading=true;sync();let image;
   try{
-    if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>40*1024*1024)throw Error('Carga PNG, JPG o WebP de hasta 40 MB.');
-    status('Cargando foto…');image=await createImageBitmap(file,{imageOrientation:'from-image'});
-    if(image.width*image.height>32e6||Math.max(image.width,image.height)>8192)throw Error('Reduce la imagen a 32 MP y 8,192 px por lado como máximo.');
+    if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>150*1024*1024)throw Error('Carga PNG, JPG o WebP de hasta 150 MB.');
+    status('Cargando foto…');image=await decodeImageFile(file);
+    validateImportSize(image.width,image.height);
     if(Math.min(image.width,image.height)<24)throw Error('La imagen es demasiado pequeña para extraer un diseño.');
     source=document.createElement('canvas');const scale=Math.min(1,6000/Math.max(image.width,image.height),Math.sqrt(20e6/(image.width*image.height)));sourceScaled=scale<1;source.width=Math.round(image.width*scale);source.height=Math.round(image.height*scale);source.getContext('2d').drawImage(image,0,0,source.width,source.height);sourcePixels=source.getContext('2d',{willReadFrequently:true}).getImageData(0,0,source.width,source.height);
     fileName=file.name||'diseno';$('extractName').textContent=fileName;$('sourceInfo').textContent=`${image.width.toLocaleString()} × ${image.height.toLocaleString()} px${sourceScaled?' · copia de trabajo reducida a '+source.width+' × '+source.height+' px':''}`;
-    worker?.terminate();worker=null;revision++;raw=null;pixels=null;undo=[];painted=false;manualFabric=false;zoom=1;selectionZoom=1;result.hidden=true;$('resultEmpty').hidden=false;$('resultInfo').textContent='Sin extracción';resetPoints();
+    worker?.terminate();worker=null;revision++;raw=null;pixels=null;undo=[];painted=false;manualFabric=false;if(!preserveSettings){$('removeMode').value='none';$('fabricColor').value='#000000';}zoom=1;selectionZoom=1;result.hidden=true;$('resultEmpty').hidden=false;$('resultInfo').textContent='Sin extracción';resetPoints();
     status('Ajusta las cuatro esquinas alrededor del estampado y pulsa Extraer diseño.');
-  }catch(error){status(error.message||'No se pudo abrir la foto.',true);}finally{image?.close();loading=false;$('extractFile').value='';sync();}
+  }catch(error){status(error.message||'No se pudo abrir la foto.',true);}finally{image?.close?.();loading=false;$('extractFile').value='';sync();}
 }
 function options(){const hex=$('fabricColor').value;return {color:[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)),tolerance:Number($('tolerance').value),softness:Number($('softness').value),mode:$('removeMode').value,minArea:Number($('minArea').value)};}
 function setColor(color){$('fabricColor').value='#'+color.map(v=>v.toString(16).padStart(2,'0')).join('');}
@@ -74,7 +76,7 @@ function receive({data:m}){
 function canvasPoint(event,canvas){const rect=canvas.getBoundingClientRect();return {x:clamp((event.clientX-rect.left)/rect.width*canvas.width,0,canvas.width-1),y:clamp((event.clientY-rect.top)/rect.height*canvas.height,0,canvas.height-1)};}
 selection.addEventListener('pointerdown',event=>{
   if(!source||busy||loading||exporting||event.button!==0)return;const p=canvasPoint(event,selection),sx=source.width/selection.width,sy=source.height/selection.height,sp={x:p.x*sx,y:p.y*sy};
-  if(tool==='pick'){const x=Math.floor(sp.x),y=Math.floor(sp.y),colors=[[],[],[]];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const o=(clamp(y+dy,0,source.height-1)*source.width+clamp(x+dx,0,source.width-1))*4;for(let c=0;c<3;c++)colors[c].push(sourcePixels.data[o+c]);}setColor(colors.map(a=>a.sort((a,b)=>a-b)[12]));manualFabric=true;tool='corners';sync();if(raw)run('adjust');else status('Color de la prenda elegido. Ajusta las esquinas y extrae el diseño.');return;}
+  if(tool==='pick'){const x=Math.floor(sp.x),y=Math.floor(sp.y),colors=[[],[],[]];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const o=(clamp(y+dy,0,source.height-1)*source.width+clamp(x+dx,0,source.width-1))*4;for(let c=0;c<3;c++)colors[c].push(sourcePixels.data[o+c]);}setColor(colors.map(a=>a.sort((a,b)=>a-b)[12]));manualFabric=true;$('removeMode').value=$('removeMode').value==='none'?'edges':$('removeMode').value;tool='corners';sync();if(raw)run('adjust');else status('Color de la prenda elegido. Ajusta las esquinas y extrae el diseño.');return;}
   const r=selection.getBoundingClientRect();let closest=-1,best=35;points.forEach((point,i)=>{const d=Math.hypot((point.x-sp.x)/source.width*r.width,(point.y-sp.y)/source.height*r.height);if(d<best){best=d;closest=i;}});
   if(closest<0)return;drag={kind:'corner',index:closest};selection.setPointerCapture(event.pointerId);event.preventDefault();
 });
@@ -95,7 +97,7 @@ function endDrag(){if(drag?.kind==='brush'){updateMeta();sync();}drag=null;}
 for(const canvas of [selection,result]){canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);canvas.addEventListener('lostpointercapture',endDrag);}
 function selectTool(value){tool=tool===value?'corners':value;result.style.cursor=['erase','restore'].includes(tool)?'crosshair':'default';sync();if(tool==='pick')status('Haz clic en una zona de la prenda, fuera del estampado, en la foto original.');}
 $('extractFile').onchange=()=>upload($('extractFile').files[0]);
-$('extractButton').onclick=()=>run('rectify',!manualFabric);
+$('extractButton').onclick=()=>run('rectify');
 $('selectAll').onclick=()=>{resetPoints(true);markStale();};$('resetSelection').onclick=()=>{resetPoints();markStale();};
 $('pickSource').onclick=()=>selectTool('pick');$('autoFabric').onclick=()=>{manualFabric=false;run('adjust',true);};
 $('eraseBrush').onclick=()=>selectTool('erase');$('restoreBrush').onclick=()=>selectTool('restore');
@@ -122,5 +124,5 @@ for(const box of [selectionBox,$('photoUpload')]){box.addEventListener('dragover
 document.addEventListener('paste',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;const item=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));if(item){e.preventDefault();upload(item.getAsFile());}});
 window.addEventListener('resize',()=>{if(source)drawSelection();else layout();});
 document.addEventListener('click',event=>{if(event.target.closest('.lz-mobile-switch'))requestAnimationFrame(()=>{if(source)drawSelection();else layout();});});
-$('extractZoomIn').closest('.zoom-controls').hidden=true;const selectionControls=document.createElement('div');selectionControls.className='zoom-controls';selectionBox.previousElementSibling.append(selectionControls);const resultControls=document.createElement('div');resultControls.className='zoom-controls';resultBox.previousElementSibling.append(resultControls);
-setupViewport({wrap:selectionBox,controls:selectionControls,editable:true,onZoom:factor=>{selectionZoom=clamp(selectionZoom*factor,.1,8);layout();},onFit:()=>{selectionZoom=1;layout();},zoomButtons:true});setupViewport({wrap:resultBox,controls:resultControls,editable:true,onZoom:factor=>{zoom=clamp(zoom*factor,.1,8);layout();},onFit:()=>{zoom=1;layout();},zoomButtons:true});registerStudioModule({id:'extract',getComparison:()=>{if(!raw||result.hidden)return null;const before=document.createElement('canvas');before.width=raw.width;before.height=raw.height;before.getContext('2d').putImageData(raw,0,0);return [before,result];},getDraft:()=>source?{images:{source,raw,pixels},data:{fileName,points,painted,manualFabric}}:null,restoreDraft:async d=>{await upload(new File([d.images.source],d.data.fileName,{type:'image/png'}));points=d.data.points;painted=d.data.painted;manualFabric=d.data.manualFabric;for(const key of ['raw','pixels'])if(d.images[key]){const bitmap=await createImageBitmap(d.images[key]),c=document.createElement('canvas');c.width=bitmap.width;c.height=bitmap.height;c.getContext('2d').drawImage(bitmap,0,0);const image=c.getContext('2d').getImageData(0,0,c.width,c.height);if(key==='raw')raw=image;else pixels=image;bitmap.close();}drawSelection();drawResult();sync();},afterRestore:()=>{drawSelection();drawResult();sync();}});sync();
+const oldZoomControls=$('extractZoomIn').closest('.zoom-controls, .lab-toolbar-actions');if(oldZoomControls)oldZoomControls.hidden=true;const selectionControls=document.createElement('div');selectionControls.className='zoom-controls';selectionBox.previousElementSibling.append(selectionControls);const resultControls=document.createElement('div');resultControls.className='zoom-controls';resultBox.previousElementSibling.append(resultControls);
+setupViewport({wrap:selectionBox,controls:selectionControls,editable:true,isPicking:()=>tool==='pick',onZoom:factor=>{selectionZoom=clamp(selectionZoom*factor,.1,8);layout();},onFit:()=>{selectionZoom=1;layout();},zoomButtons:true});setupViewport({wrap:resultBox,controls:resultControls,editable:true,onZoom:factor=>{zoom=clamp(zoom*factor,.1,8);layout();},onFit:()=>{zoom=1;layout();},zoomButtons:true});registerStudioModule({id:'extract',getExportInfo:()=>{requireTransferImage(pixels,busy||loading||exporting);const b=$('trimOutput').checked?alphaBounds(pixels.data,pixels.width,pixels.height):pixels;if(!b)throw Error('No hay píxeles visibles para descargar.');return {widthCm:b.width/Number($('extractDpi').value)*2.54,dpi:Number($('extractDpi').value),aspect:b.width/b.height};},exportCurrent:async()=>{requireTransferImage(pixels,busy||loading||exporting);const b=$('trimOutput').checked?alphaBounds(pixels.data,pixels.width,pixels.height):{x:0,y:0,width:pixels.width,height:pixels.height};if(!b)throw Error('No hay píxeles visibles.');const c=document.createElement('canvas');c.width=b.width;c.height=b.height;c.getContext('2d').drawImage(result,b.x,b.y,b.width,b.height,0,0,b.width,b.height);return canvasArtifact(c,fileName.replace(/\.[^.]+$/,'')+'_extraido.png',Number($('extractDpi').value));},getComparison:()=>{if(!raw||result.hidden)return null;const before=document.createElement('canvas');before.width=raw.width;before.height=raw.height;before.getContext('2d').putImageData(raw,0,0);return [before,result];},getDraft:()=>source?{images:{source,raw,pixels},data:{fileName,points,painted,manualFabric}}:null,restoreDraft:async d=>{await upload(new File([d.images.source],d.data.fileName,{type:'image/png'}),true);points=d.data.points;painted=d.data.painted;manualFabric=d.data.manualFabric;for(const key of ['raw','pixels'])if(d.images[key]){const bitmap=await createImageBitmap(d.images[key]),c=document.createElement('canvas');c.width=bitmap.width;c.height=bitmap.height;c.getContext('2d').drawImage(bitmap,0,0);const image=c.getContext('2d').getImageData(0,0,c.width,c.height);if(key==='raw')raw=image;else pixels=image;bitmap.close();}drawSelection();drawResult();sync();},afterRestore:()=>{drawSelection();drawResult();sync();}});sync();

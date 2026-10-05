@@ -1,5 +1,5 @@
 // Scroll the preview only: no image coordinates or export data are changed.
-export function setupViewport({wrap,controls,editable=false,canPan=()=>false,onZoom,onFit,zoomButtons=false}) {
+export function setupViewport({wrap,controls,editable=false,canPan=()=>false,isPicking=()=>document.body.classList.contains('picking'),onZoom,onFit,zoomButtons=false}) {
   if (!wrap || !controls) return;
   let enabled=!editable,space=false,gesture=null,suppressClick=false,pinch=null;
   const touches=new Map();
@@ -36,7 +36,7 @@ export function setupViewport({wrap,controls,editable=false,canPan=()=>false,onZ
     suppressClick=false;
     if(gesture||event.isPrimary===false||![0,1].includes(event.button)||event.target.closest('button,input,select,a'))return;
     // The eyedropper keeps its existing click interaction.
-    if(document.body.classList.contains('picking')&&!space&&event.button!==1)return;
+    if(isPicking()&&!space&&event.button!==1){gesture=null;wrap.classList.remove('viewport-panning');return;}
     if(!(enabled||space||event.button===1||canPan(event)))return;
     gesture={id:event.pointerId,x:event.clientX,y:event.clientY,left:wrap.scrollLeft,top:wrap.scrollTop,moved:false};
     wrap.setPointerCapture(event.pointerId);wrap.classList.add('viewport-panning');

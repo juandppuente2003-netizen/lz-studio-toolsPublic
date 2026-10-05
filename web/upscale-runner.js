@@ -1,10 +1,10 @@
 import {CNN_TILE_SIZE} from './ai-engine.js';
-export const UPSCALE_MAX_PIXELS=1_500_000,UPSCALE_MAX_SIDE=1400;
+export const UPSCALE_MAX_PIXELS=8_000_000,UPSCALE_MAX_SIDE=4096;
 export function upscaleWorkingSize(width,height){
-  const scale=Math.min(1,UPSCALE_MAX_SIDE/Math.max(width,height),Math.sqrt(UPSCALE_MAX_PIXELS/(width*height)));
+  const scale=Math.min(1,UPSCALE_MAX_SIDE/Math.max(width,height),Math.sqrt((globalThis.matchMedia?.('(pointer:coarse)').matches?4_000_000:UPSCALE_MAX_PIXELS)/(width*height)));
   return {width:Math.max(1,Math.floor(width*scale)),height:Math.max(1,Math.floor(height*scale))};
 }
-export function validateUpscaleSize(width,height){if(width*height>UPSCALE_MAX_PIXELS||Math.max(width,height)>UPSCALE_MAX_SIDE)throw Error('Usa una imagen de hasta 1.5 MP y 1,400 px por lado para esta versión del mejorador.');}
+export function validateUpscaleSize(width,height){if(width*height>UPSCALE_MAX_PIXELS||Math.max(width,height)>UPSCALE_MAX_SIDE)throw Error('Usa una imagen de hasta 8 MP y 4,096 px por lado para esta versión del mejorador.');}
 export function upscaleTiles(width,height){const pad=10,core=CNN_TILE_SIZE-pad*2,tiles=[];for(let y=0;y<height;y+=core)for(let x=0;x<width;x+=core)tiles.push({x,y,w:Math.min(core,width-x),h:Math.min(core,height-y),pad});return tiles}
 const make=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
 export async function enhanceImage(source,engine,{onProgress,signal}={}){

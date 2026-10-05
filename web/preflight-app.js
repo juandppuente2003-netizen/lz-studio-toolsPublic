@@ -1,16 +1,18 @@
+import {largePreflight} from './large-preflight.js';
+import {outputDimensions} from './image-output.js';
 import {registerStudioModule} from './studio-shell.js';
 import {decodeImageFile,validateImportSize} from './upscale-import.js';
 import {canvasArtifact,requireTransferImage} from './transfer-export.js';
 const $=id=>document.getElementById(id),tool=document.body.dataset.preflightTool,canvas=$('effectCanvas'),wrap=document.querySelector('.lab-canvas-wrap');
-const MAX_PIXELS=16_000_000;
-let source=null,result=null,resultDimensions=null,preview=null,overlay=null,markers=[],filename='diseno',busy=false,loading=false,worker=null,job=0,loadJob=0,fit=true,zoom=1,originalView=true,mode='manual',delta=0,selection=0;
+const MAX_PIXELS=140_000_000;
+let source=null,result=null,resultDimensions=null,preview=null,overlay=null,markers=[],filename='diseno',busy=false,loading=false,worker=null,job=0,loadJob=0,fit=true,zoom=1,originalView=true,mode='manual',delta=0,selection=0,resultBlob=null;
 function status(text,error=false){$('effectStatus').textContent=text;$('effectStatus').classList.toggle('error',error)}
 function options(){return {minimumMm:Number($('auditMinimum')?.value||.5),mode,delta,alphaMethod:$('alphaMethod')?.value||'screen',sizeMm:Number($('effectSize')?.value||1),threshold:Number($('alphaThreshold')?.value||50)}}
 function dimensions(){
   const widthCm=Number($('effectWidth').value),dpi=Number($('effectDpi').value);
   if(!Number.isFinite(widthCm)||widthCm<.5||widthCm>100||!Number.isFinite(dpi)||dpi<1||dpi>9600)throw Error('Revisa el ancho y la resolución de impresión.');
   const width=Math.max(1,Math.round(widthCm/2.54*dpi)),height=source?Math.max(1,Math.round(width*source.height/source.width)):0;
-  if(width*height>MAX_PIXELS||Math.max(width,height)>8192)throw Error('Para analizar a resolución real, usa hasta 16 MP y 8192 px por lado. Reduce la medida o los ppp.');
+  if(width*height>MAX_PIXELS||Math.max(width,height)>24000)throw Error('Para analizar a resolución real, usa hasta 140 MP y 24,000 px por lado. Reduce la medida o los ppp.');
   return {width,height,dpi,widthCm};
 }
 function controls(){
@@ -45,7 +47,7 @@ function highlight(mask,width,height,original){
   }
   ctx.putImageData(image,0,0);overlay={canvas:c,original};
 }
-function clearResult(){job++;worker?.terminate();worker=null;busy=false;result=null;resultDimensions=null;preview=null;overlay=null;markers=[];mode='manual';delta=0;selection=0;originalView=true;$('effectBusy').hidden=true;$('preflightProgress').hidden=true;$('preflightSummary').textContent='Pulsa Analizar o Corregir automáticamente.';controls();show()}
+function clearResult(){job++;worker?.terminate();worker=null;busy=false;result?.close?.();result=null;resultBlob=null;resultDimensions=null;preview=null;overlay=null;markers=[];mode='manual';delta=0;selection=0;originalView=true;$('effectBusy').hidden=true;$('preflightProgress').hidden=true;$('preflightSummary').textContent='Pulsa Analizar o Corregir automáticamente.';controls();show()}
 async function upload(file){
   if(!file||busy||loading)return false;const id=++loadJob;loading=true;controls();let image;
   try{status('Cargando imagen…');image=await decodeImageFile(file);validateImportSize(image.width,image.height);if(id!==loadJob){image.close?.();return false}
@@ -58,6 +60,7 @@ async function run(action='analyze'){
   busy=true;controls();overlay=null;markers=[];$('effectBusy').hidden=false;$('preflightProgress').hidden=false;status(action==='analyze'?'Analizando archivo…':'Corrigiendo archivo…');const id=++job;
   await new Promise(requestAnimationFrame);
   try{
+    if(d.width*d.height>16e6){await runLarge(action,d,o,id);return;}
     const input=action==='analyze'&&result?result:source,stage=document.createElement('canvas');stage.width=d.width;stage.height=d.height;stage.getContext('2d').drawImage(input,0,0,d.width,d.height);const pixels=stage.getContext('2d',{willReadFrequently:true}).getImageData(0,0,d.width,d.height);stage.width=stage.height=1;
     worker=new Worker('preflight-worker.js',{type:'module'});const current=worker;
     current.onmessage=({data})=>{
@@ -76,7 +79,17 @@ async function run(action='analyze'){
     current.postMessage({buffer:pixels.data.buffer,width:d.width,height:d.height,pixelsPerCm:d.width/d.widthCm,tool,action,options:o},[pixels.data.buffer]);
   }catch(error){if(id===job){busy=false;$('effectBusy').hidden=$('preflightProgress').hidden=true;status(error.message,true);controls()}}
 }
-async function artifact(){if(!result)throw Error('Pulsa Corregir automáticamente antes de enviar o descargar el resultado.');requireTransferImage(result,busy||loading);return canvasArtifact(result,filename.replace(/\.[^.]+$/,'')+`_LZ_${tool==='thickness'?'grosor':'alfa'}.png`,resultDimensions.dpi,resultDimensions.widthCm)}
+async function runLarge(action,d,o,id){
+  const input=action==='analyze'&&result?result:source;
+  const data=await largePreflight({source:input,dimensions:d,tool,options:o,action,setWorker:w=>{worker=w},onProgress:value=>{if(id===job){$('preflightProgress').value=Math.round(value*100);status(`${action==='analyze'?'Analizando':'Corrigiendo'} por franjas · ${Math.round(value*100)} %`);}}});
+  if(id!==job)return;
+  if(data.blob){const next=await createImageBitmap(data.blob);if(id!==job){next.close?.();return;}result?.close?.();result=next;resultBlob=data.blob;resultDimensions={...d};originalView=false;selection=data.metrics.count||0;}else{originalView=!result;selection=tool==='thickness'?Math.max(selection,data.metrics.count):0;}
+  preview=smallPreview(action==='correct'?result:input);highlight(new Uint8Array(data.mask),data.previewWidth,data.previewHeight,originalView);
+  $('preflightSummary').textContent=tool==='thickness'?`${data.metrics.count.toLocaleString()} puntos pequeños ${action==='correct'?'seleccionados para corregir':'en riesgo'} · mínimo ${o.minimumMm} mm ≈ ${data.metrics.minimumPx.toFixed(2)} px`:`${data.metrics.semi.toLocaleString()} píxeles con semitransparencia ${action==='correct'?'en el original':''}`;
+  if(action==='correct'){overlay=null;markers=[];}
+  busy=false;$('effectBusy').hidden=$('preflightProgress').hidden=true;status(action==='correct'?'Corrección lista a resolución completa. Pulsa Analizar para revisar el resultado.':'Análisis terminado a resolución completa.');controls();show();
+}
+async function artifact(){if(!result)throw Error('Pulsa Corregir automáticamente antes de enviar o descargar el resultado.');requireTransferImage(result,busy||loading);if(resultBlob)return {blob:resultBlob,...resultDimensions,name:filename.replace(/\.[^.]+$/,'')+`_LZ_${tool==='thickness'?'grosor':'alfa'}.png`};return canvasArtifact(result,filename.replace(/\.[^.]+$/,'')+`_LZ_${tool==='thickness'?'grosor':'alfa'}.png`,resultDimensions.dpi,resultDimensions.widthCm)}
 $('effectFile').onchange=()=>upload($('effectFile').files[0]);$('runPreflight').onclick=()=>run('analyze');$('autoPreflight').onclick=()=>{mode='auto';delta=0;run('correct')};
 if(tool==='thickness')for(const [id,step] of [['dotGrow',1],['dotShrink',-1]])$(id).onclick=()=>{if(busy)return;delta=Math.max(-12,Math.min(12,delta+step));run('correct')};
 $('resetPreflight').onclick=()=>{clearResult();status('Restaurado el original. Ningún cambio aplicado.')};
@@ -88,4 +101,4 @@ $('effectBackground').onchange=()=>{wrap.style.backgroundColor=$('effectBackgrou
 $('downloadEffect').onclick=async()=>{try{const data=await artifact(),url=URL.createObjectURL(data.blob),a=document.createElement('a');a.href=url;a.download=data.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);status('PNG preparado a resolución completa, sin marcas rojas.')}catch(error){status(error.message,true)}};
 function menu(open){$('moduleMenu').hidden=!open;$('menuBackdrop').hidden=!open;$('menuButton').setAttribute('aria-expanded',String(open))}$('menuButton').onclick=()=>menu($('moduleMenu').hidden);$('menuClose').onclick=()=>menu(false);$('menuBackdrop').onclick=()=>menu(false);document.addEventListener('keydown',event=>{if(event.key==='Escape')menu(false)});
 window.addEventListener('pagehide',()=>worker?.terminate());controls();
-registerStudioModule({id:tool==='thickness'?'thickness':'opacity',onFit:()=>{fit=true;layout();},getComparison:()=>[source,result],getDraft:()=>source?{images:{source,result},data:{filename,mode,delta,resultDimensions}}:null,restoreDraft:async d=>{await upload(new File([d.images.source],d.data.filename,{type:'image/png'}));if(d.images.result){result=await createImageBitmap(d.images.result);resultDimensions=d.data.resultDimensions;mode=d.data.mode;delta=d.data.delta;preview=smallPreview(result);originalView=false;}},afterRestore:()=>{controls();show();},onZoom:factor=>{if(!source)return;fit=false;zoom=Math.max(.01,Math.min(8,zoom*factor));show();},exportCurrent:artifact,importCurrent:async(blob,name)=>upload(new File([blob],name,{type:blob.type}))});
+registerStudioModule({id:tool==='thickness'?'thickness':'opacity',onFit:()=>{fit=true;layout();},getComparison:()=>[source,result],getDraft:()=>source?{images:{source,result:resultBlob||result},data:{filename,mode,delta,resultDimensions}}:null,restoreDraft:async d=>{await upload(new File([d.images.source],d.data.filename,{type:'image/png'}));if(d.images.result){resultBlob=d.images.result;result=await createImageBitmap(d.images.result);resultDimensions=d.data.resultDimensions;mode=d.data.mode;delta=d.data.delta;preview=smallPreview(result);originalView=false;}},afterRestore:()=>{controls();show();},onZoom:factor=>{if(!source)return;fit=false;zoom=Math.max(.01,Math.min(8,zoom*factor));show();},getExportInfo:()=>resultDimensions?{...resultDimensions,aspect:source.width/source.height}:null,exportAtSize:async(size,onProgress)=>{requireTransferImage(result,busy||loading);const d=outputDimensions(size.widthCm,size.dpi,source.width/source.height);if(d.width===resultDimensions.width&&d.height===resultDimensions.height&&d.dpi===resultDimensions.dpi)return artifact();busy=true;controls();try{const data=await largePreflight({source,dimensions:d,tool,options:options(),action:'correct',onProgress});return {blob:data.blob,...d,name:filename.replace(/\.[^.]+$/,'')+'_LZ_corregido.png'};}finally{busy=false;controls();}},exportCurrent:artifact,importCurrent:async(blob,name)=>upload(new File([blob],name,{type:blob.type}))});
