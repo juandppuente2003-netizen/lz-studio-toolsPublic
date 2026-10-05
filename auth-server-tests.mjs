@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {readFile,readdir} from 'node:fs/promises';
+import {createHandler} from './worker/account-worker.js';
+const origin='https://lz-test.example';let blocked=false,fail=false;
+const assets={'/index.html':{body:'home<article class="tool-card"><a class="open-tool" href="extract.html">Extract</a></article><a class="module" href="extract.html">Extract</a>',type:'text/html',public:true},'/account.html':{body:'login',type:'text/html',public:true},'/editor.html':{body:'editor',type:'text/html',public:false},'/extract.html':{body:'extract',type:'text/html',public:false},'/processor.js':{body:'engine',type:'text/javascript',public:false}};
+let disabled=false;const fetchUpstream=async(url,opts)=>{if(url.includes('/lz_tools?'))return Response.json([{id:'editor',enabled:true},{id:'recolor',enabled:true},{id:'extract',enabled:!disabled}]);if(fail)throw Error('offline');const token=opts.headers.Authorization;if(token!=='Bearer valid')return new Response('{}',{status:401});if(url.includes('/auth/v1/user'))return Response.json({id:'user-123'});if(url.includes('/rpc/'))return new Response(null,{status:204});return Response.json([{id:'user-123',blocked}]);};
+const handler=createHandler({assets,fetchUpstream});
+const req=(path,options={})=>handler.fetch(new Request(origin+path,options));
+const session=(token,remember=true)=>req('/api/account/session',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({access_token:token,remember})});
+assert.equal((await req('/')).status,200);assert.equal((await req('/account.html')).status,200);
+const denied=await req('/editor.html?tool=recolor');assert.equal(denied.status,303);assert.equal(denied.headers.get('Location'),'/account.html?return=editor.html%3Ftool%3Drecolor');assert.equal(denied.headers.get('Cache-Control'),'private, no-store');
+assert.equal((await req('/processor.js')).status,401);assert.equal((await session('fake')).status,401);
+let response=await session('valid');assert.equal(response.status,200);assert.match(response.headers.get('Set-Cookie'),/__Host-lz_session=valid; Path=\/; HttpOnly; Secure; SameSite=Lax/);
+const temporaryCookie=await session('valid',false);assert.ok(!temporaryCookie.headers.get('Set-Cookie').includes('Max-Age'));
+assert.equal((await req('/api/account/session',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{"access_token":"valid"}'})).status,403);
+assert.equal((await req('/editor.html',{headers:{Cookie:'__Host-lz_session=valid'}})).status,200);
+assert.equal((await req('/extract.html',{headers:{Cookie:'__Host-lz_session=valid'}})).status,200);
+response=await req('/processor.js',{method:'HEAD',headers:{Cookie:'__Host-lz_session=valid'}});assert.equal(response.status,200);assert.equal(await response.text(),'');
+disabled=true;assert.ok(!(await (await req('/')).text()).includes('extract.html'));assert.equal((await req('/extract.html',{headers:{Cookie:'__Host-lz_session=valid'}})).status,403);disabled=false;
+blocked=true;assert.equal((await session('valid')).status,403);assert.equal((await req('/processor.js',{headers:{Cookie:'__Host-lz_session=valid'}})).status,403);assert.equal((await req('/editor.html',{headers:{Cookie:'__Host-lz_session=valid'}})).status,303);
+blocked=false;fail=true;assert.equal((await req('/editor.html',{headers:{Cookie:'__Host-lz_session=valid'}})).status,503);assert.equal((await req('/')).status,200);fail=false;
+response=await session(null);assert.equal(response.status,200);assert.match(response.headers.get('Set-Cookie'),/Max-Age=0/);
+async function files(dir){let result=[];for(const e of await readdir(dir,{withFileTypes:true})){if(e.isDirectory())result.push(...await files(dir+'/'+e.name));else result.push(dir+'/'+e.name);}return result;}
+const publicFiles=await files('dist/client');assert.ok(!publicFiles.some(p=>/\.(html|js|mjs)$/.test(p)),'No protected source files exposed as CDN assets');
+const built=(await import('./dist/server/index.js')).default;assert.equal(typeof built.fetch,'function');assert.equal((await built.fetch(new Request(origin+'/extract.html'))).status,303);assert.equal((await built.fetch(new Request(origin+'/account/account-nav.js'))).status,200);assert.equal((await built.fetch(new Request(origin+'/processor.js'))).status,401);
+assert.ok((await readFile('dist/server/index.js','utf8')).length<10*1024*1024);
+console.log('PASS: server session proof, CSRF, all free signed-in tools, anonymous direct URL/code blocking, suspension, fail closed, logout, cache isolation, protected deployment assets.');

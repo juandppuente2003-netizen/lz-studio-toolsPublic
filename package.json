@@ -1,0 +1,17 @@
+{
+  "name": "lz-print-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:accounts": "node build-accounts.mjs",
+    "test": "node tests.mjs && node interaction-tests.mjs && node site-tests.mjs && node enhance-tests.mjs && node audit-tests.mjs && node handoff-tests.mjs && node preflight-tests.mjs && node account-tests.mjs && node auth-server-tests.mjs && node workspace-tests.mjs && node crop-tests.mjs",
+    "build": "node build-site.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.57.4",
+    "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}
