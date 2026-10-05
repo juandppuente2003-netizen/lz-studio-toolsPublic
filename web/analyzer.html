@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZ_STUDIO_TOOLS · Analizador DTF</title>
+<meta name="description" content="Detecta semitransparencias, detalles finos y mejora la vibrancia antes de imprimir DTF.">
+<link rel="icon" type="image/svg+xml" href="assets/lz-studio-green.svg">
+<link rel="stylesheet" href="tool-pages.css">
+<link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="preview-space.css">
+<script type="module" src="analyzer.js">
+</script>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name">LZ <span class="brand-studio">STUDIO</span> TOOLS</span></a>
+
+
+
+
+<button id="menuButton" class="menu-button" aria-expanded="false" aria-controls="moduleMenu">
+<span aria-hidden="true">☰</span> Módulos</button>
+
+<span class="version">ESTUDIO / AUDITORÍA DTF</span>
+<button id="downloadAnalyzed" class="primary" disabled>Descargar corregido <span aria-hidden="true">↧</span>
+</button>
+</header>
+<div id="menuBackdrop" class="menu-backdrop" hidden>
+</div>
+<nav id="moduleMenu" class="module-menu" aria-label="Módulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar menú">×</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Editor DTF</strong><small>Fondo, semitonos, residuos y medidas</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipografía y efectos</small></a><a class="module" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores sólidos</small></a><a class="module active" href="analyzer.html"><span>08</span><strong>Preparar para impresión</strong><small>Auditoría y corrección</small></a><a class="module" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo de 58 cm</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos rápidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar imágenes</strong><small>Aumento de resolución ×2 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia sólida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos pequeños y corrección automática</small></a><details class="module-specialists"><summary>Correcciones específicas</summary><a class="module" href="editor.html?tool=recolor"><span>02</span><strong>Recolorizador DTF</strong><small>Reemplazar colores del diseño</small></a></details><a class="module" href="extract.html"><span>β</span><strong>Extraer diseño · Beta</strong><small>Selección manual desde una foto</small></a><a class="module" href="crop.html"><span>✂</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
+<main class="lab-studio">
+<aside class="lab-sidebar">
+<div class="tool-intro">
+<span class="eyebrow">CONTROL DE PREPRENSA</span>
+<h1>Prepara tu archivo para imprimir.</h1>
+<p>Al cargarlo se corrigen automáticamente transparencias, color y detalles demasiado finos.</p>
+</div>
+<section class="step-card active">
+<h2>
+<span class="number">01</span> Diseño</h2>
+<label class="upload" for="analyzerFile">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4"/>
+</svg>
+<strong>Cargar diseño</strong>
+<span>PNG recomendado · JPG o WebP</span>
+</label>
+<input id="analyzerFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+<div class="source-info">
+<span id="analyzerName">Sin imagen</span>
+<small id="analyzerSize">
+</small>
+</div>
+</section>
+<section class="step-card">
+<h2>
+<span class="number">02</span> Condiciones de impresión</h2>
+<label>Ancho final (cm)<input id="printWidth" type="number" min="1" max="100" step="0.1" value="28">
+</label>
+<label>Grosor mínimo confiable<select id="minimumThickness">
+<option value="0.4">0.4 mm · detalle fino</option>
+<option value="0.6" selected>0.6 mm · recomendado</option>
+<option value="0.8">0.8 mm · seguro</option>
+</select>
+</label>
+<div class="inline-note">La saturación se calcula automáticamente según la imagen. No necesitas ajustar tolerancias.</div>
+</section>
+<section class="step-card">
+<h2>
+<span class="number">03</span> Auditoría y corrección</h2>
+<div class="button-row">
+<button id="runAnalysis" class="action-button" disabled>Analizar sin modificar</button>
+<details class="step-card"><summary>Elegir correcciones</summary><label class="check"><input id="correctAlpha" type="checkbox"> Corregir semitransparencias</label><label class="check"><input id="correctThickness" type="checkbox"> Reforzar detalles finos</label><label class="check"><input id="correctColor" type="checkbox"> Aumentar vibrancia</label><p class="hint">Activa solamente los cambios que necesitas.</p></details><button id="autoCorrect" class="download-action" disabled>Aplicar correcciones</button>
+</div>
+<p class="hint">La primera corrección se aplica al cargar. Usa estos botones solamente si cambiaste la medida o quieres repetir la revisión.</p>
+</section>
+<details class="step-card"><summary>Correcciones específicas</summary><a class="account-primary" href="opacity.html">Semitransparencias</a><a class="account-primary" href="thickness.html">Puntos pequeños y grosor</a></details></aside>
+<section class="lab-workspace">
+<div class="lab-toolbar">
+<div>
+<span class="eyebrow">RESULTADO DE AUDITORÍA</span>
+<strong id="analysisSummary">Carga un diseño para comenzar</strong>
+</div>
+<div class="lab-toolbar-actions"><div class="tabs">
+<button id="showAnalyzed" class="active">Resultado</button>
+<button id="showAnalyzerOriginal">Original</button>
+</div><div class="zoom-controls"><button id="analyzerZoomOut" aria-label="Alejar">−</button><span id="analyzerZoomLabel">Ajustar</span><button id="analyzerZoomIn" aria-label="Acercar">+</button><button id="analyzerFit">Ajustar</button></div></div>
+</div>
+<div class="metric-grid">
+<div id="alphaMetric" class="metric">
+<span>Semitransparencias</span>
+<strong>—</strong>
+<small>Píxeles con alfa intermedio</small>
+</div>
+<div id="thinMetric" class="metric">
+<span>Grosor mínimo</span>
+<strong>—</strong>
+<small>Áreas potencialmente frágiles</small>
+</div>
+<div id="colorMetric" class="metric">
+<span>Vibrancia</span>
+<strong>—</strong>
+<small>Saturación promedio</small>
+</div>
+</div>
+<div class="lab-canvas-wrap checker">
+<canvas id="analyzerCanvas" hidden>
+</canvas>
+<div id="analyzerEmpty" class="empty-state">Aquí verás el diseño y sus correcciones.</div>
+<div id="analyzerBusy" class="spinner" hidden>Revisando píxeles y grosores…</div>
+</div>
+<div id="auditList" class="audit-list">
+</div>
+<div id="analyzerStatus" class="lab-status" role="status">Ningún archivo cargado.</div>
+</section>
+</main>
+</body>
+</html>

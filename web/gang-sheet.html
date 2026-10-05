@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZ_STUDIO_TOOLS · Arma tu pliego</title>
+<meta name="description" content="Acomoda múltiples diseños en un pliego DTF de 58 cm y exporta con auditoría automática.">
+<link rel="icon" type="image/svg+xml" href="assets/lz-studio-green.svg">
+<link rel="stylesheet" href="tool-pages.css">
+<link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="preview-space.css">
+<script type="module" src="gang-sheet.js">
+</script>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name">LZ <span class="brand-studio">STUDIO</span> TOOLS</span></a>
+
+
+
+
+<button id="menuButton" class="menu-button" aria-expanded="false" aria-controls="moduleMenu">
+<span aria-hidden="true">☰</span> Módulos</button>
+
+<span class="version">ESTUDIO / PLIEGO DTF</span>
+<button id="downloadSheet" class="primary" disabled>Exportar pliego <span aria-hidden="true">↧</span>
+</button>
+</header>
+<div id="menuBackdrop" class="menu-backdrop" hidden>
+</div>
+<nav id="moduleMenu" class="module-menu" aria-label="Módulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar menú">×</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Editor DTF</strong><small>Fondo, semitonos, residuos y medidas</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipografía y efectos</small></a><a class="module" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores sólidos</small></a><a class="module" href="analyzer.html"><span>08</span><strong>Preparar para impresión</strong><small>Auditoría y corrección</small></a><a class="module active" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo de 58 cm</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos rápidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar imágenes</strong><small>Aumento de resolución ×2 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia sólida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos pequeños y corrección automática</small></a><details class="module-specialists"><summary>Correcciones específicas</summary><a class="module" href="editor.html?tool=recolor"><span>02</span><strong>Recolorizador DTF</strong><small>Reemplazar colores del diseño</small></a></details><a class="module" href="extract.html"><span>β</span><strong>Extraer diseño · Beta</strong><small>Selección manual desde una foto</small></a><a class="module" href="crop.html"><span>✂</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
+<main class="lab-studio">
+<aside class="lab-sidebar">
+<div class="tool-intro">
+<span class="eyebrow">ACOMODO DE PRODUCCIÓN</span>
+<h1>Arma tu pliego DTF de 58 cm.</h1>
+<p>Define el largo, agrega tus diseños y ajusta su tamaño desde las esquinas o con medidas exactas.</p>
+</div>
+<section class="step-card active">
+<h2>
+<span class="number">01</span> Medida del pliego</h2>
+<div class="pair">
+<label>Ancho (cm)<input value="58" readonly>
+</label>
+<label>Largo (cm)<input id="sheetLength" type="number" min="50" max="500" step="10" value="100">
+</label>
+</div>
+<label>Resolución de salida<select id="sheetDpi">
+<option value="150">150 ppp · prueba</option>
+<option value="300" selected>300 ppp · producción</option>
+</select>
+</label>
+<p id="sheetPixels" class="hint">
+</p>
+</section>
+<section class="step-card">
+<h2>
+<span class="number">02</span> Diseños</h2>
+<label class="upload" for="sheetFiles">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4"/>
+</svg>
+<strong>Agregar imágenes</strong>
+<span>Selecciona varias · PNG recomendado</span>
+</label>
+<input id="sheetFiles" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+<div id="imageList" class="image-list">
+</div>
+<button id="autoArrange" class="action-button" disabled>Acomodo automático</button>
+</section>
+<section id="itemControls" class="step-card" hidden>
+<h2>
+<span class="number">03</span> Medidas del diseño</h2>
+<div class="pair">
+<label>Ancho (cm)<input id="itemWidth" type="number" min="0.5" max="57" step="0.1" inputmode="decimal">
+</label>
+<label>Alto (cm)<input id="itemHeight" type="number" min="0.5" max="499" step="0.1" inputmode="decimal">
+</label>
+</div>
+<label class="check proportion-lock">
+<input id="lockRatio" type="checkbox" checked> Conservar proporción</label>
+<div class="pair">
+<label>Posición X (cm)<input id="itemX" type="number" min="0" max="58" step="0.1" inputmode="decimal">
+</label>
+<label>Posición Y (cm)<input id="itemY" type="number" min="0" max="500" step="0.1" inputmode="decimal">
+</label>
+</div>
+<label class="range-label" for="itemRotation">Rotación <output id="itemRotationOut">0°</output>
+</label>
+<input id="itemRotation" type="range" min="-180" max="180" value="0">
+<button id="applyItemSize" class="download-action full">Aplicar medidas</button>
+<div class="button-row">
+<button id="duplicateItem">Duplicar</button>
+<button id="deleteItem">Eliminar</button>
+</div>
+</section>
+<section class="step-card">
+<h2>
+<span class="number">04</span> Salida DTF</h2>
+<label class="check">
+<input id="sheetVibrance" type="checkbox" checked> Ajuste automático de vibrancia</label>
+<label class="check">
+<input id="cmykSafe" type="checkbox" checked> Conversión perceptual a gama CMYK</label>
+<div class="inline-note">Al exportar se ejecutan el detector de semitransparencias y el auditor de grosor. El alfa final queda únicamente en 0 o 255.</div>
+</section>
+</aside>
+<section class="lab-workspace">
+<div class="lab-toolbar">
+<div>
+<span class="eyebrow">MESA DE ACOMODO</span>
+<strong id="sheetSummary">58 × 100 cm · sin diseños</strong>
+</div>
+<div class="lab-toolbar-actions">
+<button id="editSelectedMobile" class="mobile-only" disabled>Medidas</button>
+<button id="zoomSheetOut" aria-label="Alejar">−</button>
+<span id="sheetZoomLabel">100 %</span>
+<button id="zoomSheetIn" aria-label="Acercar">+</button>
+<button id="fitSheet">Ajustar</button>
+</div>
+</div>
+<div class="lab-canvas-wrap pliego-wrap">
+<div id="sheetStage" class="sheet-stage">
+<canvas id="sheetCanvas" width="580" height="1000" aria-label="Pliego editable: arrastra un diseño para moverlo y sus esquinas para cambiar el tamaño">
+</canvas>
+<output id="sheetSizeBadge" class="sheet-size-badge" hidden></output>
+</div>
+</div>
+<p class="sheet-instructions">Selecciona un diseño y arrastra sus esquinas para cambiar el tamaño. Activa <b>Mover vista</b> para recorrer el pliego sin mover las imágenes.</p>
+<div class="lab-footer">
+<div>
+<span class="eyebrow">ARCHIVO DE SALIDA</span>
+<strong>PNG DTF · 58 cm · transparencia binaria</strong>
+</div>
+<p>El PNG conserva compatibilidad con los RIP DTF.<br>La gama se prepara con conversión CMYK perceptual.</p>
+</div>
+<div id="sheetAudit" class="audit-list">
+</div>
+<div id="sheetStatus" class="lab-status" role="status">Agrega tus diseños para comenzar.</div>
+</section>
+</main>
+<dialog id="sheetExportDialog">
+<h2>Preparando pliego DTF</h2>
+<p id="sheetExportText">Auditando archivos…</p>
+<progress id="sheetExportProgress" max="100" value="0">
+</progress>
+<small id="sheetExportLabel">0 %</small>
+</dialog>
+</body>
+</html>

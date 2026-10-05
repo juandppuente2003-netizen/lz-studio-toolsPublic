@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LZ_STUDIO_TOOLS · Mockups</title>
+  <meta name="description" content="Crea mockups de playeras, prendas deportivas, sudaderas y gorras con tu propio diseño.">
+  <link rel="icon" type="image/svg+xml" href="assets/lz-studio-green.svg">
+  <link rel="stylesheet" href="mockups.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="preview-space.css"><script type="module" src="mockups.js"></script>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name">LZ <span class="brand-studio">STUDIO</span> TOOLS</span></a><button id="menuButton" class="menu-button" aria-expanded="false" aria-controls="moduleMenu"><span aria-hidden="true">☰</span> Módulos</button><span class="version">ESTUDIO / MOCKUPS</span><button id="downloadMockup" class="primary">Descargar mockup <span aria-hidden="true">↧</span></button></header>
+<div id="menuBackdrop" class="menu-backdrop" hidden></div><nav id="moduleMenu" class="module-menu" aria-label="Módulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar menú">×</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Editor DTF</strong><small>Fondo, semitonos, residuos y medidas</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipografía y efectos</small></a><a class="module active" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores sólidos</small></a><a class="module" href="analyzer.html"><span>08</span><strong>Preparar para impresión</strong><small>Auditoría y corrección</small></a><a class="module" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo de 58 cm</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos rápidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar imágenes</strong><small>Aumento de resolución ×2 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia sólida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos pequeños y corrección automática</small></a><details class="module-specialists"><summary>Correcciones específicas</summary><a class="module" href="editor.html?tool=recolor"><span>02</span><strong>Recolorizador DTF</strong><small>Reemplazar colores del diseño</small></a></details><a class="module" href="extract.html"><span>β</span><strong>Extraer diseño · Beta</strong><small>Selección manual desde una foto</small></a><a class="module" href="crop.html"><span>✂</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
+
+<main class="mockup-studio">
+  <aside class="mockup-tools" aria-label="Controles del mockup">
+    <div class="tool-intro"><span class="eyebrow">PRESENTAR DISEÑO</span><h1>Prueba tu diseño en un producto.</h1><p>Elige una prenda o gorra, carga tu arte y acomódalo directamente sobre el producto.</p></div>
+    <section class="panel product-choice"><h2><span class="number">01</span> Elige el producto</h2><div class="category-tabs" role="tablist" aria-label="Familia de producto"><button class="active" data-category="apparel" role="tab" aria-selected="true">Playeras y sudaderas</button><button data-category="caps" role="tab" aria-selected="false">Gorras</button></div><div id="productGrid" class="product-grid" aria-label="Modelos disponibles"></div></section>
+
+    <section class="panel"><h2><span class="number">02</span> Carga tu diseño</h2>
+      <label class="upload compact-upload" for="designFile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4"/></svg><strong>Cargar diseño</strong><span>PNG, JPG o WebP · hasta 200 MB</span></label><input id="designFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+      <div class="design-info"><span id="designName">Sin diseño</span><button id="clearDesign" class="text-button">Quitar</button></div>
+    </section>
+
+    <section class="panel"><h2><span class="number">03</span> Color del producto</h2>
+      <div class="color-row"><label for="productColor">Color de la prenda</label><input id="productColor" type="color" value="#17191b"></div>
+      <div class="swatches" aria-label="Colores rápidos"><button data-color="#17191b" aria-label="Negro"></button><button data-color="#ffffff" aria-label="Blanco"></button><button data-color="#74787c" aria-label="Gris"></button><button data-color="#152a45" aria-label="Azul marino"></button><button data-color="#12613d" aria-label="Verde"></button><button data-color="#9f1f28" aria-label="Rojo"></button><button data-color="#dc789b" aria-label="Rosa"></button></div>
+    </section>
+
+    <section class="panel"><h2><span class="number">04</span> Tamaño y posición</h2>
+      <label class="range-label" for="designScale">Tamaño <output id="designScaleOut">70 %</output></label><input id="designScale" type="range" min="5" max="600" value="70">
+      <label class="range-label" for="designX">Horizontal <output id="designXOut">0</output></label><input id="designX" type="range" min="-300" max="300" value="0">
+      <label class="range-label" for="designY">Vertical <output id="designYOut">0</output></label><input id="designY" type="range" min="-300" max="300" value="0">
+      <label class="range-label" for="designRotation">Rotación <output id="designRotationOut">0°</output></label><input id="designRotation" type="range" min="-30" max="30" value="0">
+      <button id="resetDesign" class="secondary full">Centrar diseño</button>
+      <p class="hint">Arrastra el diseño sobre el producto. Activa Mover vista para recorrer el mockup al acercarte.</p>
+    </section>
+  </aside>
+
+  <section class="mockup-workspace" aria-label="Vista del mockup">
+    <div class="mockup-toolbar"><div><span class="eyebrow">VISTA PREVIA</span><strong id="productName">Playera regular · frente</strong></div><div class="toolbar-controls"><label>Fondo<select id="mockupBackground"><option value="#e3e6e8">Estudio gris</option><option value="#ffffff">Blanco</option><option value="#17191b">Negro</option><option value="transparent">Transparente</option></select></label><div class="zoom-controls"><button id="mockupZoomOut" aria-label="Alejar">−</button><span id="mockupZoomLabel">Ajustar</span><button id="mockupZoomIn" aria-label="Acercar">+</button><button id="mockupFit">Ajustar</button></div></div></div>
+    <div class="mockup-canvas-wrap checker"><canvas id="mockupCanvas" width="1400" height="1400" tabindex="0" aria-describedby="mockupEditHelp" aria-label="Mockup editable: arrastra el diseño para moverlo y sus esquinas para escalarlo"></canvas><div id="canvasLoading" class="processing">Preparando productos…</div></div>
+    <p id="mockupEditHelp" class="mockup-edit-help">Arrastra el diseño para moverlo. Arrastra los cuatro puntos de sus esquinas para hacerlo grande o chico. Para recorrer el lienzo, activa Mover vista.</p><div class="mockup-footer"><div><span class="eyebrow">ARCHIVO DE SALIDA</span><strong>PNG · 1400 × 1400 px</strong></div><p>Tu diseño se procesa únicamente en este dispositivo.</p></div>
+    <div id="mockupStatus" class="status" role="status" aria-live="polite">Carga un diseño o créalo en el módulo de textos para comenzar.</div>
+  </section>
+</main>
+</body>
+</html>

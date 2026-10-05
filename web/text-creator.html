@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LZ_STUDIO_TOOLS · Creador de textos</title>
+  <meta name="description" content="Crea textos urbanos, universitarios, góticos y metálicos listos para impresión y mockups.">
+  <link rel="icon" type="image/svg+xml" href="assets/lz-studio-green.svg">
+  <link rel="stylesheet" href="text-creator.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="preview-space.css"><script type="module" src="text-creator.js"></script>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name">LZ <span class="brand-studio">STUDIO</span> TOOLS</span></a><button id="menuButton" class="menu-button" aria-expanded="false" aria-controls="moduleMenu"><span aria-hidden="true">☰</span> Módulos</button><span class="version">ESTUDIO / TEXTOS</span><button id="downloadText" class="primary">Descargar PNG <span aria-hidden="true">↧</span></button></header>
+<div id="menuBackdrop" class="menu-backdrop" hidden></div><nav id="moduleMenu" class="module-menu" aria-label="Módulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar menú">×</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Editor DTF</strong><small>Fondo, semitonos, residuos y medidas</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module active" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipografía y efectos</small></a><a class="module" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores sólidos</small></a><a class="module" href="analyzer.html"><span>08</span><strong>Preparar para impresión</strong><small>Auditoría y corrección</small></a><a class="module" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo de 58 cm</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos rápidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar imágenes</strong><small>Aumento de resolución ×2 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia sólida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos pequeños y corrección automática</small></a><details class="module-specialists"><summary>Correcciones específicas</summary><a class="module" href="editor.html?tool=recolor"><span>02</span><strong>Recolorizador DTF</strong><small>Reemplazar colores del diseño</small></a></details><a class="module" href="extract.html"><span>β</span><strong>Extraer diseño · Beta</strong><small>Selección manual desde una foto</small></a><a class="module" href="crop.html"><span>✂</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
+
+<main class="text-studio">
+  <aside class="text-tools" aria-label="Controles de texto">
+    <div class="tool-intro"><span class="eyebrow">TEXTO PARA IMPRESIÓN</span><h1>Crea tu diseño de texto.</h1><p>Escribe, aplica un estilo y descarga el resultado en PNG o SVG editable.</p></div>
+
+    <section class="panel active-step"><h2><span class="number">01</span> Texto</h2>
+      <label>Escribe tu diseño<textarea id="textValue" rows="3" maxlength="80">LZ STREET</textarea></label>
+      <label class="check"><input id="uppercase" type="checkbox" checked> Convertir a mayúsculas</label>
+      <div class="preset-grid" aria-label="Estilos tipográficos">
+        <button class="preset active" data-preset="urban"><strong>URBAN</strong><small>Bloque pesado</small></button>
+        <button class="preset" data-preset="college"><strong>COLLEGE</strong><small>Universitario</small></button>
+        <button class="preset" data-preset="graffiti"><strong>TAG</strong><small>Graffiti</small></button>
+        <button class="preset" data-preset="gothic"><strong>GÓTICO</strong><small>Editorial</small></button>
+        <button class="preset" data-preset="script"><strong>Script</strong><small>Firma / brush</small></button>
+        <button class="preset" data-preset="stencil"><strong>STENCIL</strong><small>Industrial</small></button>
+        <button class="preset" data-preset="retro"><strong>RETRO</strong><small>Redondeado</small></button>
+        <button class="preset" data-preset="condensed"><strong>TALL</strong><small>Condensado</small></button>
+      </div>
+    </section>
+
+    <section class="panel"><h2><span class="number">02</span> Tipografía</h2>
+      <label>Familia<select id="fontFamily"><option value="'Bebas Neue', Impact, sans-serif">Bebas Neue / Street</option><option value="'Black Ops One', Impact, sans-serif">Black Ops / Militar</option><option value="'Graduate', Georgia, serif">Graduate / College</option><option value="'Permanent Marker', cursive">Permanent Marker / Graffiti</option><option value="'UnifrakturCook', Georgia, serif">Blackletter / Gótico</option><option value="'Bungee', Impact, sans-serif">Bungee / Retro</option><option value="'Oswald', 'Arial Narrow', sans-serif">Oswald / Condensada</option><option value="Impact, Haettenschweiler, sans-serif">Impact</option></select></label>
+      <label class="font-upload" for="customFont"><strong>Cargar tu propia fuente</strong><span>TTF, OTF, WOFF o WOFF2</span></label><input id="customFont" type="file" accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2" hidden><small id="fontStatus" class="hint">Las fuentes integradas se ven iguales en todos los dispositivos.</small>
+      <label class="range-label" for="fontSize">Tamaño <output id="fontSizeOut">340 px</output></label><input id="fontSize" type="range" min="90" max="680" value="340">
+      <label class="range-label" for="letterSpacing">Espaciado <output id="letterSpacingOut">4 px</output></label><input id="letterSpacing" type="range" min="-20" max="80" value="4">
+      <label class="range-label" for="lineHeight">Interlineado <output id="lineHeightOut">100 %</output></label><input id="lineHeight" type="range" min="70" max="180" value="100">
+      <label class="range-label" for="skew">Inclinación <output id="skewOut">0°</output></label><input id="skew" type="range" min="-25" max="25" value="0">
+    </section>
+
+    <section class="panel"><h2><span class="number">03</span> Relleno y efecto</h2>
+      <div class="effect-grid" aria-label="Efectos de relleno">
+        <button class="effect active" data-effect="solid">Sólido</button><button class="effect" data-effect="gradient">Degradado</button><button class="effect" data-effect="gold">Oro</button><button class="effect" data-effect="chrome">Cromo</button><button class="effect" data-effect="emerald">Esmeralda</button><button class="effect" data-effect="neon">Neón</button><button class="effect" data-effect="fire">Fuego</button><button class="effect" data-effect="ice">Hielo</button>
+      </div>
+      <div class="pair colors"><label>Color 1<input id="color1" type="color" value="#f7f7f7"></label><label>Color 2<input id="color2" type="color" value="#b8ff3d"></label></div>
+      <label>Dirección del degradado<select id="gradientDirection"><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option><option value="diagonal">Diagonal</option></select></label>
+    </section>
+
+    <section class="panel"><h2><span class="number">04</span> Bordes y volumen</h2>
+      <div class="pair compact"><label>Contorno<input id="outlineColor" type="color" value="#0b0b0b"></label><label>Grosor<input id="outlineWidth" type="number" min="0" max="80" value="22"></label></div>
+      <div class="pair compact"><label>Segundo borde<input id="outline2Color" type="color" value="#b8ff3d"></label><label>Grosor<input id="outline2Width" type="number" min="0" max="80" value="8"></label></div>
+      <div class="pair compact"><label>Volumen 3D<input id="depthColor" type="color" value="#343a40"></label><label>Profundidad<input id="depth" type="number" min="0" max="80" value="18"></label></div>
+      <label class="range-label" for="shadowBlur">Sombra / brillo <output id="shadowBlurOut">0 px</output></label><input id="shadowBlur" type="range" min="0" max="80" value="0">
+      <div class="pair compact"><label>Color de sombra<input id="shadowColor" type="color" value="#b8ff3d"></label><label>Desplazamiento<input id="shadowOffset" type="number" min="0" max="80" value="12"></label></div>
+    </section>
+
+    <section class="panel"><h2><span class="number">05</span> Forma y salida</h2>
+      <label class="range-label" for="curve">Arco <output id="curveOut">Recto</output></label><input id="curve" type="range" min="-260" max="260" value="0">
+      <label>Lienzo de trabajo<select id="canvasSize"><option value="3000x1500">Horizontal · 3000 × 1500</option><option value="3000x3000">Cuadrado · 3000 × 3000</option><option value="4500x1800">Panorámico · 4500 × 1800</option></select></label>
+      <label class="check"><input id="trimOutput" type="checkbox" checked> Recortar PNG al contenido</label>
+      <div class="button-stack"><button id="downloadTextSvg" class="download-action full">Descargar SVG editable</button><button id="resetText" class="secondary full">Restaurar estilo</button></div>
+    </section>
+  </aside>
+
+  <section class="text-workspace" aria-label="Vista previa del texto">
+    <div class="text-toolbar"><div><span class="eyebrow">VISTA PREVIA</span><strong id="styleName">Urban · sólido</strong></div><div class="toolbar-controls"><label>Ver sobre<select id="previewBackground"><option value="transparent">Transparencia</option><option value="#0b0b0b">Negro</option><option value="#ffffff">Blanco</option><option value="#7b7f84">Gris</option></select></label><div class="zoom-controls"><button id="textZoomOut" aria-label="Alejar">−</button><span id="textZoomLabel">Ajustar</span><button id="textZoomIn" aria-label="Acercar">+</button><button id="textFit">Ajustar</button></div></div></div>
+    <div class="text-canvas-wrap"><div id="textStage" class="text-stage checker"><canvas id="textCanvas" width="3000" height="1500" aria-label="Vista previa del texto creado"></canvas></div></div>
+    <div class="text-footer"><div><span class="eyebrow">ARCHIVO DE SALIDA</span><strong id="textOutputSummary">PNG transparente · alta resolución</strong></div><p>Rueda del mouse para acercar o alejar.<br>Todo se genera en este dispositivo.</p></div>
+    <div id="textStatus" class="status" role="status" aria-live="polite">Escribe, combina un estilo y descárgalo listo para usar.</div>
+  </section>
+</main>
+</body>
+</html>

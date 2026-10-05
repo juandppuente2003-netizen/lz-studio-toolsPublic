@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LZ_STUDIO_TOOLS · Vectorizar</title>
+<meta name="description" content="Convierte logotipos e imágenes de colores sólidos a SVG desde el navegador.">
+<link rel="icon" type="image/svg+xml" href="assets/lz-studio-green.svg">
+<link rel="stylesheet" href="tool-pages.css">
+<link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="preview-space.css">
+<script type="module" src="vectorize.js">
+</script>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name">LZ <span class="brand-studio">STUDIO</span> TOOLS</span></a>
+
+
+
+
+<button id="menuButton" class="menu-button" aria-expanded="false" aria-controls="moduleMenu">
+<span aria-hidden="true">☰</span> Módulos</button>
+
+<span class="version">ESTUDIO / VECTOR</span>
+<button id="downloadVector" class="primary" disabled>Descargar SVG <span aria-hidden="true">↧</span>
+</button>
+</header>
+<div id="menuBackdrop" class="menu-backdrop" hidden>
+</div>
+<nav id="moduleMenu" class="module-menu" aria-label="Módulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar menú">×</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Editor DTF</strong><small>Fondo, semitonos, residuos y medidas</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipografía y efectos</small></a><a class="module" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module active" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores sólidos</small></a><a class="module" href="analyzer.html"><span>08</span><strong>Preparar para impresión</strong><small>Auditoría y corrección</small></a><a class="module" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo de 58 cm</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos rápidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar imágenes</strong><small>Aumento de resolución ×2 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia sólida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos pequeños y corrección automática</small></a><details class="module-specialists"><summary>Correcciones específicas</summary><a class="module" href="editor.html?tool=recolor"><span>02</span><strong>Recolorizador DTF</strong><small>Reemplazar colores del diseño</small></a></details><a class="module" href="extract.html"><span>β</span><strong>Extraer diseño · Beta</strong><small>Selección manual desde una foto</small></a><a class="module" href="crop.html"><span>✂</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
+<main class="lab-studio">
+<aside class="lab-sidebar">
+<div class="tool-intro">
+<span class="eyebrow">CONVERTIR A VECTOR</span>
+<h1>Convierte tu imagen en SVG.</h1>
+<p>Funciona mejor con logotipos, tipografía y diseños de colores sólidos.</p>
+</div>
+<section class="step-card active">
+<h2>
+<span class="number">01</span> Imagen original</h2>
+<label class="upload" for="vectorFile">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4"/>
+</svg>
+<strong>Cargar imagen</strong>
+<span>PNG, JPG o WebP</span>
+</label>
+<input id="vectorFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+<div class="source-info">
+<span id="vectorName">Sin imagen</span>
+<small id="vectorSize">
+</small>
+</div>
+</section>
+<section class="step-card">
+<h2>
+<span class="number">02</span> Simplificación</h2>
+<label class="range-label" for="vectorColors">Cantidad de colores <output id="vectorColorsOut">6</output>
+</label>
+<input id="vectorColors" type="range" min="2" max="12" value="6">
+<label>Detalle<select id="vectorDetail">
+<option value="450">Rápido</option>
+<option value="700" selected>Equilibrado</option>
+<option value="1000">Alto</option>
+</select>
+</label>
+<label>Tipo de trazado<select id="vectorTrace"><option value="smooth" selected>Contornos suaves · recomendado</option><option value="pixel">Compatibilidad · bloques</option></select></label>
+<label class="check">
+<input id="vectorTransparent" type="checkbox" checked> Conservar transparencia</label>
+<p class="hint">El trazado suave redondea el escalonado y crea menos nodos. Compatibilidad conserva el método anterior.</p>
+</section>
+<section class="step-card">
+<h2>
+<span class="number">03</span> Generar</h2>
+<button id="runVector" class="action-button" disabled>Vectorizar imagen</button>
+<progress id="vectorProgress" max="100" value="0" hidden>
+</progress>
+<p class="hint">El resultado es SVG real y puede abrirse en Illustrator o CorelDRAW.</p>
+</section>
+</aside>
+<section class="lab-workspace">
+<div class="lab-toolbar">
+<div>
+<span class="eyebrow">VISTA VECTORIAL</span>
+<strong id="vectorSummary">Carga una imagen para comenzar</strong>
+</div>
+<div class="lab-toolbar-actions"><div class="tabs">
+<button id="showVector" class="active">Vector</button>
+<button id="showRaster">Original</button>
+</div><div class="zoom-controls"><button id="vectorZoomOut" aria-label="Alejar">−</button><span id="vectorZoomLabel">Ajustar</span><button id="vectorZoomIn" aria-label="Acercar">+</button><button id="vectorFit">Ajustar</button></div></div>
+</div>
+<div class="lab-canvas-wrap checker">
+<img id="vectorPreview" alt="Vista previa del vector" hidden>
+<canvas id="rasterPreview" hidden>
+</canvas>
+<div id="vectorEmpty" class="empty-state">Tu SVG aparecerá aquí.</div>
+<div id="vectorBusy" class="spinner" hidden>Calculando paleta y trazos…</div>
+</div>
+<div class="lab-footer">
+<div>
+<span class="eyebrow">ARCHIVO DE SALIDA</span>
+<strong>SVG editable · fondo transparente</strong>
+</div>
+<p>La vectorización funciona mejor con artes limpios.<br>Las fotografías se simplifican por bloques de color.</p>
+</div>
+<div id="vectorStatus" class="lab-status" role="status">Carga un archivo para analizar sus colores.</div>
+</section>
+</main>
+</body>
+</html>
