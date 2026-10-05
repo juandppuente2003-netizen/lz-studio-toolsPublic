@@ -1,0 +1,25 @@
+/* Shared workspace uses the available viewport and retains the full image. */
+:root{--lz-header-height:84px}
+body:not(.home) :is(.workspace,.lab-workspace,.mockup-workspace,.text-workspace){height:calc(100dvh - var(--lz-header-height));max-height:none;min-height:0;padding:12px;gap:0}
+body:not(.home) :is(.preview-wrap,.lab-canvas-wrap,.mockup-canvas-wrap,.text-canvas-wrap){padding:8px;min-height:0;max-height:none;height:auto;flex:1;min-width:0}
+body:not(.home) :is(.canvas-toolbar,.lab-toolbar,.mockup-toolbar,.text-toolbar){position:static;margin-bottom:10px;flex-shrink:0;flex-wrap:wrap;gap:8px}
+body:not(.home) :is(.view-controls,.workspace-footer,.mockup-footer,.lab-footer,.text-footer){padding-top:8px;padding-bottom:8px;flex-shrink:0}
+body:not(.home) :is(.workspace-footer p,.mockup-footer p,.lab-footer p,.text-footer p){margin:0;font-size:11px}
+.lz-preview-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.lz-preview-actions button{font-size:12px;padding:7px 10px;min-height:34px}
+.lz-preview-actions .lz-continue{border-color:#b8ff3d;color:#b8ff3d;background:#b8ff3d0c}
+.lz-focus :is(.studio,.lab-studio,.mockup-studio,.text-studio){grid-template-columns:minmax(0,1fr)}
+.lz-focus :is(.tools,.lab-sidebar,.mockup-tools,.text-tools,.workspace-footer,.mockup-footer,.lab-footer,.text-footer,.view-controls .preview-bg){display:none!important}
+.lz-focus .lz-focus-button{background:#b8ff3d;color:#111}
+.lz-transfer-dialog{width:460px;max-width:calc(100vw - 24px);background:#14181b;color:#f1f3ef;border-color:#343c40;padding:26px}
+.lz-transfer-dialog h2{padding-right:22px;margin:10px 0;font-size:23px}
+.lz-transfer-dialog p{color:#bbc2c5;line-height:1.6}.lz-transfer-dialog label{color:#e6e9e4}
+.lz-transfer-dialog select{width:100%;margin-top:8px;background:#23292d;color:#fff}
+.lz-transfer-close{position:absolute;top:12px;right:12px}.lz-transfer-status{min-height:44px;font-size:13px;overflow-wrap:anywhere}
+.lz-transfer-actions{display:flex;justify-content:flex-end;margin-top:14px}
+.lz-transfer-notice{font-size:12px;padding:8px 10px;margin-bottom:8px;border:1px solid #b8ff3d55;border-radius:6px;color:#d7e4c6;overflow-wrap:anywhere}
+.lz-transfer-notice button{margin-left:8px;font-size:12px;padding:4px 8px}
+@media(max-width:900px){:root{--lz-header-height:72px}}
+@media(max-width:700px){:root{--lz-header-height:64px}body:not(.home) :is(.workspace,.lab-workspace,.mockup-workspace,.text-workspace){height:calc(100dvh - 116px);min-height:380px;padding:8px}body.lz-focus .lz-mobile-switch{display:none}body.lz-focus :is(.workspace,.lab-workspace,.mockup-workspace,.text-workspace){height:calc(100dvh - 64px)}.lz-focus :is(.studio,.lab-studio,.mockup-studio,.text-studio){min-height:0}.lz-preview-actions{width:100%;justify-content:flex-end}.lz-preview-actions button{min-height:36px}}
+
+.lz-workspace-options{margin-top:16px}.lz-workspace-options summary{cursor:pointer;font-size:16px;font-weight:600;padding:6px 0}.lz-workspace-options input,.lz-workspace-options select{width:100%;margin:10px 0;min-height:42px;font-size:16px}.lz-options-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.lz-size-presets{margin-top:8px;width:100%;font-size:14px!important}.lz-recovery{padding:16px;border:1px solid #b8ff3d;border-radius:8px;margin:12px 0;background:#172011}.lz-recovery p{font-size:14px}.lz-recovery button{margin-right:8px}.lz-compare-dialog{width:min(960px,calc(100vw - 24px));max-height:94dvh;background:#111712;color:#edf2ed;border:1px solid #435343;border-radius:12px;padding:18px;box-sizing:border-box}.lz-compare-dialog::backdrop{background:#000b}.lz-compare-wrap{height:min(60dvh,650px);overflow:auto;display:flex;align-items:safe center;justify-content:safe center;touch-action:none;overscroll-behavior:contain}.lz-compare-wrap canvas{flex:none;max-width:none;max-height:none}.lz-compare-dialog input[type=range]{width:100%;min-height:44px;accent-color:#b8ff3d}.lz-compare-dialog p{font-size:14px;color:#b4bfb7}.lz-compare-dialog button,.lz-recovery button{min-height:44px;font-size:14px}.editor-advanced summary{cursor:pointer;padding:12px 0}.ai-card summary{cursor:pointer;font-size:16px}.zoom-controls{flex-wrap:wrap}.viewport{overscroll-behavior:contain}
