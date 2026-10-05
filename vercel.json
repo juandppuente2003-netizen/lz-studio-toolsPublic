@@ -5,10 +5,6 @@
   "outputDirectory": "dist/client",
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/api/site?__lz_path=index.html"
-    },
-    {
       "source": "/:path*",
       "destination": "/api/site?__lz_path=:path*"
     }

@@ -75,7 +75,7 @@ get('sheetLength').value=100;get('sheetDpi').value=300;get('lockRatio').checked=
 const sheetWrap=new Element();sheetWrap.clientWidth=600; // Image plus 20 px inset: fit at exactly 100%.
 const sheetDoc=new Element();sheetDoc.activeElement=new Element('BODY');sheetDoc.getElementById=get;sheetDoc.querySelector=()=>sheetWrap;sheetDoc.querySelectorAll=()=>[];
 let registration;
-const sandbox={document:sheetDoc,innerWidth:1000,CORNERS,cornerPosition,resizeFromCorner,registerStudioModule:config=>{registration=config},assemblePng:()=>{},createImageBitmap:async()=>({width:300,height:200}),URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},requestAnimationFrame:fn=>fn(),ResizeObserver:class{observe(){}},File:class{constructor(parts,name,props){this.name=name;this.type=props.type}},setTimeout,CompressionStream};
+const sandbox={document:sheetDoc,innerWidth:1000,CORNERS,cornerPosition,resizeFromCorner,registerStudioModule:config=>{registration=config},assemblePng:()=>{},decodeImageFile:async()=>({width:300,height:200}),validateImportSize:()=>{},createImageBitmap:async()=>({width:300,height:200}),URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},requestAnimationFrame:fn=>fn(),ResizeObserver:class{observe(){}},File:class{constructor(parts,name,props){this.name=name;this.type=props.type}},setTimeout,CompressionStream};
 let code=readFileSync('./web/gang-sheet.js','utf8').replace(/^import .*;\n/gm,'');
 code+='\nglobalThis.readSheet=()=>({items,selected,drag,zoom});';vm.runInNewContext(code,sandbox);
 await registration.importCurrent({type:'image/png'},'test.png');

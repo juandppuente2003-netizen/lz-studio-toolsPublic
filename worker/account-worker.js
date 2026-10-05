@@ -5,7 +5,7 @@ const json=(data,status=200,extra={})=>new Response(JSON.stringify(data),{status
 function cookie(token,maxAge){return `${COOKIE}=${token||''}; Path=/; HttpOnly; Secure; SameSite=Lax; ${maxAge===null?'':'Max-Age='+maxAge}`;}
 function tokenFrom(request){return request.headers.get('Cookie')?.split(';').map(p=>p.trim()).find(p=>p.startsWith(COOKIE+'='))?.slice(COOKIE.length+1)||null;}
 const toolRoutes={crop:'/crop.html',editor:'/editor.html',recolor:'/editor.html?tool=recolor',opacity:'/opacity.html',thickness:'/thickness.html',texture:'/textures.html',text:'/text-creator.html',mockups:'/mockups.html',vectorize:'/vectorize.html',analyzer:'/analyzer.html',sheet:'/gang-sheet.html',color:'/color-enhance.html',upscale:'/upscale.html',extract:'/extract.html'};
-function routeTool(url){if(url.pathname==='/editor.html')return url.searchParams.get('tool')==='recolor'?'recolor':'editor';return Object.keys(toolRoutes).find(id=>toolRoutes[id]===url.pathname);}
+function routeTool(url){if(url.pathname==='/premium.html')return 'editor';if(url.pathname==='/editor.html')return url.searchParams.get('tool')==='recolor'?'recolor':'editor';return Object.keys(toolRoutes).find(id=>toolRoutes[id]===url.pathname);}
 function pruneTools(html,tools){
  const enabled=new Set(tools.filter(t=>t.enabled).map(t=>t.id));
  const visible=href=>{const id=routeTool(new URL(href,'https://local.test'));return !id||enabled.has(id);};

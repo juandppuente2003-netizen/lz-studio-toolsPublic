@@ -29,8 +29,9 @@ const packet=await readTransfer(token,'color',1001);assert.deepEqual(Buffer.from
 await assert.rejects(readTransfer(token,'halftone',1001),/otra herramienta/);await assert.rejects(readTransfer(token,'color',1000+TRANSFER_TTL),/caducó/);
 const second=await saveTransfer({...artifact,name:'segundo.png'},halftone,1002);await removeTransfer(token);assert.equal((await readTransfer(second,'halftone',1003)).name,'segundo.png','independent handoffs do not overwrite each other');
 failWrite=true;await assert.rejects(saveTransfer(artifact,color,1004),/guardar/);failWrite=false;
-assert.throws(()=>validateArtifact({...artifact,width:9000},color),/8192/);
-assert.throws(()=>validateArtifact({...artifact,width:6000,height:5000},DESTINATIONS.find(d=>d[0]==='analyzer')),/24 MP/);
+assert.throws(()=>validateArtifact({...artifact,width:25000},color),/24,000/);
+assert.throws(()=>validateArtifact({...artifact,width:15000,height:10000},DESTINATIONS.find(d=>d[0]==='analyzer')),/140 MP/);
+assert.equal(validateArtifact({...artifact,width:12000,height:10000},DESTINATIONS.find(d=>d[0]==='thickness')).width,12000,'large auditor handoff accepted');
 assert.throws(()=>requireTransferImage(image,true),/termine/);assert.throws(()=>requireTransferImage(null),/Carga/);
 assert.ok(new URL(halftone[2],'https://lz.example/tools/').searchParams.get('tool')==='halftone');
 

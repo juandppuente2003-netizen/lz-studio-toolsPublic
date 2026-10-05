@@ -1,0 +1,69 @@
+ACTUALIZAR LZ STUDIO TOOLS — v45
+
+Este ZIP es una actualización acumulativa para el repositorio creado con LZ_STUDIO_TOOLS_v38_PARA_VERCEL.zip; también se puede aplicar sobre v39, v40, v41, v42, v43 o v44. Usa este ZIP actualizado. No es un sitio completo: conserva los archivos anteriores que no vienen aquí.
+
+CÓMO SUBIRLO A GITHUB
+1. Descomprime el ZIP en tu computadora.
+2. Abre tu repositorio actual en GitHub, en la rama conectada a Vercel (normalmente main).
+3. En la raíz del repositorio, usa Add file > Upload files.
+4. Arrastra el contenido descomprimido, incluyendo las carpetas web, src, api, dist y server, y los archivos sueltos de este paquete. Conserva la estructura de carpetas; no metas todo dentro de una carpeta nueva. GitHub debe reemplazar los archivos con el mismo nombre y agregar los nuevos.
+5. Confirma TODOS los archivos en un solo commit con el mensaje Actualizar LZ Studio Tools v45. No subas el ZIP sin descomprimirlo.
+6. Vercel debería desplegar automáticamente ese commit. Si no lo hace, abre el despliegue correspondiente al nuevo commit y pulsa Redeploy.
+7. Cuando aparezca Ready, abre el dominio o Visit. Recarga la página y prueba una imagen.
+
+CONFIGURACIÓN VERCEL (si aparece distinta)
+Framework Preset: Other
+Build Command: npm run build:vercel
+Output Directory: dist/client
+Root Directory: la raíz del repositorio (vacía / ./)
+El vercel.json incluido conserva las rutas hacia api/site y el inicio de sesión actual.
+
+QUÉ CONTIENE
+web/: páginas, motores, diálogo de medidas, controles y módulos de cuentas modificados.
+src/: ajustes de trabajo y rutas de cuenta modificadas.
+api/site.js: la aplicación compilada que entrega las herramientas a Vercel.
+dist/: salida compilada que cambió; los demás recursos se conservan de v38.
+server/, build-vercel.mjs y vercel.json: la integración Vercel existente, con su misma configuración.
+package.json: conserva las dependencias y añade las nuevas comprobaciones.
+V38_BASE.txt identifica la base adjunta restaurada.
+Los tests y README que cambiaron permiten reconstruir y comprobar la misma actualización.
+
+No borres el repositorio ni las carpetas anteriores. No hace falta cambiar el dominio, las credenciales o las tablas de Supabase. No se incluye node_modules, .git, el modelo de IA ni las imágenes sin cambios: ya están en tu repositorio. Los bloques de cuenta antiguos que quedaron son inofensivos; la compilación limpia web/account antes de regenerar los archivos actuales.
+
+CAMBIOS
+- Ajuste v45: Premium usa el mismo CNN compacto y la misma caché que Semitonos; omite márgenes transparentes con el mismo recorte de contenido y prepara el modelo mientras se aplica Vívido. Conserva el tamaño de salida ×2 y la transparencia.
+- Color de prenda siempre visible en Archivo y medida, con negro, blanco, gris, rosa, verde y personalizado. Cambia la vista previa; no se imprime ni modifica la selección de color a eliminar.
+- Se conserva el resto del flujo Premium y las herramientas manuales. No cambia ninguna tabla ni credencial.
+- NUEVO Semitonos Premium: al cargar, Vívido y la misma IA ×2 se ejecutan automáticamente. Después eliges color de prenda o color en la imagen y zona completa o rectangular.
+- Un solo botón ejecuta semitono a 25 LPI/rango degradado 30, Auditor reducir 1 px, Semitransparencias analizar/corregir, Auditor automático a 0.5 mm y comprobación final a la medida real.
+- Los puntos residuales que no puedan reforzarse se eliminan y se informan. Un resultado vacío o con puntos pendientes nunca se declara verificado. El auditor considera puntos compactos aislados; la comprobación no certifica trazos finos ni la configuración de tu impresora.
+- Si descargas a otra medida, repite las correcciones desde la imagen mejorada y vuelve a verificar el archivo para esa medida. No reescala un PNG previamente verificado. Conserva tus medidas de trabajo.
+- Progreso por pasos, comparación, cancelar/reintentar y recuperación del original y la imagen mejorada. Premium aparece en Inicio y todos los menús. Hereda el acceso de Semitonos: no requiere modificar tablas de Supabase.
+- Se conservaron los motores normales de Vívido, semitono e IA y los controles manuales.
+- Pulido visual compartido: paneles grafito, cabecera compacta con nombre de herramienta, controles legibles y consistentes, tarjetas de inicio con elevación suave y diálogos con transición.
+- Guía plegada para liberar espacio, códigos de color visibles y aviso del cuentagotas con Cancelar. Los motores y operaciones de imagen se conservan.
+- Exportación presentada con una ficha de medidas y tamaños rápidos. Movimiento reducido respetado.
+- Corregido el cuentagotas en Semitonos, Quitar fondo color y Reemplazar color: al elegir un píxel visible, se guarda el color y se aplica la operación de ese apartado. Mouse, touch y click de respaldo. La imagen nueva empieza intacta.
+- En Extraer diseño, Elegir en la foto funciona desde la carga, antes y después de extraer; Mover vista respeta el cuentagotas. Elegir un color activa quitar desde los bordes si estaba en Conservar fondo.
+- Base restaurada desde el ZIP v38 verificado que adjuntaste. Se conservaron los motores de semitonos, procesamiento e IA de ese archivo.
+- Corregido el error del menú que detenía el editor antes de mostrar los controles. Ya no depende de un enlace activo inexistente.
+- Corregido el inicio de Extraer diseño: sus controles de zoom se localizan en la estructura real de la página.
+- Corregidos los efectos que se activaban al cargar: semitonos, quitar fondo y reemplazar color empiezan con el original intacto. Si usas el cuentagotas, elegir el color aplica la operación; si usas el selector, pulsa Aplicar. Puedes desactivar el efecto o restaurar los ajustes.
+- El cuentagotas elige el color y activa la operación correspondiente; en móvil muestra el original para elegir y vuelve a los controles.
+- Texturas tiene Aplicar y Restaurar original. No se aplica desgaste ni conversión de alfa al cargar.
+- Mejorar colores reinicia sus ajustes en cada imagen nueva. Recuperar un borrador conserva los ajustes que sí guardaste.
+- Extraer diseño empieza solo con el recorte. El color de la prenda no se detecta ni elimina automáticamente; la detección tiene su botón y quitar color requiere elegir el modo.
+- Pliego DTF conserva los colores y la transparencia por defecto. Vibrancia, conversión CMYK y alfa sólido son correcciones opcionales; se reflejan en la vista previa y en el PNG sobre la composición completa. El análisis no aplica correcciones.
+- Corregida la liberación de imágenes decodificadas con el método alternativo, para no bloquear la carga de una foto válida en navegadores que lo utilizan.
+- Semitonos, Quitar fondo color y Reemplazar color separados en Inicio y Módulos; Archivo y medida visible y la misma mejora ×2 en los tres.
+- Entrada de hasta 150 MB / 140 MP / 24,000 px por lado en las herramientas actualizadas. Mockups conserva su entrada de 200 MB.
+- Auditor y corrección de alfa a resolución final de hasta 140 MP, procesando por franjas cuando es necesario.
+- Descarga con medida actual, 25, 28, 30, 35 cm o ancho personalizado, proporción conservada y elección de ppp. El SVG incluye centímetros.
+- Trabajo actual, Ajustes favoritos y Mis medidas separados; guardado automático configurable.
+- Misma IA ×2, hasta 8 MP de trabajo en computadora y 4 MP en pantalla táctil. Las imágenes habituales grandes preparan una copia de trabajo automáticamente y muestran las medidas. Para originales de 32 MP o 8192 px de lado se informa su alta resolución; el mejorador independiente permite preparar una copia si se necesita. El límite no se basa en que el archivo pese 2 o 3 MB.
+
+VERIFICACIÓN
+El nuevo flujo se probó en el HTML/controlador real con clic y toque, selección rectangular, workers reales, PNG a otra medida y bloqueo de descarga al cambiar la medida. Para ese test de interfaz se utiliza una inferencia de prueba. Se analizaron independientemente los píxeles de salida a tres tamaños y un caso recortado al borde: 0 puntos aislados menores de 0.5 mm y 0 píxeles semitransparentes. Cancelación, original conservado, imagen vacía rechazada y permisos del editor también pasaron. La inferencia del CNN real y la revisión visual en un navegador no se ejecutaron en este entorno.
+También se probaron PNG cargados en el HTML real: la secuencia de pointerdown/pointerup/click y touch selecciona el RGB en una vista escalada, elimina/reemplaza los píxeles correctos y no se bloquea por el movimiento de la vista.
+Pruebas nuevas sobre el HTML real y todos sus módulos importados: apertura sin excepciones en 16 rutas, menú con las tres herramientas, controles de color y Aplicar visibles, Archivo y medida siempre visible, misma opción IA ×2, diálogo de exportación y carga de las prendas originales. Este test reproduce el fallo de apertura anterior y ahora pasa. Se usa un DOM de prueba; no es una revisión visual de navegador.
+La compilación Sites y Vercel y las pruebas incluidas pasaron. También se verificaron los controladores de carga, selección de color, Aplicar, cuentagotas con aplicación del color elegido, deshacer, reinicio, otra imagen, aislamiento de herramientas, borradores y PNG; el PNG del pliego coincide con la composición corregida sin guías ni tiradores. Se verificaron un análisis de 20 MP, componentes conectados por franjas de 122.9 MP, bordes entre franjas, Auto y ±1 px, alfa, tamaños personalizados, metadatos PNG y dimensiones SVG. La inferencia real del CNN y el navegador de tu teléfono deben revisarse con tus imágenes: la memoria disponible sigue dependiendo del dispositivo. La opción ×2 es sobre el original compatible o la copia indicada en pantalla, no promete reconstruir detalle perfecto.

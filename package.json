@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build:accounts": "node build-accounts.mjs",
-    "test": "node tests.mjs && node interaction-tests.mjs && node site-tests.mjs && node enhance-tests.mjs && node audit-tests.mjs && node handoff-tests.mjs && node preflight-tests.mjs && node account-tests.mjs && node auth-server-tests.mjs && node workspace-tests.mjs && node crop-tests.mjs && node vercel-tests.mjs",
+    "test": "node --experimental-vm-modules premium-tests.mjs && node tests.mjs && node interaction-tests.mjs && node site-tests.mjs && node enhance-tests.mjs && node audit-tests.mjs && node handoff-tests.mjs && node preflight-tests.mjs && node account-tests.mjs && node auth-server-tests.mjs && node workspace-tests.mjs && node crop-tests.mjs && node vercel-tests.mjs && node large-files-tests.mjs && node export-dialog-tests.mjs && node manual-operation-tests.mjs && node --experimental-vm-modules dom-boot-tests.mjs && node --experimental-vm-modules dom-boot-tests.mjs --eyedropper && node --experimental-vm-modules dom-boot-tests.mjs --premium",
     "build": "node build-site.mjs",
     "build:vercel": "node build-vercel.mjs"
   },
@@ -13,6 +13,7 @@
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4"
   },
   "devDependencies": {
-    "esbuild": "0.25.10"
+    "esbuild": "0.25.10",
+    "jsdom": "^30.1.2"
   }
 }

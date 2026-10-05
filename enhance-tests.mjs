@@ -21,7 +21,7 @@ for(const style of Object.values(COLOR_STYLES))processColorAdjustments(src.slice
 const bw=processColorAdjustments(src.slice(),w,h,{...p,colorAdjustments:{...COLOR_DEFAULTS,...COLOR_STYLES.bw}},36.5);
 for(let i=0;i<bw.length;i+=4)if(bw[i+3])assert.equal(bw[i],bw[i+1]);
 const dark=new Uint8ClampedArray([24,24,24,255]),auto=autoColorAdjustments(dark);assert.ok(auto.exposure>0);assert.deepEqual(autoColorAdjustments(new Uint8ClampedArray(4)),COLOR_DEFAULTS);
-assert.throws(()=>validateUpscaleSize(2000,2000));validateUpscaleSize(1200,1000);
+assert.throws(()=>validateUpscaleSize(5000,5000));validateUpscaleSize(1200,1000);
 const tiles=upscaleTiles(141,11);assert.equal(tiles.length,2);assert.deepEqual(tiles.map(t=>[t.x,t.w]),[[0,140],[140,1]]);
 
 // Pixel/canvas adapter exercises the actual standalone tile runner with a
@@ -68,8 +68,8 @@ console.log('PASS: 13 color controls, 6 presets, Auto, alpha preservation, clari
 validateImageFile({name:'diseno.PNG',type:'',size:1024});
 validateImageFile({name:'foto.jpeg',type:'application/octet-stream',size:1024});
 assert.throws(()=>validateImageFile({name:'foto.heic',type:'image/heic',size:1024}),/HEIC/);
-assert.throws(()=>validateImageFile({name:'huge.png',type:'image/png',size:41*1024*1024}),/40 MB/);
-validateImportSize(4000,3000);assert.throws(()=>validateImportSize(9000,1));
+assert.throws(()=>validateImageFile({name:'huge.png',type:'image/png',size:151*1024*1024}),/150 MB/);
+validateImportSize(4000,3000);assert.throws(()=>validateImportSize(24001,1));
 for(const [width,height] of [[4000,3000],[1400,1400],[1200,1000],[8192,1]]){
   const size=upscaleWorkingSize(width,height);validateUpscaleSize(size.width,size.height);
   assert.ok(size.width<=width&&size.height<=height);
@@ -103,9 +103,9 @@ try{
   const input=nodes.get('upscaleFile');input.files=[file('art.PNG','')];input.value='chosen';
   await input.onchange();assert.equal(input.value,'');assert.equal(input.disabled,false);
   assert.equal(nodes.get('upscaleCanvas').hidden,false);assert.equal(nodes.get('upscaleSourceSize').textContent,'4,000 × 3,000 px · original');
-  assert.equal(nodes.get('runUpscale').disabled,true);assert.equal(nodes.get('prepareUpscale').hidden,false);
+  assert.equal(nodes.get('runUpscale').disabled,false);assert.equal(nodes.get('prepareUpscale').hidden,true);assert.match(nodes.get('upscalePreparationText').textContent,/se usa una copia/);
   assert.equal(engineCalls,0,'import does not load IA');assert.equal(closed,0,'large original stays open');
-  nodes.get('prepareUpscale').onclick();assert.equal(nodes.get('runUpscale').disabled,false);
+  assert.equal(nodes.get('runUpscale').disabled,false,'a regular large photo is immediately ready for IA');
   await nodes.get('runUpscale').onclick();assert.equal(engineCalls,1);validateUpscaleSize(lastWorking.width,lastWorking.height);
   assert.notEqual(lastWorking.width,4000);assert.match(nodes.get('upscaleImportStatus').textContent,/desde la copia/);
   const priorName=nodes.get('upscaleName').textContent;input.files=[file('bad.heic','image/heic')];input.value='chosen';
@@ -117,4 +117,4 @@ try{
   assert.equal(nodes.get('downloadUpscale').disabled,true,'new import clears old result');assert.equal(closed,1);
   await nodes.get('runUpscale').onclick();assert.equal(lastWorking.width,1200);assert.equal(nodes.get('downloadUpscale').disabled,false);
 }finally{globalThis.createImageBitmap=native.bitmap;globalThis.Image=native.image;globalThis.URL=native.url}
-console.log('PASS: large-image imports, missing MIME, native decoder fallback, visible errors, retry, explicit IA copy, original preservation and small-image enhancement handlers.');
+console.log('PASS: large-image imports, missing MIME, native decoder fallback, visible errors, retry, automatic IA copy, original preservation and small-image enhancement handlers.');

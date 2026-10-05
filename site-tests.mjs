@@ -48,8 +48,8 @@ for(const page of pages){
   assert.equal(new Set(ids).size,ids.length,`${page}: unique control ids`);
   for(const [,url] of html.matchAll(/(?:href|src)="([^"]+)"/g))if(!/^(?:https?:|data:|#)/.test(url))assert.ok(existsSync('./web/'+url.split(/[?#]/)[0]),`${page}: ${url}`);
 }
-const home=readFileSync('./web/index.html','utf8');assert.equal((home.match(/class="tool-card"/g)||[]).length,13);assert.match(home,/editor\.html\?tool=recolor/);assert.ok(!home.includes('app.js'));
-const app=readFileSync('./web/app.js','utf8');assert.match(app,/setTool\(initialTool\)/);assert.match(app,/recolorOn:initialTool==='recolor'/);
+const home=readFileSync('./web/index.html','utf8');assert.equal((home.match(/class="tool-card"/g)||[]).length,16);assert.match(home,/editor\.html\?tool=recolor/);assert.ok(!home.includes('app.js'));
+const app=readFileSync('./web/app.js','utf8');assert.match(app,/setTool\(initialTool\)/);assert.match(app,/recolorOn:false/);
 
 // Exercise the real tiled PNG exporter and its effect dispatch. This adapter
 // supplies pixel/canvas operations; no UI decoration is in the source bitmap.

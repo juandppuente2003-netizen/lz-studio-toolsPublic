@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import {outputDimensions,resizedArtifact} from './web/image-output.js';
+import {pngBlobDensity} from './web/png.js';
+const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
+class Node{
+ constructor(tag='div'){this.tag=tag;this.value='';this.disabled=false;this.hidden=false;this.listeners={};this.dataset={};this.children=[];this._checked=false;}
+ set checked(value){this._checked=value;if(value&&this.group)for(const r of this.group)if(r!==this)r._checked=false;}get checked(){return this._checked;}
+ setAttribute(){}append(...nodes){this.children.push(...nodes);}focus(){this.focused=true;}addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);}
+ set innerHTML(html){this.nodes=[];for(const [,tag,attrs] of html.matchAll(/<(button|input|select|label|p|h2|progress)\b([^>]*)>/g)){const n=new Node(tag);n.id=attrs.match(/id="([^"]+)"/)?.[1];n.value=attrs.match(/value="([^"]+)"/)?.[1]||'';n.name=attrs.match(/name="([^"]+)"/)?.[1];n.dataset.width=attrs.match(/data-width="([^"]+)"/)?.[1];n._checked=/\bchecked\b/.test(attrs);this.nodes.push(n);}const group=this.nodes.filter(n=>n.name==='lz-output-choice');for(const n of group)n.group=group;}
+ querySelector(selector){if(selector.startsWith('#'))return this.nodes?.find(n=>n.id===selector.slice(1));const value=selector.match(/^\[value="([^"]+)"\]$/)?.[1];return this.nodes?.find(n=>n.value===value);}
+ querySelectorAll(selector){return this.nodes?.filter(n=>selector==='[data-width]'?n.dataset.width!==undefined:selector==='[name="lz-output-choice"]'?n.name==='lz-output-choice':false)||[];}
+ showModal(){this.open=true;}close(){this.open=false;for(const fn of this.listeners.close||[])fn();}
+}
+const button=new Node('button');button.id='downloadText';const svgButton=new Node('button');svgButton.id='downloadTextSvg';
+let dialog,lastDownload;const blobs=new Map(),status=new Node('p');
+const document={body:new Node('body'),querySelectorAll:()=>[button,svgButton],querySelector:()=>status,createElement:tag=>{if(tag==='dialog')return dialog=new Node('dialog');if(tag==='canvas')return native.createCanvas(1,1);if(tag==='a'){const a=new Node('a');a.click=()=>lastDownload={name:a.download,blob:blobs.get(a.href)};return a;}return new Node(tag);}};
+globalThis.document=document;globalThis.requestAnimationFrame=fn=>queueMicrotask(fn);globalThis.createImageBitmap=async blob=>{const image=await native.loadImage(Buffer.from(await blob.arrayBuffer()));image.close=()=>{};return image;};
+const source=native.createCanvas(64,32);source.getContext('2d').fillStyle='#26b3a1';source.getContext('2d').fillRect(5,5,50,20);const blob=new Blob([source.toBuffer('image/png')],{type:'image/png'}),widthCm=64/300*2.54,info={widthCm,dpi:300,aspect:2};let calls=0;
+const config={id:'text',getExportInfo:()=>({...info}),exportCurrent:async()=>{calls++;return {blob,width:64,height:32,widthCm,dpi:300,name:'test.png'};},exportSvg:async()=>({blob:new Blob(['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" width="64" height="32"><rect width="64" height="32"/></svg>'],{type:'image/svg+xml'}),name:'test.svg'})};
+const context={document,outputDimensions,resizedArtifact,trackTool(){},URL:{createObjectURL:b=>{const url='blob:'+blobs.size;blobs.set(url,b);return url;},revokeObjectURL(){}},Blob,setTimeout:()=>{},Number,Math};
+vm.runInNewContext(readFileSync('web/export-dialog.js','utf8').replace(/^import .*;\n/gm,'').replace('export function setupExportDialog','function setupExportDialog')+'\nglobalThis.setup=setupExportDialog;',context);context.setup(config);
+async function open(target=button){const event={preventDefault(){this.prevented=true;},stopImmediatePropagation(){this.stopped=true;}};target.listeners.click[0](event);await new Promise(setImmediate);assert.ok(event.prevented&&event.stopped,'native download is intercepted until choosing dimensions');assert.ok(dialog.open);}
+const get=id=>dialog.querySelector('#lz-export-'+id);
+await open();assert.equal(get('width').disabled,true);assert.equal(calls,0,'opening the size picker does not process the PNG');get('cancel').onclick();assert.equal(calls,0,'cancel does not export');assert.equal(button.focused,true);
+await open();await get('confirm').onclick();const current=await native.loadImage(Buffer.from(await lastDownload.blob.arrayBuffer()));assert.equal(current.width,64);assert.equal(current.height,32);let density=0;const bytes=new Uint8Array(await lastDownload.blob.arrayBuffer());for(let p=8;p<bytes.length;){const n=new DataView(bytes.buffer).getUint32(p),kind=String.fromCharCode(...bytes.slice(p+4,p+8));if(kind==='pHYs')density=new DataView(bytes.buffer).getUint32(p+8);p+=n+12;}assert.equal(density,Math.round(300/.0254),'unchanged current-size PNG still gets correct physical density');
+await open();dialog.querySelectorAll('[data-width]').find(n=>n.dataset.width==='25').onclick();assert.equal(get('width').disabled,false);assert.equal(get('height').value,'12.50');await get('confirm').onclick();let image=await native.loadImage(Buffer.from(await lastDownload.blob.arrayBuffer()));assert.equal(image.width,2953);assert.equal(image.height,1477);assert.equal(info.widthCm,widthCm,'export choice never modifies working print size');
+await open();dialog.querySelector('[value="custom"]').checked=true;get('width').value='35.7';get('width').oninput();get('dpi').value='150';get('dpi').onchange();await get('confirm').onclick();image=await native.loadImage(Buffer.from(await lastDownload.blob.arrayBuffer()));assert.equal(image.width,2108);assert.equal(image.height,1054);
+await open();dialog.querySelector('[value="custom"]').checked=true;get('width').value='';get('width').oninput();assert.equal(get('confirm').disabled,true,'invalid custom size blocks export');get('cancel').onclick();
+await open(svgButton);dialog.querySelectorAll('[data-width]').find(n=>n.dataset.width==='30').onclick();await get('confirm').onclick();const svg=await lastDownload.blob.text();assert.match(svg,/viewBox="0 0 64 32"/);assert.match(svg,/width="30cm" height="15cm"/);assert.ok(lastDownload.name.endsWith('.svg'));
+const sized=await pngBlobDensity(blob,600);assert.ok(sized.size>blob.size);
+const editor=readFileSync('web/editor.html','utf8'),app=readFileSync('web/app.js','utf8');assert.ok(!editor.includes('role="tablist"'),'file and measure is never a tab');assert.equal((editor.match(/id="aiUpscale"/g)||[]).length,1,'all three views reuse one existing IA control');assert.match(app,/panel\.dataset\.toolPanel!=='file'/);const home=readFileSync('web/index.html','utf8');for(const target of ['editor.html','editor.html?tool=remove','editor.html?tool=recolor'])assert.ok(home.includes(`class="open-tool" href="${target}"`));
+console.log('PASS: actual export dialog opens/cancels, current-size PNG density, 25 cm preset, decimal custom width/DPI, proportional output, working settings intact, SVG physical dimensions and three dedicated editor entries.');
