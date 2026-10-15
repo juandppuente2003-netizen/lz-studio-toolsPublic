@@ -1,0 +1,2 @@
+Corrección de navegación v48
+Copia build-site.mjs y la carpeta api a la raíz del repositorio existente y reemplaza los archivos. No borres los demás archivos. Confirma los cambios y espera el nuevo despliegue de Vercel. Después recarga la página y abre Módulos para comprobar v48.
