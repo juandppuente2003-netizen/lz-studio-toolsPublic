@@ -4,14 +4,15 @@ import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {outputDimensions,resizedArtifact} from './web/image-output.js';
 import {pngBlobDensity} from './web/png.js';
+import {finishPrintExport} from './web/print-export.js';
 const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
 class Node{
  constructor(tag='div'){this.tag=tag;this.value='';this.disabled=false;this.hidden=false;this.listeners={};this.dataset={};this.children=[];this._checked=false;}
  set checked(value){this._checked=value;if(value&&this.group)for(const r of this.group)if(r!==this)r._checked=false;}get checked(){return this._checked;}
  setAttribute(){}append(...nodes){this.children.push(...nodes);}focus(){this.focused=true;}addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);}
- set innerHTML(html){this.nodes=[];for(const [,tag,attrs] of html.matchAll(/<(button|input|select|label|p|h2|progress)\b([^>]*)>/g)){const n=new Node(tag);n.id=attrs.match(/id="([^"]+)"/)?.[1];n.value=attrs.match(/value="([^"]+)"/)?.[1]||'';n.name=attrs.match(/name="([^"]+)"/)?.[1];n.dataset.width=attrs.match(/data-width="([^"]+)"/)?.[1];n._checked=/\bchecked\b/.test(attrs);this.nodes.push(n);}const group=this.nodes.filter(n=>n.name==='lz-output-choice');for(const n of group)n.group=group;}
- querySelector(selector){if(selector.startsWith('#'))return this.nodes?.find(n=>n.id===selector.slice(1));const value=selector.match(/^\[value="([^"]+)"\]$/)?.[1];return this.nodes?.find(n=>n.value===value);}
- querySelectorAll(selector){return this.nodes?.filter(n=>selector==='[data-width]'?n.dataset.width!==undefined:selector==='[name="lz-output-choice"]'?n.name==='lz-output-choice':false)||[];}
+ set innerHTML(html){this.nodes=[];for(const [,tag,attrs] of html.matchAll(/<(div|button|input|select|label|p|h2|progress)\b([^>]*)>/g)){const n=new Node(tag);n.id=attrs.match(/id="([^"]+)"/)?.[1];n.className=attrs.match(/class="([^"]+)"/)?.[1]||'';n.value=attrs.match(/value="([^"]+)"/)?.[1]||'';n.name=attrs.match(/name="([^"]+)"/)?.[1];n.dataset.width=attrs.match(/data-width="([^"]+)"/)?.[1];n._checked=/\bchecked\b/.test(attrs);this.nodes.push(n);}const group=this.nodes.filter(n=>n.name==='lz-output-choice');for(const n of group)n.group=group;}
+ querySelector(selector){if(selector.startsWith('#'))return this.nodes?.find(n=>n.id===selector.slice(1));if(selector.startsWith('.'))return this.nodes?.find(n=>n.className.split(' ').includes(selector.slice(1)));const value=selector.match(/^\[value="([^"]+)"\]$/)?.[1];return this.nodes?.find(n=>n.value===value);}
+ querySelectorAll(selector){const nodes=[...(this.nodes||[]),...(this.nodes||[]).flatMap(n=>n.nodes||[])];return nodes.filter(n=>selector==='[data-width]'?n.dataset.width!==undefined:selector==='[name="lz-output-choice"]'?n.name==='lz-output-choice':false);}
  showModal(){this.open=true;}close(){this.open=false;for(const fn of this.listeners.close||[])fn();}
 }
 const button=new Node('button');button.id='downloadText';const svgButton=new Node('button');svgButton.id='downloadTextSvg';
@@ -20,7 +21,8 @@ const document={body:new Node('body'),querySelectorAll:()=>[button,svgButton],qu
 globalThis.document=document;globalThis.requestAnimationFrame=fn=>queueMicrotask(fn);globalThis.createImageBitmap=async blob=>{const image=await native.loadImage(Buffer.from(await blob.arrayBuffer()));image.close=()=>{};return image;};
 const source=native.createCanvas(64,32);source.getContext('2d').fillStyle='#26b3a1';source.getContext('2d').fillRect(5,5,50,20);const blob=new Blob([source.toBuffer('image/png')],{type:'image/png'}),widthCm=64/300*2.54,info={widthCm,dpi:300,aspect:2};let calls=0;
 const config={id:'text',getExportInfo:()=>({...info}),exportCurrent:async()=>{calls++;return {blob,width:64,height:32,widthCm,dpi:300,name:'test.png'};},exportSvg:async()=>({blob:new Blob(['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" width="64" height="32"><rect width="64" height="32"/></svg>'],{type:'image/svg+xml'}),name:'test.svg'})};
-const context={document,outputDimensions,resizedArtifact,trackTool(){},URL:{createObjectURL:b=>{const url='blob:'+blobs.size;blobs.set(url,b);return url;},revokeObjectURL(){}},Blob,setTimeout:()=>{},Number,Math};
+const context={document,outputDimensions,resizedArtifact,finishPrintExport,AbortController,trackTool(){},URL:{createObjectURL:b=>{const url='blob:'+blobs.size;blobs.set(url,b);return url;},revokeObjectURL(){}},Blob,setTimeout:()=>{},Number,Math};
+document.dispatchEvent=()=>{};context.Event=Event;context.printReport=p=>`${p.remaining} semitransparencias`;context.createPrintReview=()=>({thickness:{checked:false},minimum:.5,preview:{},reset(){},clear(){},busy(){},show(){}});
 vm.runInNewContext(readFileSync('web/export-dialog.js','utf8').replace(/^import .*;\n/gm,'').replace('export function setupExportDialog','function setupExportDialog')+'\nglobalThis.setup=setupExportDialog;',context);context.setup(config);
 async function open(target=button){const event={preventDefault(){this.prevented=true;},stopImmediatePropagation(){this.stopped=true;}};target.listeners.click[0](event);await new Promise(setImmediate);assert.ok(event.prevented&&event.stopped,'native download is intercepted until choosing dimensions');assert.ok(dialog.open);}
 const get=id=>dialog.querySelector('#lz-export-'+id);

@@ -4,6 +4,7 @@ import {upscaleTiles,validateUpscaleSize,enhanceImage,upscaleWorkingSize} from '
 import {decodeImageFile,validateImageFile,validateImportSize} from './web/upscale-import.js';
 import {runInNewContext} from 'node:vm';
 import {readFileSync} from 'node:fs';
+import {imagePrintSize} from './web/image-print-size.js';
 const w=73,h=89,src=new Uint8ClampedArray(w*h*4);
 for(let y=0;y<h;y++)for(let x=0;x<w;x++)src.set([x*3,y*2,(x+y)%255,[0,64,192,255][x%4]],(y*w+x)*4);
 const p={effectTool:'color',widthCm:2,colorAspect:w/h,colorAdjustments:{...COLOR_DEFAULTS,exposure:.3,contrast:20,shadows:30,temperature:18,vibrance:25,clarity:50,grain:15,vignette:40}};
@@ -91,7 +92,7 @@ try{
   const wrap={clientWidth:1000,clientHeight:800,addEventListener(){},scrollTo(){}};
   const label={classList:{toggle(){}}};let registration,engineCalls=0,lastWorking;
   const context={document:{getElementById:id=>{assert.ok(nodes.has(id),id);return nodes.get(id)},querySelector:s=>s.startsWith('label')?label:wrap,addEventListener(){},createElement:()=>({width:0,height:0,getContext:()=>({drawImage(){}})})},
-    registerStudioModule:r=>registration=r,decodeImageFile,validateImportSize,upscaleWorkingSize,pngDensity(){},
+    registerStudioModule:r=>registration=r,decodeImageFile,validateImportSize,upscaleWorkingSize,imagePrintSize,pngDensity(){},
     createOnnxSuperResolution:async()=>{engineCalls++;return ()=>{}},
     enhanceImage:async s=>{lastWorking=s;return {width:s.width*2,height:s.height*2}},
     ResizeObserver:class{observe(){}},window:{addEventListener(){}},navigator:{},AbortController,DOMException,File,setTimeout};

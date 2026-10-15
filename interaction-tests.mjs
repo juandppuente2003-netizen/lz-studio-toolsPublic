@@ -75,16 +75,16 @@ get('sheetLength').value=100;get('sheetDpi').value=300;get('lockRatio').checked=
 const sheetWrap=new Element();sheetWrap.clientWidth=600; // Image plus 20 px inset: fit at exactly 100%.
 const sheetDoc=new Element();sheetDoc.activeElement=new Element('BODY');sheetDoc.getElementById=get;sheetDoc.querySelector=()=>sheetWrap;sheetDoc.querySelectorAll=()=>[];
 let registration;
-const sandbox={document:sheetDoc,innerWidth:1000,CORNERS,cornerPosition,resizeFromCorner,registerStudioModule:config=>{registration=config},assemblePng:()=>{},decodeImageFile:async()=>({width:300,height:200}),validateImportSize:()=>{},createImageBitmap:async()=>({width:300,height:200}),URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},requestAnimationFrame:fn=>fn(),ResizeObserver:class{observe(){}},File:class{constructor(parts,name,props){this.name=name;this.type=props.type}},setTimeout,CompressionStream};
+const sandbox={document:sheetDoc,innerWidth:1000,CORNERS,cornerPosition,resizeFromCorner,registerStudioModule:config=>{registration=config},assemblePng:()=>{},decodeImageFile:async()=>({width:300,height:200}),validateImportSize:()=>{},createImageBitmap:async()=>({width:300,height:200}),URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},requestAnimationFrame:fn=>fn(),ResizeObserver:class{observe(){}},File:class{constructor(parts,name,props){this.name=name;this.type=props.type}},setTimeout:()=>0,clearTimeout:()=>{},CompressionStream};
 let code=readFileSync('./web/gang-sheet.js','utf8').replace(/^import .*;\n/gm,'');
 code+='\nglobalThis.readSheet=()=>({items,selected,drag,zoom});';vm.runInNewContext(code,sandbox);
-await registration.importCurrent({type:'image/png'},'test.png');
+await registration.importCurrent({type:'image/png'},'test.png',{widthCm:15});
 const before={...sandbox.readSheet().selected};near(before.widthCm,15);near(before.heightCm,10);
 const corner=cornerPosition(before,[1,1]);
 canvas.dispatch('pointerdown',event({clientX:corner.x*10,clientY:corner.y*10}));assert.equal(sandbox.readSheet().drag.kind,'resize');
 canvas.dispatch('pointermove',event({clientX:(corner.x+6)*10,clientY:(corner.y+4)*10}));
 near(sandbox.readSheet().selected.widthCm,21);near(sandbox.readSheet().selected.heightCm,14);
-assert.equal(get('itemWidth').value,'21.0');assert.equal(get('itemHeight').value,'14.0');assert.equal(get('sheetSizeBadge').textContent,'21.0 × 14.0 cm');
+near(Number(get('itemWidth').value),21);near(Number(get('itemHeight').value),14);assert.equal(get('sheetSizeBadge').textContent,'21.0 × 14.0 cm');
 canvas.dispatch('pointerup',event());assert.equal(sandbox.readSheet().drag,null);
 const resized={...sandbox.readSheet().selected};
 assert.ok(!registration.canPan(event({clientX:resized.x*10,clientY:resized.y*10})),'design drag stays editable');
