@@ -2413,7 +2413,7 @@ export function setupWorkSummary(config){
  const refresh=()=>{clearTimeout(timer);const request=++generation;timer=setTimeout(async()=>{try{const p=await config.getExportInfo(config.id==='vectorize');if(request!==generation||!p)return;const next=\`\${Number(p.widthCm).toFixed(2)} \xD7 \${(p.widthCm/p.aspect).toFixed(2)} cm \xB7 \${Math.round(p.dpi)} ppp\`;dimensions.textContent=next;if(next!==last){state.textContent='Medida de trabajo \xB7 comprobaci\xF3n final al descargar';last=next;}}catch{dimensions.textContent='Carga o prepara un resultado para ver su medida';state.textContent='A\xFAn no hay salida preparada';}},180);};
  document.addEventListener('lz-work-changed',refresh);document.addEventListener('change',refresh);document.addEventListener('input',refresh);document.addEventListener('lz-export-verified',()=>{state.textContent='\xDAltima descarga comprobada \xB7 consulta el informe de salida';});refresh();
 }
-`,type:"text/javascript; charset=utf-8",public:!0},"/studio-shell.js":{body:`import {setupInterfacePolish} from './interface-polish.js';
+`,type:"text/javascript; charset=utf-8",public:!1},"/studio-shell.js":{body:`import {setupInterfacePolish} from './interface-polish.js';
 import {groupStudioNavigation,setupWorkSummary} from './studio-navigation.js';
 import {setupExportDialog} from './export-dialog.js';
 import {setupWorkspace} from './account/workspace.js';
