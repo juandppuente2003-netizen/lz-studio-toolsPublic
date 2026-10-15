@@ -24,7 +24,7 @@ export async function exportBands({source,width,height,dpi,rect,process,onProgre
 }
 export async function resizedArtifact(artifact,options,onProgress){
  const d=outputDimensions(options.widthCm,options.dpi,artifact.width/artifact.height);
- if(d.width===artifact.width&&d.height===artifact.height&&d.dpi===artifact.dpi)return {...artifact,blob:await pngBlobDensity(artifact.blob,d.dpi)};
+ if(d.width===artifact.width&&d.height===artifact.height&&d.dpi===artifact.dpi)return {...artifact,...d,blob:await pngBlobDensity(artifact.blob,d.dpi)};
  const image=await createImageBitmap(artifact.blob);
  try{return {...artifact,...d,blob:await exportBands({source:image,...d,onProgress})};}finally{image.close?.();}
 }

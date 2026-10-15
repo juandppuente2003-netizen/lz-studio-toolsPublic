@@ -33,7 +33,7 @@
 <div class="tool-intro">
 <span class="eyebrow">ACOMODO DE PRODUCCIÓN</span>
 <h1>Arma tu pliego DTF de 58 cm.</h1>
-<p>Define el largo, agrega tus diseños y ajusta su tamaño desde las esquinas o con medidas exactas.</p>
+<p>Agrega tus diseños a su medida original de impresión. Cambiar el tamaño después es opcional.</p>
 </div>
 <section class="step-card active">
 <h2>
@@ -63,17 +63,21 @@
 <span>Selecciona varias · PNG recomendado</span>
 </label>
 <input id="sheetFiles" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+<div class="inline-note">Respetamos la medida guardada en el archivo (cm y resolución). Si no contiene una medida física, te la preguntamos. Nunca lo reducimos automáticamente: cambiar el tamaño puede alterar los puntos del semitono.</div>
 <div id="imageList" class="image-list">
 </div>
+<label>Separación para acomodo (mm)<input id="sheetGap" type="number" min="0" max="50" step="0.5" value="5"></label>
 <button id="autoArrange" class="action-button" disabled>Acomodo automático</button>
+<p id="sheetLayoutWarning" class="hint" role="status"></p>
 </section>
 <section id="itemControls" class="step-card" hidden>
 <h2>
 <span class="number">03</span> Medidas del diseño</h2>
+<p id="itemOriginalSize" class="hint"></p>
 <div class="pair">
-<label>Ancho (cm)<input id="itemWidth" type="number" min="0.5" max="57" step="0.1" inputmode="decimal">
+<label>Ancho (cm)<input id="itemWidth" type="number" min="0.01" step="any" inputmode="decimal">
 </label>
-<label>Alto (cm)<input id="itemHeight" type="number" min="0.5" max="499" step="0.1" inputmode="decimal">
+<label>Alto (cm)<input id="itemHeight" type="number" min="0.01" step="any" inputmode="decimal">
 </label>
 </div>
 <label class="check proportion-lock">
@@ -95,12 +99,21 @@
 </section>
 <section class="step-card">
 <h2>
-<span class="number">04</span> Salida DTF</h2>
+<span class="number">04</span> Revisar sin modificar</h2>
+<label class="check"><input id="sheetCheckAlpha" type="checkbox" checked> Semitransparencias</label>
+<label class="check"><input id="sheetCheckThickness" type="checkbox" checked> Auditor de grosor automático</label>
+<p class="hint">Mínimo de puntos: 0.5 mm. Revisamos a la medida y resolución de salida, no en la miniatura. El auditor detecta puntos compactos aislados; no certifica el grosor de todas las líneas.</p>
+<button id="sheetRunAudit" class="action-button">Revisar ahora</button>
+<div class="inline-note">Revisar ahora analiza el acomodo actual sin modificarlo. Al descargar se revisa el PNG definitivo después de las correcciones elegidas. Puedes desactivar la revisión de grosor.</div>
+</section>
+<section class="step-card">
+<h2><span class="number">05</span> Correcciones opcionales de salida</h2>
 <label class="check">
 <input id="sheetVibrance" type="checkbox"> Ajuste automático de vibrancia</label>
 <label class="check">
-<input id="cmykSafe" type="checkbox"> Conversión perceptual a gama CMYK</label>
-<label class="check"><input id="sheetSolidAlpha" type="checkbox"> Convertir semitransparencias a alfa sólido</label><div class="inline-note">El análisis informa sin modificar el diseño. Activa únicamente las correcciones que quieras aplicar.</div>
+<input id="cmykSafe" type="checkbox"> Ajuste aproximado de colores intensos (RGB)</label>
+<p class="hint">No convierte el archivo a CMYK ni aplica un perfil ICC de impresora.</p>
+<label class="check"><input id="sheetSolidAlpha" type="checkbox" checked> Corregir semitransparencias al descargar</label><div class="inline-note">Esta opción se lleva a la ventana de descarga; puedes cambiarla para esa salida. Se aplica una sola vez al final, con umbral 50 %. Usa Vista previa final para comprobar los píxeles que se eliminan.</div>
 </section>
 </aside>
 <section class="lab-workspace">
@@ -110,6 +123,7 @@
 <strong id="sheetSummary">58 × 100 cm · sin diseños</strong>
 </div>
 <div class="lab-toolbar-actions">
+<button id="sheetUndo" disabled>Deshacer</button><button id="sheetRedo" disabled>Rehacer</button>
 <button id="editSelectedMobile" class="mobile-only" disabled>Medidas</button>
 <button id="zoomSheetOut" aria-label="Alejar">−</button>
 <span id="sheetZoomLabel">100 %</span>
@@ -128,9 +142,9 @@
 <div class="lab-footer">
 <div>
 <span class="eyebrow">ARCHIVO DE SALIDA</span>
-<strong>PNG DTF · 58 cm · transparencia binaria</strong>
+<strong>PNG DTF · 58 cm · medida original</strong>
 </div>
-<p>El PNG conserva compatibilidad con los RIP DTF.<br>La gama se prepara con conversión CMYK perceptual.</p>
+<p>Los diseños conservan su alfa y color original.<br>Las correcciones solo se aplican si las activas.</p>
 </div>
 <div id="sheetAudit" class="audit-list">
 </div>
@@ -143,6 +157,15 @@
 <progress id="sheetExportProgress" max="100" value="0">
 </progress>
 <small id="sheetExportLabel">0 %</small>
+</dialog>
+<dialog id="sheetImportDialog">
+<form id="sheetImportForm">
+<h2>No encontramos una medida de impresión</h2>
+<p id="sheetImportName"></p>
+<p>Los píxeles no indican centímetros sin una resolución física. Escribe el ancho con el que preparaste el diseño; conservaremos su proporción y sus márgenes transparentes.</p>
+<div class="pair"><label>Ancho original (cm)<input id="sheetImportWidth" type="number" min="0.01" step="any" required inputmode="decimal"></label><label>Alto (cm)<input id="sheetImportHeight" readonly></label></div>
+<div class="button-row"><button type="button" id="sheetImportCancel">Omitir archivo</button><button type="submit" class="primary">Agregar a esta medida</button></div>
+</form>
 </dialog>
 </body>
 </html>

@@ -1,4 +1,5 @@
 import {setupInterfacePolish} from './interface-polish.js';
+import {groupStudioNavigation,setupWorkSummary} from './studio-navigation.js';
 import {setupExportDialog} from './export-dialog.js';
 import {setupWorkspace} from './account/workspace.js';
 import './account/account-nav.js';
@@ -31,7 +32,7 @@ export function registerStudioModule(config){
 
 function initialize(){
   if(initialized||!registration)return;initialized=true;
-  setupPrintMeasure(registration);setupExportDialog(registration);improveNavigation();addQuickGuide();setupMobileSwitch();setupStepFocus();setupPreviewNavigation();setupPreviewSpace();setupInterfacePolish(registration);setupWorkspace(registration).catch(()=>{});
+  setupPrintMeasure(registration);setupExportDialog(registration);improveNavigation();groupStudioNavigation();addQuickGuide();setupMobileSwitch();setupStepFocus();setupPreviewNavigation();setupPreviewSpace();setupInterfacePolish(registration);setupWorkSummary(registration);setupWorkspace(registration).catch(()=>{});
 }
 
 function setupPreviewNavigation(){
@@ -87,9 +88,11 @@ function setupPreviewSpace(){
 function setupPrintMeasure(config){
  if(config.id==='home'||document.querySelector('#widthCm,#effectWidth,#printWidth,#itemWidth,#cropWidth'))return;
  const sidebar=document.querySelector('.tools,.lab-sidebar,.mockup-tools,.text-tools');if(!sidebar)return;
- const section=document.createElement('section');section.className='panel step-card';section.innerHTML='<h2>Medida de impresión</h2><div class="pair"><label>Ancho (cm)<input id="printOutputWidth" type="number" min="0.5" max="500" step="0.1" value="28"></label><label>Alto (cm)<input id="printOutputHeight" readonly></label></div><p class="hint">Se conserva la proporción. Puedes elegir otra medida al descargar.</p>';sidebar.append(section);
+ const section=document.createElement('section');section.className='panel step-card';section.innerHTML='<h2>Medida de impresión</h2><div class="pair"><label>Ancho (cm)<input id="printOutputWidth" type="number" min="0.5" max="500" step="any" placeholder="Se calcula al cargar"></label><label>Alto (cm)<input id="printOutputHeight" readonly></label></div><p class="hint">Se conserva la medida del resultado. Solo cambia si tú indicas otro ancho.</p>';sidebar.append(section);
  const field=section.querySelector('#printOutputWidth'),height=section.querySelector('#printOutputHeight'),original=config.getExportInfo;
- config.getExportInfo=async svg=>{const info=await original?.(svg);if(!info)return null;return {...info,widthCm:Number(field.value)};};
+ let edited=false;field.addEventListener('input',()=>{edited=true;});
+ document.addEventListener('change',event=>{if(event.target?.type==='file'){edited=false;field.value='';}},true);
+ config.getExportInfo=async svg=>{const info=await original?.(svg);if(!info)return null;if(!edited)field.value=String(info.widthCm);return {...info,widthCm:edited?Number(field.value):info.widthCm};};
  let update=0;const refresh=()=>{clearTimeout(update);update=setTimeout(async()=>{try{const info=await config.getExportInfo(config.id==='vectorize');height.value=info?(info.widthCm/info.aspect).toFixed(2):'';}catch{height.value='';}},200);};
  field.addEventListener('input',refresh);document.addEventListener('lz-work-changed',refresh);
 }

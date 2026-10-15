@@ -1,4 +1,6 @@
 import './account/account-nav.js';
+import {groupStudioNavigation} from './studio-navigation.js';
+groupStudioNavigation();
 const $=id=>document.getElementById(id);
 function menu(open){$('moduleMenu').hidden=!open;$('menuBackdrop').hidden=!open;$('menuButton').setAttribute('aria-expanded',String(open));if(open)$('menuClose').focus();else $('menuButton').focus()}
 $('menuButton').onclick=()=>menu($('moduleMenu').hidden);$('menuClose').onclick=()=>menu(false);$('menuBackdrop').onclick=()=>menu(false);document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('moduleMenu').hidden)menu(false)});

@@ -1,0 +1,34 @@
+LZ STUDIO TOOLS — v48
+
+INSTALAR SIN BORRAR EL PROYECTO
+Este ZIP es una actualización acumulativa de v46/v47/v48 sobre el proyecto existente. No es un sitio completo para un repositorio vacío.
+1. Descomprime el ZIP.
+2. Copia las carpetas api y web y los archivos build-site.mjs y vercel.json al repositorio existente, respetando sus rutas. Reemplaza solo los archivos incluidos; NO borres lo demás.
+3. Incluye los nuevos archivos web/print-review.js y web/studio-navigation.js, además de web/print-export.js de v47. Todos son necesarios.
+4. Confirma los cambios en la rama que utiliza tu proyecto Vercel y espera el despliegue Ready.
+5. Abre Módulos: debe verse LZ_STUDIO_TOOLS · v48.
+
+La publicación en Sites ya está actualizada. Este ZIP no actualiza automáticamente GitHub o Vercel. No se modificaron tu base de datos, usuarios, credenciales ni dependencias.
+
+QUÉ CAMBIÓ
+- Aplicar medidas en el pliego ya no limita el ancho a 57 cm. Si un diseño no cabe, avisa y bloquea su exportación sin reducirlo silenciosamente.
+- Deshacer/rehacer conserva hasta 30 estados en esta sesión: importar, mover, redimensionar, duplicar, eliminar y acomodar. Atajos Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z o Ctrl+Y. No sustituye Guardar trabajo ni persiste después de recargar.
+- Separación configurable de 0 a 50 mm en acomodo automático, sin cambiar el tamaño de las imágenes.
+- Aviso de posibles superposiciones entre áreas rectangulares. Las transparencias y rotaciones pueden producir avisos conservadores: comprueba visualmente.
+- Se distinguen Revisar sin modificar y Corregir al descargar. El interruptor de corrección del pliego se lleva al diálogo de descarga. Allí se puede cambiar para esa descarga.
+- La corrección de alfa se aplica al PNG definitivo. La revisión de puntos aislados ocurre DESPUÉS de corregir y redimensionar, usando los píxeles finales.
+- Vista previa final opcional: antes/después y detalle ampliado de la primera zona corregida. No descarga hasta que confirmas. Cambiar medidas u opciones invalida el resultado preparado.
+- Si el PNG final conserva semitransparencias o puntos aislados menores al mínimo, se pide confirmación antes de descargar con advertencias. La revisión de grosor se puede desactivar; la revisión no aumenta automáticamente los puntos.
+- Menú por tareas, datos de medida/resolución junto al área de trabajo y ajustes visuales en negro, gris y verde.
+- Se aclara que el ajuste aproximado de colores del pliego sigue siendo RGB: no es una conversión CMYK ni aplica un perfil ICC.
+- El pliego no repite una auditoría completa tras cada movimiento. Revisar ahora analiza el acomodo; descargar comprueba el archivo definitivo.
+
+PRUEBAS RÁPIDAS
+1. Importa un diseño de 58 cm, pulsa Aplicar medidas y comprueba que conserva 58 cm.
+2. Cambia tamaño, deshaz y rehace; elimina una imagen y recupérala con Deshacer.
+3. En descarga pulsa Vista previa final. Revisa el antes/después y las advertencias. Cambia la medida: la vista preparada debe invalidarse.
+4. Descarga un diseño a 35 cm con corrección activada y vuelve a analizar ese PNG: no debe tener alfa intermedio. La medida del trabajo abierto no cambia.
+
+ALCANCE Y CUIDADOS
+La corrección de alfa usa umbral 50 % y puede quitar píxeles tenues. Puedes desactivarla cuando quieras conservar efectos suaves. La auditoría detecta puntos compactos aislados: no garantiza todas las líneas conectadas, un mínimo universal en todas las formas ni el resultado de un RIP que vuelva a escalar. SVG conserva su exportación vectorial.
+Se comprobaron controladores, píxeles, importación/exportación y arranque de los módulos mediante pruebas automatizadas. No se realizó una prueba visual interactiva en navegadores móviles durante esta entrega.
