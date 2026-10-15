@@ -1,0 +1,32 @@
+.extract-studio{grid-template-columns:350px minmax(0,1fr)}
+.extract-studio [hidden]{display:none!important}
+.extract-studio .lab-sidebar{padding:22px;max-height:calc(100dvh - 84px)}
+.extract-studio h1{font-size:28px;margin:6px 0}.extract-studio h2{font-size:16px}
+.extract-studio .hint,.extract-studio .lab-status,.extract-studio label,.extract-studio .tool-intro p{font-size:14px;line-height:1.5}
+.extract-studio .hint{margin:8px 0}.extract-studio label{margin-bottom:10px}
+.extract-studio fieldset{border:0;padding:0;margin:0;min-width:0}
+.extract-studio input[type=range]{width:100%;margin:4px 0 10px}
+.extract-studio input[type=number]{width:100%;min-width:0}
+.extract-studio .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.extract-studio button,.extract-studio select{min-height:44px;font-size:14px}
+.extract-studio .button-row{grid-template-columns:1fr 1fr;gap:8px}
+.extract-studio .lab-workspace{max-height:none;min-height:calc(100dvh - 84px)}
+.extract-views{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;flex:1;min-height:440px;min-width:0}
+.extract-view{display:flex;flex-direction:column;min-width:0;min-height:0}
+.extract-view-heading{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:10px}
+.extract-view-heading h2{margin:0}.extract-view-heading button{padding:8px 11px}
+.extract-box{position:relative;flex:1;min-height:320px;overflow:auto;display:flex;align-items:safe center;justify-content:safe center;border:1px solid #2b3034;border-radius:10px;background:#101315;padding:10px;overscroll-behavior:contain}
+.extract-box canvas{display:block;flex:none;touch-action:none;user-select:none;max-width:none!important;max-height:none!important}
+#selectionCanvas{cursor:crosshair}#resultCanvas{cursor:default}
+.extract-box.checker{background-color:#20262a;background-image:linear-gradient(45deg,#30383d 25%,transparent 25%),linear-gradient(-45deg,#30383d 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#30383d 75%),linear-gradient(-45deg,transparent 75%,#30383d 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+.extract-box[data-background=white]{background:#fff}.extract-box[data-background=black]{background:#000}
+.extract-meta{color:#9ca3a8;line-height:1.5;font-size:14px;margin:10px 0 0;min-height:42px}
+.swatch-row{display:flex;gap:8px;align-items:center;margin:12px 0}.swatch-row input{width:56px;height:44px;border:1px solid #343a3f;border-radius:6px;background:#171b1e;padding:4px}.swatch-row button{flex:1}
+.extract-studio .active-tool{border-color:var(--lab-green);color:var(--lab-green);background:#20271a}
+.extract-work-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.extract-work-actions select{width:auto;margin:0}
+.extract-color-help{padding:10px;border-left:2px solid var(--lab-green);background:#171e13;color:#c9d1c4;line-height:1.5;font-size:14px}
+.extract-studio .source-info{font-size:14px;overflow-wrap:anywhere;color:#aeb5bb;display:block;margin-top:10px}.extract-studio .source-info span{display:block}
+.extract-studio .topbar{flex-wrap:wrap}.extract-top-download{margin-left:auto}
+.extract-studio a{color:var(--lab-green)}
+@media(max-width:1100px){.extract-studio{grid-template-columns:320px minmax(0,1fr)}.extract-views{grid-template-columns:minmax(0,1fr)}.extract-box{height:360px;flex:auto}.extract-studio .lab-workspace{overflow:visible}.extract-studio .lab-sidebar{padding:18px}}
+@media(max-width:700px){.extract-studio .lab-sidebar{max-height:none}.extract-studio .lab-workspace{min-height:600px}.extract-box{height:380px;min-height:260px}.extract-studio .lab-toolbar{position:static;flex-wrap:wrap;gap:10px}.extract-studio .lab-toolbar>div:first-child{max-width:none}.extract-studio .lab-toolbar-actions{justify-content:flex-start}.extract-studio .pair{grid-template-columns:1fr 1fr}.extract-views{min-height:0}.extract-studio .extract-work-actions select{max-width:170px}body.lz-mobile-view .extract-studio .lab-workspace{display:flex!important}.extract-studio .extract-view h2{font-size:16px}.extract-studio .button-row{grid-template-columns:1fr 1fr}}

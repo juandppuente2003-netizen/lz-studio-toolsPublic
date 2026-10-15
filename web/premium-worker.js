@@ -1,0 +1,2 @@
+import {applyPremiumVivid,premiumHalftone} from './premium-engine.js';
+self.onmessage=({data:m})=>{try{const pixels=new Uint8ClampedArray(m.buffer);if(m.type==='vivid')applyPremiumVivid(pixels,m.width,m.height,m.widthCm);else if(m.type==='halftone')premiumHalftone(pixels,m.width,m.rows,m.y,m.height,m.params,m.zone);else throw Error('Paso de preparación desconocido.');self.postMessage({buffer:pixels.buffer},[pixels.buffer]);}catch(error){self.postMessage({error:error.message});}};
