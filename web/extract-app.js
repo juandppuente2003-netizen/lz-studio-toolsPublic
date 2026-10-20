@@ -22,7 +22,7 @@ function sync(){
 }
 function resetPoints(all=false){if(!source)return;const w=source.width-1,h=source.height-1,left=all?0:w*.22,top=all?0:h*.17,right=all?w:w*.78,bottom=all?h:h*.80;points=[{x:left,y:top},{x:right,y:top},{x:right,y:bottom},{x:left,y:bottom}];tool='corners';drawSelection();sync();}
 function scaleCanvas(canvas,box,natural=false){if(canvas.hidden)return;const fit=Math.max(.04,Math.min((box.clientWidth-24)/canvas.width,(box.clientHeight-24)/canvas.height));const scale=fit*(natural?zoom:selectionZoom);canvas.style.width=canvas.width*scale+'px';canvas.style.height=canvas.height*scale+'px';}
-function layout(){scaleCanvas(selection,selectionBox);scaleCanvas(result,resultBox,true);$('extractZoomLabel').textContent=zoom===1?'Ajustar':Math.round(zoom*100)+' %';}
+function layout(){scaleCanvas(selection,selectionBox);scaleCanvas(result,resultBox,true);$('extractZoomLabel').textContent=zoom===1?'A pantalla':Math.round(zoom*100)+' %';}
 function drawSelection(){
   if(!source)return;const s=Math.min(1,1400/Math.max(source.width,source.height));selection.width=Math.round(source.width*s);selection.height=Math.round(source.height*s);
   const ctx=selection.getContext('2d');ctx.drawImage(source,0,0,selection.width,selection.height);const sx=selection.width/source.width,sy=selection.height/source.height;

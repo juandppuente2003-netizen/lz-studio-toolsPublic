@@ -5,7 +5,7 @@ import {createRequire} from 'node:module';
 import {outputDimensions,resizedArtifact} from './web/image-output.js';
 import {pngBlobDensity} from './web/png.js';
 import {finishPrintExport} from './web/print-export.js';
-const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
+const native=createRequire(import.meta.url)('@napi-rs/canvas');
 class Node{
  constructor(tag='div'){this.tag=tag;this.value='';this.disabled=false;this.hidden=false;this.listeners={};this.dataset={};this.children=[];this._checked=false;}
  set checked(value){this._checked=value;if(value&&this.group)for(const r of this.group)if(r!==this)r._checked=false;}get checked(){return this._checked;}

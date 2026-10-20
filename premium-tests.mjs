@@ -7,7 +7,7 @@ import {applyPremiumVivid,premiumParams,premiumHalftone} from './web/premium-eng
 import {processColorAdjustments,COLOR_DEFAULTS,COLOR_STYLES} from './web/color-engine.js';
 import {DotScanner} from './web/large-dot-engine.js';
 import {createHandler} from './worker/account-worker.js';
-const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
+const native=createRequire(import.meta.url)('@napi-rs/canvas');
 globalThis.document={createElement:()=>{const canvas=native.createCanvas(1,1),get=canvas.getContext.bind(canvas);canvas.getContext=(...args)=>{const ctx=get(...args);return new Proxy(ctx,{get:(target,key)=>key==='getImageData'?((...values)=>{const image=target.getImageData(...values);return {data:new Uint8ClampedArray(image.data),width:image.width,height:image.height};}):typeof target[key]==='function'?target[key].bind(target):target[key],set:(target,key,value)=>{target[key]=value;return true;}});};return canvas;}};globalThis.requestAnimationFrame=fn=>setTimeout(fn,0);globalThis.createImageBitmap=async blob=>native.loadImage(Buffer.from(await blob.arrayBuffer()));
 let live=0;
 // Execute actual worker modules with real transferable buffer detachment.

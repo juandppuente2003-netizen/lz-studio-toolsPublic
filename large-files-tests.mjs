@@ -8,7 +8,7 @@ import {processDesignEffect} from './web/effects-engine.js';
 import {largePreflight} from './web/large-preflight.js';
 import {outputDimensions,exportBands} from './web/image-output.js';
 import {validateImageFile,validateImportSize} from './web/upscale-import.js';
-const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
+const native=createRequire(import.meta.url)('@napi-rs/canvas');
 globalThis.document={createElement:()=>native.createCanvas(1,1)};globalThis.requestAnimationFrame=fn=>queueMicrotask(fn);
 globalThis.Worker=class{constructor(){this.dead=false;const self={postMessage:data=>queueMicrotask(()=>{if(!this.dead)this.onmessage?.({data});})};this.scope=self;vm.runInNewContext(readFileSync('./web/large-preflight-worker.js','utf8').replace(/^import .*;\n/gm,''),{self,DotScanner,correctDotBand,dotRadius,processDesignEffect,Uint8ClampedArray,Uint8Array,Map,Math});}postMessage(data){queueMicrotask(()=>this.scope.onmessage({data}));}terminate(){this.dead=true;}};
 function rgba(canvas){return canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;}

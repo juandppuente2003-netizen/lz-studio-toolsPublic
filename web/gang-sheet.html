@@ -10,7 +10,8 @@
 <link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="preview-space.css">
 <script type="module" src="gang-sheet.js">
 </script>
-<link rel="stylesheet" href="interface-polish.css"></head>
+<link rel="stylesheet" href="interface-polish.css"><link rel="stylesheet" href="lz-system.css">
+</head>
 <body>
 <header class="topbar">
 <a class="brand" href="index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name">LZ <span class="brand-studio">STUDIO</span> TOOLS</span></a>
@@ -27,20 +28,19 @@
 </header>
 <div id="menuBackdrop" class="menu-backdrop" hidden>
 </div>
-<nav id="moduleMenu" class="module-menu" aria-label="Módulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar menú">×</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Semitonos</strong><small>Tramas físicas y resolución ×2</small></a><a class="module" href="premium.html"><span>★</span><strong>Semitonos Premium</strong><small>Vívido, IA y correcciones automáticas</small></a><a class="module" href="editor.html?tool=remove"><span>02</span><strong>Quitar fondo color</strong><small>Eliminar un color del original</small></a><a class="module" href="editor.html?tool=recolor"><span>03</span><strong>Reemplazar color</strong><small>Elegir color original y nuevo</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipografía y efectos</small></a><a class="module" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores sólidos</small></a><a class="module" href="analyzer.html"><span>08</span><strong>Preparar para impresión</strong><small>Auditoría y corrección</small></a><a class="module active" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo de 58 cm</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos rápidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar imágenes</strong><small>Aumento de resolución ×2 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia sólida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos pequeños y corrección automática</small></a><a class="module" href="extract.html"><span>β</span><strong>Extraer diseño · Beta</strong><small>Selección manual desde una foto</small></a><a class="module" href="crop.html"><span>✂</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
+<nav id="moduleMenu" class="module-menu" aria-label="Módulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar menú">×</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Semitonos</strong><small>Tramas físicas y resolución ×2</small></a><a class="module" href="premium.html"><span>★</span><strong>Semitonos Premium</strong><small>Vívido, IA y correcciones automáticas</small></a><a class="module" href="editor.html?tool=remove"><span>02</span><strong>Quitar fondo color</strong><small>Eliminar un color del original</small></a><a class="module" href="editor.html?tool=recolor"><span>03</span><strong>Reemplazar color</strong><small>Elegir color original y nuevo</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipografía y efectos</small></a><a class="module" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores sólidos</small></a><a class="module" href="analyzer.html"><span>08</span><strong>Preparar para impresión</strong><small>Auditoría y corrección</small></a><a class="module active" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo a medida real</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos rápidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar imágenes</strong><small>Aumento de resolución ×2 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia sólida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos pequeños y corrección automática</small></a><a class="module" href="extract.html"><span>β</span><strong>Extraer diseño · Beta</strong><small>Selección manual desde una foto</small></a><a class="module" href="crop.html"><span>✂</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
 <main class="lab-studio">
 <aside class="lab-sidebar">
 <div class="tool-intro">
 <span class="eyebrow">ACOMODO DE PRODUCCIÓN</span>
-<h1>Arma tu pliego DTF de 58 cm.</h1>
-<p>Agrega tus diseños a su medida original de impresión. Cambiar el tamaño después es opcional.</p>
+<h1>Arma tu pliego DTF</h1>
+<p>Agrega tus diseños a su medida original de impresión. El ancho del pliego es el que tú definas; nada se reduce sin que lo indiques.</p>
 </div>
 <section class="step-card active">
 <h2>
 <span class="number">01</span> Medida del pliego</h2>
 <div class="pair">
-<label>Ancho (cm)<input value="58" readonly>
-</label>
+<label>Ancho (cm)<input value="58" id="sheetWidth" type="number" min="20" max="160" step="0.5" inputmode="decimal" list="sheetWidthPresets"></label><datalist id="sheetWidthPresets"><option value="30"><option value="33"><option value="56"><option value="58"><option value="60"></datalist>
 <label>Largo (cm)<input id="sheetLength" type="number" min="50" max="500" step="10" value="100">
 </label>
 </div>
@@ -64,38 +64,23 @@
 </label>
 <input id="sheetFiles" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
 <div class="inline-note">Respetamos la medida guardada en el archivo (cm y resolución). Si no contiene una medida física, te la preguntamos. Nunca lo reducimos automáticamente: cambiar el tamaño puede alterar los puntos del semitono.</div>
-<div id="imageList" class="image-list">
-</div>
+<div id="imageListHead" class="image-list-head" hidden><span id="imageListCount"></span><button type="button" id="selectAllItems" class="text-button">Seleccionar todo</button></div><div id="imageList" class="image-list"></div>
 <label>Separación para acomodo (mm)<input id="sheetGap" type="number" min="0" max="50" step="0.5" value="5"></label>
 <button id="autoArrange" class="action-button" disabled>Acomodo automático</button>
 <p id="sheetLayoutWarning" class="hint" role="status"></p>
 </section>
-<section id="itemControls" class="step-card" hidden>
-<h2>
-<span class="number">03</span> Medidas del diseño</h2>
+<section id="itemControls" class="step-card" hidden><h2><span class="number">03</span> Diseño seleccionado</h2>
+<p id="itemSelectionInfo" class="selection-info" hidden></p>
 <p id="itemOriginalSize" class="hint"></p>
-<div class="pair">
-<label>Ancho (cm)<input id="itemWidth" type="number" min="0.01" step="any" inputmode="decimal">
-</label>
-<label>Alto (cm)<input id="itemHeight" type="number" min="0.01" step="any" inputmode="decimal">
-</label>
-</div>
-<label class="check proportion-lock">
-<input id="lockRatio" type="checkbox" checked> Conservar proporción</label>
-<div class="pair">
-<label>Posición X (cm)<input id="itemX" type="number" min="0" max="58" step="0.1" inputmode="decimal">
-</label>
-<label>Posición Y (cm)<input id="itemY" type="number" min="0" max="500" step="0.1" inputmode="decimal">
-</label>
-</div>
-<label class="range-label" for="itemRotation">Rotación <output id="itemRotationOut">0°</output>
-</label>
-<input id="itemRotation" type="range" min="-180" max="180" value="0">
+<p id="itemLockedNote" class="hint" hidden>Bloqueado: no se mueve, escala ni rota hasta que lo desbloquees.</p>
+<fieldset class="field-group"><legend>Medida</legend><div class="pair"><label>Ancho (cm)<input id="itemWidth" type="number" min="0.01" step="any" inputmode="decimal"></label><label>Alto (cm)<input id="itemHeight" type="number" min="0.01" step="any" inputmode="decimal"></label></div><label class="check proportion-lock"><input id="lockRatio" type="checkbox" checked> Conservar proporción</label></fieldset>
+<fieldset class="field-group"><legend>Posición del centro</legend><div class="pair"><label>X (cm)<input id="itemX" type="number" min="0" max="58" step="any" inputmode="decimal"></label><label>Y (cm)<input id="itemY" type="number" min="0" max="500" step="any" inputmode="decimal"></label></div></fieldset>
+<fieldset class="field-group"><legend>Rotación</legend><div class="rotation-row"><input id="itemRotation" type="range" min="-180" max="180" step="1" value="0" aria-label="Rotación"><label class="rotation-value"><span class="sr-only">Ángulo exacto en grados</span><input id="itemRotationValue" type="number" min="-180" max="180" step="0.1" inputmode="decimal" value="0"><span aria-hidden="true">°</span></label><output id="itemRotationOut" hidden>0°</output></div>
+<div class="segmented" role="group" aria-label="Ángulos comunes"><button type="button" data-rotate="-90">−90°</button><button type="button" data-rotate="0">0°</button><button type="button" data-rotate="90">+90°</button><button type="button" data-rotate="180">180°</button></div>
+<p class="hint">En el pliego, arrastra el tirador circular superior. Se ajusta a múltiplos de 45°; mantén Mayús para pasos de 15°.</p></fieldset>
 <button id="applyItemSize" class="download-action full">Aplicar medidas</button>
-<div class="button-row">
-<button id="duplicateItem">Duplicar</button>
-<button id="deleteItem">Eliminar</button>
-</div>
+<fieldset class="field-group"><legend>Organizar</legend><div class="icon-row" role="group" aria-label="Alinear"><button type="button" class="icon-button" data-align="left" aria-label="Alinear a la izquierda" title="Alinear a la izquierda"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 2v16"/><rect x="6" y="5" width="11" height="3.5" rx="1"/><rect x="6" y="11.5" width="7" height="3.5" rx="1"/></svg></button><button type="button" class="icon-button" data-align="hcenter" aria-label="Centrar horizontalmente" title="Centrar horizontalmente"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v16"/><rect x="4" y="5" width="12" height="3.5" rx="1"/><rect x="6" y="11.5" width="8" height="3.5" rx="1"/></svg></button><button type="button" class="icon-button" data-align="right" aria-label="Alinear a la derecha" title="Alinear a la derecha"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M17 2v16"/><rect x="3" y="5" width="11" height="3.5" rx="1"/><rect x="7" y="11.5" width="7" height="3.5" rx="1"/></svg></button><button type="button" class="icon-button" data-align="top" aria-label="Alinear arriba" title="Alinear arriba"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 3h16"/><rect x="5" y="6" width="3.5" height="11" rx="1"/><rect x="11.5" y="6" width="3.5" height="7" rx="1"/></svg></button><button type="button" class="icon-button" data-align="vcenter" aria-label="Centrar verticalmente" title="Centrar verticalmente"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 10h16"/><rect x="5" y="4" width="3.5" height="12" rx="1"/><rect x="11.5" y="6" width="3.5" height="8" rx="1"/></svg></button><button type="button" class="icon-button" data-align="bottom" aria-label="Alinear abajo" title="Alinear abajo"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 17h16"/><rect x="5" y="3" width="3.5" height="11" rx="1"/><rect x="11.5" y="7" width="3.5" height="7" rx="1"/></svg></button></div><div class="icon-row" role="group" aria-label="Distribuir"><button type="button" class="icon-button" data-distribute="h" aria-label="Distribuir horizontalmente" title="Distribuir horizontalmente (3 o más)"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 3v14M18 3v14"/><rect x="8.25" y="6" width="3.5" height="8" rx="1"/></svg></button><button type="button" class="icon-button" data-distribute="v" aria-label="Distribuir verticalmente" title="Distribuir verticalmente (3 o más)"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 2h14M3 18h14"/><rect x="6" y="8.25" width="8" height="3.5" rx="1"/></svg></button><span class="icon-row-note">Un diseño se alinea al pliego; varios, entre ellos.</span></div></fieldset>
+<div class="button-row three"><button id="duplicateItem" type="button">Duplicar</button><button id="lockItem" type="button" aria-pressed="false">Bloquear</button><button id="deleteItem" type="button" class="danger">Eliminar</button></div>
 </section>
 <section class="step-card">
 <h2>
@@ -138,11 +123,11 @@
 <output id="sheetSizeBadge" class="sheet-size-badge" hidden></output>
 </div>
 </div>
-<p class="sheet-instructions">Selecciona un diseño y arrastra sus esquinas para cambiar el tamaño. Activa <b>Mover vista</b> para recorrer el pliego sin mover las imágenes.</p>
+<p class="sheet-instructions"><span>Arrastra para mover</span><span>Esquinas: escalar</span><span>Tirador superior: rotar</span><span>Mayús + clic: varios</span><span>Flechas: 1 mm · Mayús: 1 cm</span><span>Espacio + arrastrar: recorrer</span></p>
 <div class="lab-footer">
 <div>
 <span class="eyebrow">ARCHIVO DE SALIDA</span>
-<strong>PNG DTF · 58 cm · medida original</strong>
+<strong>PNG DTF · <span id="sheetOutputWidth">58 cm</span> de ancho · medida original</strong>
 </div>
 <p>Los diseños conservan su alfa y color original.<br>Las correcciones solo se aplican si las activas.</p>
 </div>
@@ -156,7 +141,7 @@
 <p id="sheetExportText">Auditando archivos…</p>
 <progress id="sheetExportProgress" max="100" value="0">
 </progress>
-<small id="sheetExportLabel">0 %</small>
+<small id="sheetExportLabel">0 %</small><div class="button-row"><button type="button" id="sheetExportCancel">Cancelar exportación</button></div>
 </dialog>
 <dialog id="sheetImportDialog">
 <form id="sheetImportForm">

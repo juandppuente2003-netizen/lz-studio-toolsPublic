@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-10-20T03:45:16.537Z",
+        "reason": "Claude decided: Operate-mode tool UI favors a familiar, highly legible sans for dense controls and tabular measurements; brand voice stays in the LZ Display wordmark"
+      }
+    ]
+  }
+}

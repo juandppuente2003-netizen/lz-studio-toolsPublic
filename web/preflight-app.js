@@ -26,7 +26,7 @@ function controls(){
 }
 function smallPreview(image){const c=document.createElement('canvas'),scale=Math.min(1,1100/Math.max(image.width,image.height));c.width=Math.max(1,Math.round(image.width*scale));c.height=Math.max(1,Math.round(image.height*scale));c.getContext('2d').drawImage(image,0,0,c.width,c.height);return c}
 function imageCanvas(buffer,width,height){const c=document.createElement('canvas');c.width=width;c.height=height;c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(buffer),width,height),0,0);return c}
-function layout(){if(canvas.hidden)return;const scale=Math.max(.001,fit?Math.min((wrap.clientWidth-20)/canvas.width,(wrap.clientHeight-20)/canvas.height):zoom);canvas.style.width=canvas.width*scale+'px';canvas.style.height=canvas.height*scale+'px';if(fit)zoom=scale;$('effectZoomLabel').textContent=fit?'Ajustar':Math.round(scale*100)+' %'}
+function layout(){if(canvas.hidden)return;const scale=Math.max(.001,fit?Math.min((wrap.clientWidth-20)/canvas.width,(wrap.clientHeight-20)/canvas.height):zoom);canvas.style.width=canvas.width*scale+'px';canvas.style.height=canvas.height*scale+'px';if(fit)zoom=scale;$('effectZoomLabel').textContent=fit?'A pantalla':Math.round(scale*100)+' %'}
 function show(){if(globalThis.Event)document.dispatchEvent?.(new Event('lz-work-changed'));
   if(!source)return;const shown=originalView?(overlay?.original&&preview?preview:smallPreview(source)):preview||smallPreview(result||source);canvas.width=shown.width;canvas.height=shown.height;
   const ctx=canvas.getContext('2d');ctx.drawImage(shown,0,0);canvas.hidden=false;$('effectEmpty').hidden=true;layout();

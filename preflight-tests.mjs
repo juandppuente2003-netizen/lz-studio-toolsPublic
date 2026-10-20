@@ -7,6 +7,7 @@ import {auditDtfPixels,auditPreview} from './web/dtf-audit-engine.js';
 import {processDesignEffect} from './web/effects-engine.js';
 import {canvasArtifact,requireTransferImage} from './web/transfer-export.js';
 import {validateImportSize} from './web/upscale-import.js';
+import {applyFilePrintMeasure} from './web/image-print-size.js';
 const w=120,h=80,rgba=new Uint8ClampedArray(w*h*4),put=(x,y,c=[24,120,220,255])=>rgba.set(c,(y*w+x)*4);
 for(let y=5;y<35;y++)for(let x=5;x<35;x++)put(x,y);
 put(80,15,[210,100,25,100]);for(let y=30;y<32;y++)for(let x=100;x<102;x++)put(x,y);
@@ -25,7 +26,7 @@ assert.ok(findSmallDots(rgba,w,h,{...options,pixelsPerCm:options.pixelsPerCm*2})
 const edge=new Uint8ClampedArray(20*20*4);edge.set([90,20,40,255],0);assert.ok(adjustSmallDots(edge,20,20,{...options,mode:'auto'}).clipped>0);
 assert.throws(()=>adjustSmallDots(rgba,w,h,{...options,delta:99}),/12/);
 
-const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
+const native=createRequire(import.meta.url)('@napi-rs/canvas');
 class Element{
   constructor(){this.value='';this.hidden=false;this.disabled=false;this.checked=false;this.style={};this.listeners={};this.classList={toggle(){},add(){},remove(){}}}
   addEventListener(t,fn){(this.listeners[t]??=[]).push(fn)}dispatch(t){for(const fn of this.listeners[t]||[])fn({target:this})}setAttribute(){}removeAttribute(){}scrollTo(){}
@@ -46,7 +47,7 @@ async function app(tool){
   get('effectDpi').value=300;get('effectWidth').value=w/300*2.54;if(get('alphaMethod'))get('alphaMethod').value='screen';
   const doc={body:{dataset:{preflightTool:tool}},getElementById:get,createElement:t=>t==='canvas'?new Canvas():new Element(),querySelector:q=>q==='.lab-canvas-wrap'?wrap:null,addEventListener(){}};
   globalThis.document=doc;
-  let registration;const scope={document:doc,window:{addEventListener(){},matchMedia:()=>({matches:false})},registerStudioModule:c=>{registration=c},decodeImageFile:async file=>native.loadImage(Buffer.from(await file.arrayBuffer())),validateImportSize,canvasArtifact,requireTransferImage,Worker:workerClass(),ResizeObserver:class{observe(){}},ImageData:native.ImageData,File,URL,setTimeout,requestAnimationFrame:fn=>queueMicrotask(fn),console};
+  let registration;const scope={document:doc,window:{addEventListener(){},matchMedia:()=>({matches:false})},registerStudioModule:c=>{registration=c},applyFilePrintMeasure,decodeImageFile:async file=>native.loadImage(Buffer.from(await file.arrayBuffer())),validateImportSize,canvasArtifact,requireTransferImage,Worker:workerClass(),ResizeObserver:class{observe(){}},ImageData:native.ImageData,File,URL,setTimeout,requestAnimationFrame:fn=>queueMicrotask(fn),console};
   let code=readFileSync('./web/preflight-app.js','utf8').replace(/^import .*;\n/gm,'');code+='\nglobalThis.inspect=()=>({source,result,selection,mode,delta,busy,originalView,overlay,preview});';vm.runInNewContext(code,scope);
   const image=native.createCanvas(w,h);image.getContext('2d').putImageData(new native.ImageData(rgba,w,h),0,0);
   const file=new File([image.toBuffer('image/png')],'test.png',{type:'image/png'});

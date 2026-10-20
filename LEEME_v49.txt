@@ -1,0 +1,38 @@
+LZ STUDIO TOOLS — v49
+
+Actualización acumulativa sobre v48. No cambia la base de datos, usuarios, credenciales ni los motores de imagen (semitono, alfa, grosor, IA).
+
+QUÉ CAMBIÓ
+
+Pliego DTF
+- Rotación directa en el pliego: tirador circular sobre el diseño (o debajo, si arriba no hay espacio). Muestra el ángulo mientras giras, se ajusta a múltiplos de 45° y con Mayús avanza de 15° en 15°. También: ángulo exacto en grados y botones −90°, 0°, +90°, 180°.
+- Selección múltiple: Mayús/Ctrl + clic (en el pliego o en la lista) y Ctrl/Cmd + A. Arrastrar mueve el grupo completo sin salirse del pliego.
+- Alinear (izquierda, centro, derecha, arriba, medio, abajo): un diseño se alinea al pliego; varios, entre ellos. Distribuir horizontal o vertical con tres o más.
+- Bloquear/Desbloquear: un diseño bloqueado no se mueve, escala, rota ni elimina por accidente. El acomodo automático lo respeta.
+- Duplicar y Eliminar funcionan sobre toda la selección. Ctrl/Cmd + D duplica. Flechas: 1 mm; Mayús + flechas: 1 cm.
+- Ancho del pliego configurable (20 a 160 cm; 58 por defecto, con atajos 30/33/56/58/60). Cambiarlo nunca reduce diseños: los que no caben se marcan en rojo y bloquean la exportación hasta que los ajustes.
+- Avisos claros: borde rojo y etiqueta "Fuera del pliego" en la lista; el resumen indica cuántos quedan fuera y cuántas posibles superposiciones hay.
+- Exportación con botón Cancelar real (detiene el proceso por bloques; el pliego no cambia).
+- Deshacer/Rehacer incluyen rotación, bloqueo, alineación, ancho y selección. La recuperación tras recarga guarda también ancho y largo.
+
+Medidas físicas
+- Semitonos, Quitar fondo color, Reemplazar color, Mejorar colores, Texturas, Semitransparencias, Auditor de grosor y Recortar aceptaban como máximo 100 cm y, al importar un archivo más ancho, se quedaban en 28 cm sin avisar. Ahora aceptan hasta 500 cm y conservan la medida guardada en el archivo; los límites reales de píxeles (140 MP / 24,000 px) siguen protegiendo.
+- Semitonos Premium ahora lee la medida y resolución guardadas en el archivo (pHYs/EXIF/JFIF) como las demás herramientas.
+- Los atajos 25/28/30/35 cm del diálogo de descarga siguen siendo opcionales y solo aparecen en herramientas de diseño; nunca se aplican solos.
+
+Interfaz
+- Sistema visual común (web/lz-system.css) cargado al final en todas las páginas: grafito neutro, acción principal en blanco y el verde lima solo para foco, selección, estado activo y éxito.
+- Tipografía Inter autoalojada (licencia OFL en web/assets/fonts/Inter-LICENSE.txt); el logotipo conserva LZ Display.
+- Cabecera más baja (56 px) y barras compactas: el área de trabajo gana espacio. En celular la barra de herramientas es una sola fila desplazable.
+- Botones deshabilitados planos y grises (antes parecían botones verdes apagados). Foco visible en todos los controles. Etiquetas de al menos 11 px.
+- Corregido: selector "Fondo" de Mockups con texto casi invisible; casillas gigantes en el diálogo de descarga; título tapado por la barra Ajustes/Vista previa en celular; la etiqueta de zoom decía "Ajustar" junto al botón "Ajustar" (ahora "A pantalla").
+
+Pruebas
+- npm test pasa completo. En v48 fallaban interaction-tests, preflight-tests y manual-operation-tests porque sus adaptadores no incluían funciones añadidas después (createElement, applyFilePrintMeasure, imagePrintSize) y por la decisión de v48 de llevar la corrección de alfa del pliego al diálogo de descarga. Se actualizaron sin relajar comprobaciones.
+- Nuevas comprobaciones del pliego: tirador de rotación (arriba y abajo), imán de 45°, pasos de 15° con Mayús, ángulo visible, deshacer/rehacer de rotación, selección múltiple, alinear, bloqueo y ancho personalizado.
+- Revisión en Chromium real: 16 páginas a 1440 px y 390 px sin desbordamiento horizontal ni errores de consola; flujo del pliego (cargar, acomodar, rotar con el ratón, seleccionar varios, deshacer, diálogo de exportación).
+
+LIMITACIONES PENDIENTES
+- No se modificaron los algoritmos de semitono, eliminación/reemplazo de color, semitransparencias, limpieza de puntos ni auditoría de grosor; solo cómo reciben la medida.
+- No se probó en Safari de iPhone ni con una inferencia real del modelo de IA en el navegador.
+- La carpeta dist/ (paquete de Sites v38) no se modificó. Vercel reconstruye api/site.js con npm run build:vercel.
