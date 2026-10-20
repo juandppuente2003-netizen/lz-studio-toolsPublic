@@ -4,7 +4,7 @@ fieldset#colorControls{border:0;padding:0;margin:0;min-width:0}
 .color-group h2{font-size:14px;letter-spacing:.07em;margin-bottom:18px;color:#c8d0d5}
 .color-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:16px}
 .color-presets button{padding:10px 4px;font-size:14px}
-.color-presets button.active{border-color:var(--lab-green);color:var(--lab-green);background:#1c221a}
+.color-presets button.active{border-color:var(--lab-green);color:var(--lab-green);background:#202020}
 .color-slider input[type=range]{margin-bottom:23px}
 .color-slider output{color:var(--lab-green);font-size:14px;min-width:32px;text-align:right}
 .color-slider input[type=range]:disabled{opacity:.4}
