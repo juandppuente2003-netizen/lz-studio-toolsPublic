@@ -1,0 +1,12 @@
+LZ STUDIO TOOLS — v50
+
+Colores
+- Se eliminó el verde lima de toda la interfaz: botones, selección, foco, casillas, barras de progreso, guías del pliego, recorte y extracción, y el logotipo de Inicio ahora son blancos. Los grises con tinte verde pasaron a grises neutros. El ícono de la pestaña del navegador conserva su color para no desaparecer en pestañas claras.
+
+Semitonos
+- Puntos imprimibles: punto mínimo y hueco mínimo en milímetros reales de impresión. Los puntos más pequeños se pueden eliminar o agrandar al mínimo; los huecos más pequeños se rellenan. Atajos: Sin límite, 0.3 mm, 0.5 mm DTF y Hueco 0.3. Un aviso indica el tamaño de celda y a qué densidad corresponde cada límite. Con 0 mm (predeterminado) el resultado es idéntico al de v49.
+- Vista previa fiel: cuando la vista está reducida, cada punto se muestra con su tamaño proporcional (suavizado) en lugar de pixeles sueltos que desaparecían. La descarga sigue generando puntos nítidos a la resolución final.
+- Corregido: el texto del botón Aplicar semitono era invisible.
+
+Pruebas
+- Nueva suite halftone-limits-tests.mjs (incluida en npm test). Se comprobó que el motor da exactamente los mismos bytes que v49 en 64 combinaciones de forma, modo, doble trama, eliminación y limpieza.
