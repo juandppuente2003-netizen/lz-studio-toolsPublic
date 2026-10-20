@@ -7,7 +7,7 @@ const assets={};
 async function walk(dir,prefix=''){for(const entry of await readdir(dir,{withFileTypes:true})){const relative=prefix+'/'+entry.name;if(entry.isDirectory())await walk(dir+'/'+entry.name,relative);else{
  const ext=entry.name.split('.').pop();
  if(['html','js','mjs'].includes(ext)){
-  const body=await readFile(dir+'/'+entry.name,'utf8');assets[relative]={body,type:ext==='html'?'text/html; charset=utf-8':'text/javascript; charset=utf-8',public:relative==='/index.html'||relative==='/account.html'||relative==='/auth-config.js'||relative.startsWith('/account/')||publicScripts.has(relative)};
+  const body=await readFile(dir+'/'+entry.name,'utf8');assets[relative]={body,type:ext==='html'?'text/html; charset=utf-8':'text/javascript; charset=utf-8',public:relative==='/index.html'||relative==='/dtf.html'||relative==='/account.html'||relative==='/auth-config.js'||relative.startsWith('/account/')||publicScripts.has(relative)};
  }else{await mkdir('dist/client'+prefix,{recursive:true});await copyFile(dir+'/'+entry.name,'dist/client'+relative);}
 }}}
 await rm('dist',{recursive:true,force:true});await mkdir('dist/server',{recursive:true});await walk('web');

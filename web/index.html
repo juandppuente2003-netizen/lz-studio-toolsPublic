@@ -57,6 +57,12 @@ body {
   font-weight: 400;
 }
 
+.land-nav { display: flex; align-items: center; gap: 4px; margin-left: 28px; padding-left: 28px; border-left: 1px solid var(--lz-land-line2); }
+.land-nav-link { font-size: 13px; font-weight: 500; color: #aaa; text-decoration: none; padding: 6px 12px; border-radius: 8px; transition: color .15s, background .15s; }
+.land-nav-link:hover { color: #fff; background: #151515; }
+.land-nav-link.active { color: #fff; background: #1a1a1a; }
+.land-nav-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
 /* Main content */
 .land-main {
   flex: 1;
@@ -253,7 +259,10 @@ body {
 
 /* Mobile */
 @media (max-width: 680px) {
-  .land-topbar { padding: 0 16px; }
+  .land-topbar { padding: 0 16px; overflow-x: auto; }
+  .land-nav { margin-left: 12px; padding-left: 12px; }
+  .land-nav-link { padding: 6px 8px; white-space: nowrap; }
+  .land-logo { white-space: nowrap; }
   .land-main { padding: 36px 16px 56px; }
   .land-hero { margin-bottom: 40px; }
   .land-cards { grid-template-columns: 1fr; gap: 14px; }
@@ -266,6 +275,11 @@ body {
 
 <header class="land-topbar">
   <a class="land-logo" href="index.html">LZ <span>STUDIO</span> TOOLS</a>
+  <nav class="land-nav" aria-label="Secciones">
+    <a class="land-nav-link active" href="index.html" aria-current="page">Inicio</a>
+    <a class="land-nav-link" href="dtf.html">Herramientas DTF</a>
+    <a class="land-nav-link" href="box/index.html">LZ Box Studio</a>
+  </nav>
 </header>
 
 <main class="land-main">

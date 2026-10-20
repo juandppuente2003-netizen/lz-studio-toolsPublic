@@ -16,7 +16,9 @@ globalThis.fetch=async(url)=>{
 };
 const {default:app}=await import('./api/site.js');
 const req=(path,options={})=>new Request(origin+'/api/site?__lz_path='+encodeURIComponent(path),options);
-let response=await app.fetch(req(''));assert.equal(response.status,200);assert.match(await response.text(),/Recortar imagen/);
+let response=await app.fetch(req(''));assert.equal(response.status,200);{const landing=await response.text();assert.match(landing,/Herramientas DTF Premium/);assert.match(landing,/LZ Box Studio/);}
+response=await app.fetch(req('dtf.html'));assert.equal(response.status,200);assert.match(await response.text(),/Recortar imagen/);
+response=await app.fetch(req('box/index.html'));assert.equal(response.status,303);assert.equal(response.headers.get('Location'),'/account.html?return=box%2Findex.html');
 response=await app.fetch(req('account.html'));assert.equal(response.status,200);const html=await response.text();assert.match(html,/Cambiar contraseña/);assert.doesNotMatch(html,/Recibir enlace de acceso/);
 response=await app.fetch(req('crop.html'));assert.equal(response.status,303);assert.equal(response.headers.get('Location'),'/account.html?return=crop.html');
 response=await app.fetch(req('crop-app.js'));assert.equal(response.status,401);
