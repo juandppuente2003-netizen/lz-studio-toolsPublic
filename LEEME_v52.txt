@@ -1,0 +1,11 @@
+LZ STUDIO TOOLS — v52
+
+Semitonos Premium · Mejora con IA ×2 opcional
+- Nuevo selector "Mejora con IA ×2" en Archivo y medida:
+  · Automática (predeterminada): mide la resolución que tiene tu original a la medida de impresión. Si alcanza la resolución de salida (300 ppp, o 150/600 si los elegiste), usa tu original sin IA; si no, lo mejora con IA ×2. La resolución guardada en el archivo (por ejemplo 72 ppp) nunca rebaja esa meta.
+  · Mejorar siempre.
+  · No mejorar: usa tu original (con Vívido aplicado).
+- Un aviso muestra los ppp de tu imagen a esa medida y qué se va a hacer. El paso de la lista indica si la IA se aplicó u omitió.
+- Si cambias la opción después de cargar, aparece "Volver a preparar" para aplicarla sin volver a subir el archivo.
+- Sin IA, la imagen se usa a resolución completa (hasta 40 MP de copia de trabajo).
+- El rectángulo de zona ya es blanco (aún era verde).

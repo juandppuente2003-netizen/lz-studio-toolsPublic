@@ -1,7 +1,7 @@
 // Reorder existing links without changing routes or tool access controls.
 export function groupStudioNavigation(){
  const menu=document.querySelector('.module-menu');if(!menu||menu.dataset.grouped)return;menu.dataset.grouped='true';
- const version=menu.querySelector('.menu-head .eyebrow');if(version)version.textContent='LZ_STUDIO_TOOLS · v51';
+ const version=menu.querySelector('.menu-head .eyebrow');if(version)version.textContent='LZ_STUDIO_TOOLS · v52';
  const groups=[['Preparar',['crop','extract','remove','recolor','upscale','color-enhance']],['Diseñar',['editor','premium','text-creator','textures','vectorize']],['Producir',['opacity','thickness','analyzer','gang-sheet']],['Presentar',['mockups']]];
  const links=[...menu.querySelectorAll('a.module')];
  const id=link=>{const url=new URL(link.getAttribute('href'),document.baseURI);return url.searchParams.get('tool')||url.pathname.split('/').pop().replace('.html','');};
