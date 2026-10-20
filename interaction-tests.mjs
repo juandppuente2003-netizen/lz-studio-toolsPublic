@@ -33,6 +33,10 @@ class Element {
   closest(){return null}
   setAttribute(name,value){this.attrs[name]=value}
   prepend(child){this.button=child}
+  append(...children){(this.children??=[]).push(...children)}
+  replaceChildren(...children){this.children=[...children]}
+  get dataset(){return this._dataset??={}}
+  scrollIntoView(){}
   setPointerCapture(id){this.captured.add(id)}
   releasePointerCapture(id){this.captured.delete(id)}
   hasPointerCapture(id){return this.captured.has(id)}
@@ -73,11 +77,11 @@ const context=new Proxy({}, {get:(target,key)=>target[key]??(()=>{}),set:(target
 canvas.getContext=()=>context;canvas.getBoundingClientRect=()=>({left:0,top:0,width:parseFloat(canvas.style.width)||580,height:parseFloat(canvas.style.height)||1000});
 get('sheetLength').value=100;get('sheetDpi').value=300;get('lockRatio').checked=true;
 const sheetWrap=new Element();sheetWrap.clientWidth=600; // Image plus 20 px inset: fit at exactly 100%.
-const sheetDoc=new Element();sheetDoc.activeElement=new Element('BODY');sheetDoc.getElementById=get;sheetDoc.querySelector=()=>sheetWrap;sheetDoc.querySelectorAll=()=>[];
+const sheetDoc=new Element();sheetDoc.activeElement=new Element('BODY');sheetDoc.getElementById=get;sheetDoc.querySelector=()=>sheetWrap;sheetDoc.querySelectorAll=()=>[];sheetDoc.createElement=tag=>new Element(tag.toUpperCase());
 let registration;
 const sandbox={document:sheetDoc,innerWidth:1000,CORNERS,cornerPosition,resizeFromCorner,registerStudioModule:config=>{registration=config},assemblePng:()=>{},decodeImageFile:async()=>({width:300,height:200}),validateImportSize:()=>{},createImageBitmap:async()=>({width:300,height:200}),URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},requestAnimationFrame:fn=>fn(),ResizeObserver:class{observe(){}},File:class{constructor(parts,name,props){this.name=name;this.type=props.type}},setTimeout:()=>0,clearTimeout:()=>{},CompressionStream};
 let code=readFileSync('./web/gang-sheet.js','utf8').replace(/^import .*;\n/gm,'');
-code+='\nglobalThis.readSheet=()=>({items,selected,drag,zoom});';vm.runInNewContext(code,sandbox);
+code+='\nglobalThis.readSheet=()=>({items,selected,drag,zoom,selection,width:sheetWidthCm});globalThis.align=align;';vm.runInNewContext(code,sandbox);
 await registration.importCurrent({type:'image/png'},'test.png',{widthCm:15});
 const before={...sandbox.readSheet().selected};near(before.widthCm,15);near(before.heightCm,10);
 const corner=cornerPosition(before,[1,1]);
@@ -92,4 +96,23 @@ assert.ok(registration.canPan(event({clientX:10,clientY:10})),'empty sheet suppo
 canvas.dispatch('pointerdown',event({clientX:resized.x*10,clientY:resized.y*10}));
 canvas.dispatch('pointermove',event({clientX:(resized.x+2)*10,clientY:(resized.y+2)*10}));canvas.dispatch('pointerup',event());
 near(sandbox.readSheet().selected.x,resized.x+2);near(sandbox.readSheet().selected.y,resized.y+2);near(sandbox.readSheet().selected.widthCm,21);
+// v49: rotation handle with 45° magnet and Shift 15° steps, multi-selection, alignment and lock.
+{const item=sandbox.readSheet().selected;Object.assign(item,{x:29,y:40});const offset=28/(sandbox.readSheet().zoom*10),top={x:item.x,y:item.y-item.heightCm/2-offset};
+ canvas.dispatch('pointerdown',event({clientX:top.x*10,clientY:top.y*10}));assert.equal(sandbox.readSheet().drag.kind,'rotate','top handle rotates');
+ canvas.dispatch('pointermove',event({clientX:(item.x+10)*10,clientY:(item.y-0.4)*10}));near(sandbox.readSheet().selected.rotation,90);
+ assert.match(get('sheetSizeBadge').textContent,/90°/,'angle shown while rotating');
+ canvas.dispatch('pointermove',event({clientX:(item.x+10)*10,clientY:(item.y-6)*10,shiftKey:true}));near(sandbox.readSheet().selected.rotation,60);
+ canvas.dispatch('pointerup',event());assert.equal(sandbox.readSheet().drag,null);near(Number(get('itemRotationValue').value),60);
+ get('itemRotationValue').value='0';get('itemRotationValue').dispatch('change');near(sandbox.readSheet().selected.rotation,0);
+ get('sheetUndo').onclick();near(sandbox.readSheet().selected.rotation,60,'undo restores rotation');get('sheetRedo').onclick();near(sandbox.readSheet().selected.rotation,0);}
+{const item=sandbox.readSheet().selected;Object.assign(item,{x:29,y:item.heightCm/2,rotation:0});const offset=28/(sandbox.readSheet().zoom*10),bottom={x:item.x,y:item.y+item.heightCm/2+offset};
+ canvas.dispatch('pointerdown',event({clientX:bottom.x*10,clientY:bottom.y*10}));assert.equal(sandbox.readSheet().drag.kind,'rotate','handle flips below at the top edge');
+ canvas.dispatch('pointermove',event({clientX:(item.x-10)*10,clientY:(item.y+0.4)*10}));near(sandbox.readSheet().selected.rotation,90);canvas.dispatch('pointerup',event());setRot:{get('itemRotationValue').value='0';get('itemRotationValue').dispatch('change');}}
+{Object.assign(sandbox.readSheet().selected,{x:29,y:40});get('duplicateItem').onclick();const s=sandbox.readSheet();assert.equal(s.items.length,2);const [a,b]=s.items;
+ canvas.dispatch('pointerdown',event({clientX:(a.x-a.widthCm/2+.3)*10,clientY:(a.y+a.heightCm/2-.3)*10,shiftKey:true}));canvas.dispatch('pointerup',event());assert.equal(sandbox.readSheet().selection.size,2,'shift+click adds to selection');
+ sandbox.align('left');const left=Math.min(a.x-a.widthCm/2,b.x-b.widthCm/2);near(a.x-a.widthCm/2,left);near(b.x-b.widthCm/2,left);
+ const lx=a.x;get('lockItem').onclick();assert.ok(a.locked&&b.locked);canvas.dispatch('pointerdown',event({clientX:(a.x-a.widthCm/2+.3)*10,clientY:(a.y+a.heightCm/2-.3)*10}));assert.equal(sandbox.readSheet().drag,null,'locked designs do not drag');near(a.x,lx);
+ get('lockItem').onclick();assert.ok(!a.locked&&!b.locked);}
+{get('sheetWidth').value='30';get('sheetWidth').onchange();near(sandbox.readSheet().width(),30,'custom sheet width kept');assert.equal(canvas.width,300);
+ get('sheetWidth').value='58';get('sheetWidth').onchange();near(sandbox.readSheet().width(),58);}
 console.log('PASS: anchored rotated resize, sheet boundaries, aspect ratio, live cm controls, viewport pan, touch, cancellation and editing/eyedropper preservation.');

@@ -6,6 +6,7 @@ import {createOnnxSuperResolution,prefetchSuperResolution} from './ai-engine.js'
 import {outputDimensions} from './image-output.js';
 import {workerRequest,runPremiumPipeline} from './premium-pipeline.js';
 import {requireTransferImage} from './transfer-export.js';
+import {applyFilePrintMeasure} from './image-print-size.js';
 const $=id=>document.getElementById(id),canvas=$('premiumCanvas'),wrap=document.querySelector('.lab-canvas-wrap');
 let source=null,prepared=null,result=null,artifact=null,filename='diseno',busy=false,controller=null,view='original',colorChosen=false,zone=null,mode=null,gesture=null,fit=true,zoom=1;
 const engines={webgpu:null,wasm:null};let aiPrefetch=null;
@@ -20,7 +21,7 @@ function stage(name){let reached=false;for(const li of $('premiumSteps').childre
 function complete(){for(const li of $('premiumSteps').children)li.dataset.state='done';$('premiumProgress').value=100;}
 function waiting(){for(const li of $('premiumSteps').children)li.dataset.state=['vivid','ai'].includes(li.dataset.stage)&&prepared?'done':'waiting';}
 function progress(value){$('premiumProgress').hidden=false;$('premiumProgress').value=Math.round(value*100);}
-function layout(){if(canvas.hidden)return;const scale=Math.max(.03,Math.min(5,fit?Math.min((wrap.clientWidth-20)/canvas.width,(wrap.clientHeight-20)/canvas.height):zoom));canvas.style.width=canvas.width*scale+'px';canvas.style.height=canvas.height*scale+'px';$('premiumZoomLabel').textContent=fit?'Ajustar':Math.round(scale*100)+' %';if(fit)zoom=scale;}
+function layout(){if(canvas.hidden)return;const scale=Math.max(.03,Math.min(5,fit?Math.min((wrap.clientWidth-20)/canvas.width,(wrap.clientHeight-20)/canvas.height):zoom));canvas.style.width=canvas.width*scale+'px';canvas.style.height=canvas.height*scale+'px';$('premiumZoomLabel').textContent=fit?'A pantalla':Math.round(scale*100)+' %';if(fit)zoom=scale;}
 function show(){const image=view==='result'?result:view==='prepared'?prepared:source;if(!image)return;const scale=Math.min(1,1400/Math.max(image.width,image.height));canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0,canvas.width,canvas.height);
  const box=gesture?.box||zone;if(view==='prepared'&&$('premiumZone').value==='rect'&&box){ctx.save();ctx.strokeStyle='#bdff67';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.strokeRect(box.x*canvas.width,box.y*canvas.height,box.width*canvas.width,box.height*canvas.height);ctx.restore();}
  canvas.hidden=false;$('premiumEmpty').hidden=true;for(const [id,v] of [['premiumOriginal','original'],['premiumPrepared','prepared'],['premiumResult','result']]){$(id).classList.toggle('active',view===v);$(id).setAttribute('aria-pressed',String(view===v));}layout();document.dispatchEvent(new Event('lz-work-changed'));}
@@ -42,7 +43,7 @@ async function prepare(){if(!source||busy)return;busy=true;controller=new AbortC
  finally{worker?.terminate();if(copy)copy.width=copy.height=1;busy=false;controller=null;controls();}
 }
 async function upload(file,{savedPrepared=null,savedState=null}={}){if(!file||busy)return false;let image=null;busy=true;controls();status('Cargando imagen…');try{
- image=await decodeImageFile(file);validateImportSize(image.width,image.height);source?.close?.();prepared?.close?.();result?.close?.();if(prepared?.getContext)prepared.width=prepared.height=1;
+ image=await decodeImageFile(file);validateImportSize(image.width,image.height);try{await applyFilePrintMeasure(file,image,'widthCm','dpi');}catch(error){status(error.message);}source?.close?.();prepared?.close?.();result?.close?.();if(prepared?.getContext)prepared.width=prepared.height=1;
  source=image;prepared=null;result=null;artifact=null;filename=file.name;view='original';zone=null;colorChosen=false;mode=null;gesture=null;document.body.classList.remove('picking','premium-selecting');$('garmentColor').value='';$('premiumZone').value='all';$('drawPremiumZone').hidden=true;$('premiumName').textContent=file.name;$('premiumColorInfo').textContent='Elige el color de la prenda o selecciónalo en la imagen mejorada.';$('premiumZoneInfo').textContent='Se buscará ese color en toda la imagen.';$('premiumReport').textContent='El resultado se comprueba a la medida final de impresión.';waiting();fit=true;show();
  if(savedPrepared){prepared=await createImageBitmap(savedPrepared);validateImportSize(prepared.width,prepared.height);if(savedState){zone=savedState.zone;colorChosen=Boolean(savedState.colorChosen);$('premiumZone').value=zone?'rect':'all';$('drawPremiumZone').hidden=!zone;}$('premiumColorInfo').textContent=colorChosen?`Color a eliminar: ${$('premiumColor').value.toUpperCase()}`:'Selecciona un color para continuar.';view='prepared';waiting();show();status('Trabajo recuperado. Crea el semitono para verificarlo nuevamente.');}
  }catch(error){if(image!==source)image?.close?.();status(error.message||'No se pudo abrir la imagen.',true);return false;}finally{busy=false;controls();$('premiumFile').value='';}

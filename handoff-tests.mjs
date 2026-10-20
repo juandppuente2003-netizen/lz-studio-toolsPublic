@@ -15,7 +15,7 @@ globalThis.indexedDB={open(){const req={};setImmediate(()=>{req.result={close(){
   delete(token){schedule(()=>rows.delete(token))},
   openCursor(){const r={},keys=[...rows.keys()];let index=0;const next=()=>schedule(()=>{const key=keys[index++];r.result=key?{value:rows.get(key),delete(){rows.delete(key)},continue:next}:null;r.onsuccess?.()});next();return r}
 });return tx}};req.onsuccess()});return req}};
-const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
+const native=createRequire(import.meta.url)('@napi-rs/canvas');
 function newCanvas(){const canvas=native.createCanvas(1,1);canvas.toBlob=fn=>fn(new Blob([canvas.toBuffer('image/png')],{type:'image/png'}));return canvas}
 globalThis.document={createElement:()=>newCanvas()};
 const image=native.createCanvas(2400,1200),ctx=image.getContext('2d');ctx.fillStyle='#26b3a1';ctx.fillRect(100,100,500,400);

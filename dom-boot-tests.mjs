@@ -11,7 +11,7 @@ import {applyPremiumVivid} from './web/premium-engine.js';
 import {rectify,removeColor,edgeColor} from './web/extract-engine.js';
 import {AUTH_CONFIG} from './web/auth-config.js';
 import {pngBlobDensity} from './web/png.js';
-const native=createRequire('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/package.json')('@napi-rs/canvas');
+const native=createRequire(import.meta.url)('@napi-rs/canvas');
 class QAImage extends native.Image{set src(value){super.src=readFileSync(path.resolve('web',value));}}
 const routes=['premium.html','editor.html','editor.html?tool=remove','editor.html?tool=recolor','textures.html','color-enhance.html','upscale.html','extract.html','gang-sheet.html','thickness.html','opacity.html','crop.html','vectorize.html','text-creator.html','mockups.html','analyzer.html'];
 const pickerQA=process.argv.includes('--eyedropper'),premiumQA=process.argv.includes('--premium'),sheetQA=process.argv.includes('--sheet'),exportQA=process.argv.includes('--export');
