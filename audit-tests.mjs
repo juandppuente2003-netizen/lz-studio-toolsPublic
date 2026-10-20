@@ -106,7 +106,7 @@ const blob=await exportTiledPng({source:{width:w,height:h,data:rgba},sourceWidth
 for(let o=8;o<png.length;){const len=new DataView(png.buffer).getUint32(o),name=String.fromCharCode(...png.slice(o+4,o+8));if(name==='IDAT')chunks.push(png.slice(o+8,o+8+len));o+=len+12}
 const raw=new Uint8Array(await new Response(new Blob(chunks).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
 for(let y=0;y<h;y++)assert.deepEqual(raw.slice(y*(w*4+1)+1,(y+1)*(w*4+1)),new Uint8Array(expected.buffer,y*w*4,w*4),'export equals corrected pixels, never red inspection marks');
-for(const page of ['index','editor','opacity','textures','mockups','text-creator','vectorize','analyzer','gang-sheet','color-enhance','upscale','thickness']){
+for(const page of ['dtf','editor','opacity','textures','mockups','text-creator','vectorize','analyzer','gang-sheet','color-enhance','upscale','thickness']){
   const html=readFileSync(`./web/${page}.html`,'utf8');assert.ok(!html.includes('PREPRENSA TEXTIL'));assert.match(html,/class="brand-name"/);assert.match(html,/assets\/lz-studio-green\.svg/);assert.ok(!html.includes('class="brandmark"'));
 }
 assert.ok(existsSync('./web/assets/fonts/lz-display.woff'));assert.match(auditHtml,/href="preflight\.css"/);

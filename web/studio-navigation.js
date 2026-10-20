@@ -1,7 +1,10 @@
 // Reorder existing links without changing routes or tool access controls.
 export function groupStudioNavigation(){
  const menu=document.querySelector('.module-menu');if(!menu||menu.dataset.grouped)return;menu.dataset.grouped='true';
- const version=menu.querySelector('.menu-head .eyebrow');if(version)version.textContent='LZ_STUDIO_TOOLS · v52';
+ const version=menu.querySelector('.menu-head .eyebrow');if(version)version.textContent='LZ_STUDIO_TOOLS · v53';
+ // Add Box Studio link if not already present
+ if(!menu.querySelector('a[data-box-link]')){const boxLink=document.createElement('a');boxLink.className='module';boxLink.dataset.boxLink='1';boxLink.href='box/index.html';boxLink.innerHTML='<span>📦</span><strong>LZ Box Studio</strong><small>Cajas y piezas de MDF</small>';menu.querySelector('.menu-head')?.after(boxLink)||(menu.prepend(boxLink));}
+
  const groups=[['Preparar',['crop','extract','remove','recolor','upscale','color-enhance']],['Diseñar',['editor','premium','text-creator','textures','vectorize']],['Producir',['opacity','thickness','analyzer','gang-sheet']],['Presentar',['mockups']]];
  const links=[...menu.querySelectorAll('a.module')];
  const id=link=>{const url=new URL(link.getAttribute('href'),document.baseURI);return url.searchParams.get('tool')||url.pathname.split('/').pop().replace('.html','');};
