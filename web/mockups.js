@@ -33,7 +33,7 @@ function rebuildProduct(){const image=assets.get(state.product.id);if(!image)ret
 function drawDesign(){if(!design)return;const z=zone(),fit=Math.min(z.w/design.width,z.h/design.height),width=design.width*fit*state.scale/100,height=design.height*fit*state.scale/100,cx=z.x+state.x/100*z.w*.5,cy=z.y+state.y/100*z.h*.5,original=assets.get(state.product.id);designCtx.clearRect(0,0,SIZE,SIZE);designCtx.save();designCtx.translate(cx,cy);designCtx.rotate(state.rotation*Math.PI/180);designCtx.globalAlpha=.98;designCtx.drawImage(design,-width/2,-height/2,width,height);designCtx.restore();if(original){designCtx.save();designCtx.globalCompositeOperation='destination-in';designCtx.drawImage(original,0,0,SIZE,SIZE);designCtx.restore();}ctx.drawImage(designLayer,0,0);if(original){ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=state.product.category==='caps'?.21:.14;ctx.drawImage(original,0,0,SIZE,SIZE);ctx.restore();}}
 function drawHandles(){
   if(!design)return;const item=designGeometry(design,state,zone()),rect=canvas.getBoundingClientRect(),unit=SIZE/(rect.width||SIZE),r=5*unit;
-  ctx.save();ctx.fillStyle='#b8ff3d';ctx.strokeStyle='#090b0c';ctx.lineWidth=2*unit;
+  ctx.save();if(drag?.snap&&(drag.snap.x||drag.snap.y)){const z=zone();ctx.strokeStyle='#ffffffcc';ctx.lineWidth=1.5*unit;ctx.setLineDash([6*unit,5*unit]);if(drag.snap.x){ctx.beginPath();ctx.moveTo(z.x,z.y-z.h*.75);ctx.lineTo(z.x,z.y+z.h*.75);ctx.stroke();}if(drag.snap.y){ctx.beginPath();ctx.moveTo(z.x-z.w*.75,z.y);ctx.lineTo(z.x+z.w*.75,z.y);ctx.stroke();}ctx.setLineDash([]);}ctx.fillStyle='#ffffff';ctx.strokeStyle='#090b0c';ctx.lineWidth=2*unit;
   // Four handles on the artwork only; no product-area bounding rectangle.
   for(const corner of CORNERS){const p=cornerPosition(item,corner);ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();ctx.stroke()}
   ctx.restore();
@@ -62,10 +62,13 @@ canvas.addEventListener('pointermove',event=>{
   if(!drag){const item=designGeometry(design,state,z);canvas.style.cursor=hitCorner(item,p)?'nwse-resize':designContains(item,p)?'move':'default';return}
   if(drag.pointer!==event.pointerId)return;event.preventDefault();
   if(drag.corner)Object.assign(state,resizeMockup(drag.item,drag.startScale,drag.corner,p,z));
-  else{state.x=Math.max(-300,Math.min(300,drag.startX+(p.x-drag.x)/(z.w*.5)*100));state.y=Math.max(-300,Math.min(300,drag.startY+(p.y-drag.y)/(z.h*.5)*100));}
+  else{let nx=Math.max(-300,Math.min(300,drag.startX+(p.x-drag.x)/(z.w*.5)*100)),ny=Math.max(-300,Math.min(300,drag.startY+(p.y-drag.y)/(z.h*.5)*100));
+    // Magnet to the print-area centre lines; hold Alt to place freely.
+    drag.snap={x:!event.altKey&&Math.abs(nx)<2.5,y:!event.altKey&&Math.abs(ny)<2.5};if(drag.snap.x)nx=0;if(drag.snap.y)ny=0;state.x=nx;state.y=ny;}
+  drag.moved=true;
   setControls();render();
 });
-function stopDrag(event){if(!drag||(event&&event.pointerId!==drag.pointer))return;const id=drag.pointer;drag=null;canvas.classList.remove('dragging','resizing');if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id)}
+function stopDrag(event){if(!drag||(event&&event.pointerId!==drag.pointer))return;const id=drag.pointer,moved=drag.moved;drag=null;if(moved){recordMockup();render();}canvas.classList.remove('dragging','resizing');if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id)}
 canvas.addEventListener('pointerup',stopDrag);canvas.addEventListener('pointercancel',stopDrag);canvas.addEventListener('lostpointercapture',stopDrag);window.addEventListener('blur',()=>stopDrag());
 canvas.addEventListener('keydown',event=>{
   if(!design||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-'].includes(event.key))return;
@@ -73,7 +76,7 @@ canvas.addEventListener('keydown',event=>{
   if(event.key==='ArrowLeft')state.x=Math.max(-300,state.x-step);if(event.key==='ArrowRight')state.x=Math.min(300,state.x+step);
   if(event.key==='ArrowUp')state.y=Math.max(-300,state.y-step);if(event.key==='ArrowDown')state.y=Math.min(300,state.y+step);
   if(event.key==='+'||event.key==='=')state.scale=Math.min(600,state.scale*1.05);if(event.key==='-')state.scale=Math.max(5,state.scale/1.05);
-  setControls();render();
+  setControls();render();clearTimeout(nudgeTimer);nudgeTimer=setTimeout(recordMockup,350);
 });
 
 async function download(){render(false);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));render();if(!blob){status('No se pudo preparar el mockup.',true);return;}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`LZ_mockup_${state.product.id}_${state.color.slice(1)}.png`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);status('Mockup descargado en PNG · 1400 × 1400 px.');}
@@ -88,3 +91,15 @@ $('mockupZoomIn').onclick=()=>{mockupFit=false;mockupZoom=Math.min(3,mockupZoom*
 try{for(const product of products)assets.set(product.id,await loadImage(product.asset));rebuildProduct();renderProducts();$('canvasLoading').hidden=true;requestAnimationFrame(layoutMockup);status('Mockups listos. Carga un diseño para comenzar.');}catch(error){$('canvasLoading').textContent='No se pudieron cargar los productos.';status(error.message||'No se pudieron preparar los mockups.',true);}
 
 registerStudioModule({id:'mockups',getExportInfo:()=>({widthCm:SIZE/300*2.54,dpi:300,aspect:1}),getComparison:()=>{if(!design)return null;render(false);const after=document.createElement('canvas');after.width=after.height=SIZE;after.getContext('2d').drawImage(canvas,0,0);render();return [productLayer,after];},onFit:()=>{mockupFit=true;layoutMockup();},getDraft:()=>design?{images:{design},data:{...state,product:state.product.id}}:null,restoreDraft:async d=>{await useDesign(await createImageBitmap(d.images.design),'Diseño recuperado');await selectProduct(d.data.product);Object.assign(state,d.data,{product:products.find(p=>p.id===d.data.product)||products[0]});setControls();renderProducts();rebuildProduct();},afterRestore:()=>{controlValues();rebuildProduct();},onZoom:factor=>{mockupFit=false;mockupZoom=Math.max(.05,Math.min(3,mockupZoom*factor));layoutMockup();},exportCurrent:async()=>{requireTransferImage(design);render(false);try{return await canvasArtifact(canvas,`mockup_${state.product.id}.png`)}finally{render()}},importCurrent:async(blob,name)=>{const image=await createImageBitmap(blob);await useDesign(image,name);return true}});
+
+// v51 · Undo/redo for placement, product, garment colour and background (up to 40 steps).
+let mockupHistory=[],mockupIndex=-1,restoringMockup=false,nudgeTimer=null;
+function mockupSnapshot(){return {product:state.product.id,category:state.category,color:state.color,background:state.background,scale:state.scale,x:state.x,y:state.y,rotation:state.rotation}}
+function recordMockup(){if(restoringMockup)return;const snap=mockupSnapshot(),key=JSON.stringify(snap);if(mockupIndex>=0&&JSON.stringify(mockupHistory[mockupIndex])===key)return;mockupHistory=mockupHistory.slice(0,mockupIndex+1);mockupHistory.push(snap);if(mockupHistory.length>40)mockupHistory.shift();mockupIndex=mockupHistory.length-1;updateMockupHistory();}
+function updateMockupHistory(){const undo=$('mockupUndo'),redo=$('mockupRedo');if(undo)undo.disabled=mockupIndex<=0;if(redo)redo.disabled=mockupIndex>=mockupHistory.length-1;}
+function restoreMockup(delta){const next=mockupIndex+delta;if(drag||next<0||next>=mockupHistory.length)return;restoringMockup=true;mockupIndex=next;const snap=mockupHistory[next],product=products.find(item=>item.id===snap.product)||products[0];Object.assign(state,snap,{product});for(const button of document.querySelectorAll('[data-category]')){const active=button.dataset.category===state.category;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}$('productName').textContent=product.name+' · frente';$('productColor').value=state.color;$('mockupBackground').value=state.background;renderProducts();setControls();rebuildProduct();restoringMockup=false;updateMockupHistory();status(delta<0?'Cambio deshecho.':'Cambio rehecho.');}
+for(const id of ['designScale','designX','designY','designRotation','productColor','mockupBackground'])$(id)?.addEventListener('change',()=>setTimeout(recordMockup));
+document.addEventListener('click',event=>{if(event.target.closest?.('[data-product],[data-color],[data-category],#resetDesign'))setTimeout(recordMockup);});
+if($('mockupUndo'))$('mockupUndo').onclick=()=>restoreMockup(-1);if($('mockupRedo'))$('mockupRedo').onclick=()=>restoreMockup(1);
+document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName)||document.querySelector('dialog[open]'))return;const key=event.key.toLowerCase();if(key==='z'){event.preventDefault();restoreMockup(event.shiftKey?1:-1);}else if(key==='y'){event.preventDefault();restoreMockup(1);}});
+recordMockup();

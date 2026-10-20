@@ -1,0 +1,14 @@
+LZ STUDIO TOOLS — v51
+
+Mockups
+- Deshacer y Rehacer (botones y Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z o Ctrl+Y): posición, tamaño, rotación, producto, color de prenda y fondo. Hasta 40 pasos.
+- Imán de centrado: al arrastrar cerca del centro del área de impresión el diseño se alinea solo y aparece una guía. Mantén Alt para colocarlo libremente.
+- Tiradores blancos (aún eran verdes) y un anillo de foco más discreto sobre el lienzo.
+- La descarga sigue a 1400 × 1400 px: las fotos de producto miden 1254 px, así que una salida mayor no agregaría detalle real.
+
+Semitonos Premium
+- Nueva sección "Trama del semitono": frecuencia (20, 25, 30, 35, 45 LPI), forma (círculos, rombos, cuadrados, líneas), ángulo (45°, 22.5°, 15°, 75°) y rango del degradado. Los valores iniciales son los de siempre (25 LPI, círculos, rango 30) y producen el mismo resultado. Un aviso explica el tamaño de celda y qué densidades no alcanzan 0.5 mm. Las correcciones automáticas de 0.5 mm se aplican igual.
+- El resumen y el paso "Crear semitono" muestran la trama elegida.
+
+Pruebas
+- halftone-limits-tests.mjs añade comprobaciones de la trama de Premium (predeterminados intactos y valores no válidos rechazados). npm test completo en verde.

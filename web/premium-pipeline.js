@@ -9,8 +9,8 @@ export function workerRequest(worker,message,transfer=[],signal){
   try{worker.postMessage(message,transfer);}catch(error){finish(reject,error);}
  });
 }
-export async function runPremiumPipeline({source,color,zone=null,widthCm,dpi,signal,onStage,onProgress}){
- const dimensions=outputDimensions(widthCm,dpi,source.width/source.height),params=premiumParams(color,widthCm,dpi);validatePremiumZone(zone);signal?.throwIfAborted();
+export async function runPremiumPipeline({source,color,zone=null,widthCm,dpi,screen={},signal,onStage,onProgress}){
+ const dimensions=outputDimensions(widthCm,dpi,source.width/source.height),params=premiumParams(color,widthCm,dpi,screen);validatePremiumZone(zone);signal?.throwIfAborted();
  let image=null,blob=null,purged=0;const worker=new Worker('premium-worker.js',{type:'module'});
  const stage=(name,index)=>{signal?.throwIfAborted();onStage?.(name);return value=>onProgress?.((index+value)/6);};
  const replace=async next=>{signal?.throwIfAborted();const decoded=await createImageBitmap(next);if(signal?.aborted){decoded.close?.();signal.throwIfAborted();}image?.close?.();image=decoded;blob=next;};

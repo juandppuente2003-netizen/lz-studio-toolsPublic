@@ -26,3 +26,10 @@ const binary=processPixels(patch(128),W,H,base,30);assert.ok([...binary].every((
 const smooth=processPixels(patch(128),W,H,{...base,previewSamples:3},30);assert.ok([...smooth].some((v,i)=>i%4===3&&v>0&&v<255),'preview anti-aliasing');
 assert.ok(Math.abs(coverage(smooth)-coverage(binary))<.03,'anti-aliasing preserves tone');
 console.log('PASS: printable dot/hole limits in mm (drop, grow, fill), neutral defaults, binary export and tone-preserving anti-aliased preview.');
+
+// Premium: configurable screen with the tested defaults (25 LPI · circles · range 30) and strict whitelisting.
+const {premiumParams}=await import('./web/premium-engine.js');
+const def=premiumParams('#000000',28,300);assert.deepEqual([def.lpi,def.shape,def.halftoneRange,def.angle],[25,'circle',30,45]);
+const custom=premiumParams('#000000',28,300,{lpi:'35',shape:'diamond',halftoneRange:'40',angle:'22.5'});assert.deepEqual([custom.lpi,custom.lpi2,custom.shape,custom.halftoneRange,custom.angle],[35,35,'diamond',40,22.5]);
+const junk=premiumParams('#000000',28,300,{lpi:'7',shape:'star',halftoneRange:'500',angle:'33'});assert.deepEqual([junk.lpi,junk.shape,junk.halftoneRange,junk.angle],[25,'circle',30,45],'unknown values fall back to defaults');
+console.log('PASS: Premium screen options keep the 25/30 defaults and reject unsupported values.');

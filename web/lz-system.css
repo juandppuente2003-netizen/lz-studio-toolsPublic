@@ -36,7 +36,7 @@ a{color:var(--lz-text);text-underline-offset:3px}
 
 /* Foco visible y consistente en todos los controles. */
 :is(button,a,summary,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--lz-accent)!important;outline-offset:2px!important;box-shadow:none}
-canvas:focus-visible{outline:2px solid var(--lz-accent);outline-offset:-2px}
+canvas:focus-visible,canvas[tabindex]:focus-visible{outline:1px solid #ffffff59!important;outline-offset:-1px!important}
 
 /* Kickers decorativos sobre títulos: el título se sostiene solo. */
 .tool-intro>.eyebrow,.lz-tool-context>span,:is(.canvas-toolbar,.lab-toolbar,.mockup-toolbar,.text-toolbar) .eyebrow,:is(.workspace-footer,.lab-footer,.mockup-footer,.text-footer) .eyebrow{display:none}
