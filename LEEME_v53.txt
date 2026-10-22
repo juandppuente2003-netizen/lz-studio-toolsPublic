@@ -20,3 +20,13 @@ Rendimiento
 - LZ Box Studio: textura y miniaturas en WebP (5.9 MB → 2.2 MB por carga).
 
 Pruebas nuevas: catalog-tests.mjs, dot-precision-tests.mjs.
+
+Mockups
+- Frente y espalda: en playeras, dry fit y sudadera puedes activar «Agregar diseño en la espalda».
+  Cada lado tiene su propio diseño y posición; la zona de la espalda queda bajo el cuello (o bajo el gorro).
+  La descarga puede ser «Frente y espalda en una imagen» (2800 × 1400 px) o solo el lado visible.
+  Las gorras siguen solo con vista de frente.
+- Mockups 3D (nuevo, mockups-3d.html): playera, oversize y manga larga en 3D; varios diseños
+  (hasta 12) proyectados sobre la tela; arrastrar para mover, ancho en cm, rotación, frente, espalda,
+  pecho izquierdo y mangas; deshacer/rehacer; PNG de una, dos o cuatro vistas.
+  Usa el mismo interruptor del panel que Mockups.

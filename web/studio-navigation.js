@@ -10,7 +10,7 @@ export function groupStudioNavigation(){
   menu.querySelector('.menu-head')?.after(nav);}
  for(const a of menu.querySelectorAll('a.module[href="index.html"]')){a.href='dtf.html';const title=a.querySelector('strong');if(title)title.textContent='Catálogo DTF';}
  const here=location.pathname.split('/').pop()+location.search;for(const a of menu.querySelectorAll('a.module')){if(a.getAttribute('href')===here||(here==='editor.html'&&a.getAttribute('href')==='editor.html'))a.setAttribute('aria-current','page');}
- const groups=[['Preparar',['crop','extract','remove','recolor','upscale','color-enhance']],['Diseñar',['editor','premium','text-creator','textures','vectorize']],['Producir',['opacity','thickness','analyzer','gang-sheet']],['Presentar',['mockups']]];
+ const groups=[['Preparar',['crop','extract','remove','recolor','upscale','color-enhance']],['Diseñar',['editor','premium','text-creator','textures','vectorize']],['Producir',['opacity','thickness','analyzer','gang-sheet']],['Presentar',['mockups','mockups-3d']]];
  const links=[...menu.querySelectorAll('a.module')];
  const id=link=>{const url=new URL(link.getAttribute('href'),document.baseURI);return url.searchParams.get('tool')||url.pathname.split('/').pop().replace('.html','');};
  for(const [name,ids] of groups){const section=document.createElement('section');section.className='lz-nav-group';const heading=document.createElement('h3');heading.textContent=name;section.append(heading);for(const key of ids){const link=links.find(a=>id(a)===key);if(!link)continue;link.querySelector('span')?.setAttribute('hidden','');section.append(link);}if(section.children.length>1)menu.append(section);}

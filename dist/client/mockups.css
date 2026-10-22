@@ -12,3 +12,15 @@
 @media(max-width:1000px){.mockup-studio{grid-template-columns:320px minmax(0,1fr)}.mockup-workspace{padding:18px}.product-grid{grid-template-columns:repeat(2,1fr)}.toolbar-controls{gap:8px;flex-wrap:wrap;justify-content:flex-end}}
 @media(max-width:700px){.mockup-studio{display:flex;flex-direction:column}.mockup-workspace{order:0;max-height:none;height:620px}.mockup-tools{order:1;max-height:none;border-right:0;border-top:1px solid var(--line);padding:24px 20px}.mockup-toolbar{align-items:flex-start}.toolbar-controls{flex-direction:column;align-items:flex-end}.mockup-canvas-wrap{min-height:390px}.mockup-footer p{display:none}.product-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:440px){.mockup-workspace{height:560px;padding:14px}.mockup-toolbar strong{font-size:15px}.toolbar-controls label:first-child{display:none}.mockup-canvas-wrap{min-height:340px}.mockup-footer{margin-top:12px;padding-top:12px}.mockup-tools{padding:22px 16px}.product-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* Frente y espalda (v53) */
+.side-check{display:flex;align-items:center;gap:10px;font-size:14px;margin:6px 0 4px}
+.side-check input{width:18px;height:18px;margin:0;accent-color:var(--lz-text,#fff)}
+.side-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid var(--lz-line,#2a2c2f);border-radius:var(--lz-radius,8px);margin:10px 0}
+.side-switch[hidden]{display:none}
+.side-switch button{min-height:34px;border:1px solid transparent;background:transparent;font-size:13px}
+.side-switch button[aria-pressed=true]{background:var(--lz-surface-3,#26282a);border-color:var(--lz-line-strong,#3b3e41);color:var(--lz-text,#fff);font-weight:600}
+.mockup-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mockup-title .side-switch{margin:0;min-width:200px}
+.output-choice{display:grid;gap:6px;font-size:13px;margin-top:6px}
+.output-choice[hidden]{display:none}

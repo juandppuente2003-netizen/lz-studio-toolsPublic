@@ -49,7 +49,7 @@ for(const page of pages){
   for(const [,url] of html.matchAll(/(?:href|src)="([^"]+)"/g))if(!/^(?:https?:|data:|#)/.test(url))assert.ok(existsSync('./web/'+url.split(/[?#]/)[0]),`${page}: ${url}`);
 }
 const home=readFileSync('./web/index.html','utf8');assert.ok(home.includes('dtf.html'),'index: links to dtf.html');assert.ok(home.includes('box/index.html'),'index: links to box/index.html');assert.ok(!home.includes('app.js'));
-const dtf=readFileSync('./web/dtf.html','utf8');assert.equal((dtf.match(/class="tool-card"/g)||[]).length,16);assert.match(dtf,/editor\.html\?tool=recolor/);
+const dtf=readFileSync('./web/dtf.html','utf8');assert.equal((dtf.match(/class="tool-card"/g)||[]).length,17);assert.match(dtf,/editor\.html\?tool=recolor/);
 const app=readFileSync('./web/app.js','utf8');assert.match(app,/setTool\(initialTool\)/);assert.match(app,/recolorOn:false/);
 
 // Exercise the real tiled PNG exporter and its effect dispatch. This adapter

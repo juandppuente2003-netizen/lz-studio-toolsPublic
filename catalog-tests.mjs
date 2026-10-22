@@ -23,12 +23,12 @@ async function boot({total=null,remove=[]}={}){
 }
 
 // 16 tarjetas configuradas; el servidor quitó 3 desactivadas.
-let t=await boot({total:16,remove:['analyzer','extract','vectorize']});
-assert.equal(t.visible().length,13);
-assert.match(t.$('searchStatus').textContent,/13 herramientas disponibles · 16 en total, 3 desactivadas/);
+let t=await boot({total:17,remove:['analyzer','extract','vectorize']});
+assert.equal(t.visible().length,14);
+assert.match(t.$('searchStatus').textContent,/14 herramientas disponibles · 17 en total, 3 desactivadas/);
 assert.equal(t.warnings.length,2,'los fallos de módulos secundarios solo se registran');
 // Búsqueda «pliego»
-t.type('pliego');assert.deepEqual(t.visible(),['sheet']);assert.equal(t.$('clearSearch').hidden,false);assert.equal(t.$('resetFilters').hidden,false);assert.match(t.$('searchStatus').textContent,/^1 de 13/);
+t.type('pliego');assert.deepEqual(t.visible(),['sheet']);assert.equal(t.$('clearSearch').hidden,false);assert.equal(t.$('resetFilters').hidden,false);assert.match(t.$('searchStatus').textContent,/^1 de 14/);
 // Sin acentos y con sinónimos
 t.type('grosor');assert.deepEqual(t.visible(),['thickness']);
 t.type('gang sheet');assert.deepEqual(t.visible(),['sheet']);
@@ -36,16 +36,16 @@ t.type('gang sheet');assert.deepEqual(t.visible(),['sheet']);
 t.type('zzzz');assert.equal(t.visible().length,0);assert.equal(t.$('noTools').hidden,false);assert.match(t.$('noToolsTerm').textContent,/zzzz/);
 for(const s of t.doc.querySelectorAll('.tool-section'))assert.equal(s.hidden,true);
 // Limpiar búsqueda
-t.$('clearSearch').click();assert.equal(t.$('toolSearch').value,'');assert.equal(t.visible().length,13);assert.equal(t.$('noTools').hidden,true);
+t.$('clearSearch').click();assert.equal(t.$('toolSearch').value,'');assert.equal(t.visible().length,14);assert.equal(t.$('noTools').hidden,true);
 // Filtros «Creación» y «Pliegos y mockups»
 const filter=g=>t.doc.querySelector(`[data-category="${g}"]`);
 filter('group-02').click();assert.equal(filter('group-02').getAttribute('aria-pressed'),'true');assert.equal(filter('all').getAttribute('aria-pressed'),'false');assert.deepEqual(t.visible(),['text','texture','recolor']);
-filter('group-03').click();assert.deepEqual(t.visible(),['sheet','mockups']);assert.equal(filter('group-02').getAttribute('aria-pressed'),'false');
+filter('group-03').click();assert.deepEqual(t.visible(),['sheet','mockups','mockups3d']);assert.equal(filter('group-02').getAttribute('aria-pressed'),'false');
 // Contadores de filtros calculados con las herramientas habilitadas
-assert.equal(filter('group-02').querySelector('.filter-count').textContent,'3');assert.equal(filter('all').querySelector('.filter-count').textContent,'13');
+assert.equal(filter('group-02').querySelector('.filter-count').textContent,'3');assert.equal(filter('all').querySelector('.filter-count').textContent,'14');
 // Búsqueda + filtro juntos y restablecer
 t.type('semitono');assert.equal(t.visible().length,0);assert.match(t.$('noToolsTerm').textContent,/en esta categoría/);
-t.$('noToolsReset').click();assert.equal(t.$('toolSearch').value,'');assert.equal(filter('all').getAttribute('aria-pressed'),'true');assert.equal(t.visible().length,13);assert.equal(t.$('resetFilters').hidden,true);
+t.$('noToolsReset').click();assert.equal(t.$('toolSearch').value,'');assert.equal(filter('all').getAttribute('aria-pressed'),'true');assert.equal(t.visible().length,14);assert.equal(t.$('resetFilters').hidden,true);
 // Las desactivadas no aparecen en búsquedas
 t.type('vectorizar');assert.equal(t.visible().length,0);t.type('');
 // Menú «Módulos»: abre, cierra con Escape y devuelve el foco
@@ -57,11 +57,11 @@ t.type('pliego');t.$('toolSearch').dispatchEvent(new t.window.KeyboardEvent('key
 // Recientes: se guarda al abrir y se muestra
 t.doc.querySelector('[data-tool="sheet"] .open-tool').addEventListener('click',e=>e.preventDefault());t.doc.querySelector('[data-tool="sheet"] .open-tool').click();
 assert.deepEqual(JSON.parse(t.window.localStorage.getItem('lz-recent-tools')),['gang-sheet.html']);
-t=await boot();assert.match(t.$('searchStatus').textContent,/^16 herramientas disponibles$/,'sin desactivadas no menciona total');
+t=await boot();assert.match(t.$('searchStatus').textContent,/^17 herramientas disponibles$/,'sin desactivadas no menciona total');
 
 // Tarjetas: cada una explica qué acepta y qué entrega; las rutas siguen siendo podables por el servidor.
 const cards=[...html.matchAll(/<article\b[^>]*class="tool-card"[^>]*>[\s\S]*?<\/article>/g)].map(m=>m[0]);
-assert.equal(cards.length,16);for(const c of cards){assert.match(c,/<dt>Acepta<\/dt><dd>[^<]+<\/dd>/);assert.match(c,/<dt>Entrega<\/dt><dd>[^<]+<\/dd>/);assert.match(c,/class="open-tool" href="[^"]+"/);}
+assert.equal(cards.length,17);for(const c of cards){assert.match(c,/<dt>Acepta<\/dt><dd>[^<]+<\/dd>/);assert.match(c,/<dt>Entrega<\/dt><dd>[^<]+<\/dd>/);assert.match(c,/class="open-tool" href="[^"]+"/);}
 assert.equal((html.match(/class="topbar/g)||[]).length,1,'una sola barra superior');assert.doesNotMatch(html,/lz-suite-nav/);
 
 // Destinos después de iniciar sesión: conservan parámetros y Box Studio; rechazan externos.
@@ -80,8 +80,12 @@ const assets={'/dtf.html':{body:html,type:'text/html; charset=utf-8',public:true
 const catalog=[{id:'analyzer',enabled:false},{id:'extract',enabled:false},{id:'vectorize',enabled:false},...['color','crop','editor','mockups','opacity','recolor','sheet','text','texture','thickness','upscale'].map(id=>({id,enabled:true}))];
 const app=createHandler({assets,fetchUpstream:async url=>{if(String(url).includes('/lz_tools'))return Response.json(catalog);return new Response('{}',{status:401});}});
 let res=await app.fetch(new Request('https://x.test/dtf.html'));let body=await res.text();
-assert.equal((body.match(/class="tool-card"/g)||[]).length,13);assert.match(body,/data-tools-total="16"/);assert.doesNotMatch(body,/href="vectorize.html"/);assert.doesNotMatch(body,/href="analyzer.html"/);
-res=await app.fetch(new Request('https://x.test/index.html'));body=await res.text();assert.match(body,/13 de 16 herramientas activas/);
+assert.equal((body.match(/class="tool-card"/g)||[]).length,14);assert.match(body,/data-tools-total="17"/);assert.doesNotMatch(body,/href="vectorize.html"/);assert.doesNotMatch(body,/href="analyzer.html"/);
+res=await app.fetch(new Request('https://x.test/index.html'));body=await res.text();assert.match(body,/14 de 17 herramientas activas/);
 res=await app.fetch(new Request('https://x.test/studio-navigation.js'));assert.equal(res.status,200,'navegación pública sin sesión');
 res=await app.fetch(new Request('https://x.test/crop-app.js'));assert.equal(res.status,401,'motores siguen protegidos');
+// Mockups 3D comparte el interruptor de Mockups
+assert.equal(parseReturn('mockups-3d.html').name,'Mockups 3D');
+const gated=createHandler({assets:{'/mockups-3d.html':{body:'<h1>3D</h1>',type:'text/html; charset=utf-8',public:true}},fetchUpstream:async url=>Response.json([{id:'mockups',enabled:false}])});
+assert.equal((await gated.fetch(new Request('https://x.test/mockups-3d.html'))).status,403,'desactivar Mockups también desactiva Mockups 3D');
 console.log('PASS: catálogo sin dependencias bloqueantes, búsqueda, sin resultados, filtros, restablecer, menú con Escape y foco, contadores totales/disponibles, recientes, retorno seguro tras iniciar sesión y contador de portada desde el panel.');

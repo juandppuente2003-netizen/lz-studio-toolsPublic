@@ -20,8 +20,8 @@ export const routes={premium:"premium.html",crop:'crop.html',editor:'editor.html
 export async function rpc(name,args={}) {const {data,error}=await client.rpc(name,args);if(error)throw error;return data;}
 export async function rows(table) {let result=[];for(let offset=0;;offset+=1000){const {data,error}=await client.from(table).select('*').order('id').range(offset,offset+999);if(error)throw error;result.push(...data);if(data.length<1000)return result;}}
 // Rutas protegidas a las que se puede volver después de iniciar sesión.
-export const protectedPages={...Object.fromEntries(Object.entries(routes).map(([id,route])=>[route,id])),'box/index.html':'box'};
-export const toolNames={premium:'Semitonos Premium',editor:'Semitonos',remove:'Quitar fondo color',recolor:'Reemplazar color',crop:'Recortar imagen',opacity:'Semitransparencias',thickness:'Auditor de grosor',texture:'Texturas',text:'Creador de textos',mockups:'Mockups',vectorize:'Vectorizar',analyzer:'Preparar para impresión',sheet:'Pliego DTF',color:'Mejorar colores',upscale:'Mejorar imágenes',extract:'Extraer diseño',box:'LZ Box Studio'};
+export const protectedPages={...Object.fromEntries(Object.entries(routes).map(([id,route])=>[route,id])),'mockups-3d.html':'mockups3d','box/index.html':'box'};
+export const toolNames={premium:'Semitonos Premium',editor:'Semitonos',remove:'Quitar fondo color',recolor:'Reemplazar color',crop:'Recortar imagen',opacity:'Semitransparencias',thickness:'Auditor de grosor',texture:'Texturas',text:'Creador de textos',mockups:'Mockups',vectorize:'Vectorizar',analyzer:'Preparar para impresión',sheet:'Pliego DTF',color:'Mejorar colores',upscale:'Mejorar imágenes',extract:'Extraer diseño',mockups3d:'Mockups 3D',box:'LZ Box Studio'};
 // Conserva la página y sus parámetros; solo acepta destinos internos conocidos.
 export function parseReturn(value){
  if(typeof value!=='string'||value.length>600)return null;let url;
@@ -31,7 +31,7 @@ export function parseReturn(value){
  if(!id)return null;return {id,page,href:page+url.search+url.hash,name:toolNames[id]||'la herramienta'};
 }
 export function safeReturn(value){return parseReturn(value)?.href||'index.html';}
-export function toolCatalogId(id){return ['remove','premium'].includes(id)?'editor':id;}
+export function toolCatalogId(id){return ['remove','premium'].includes(id)?'editor':id==='mockups3d'?'mockups':id;}
 export async function identity(){if(!client)return null;const {data,error}=await client.auth.getUser();if(error||!data.user)return null;await rpc('lz_ensure_profile');const [profiles,isAdmin,tools]=await Promise.all([rows('lz_profiles'),rpc('lz_is_admin'),rows('lz_tools')]);return {user:data.user,profile:profiles.find(p=>p.id===data.user.id),profiles,isAdmin,tools};}
 export function allowed(state,id){return Boolean(state&&state.profile&&!state.profile.blocked&&routes[id]&&state.tools.some(t=>t.id===(['remove','premium'].includes(id)?'editor':id)&&t.enabled!==false));}
 export async function syncServerSession(session){const response=await fetch('/api/account/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session?.access_token||null,remember:rememberSession()}),credentials:'same-origin'});if(!response.ok){let data={};try{data=await response.json();}catch{}const error=new Error(data.message||'No pudimos verificar tu sesión.');error.status=response.status;throw error;}}
