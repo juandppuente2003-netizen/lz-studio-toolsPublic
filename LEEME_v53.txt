@@ -26,7 +26,8 @@ Mockups
   Cada lado tiene su propio diseño y posición; la zona de la espalda queda bajo el cuello (o bajo el gorro).
   La descarga puede ser «Frente y espalda en una imagen» (2800 × 1400 px) o solo el lado visible.
   Las gorras siguen solo con vista de frente.
-- Mockups 3D (nuevo, mockups-3d.html): playera, oversize y manga larga en 3D; varios diseños
-  (hasta 12) proyectados sobre la tela; arrastrar para mover, ancho en cm, rotación, frente, espalda,
-  pecho izquierdo y mangas; deshacer/rehacer; PNG de una, dos o cuatro vistas.
+- Mockups 3D (nuevo, mockups-3d.html): playera regular, dry fit deportiva (raglán), oversize y manga larga,
+  construidas desde su patrón plano en cm; varios diseños (hasta 12) proyectados sobre la tela; arrastrar para
+  mover y arrastrar sus esquinas para agrandar o achicar (también + y −), ancho en cm, rotación, frente,
+  espalda, pecho izquierdo y mangas; fondo con color personalizado; deshacer/rehacer; PNG de 1, 2 o 4 vistas.
   Usa el mismo interruptor del panel que Mockups.

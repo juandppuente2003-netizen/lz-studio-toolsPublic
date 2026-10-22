@@ -2,7 +2,7 @@
 // y se puede arrastrar sobre la superficie, escalar en cm y rotar.
 import * as THREE from './box/vendor/three.module.min.js';
 import {DecalGeometry} from './vendor/three-decal.js';
-import {buildGarment,garments,placements,UNIT_CM} from './mockup3d-garment.js';
+import {buildGarment,placements,zoneOf,UNIT_CM} from './mockup3d-garment.js';
 import {registerStudioModule} from './studio-shell.js';
 
 const $=id=>document.getElementById(id);
@@ -19,13 +19,15 @@ scene.add(new THREE.HemisphereLight(0xffffff,0x3a3d40,1.15));
 const key=new THREE.DirectionalLight(0xffffff,2.1);key.position.set(2.4,3,3.2);scene.add(key);
 const fill=new THREE.DirectionalLight(0xffffff,.7);fill.position.set(-3,1,2);scene.add(fill);
 const rim=new THREE.DirectionalLight(0xffffff,.9);rim.position.set(0,2.5,-3.5);scene.add(rim);
-const orbit={az:0,el:.06,dist:3.4,target:new THREE.Vector3(0,-.08,0)};
+const orbit={az:0,el:.05,dist:3.4,target:new THREE.Vector3(0,-.33,0)};
 let garment=null;const decalGroup=new THREE.Group();scene.add(decalGroup);
 const frame=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0xb8ff3d,depthTest:false,transparent:true}));frame.renderOrder=999;scene.add(frame);
+// Esquinas para cambiar el tamaño arrastrando, como en Mockups.
+const handles=new THREE.Points(new THREE.BufferGeometry(),new THREE.PointsMaterial({color:0xffffff,size:11,sizeAttenuation:false,depthTest:false,transparent:true}));handles.renderOrder=1000;scene.add(handles);let frameCorners=[];
 
 function placeCamera(){const {az,el,dist,target}=orbit;camera.position.set(target.x+dist*Math.sin(az)*Math.cos(el),target.y+dist*Math.sin(el),target.z+dist*Math.cos(az)*Math.cos(el));camera.lookAt(target);}
 // En pantallas angostas la cámara se aleja para que entren las mangas.
-let userZoom=false;const fitDist=()=>3.4*Math.max(1,1/camera.aspect)**.85;
+let userZoom=false;const fitDist=()=>3.3*Math.max(1,1/camera.aspect)**.85;
 function resize(){const w=wrap.clientWidth,h=wrap.clientHeight;if(!w||!h)return;renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(!userZoom)orbit.dist=fitDist();draw();}
 let pending=false;
 function draw(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;placeCamera();updateFrame();renderer.setClearColor(state.background==='transparent'?0x000000:state.background,state.background==='transparent'?0:1);renderer.render(scene,camera);});}
@@ -42,28 +44,28 @@ function setGarment(type){
 
 /* Diseños -------------------------------------------------------------- */
 const raycaster=new THREE.Raycaster(),helper=new THREE.Object3D();
-function targetMeshes(){return garment?[garment.meshes.body,garment.meshes.sleeveL,garment.meshes.sleeveR]:[];}
+function targetMeshes(){return garment?Object.values(garment.meshes):[];}
 function hitGarment(from,to){from=from.clone();from.x+=1e-4;to=to.clone();to.x+=1e-4;raycaster.set(from,to.clone().sub(from).normalize());const hit=raycaster.intersectObjects(targetMeshes(),false)[0];return hit||null;}
-function zoneFor(hit){if(hit.object.name!=='body')return hit.object.name;return hit.face.normal.z>=0||hit.point.z>=0?'front':'back';}
+function zoneFor(hit){return zoneOf(garment.spec,hit.point,hit.object.name==='back'?'back':'front');}
 function applyHit(item,hit){const normal=hit.face.normal.clone().transformDirection(hit.object.matrixWorld);if(normal.dot(raycaster.ray.direction)>0)normal.negate();item.point=hit.point.clone();item.normal=normal;item.target=hit.object.name;item.zone=zoneFor(hit);}
 function positionAt(item,where){const p=placements(garment.spec)[where]||placements(garment.spec).front;const hit=hitGarment(p.from,p.to);if(hit)applyHit(item,hit);item.zone=where;}
 function sizeOf(item){const w=item.widthCm/UNIT_CM;return new THREE.Vector3(w,w/item.aspect,Math.max(.12,Math.min(.3,w*.8)));}
 function orientation(item){helper.position.copy(item.point);helper.up.set(0,1,0);if(Math.abs(item.normal.y)>.95)helper.up.set(0,0,1);helper.lookAt(item.point.clone().add(item.normal));helper.rotateZ(THREE.MathUtils.degToRad(item.rotation));return helper.rotation.clone();}
 function rebuild(item){
  if(item.mesh){decalGroup.remove(item.mesh);item.mesh.geometry.dispose();}
- const target=garment.meshes[item.target]||garment.meshes.body;
+ const target=garment.meshes[item.target]||garment.meshes.front;
  const geometry=new DecalGeometry(target,item.point,orientation(item),sizeOf(item));
- item.material??=new THREE.MeshStandardMaterial({map:item.texture,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4,roughness:.86,metalness:0});
+ item.material??=new THREE.MeshStandardMaterial({map:item.texture,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4,roughness:1,metalness:0});
  item.mesh=new THREE.Mesh(geometry,item.material);item.mesh.renderOrder=10+item.order;item.mesh.userData.id=item.id;decalGroup.add(item.mesh);
 }
 function rebuildAll(){items.forEach((item,i)=>{item.order=i;rebuild(item);});renderList();}
 function updateFrame(){
- const item=items.find(i=>i.id===selected);if(!item||!item.point){frame.visible=false;return;}
+ const item=items.find(i=>i.id===selected);frameCorners=[];if(!item||!item.point){frame.visible=handles.visible=false;return;}
  // El marco solo se ve si el diseño está del lado que mira a la cámara.
- if(item.normal.dot(camera.position.clone().sub(item.point))<=0){frame.visible=false;return;}
+ if(item.normal.dot(camera.position.clone().sub(item.point))<=0){frame.visible=handles.visible=false;return;}
  frame.visible=true;const s=sizeOf(item);helper.position.copy(item.point);helper.rotation.copy(orientation(item));helper.updateMatrixWorld(true);
  const hw=s.x/2,hh=s.y/2,lift=.006,c=[[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].map(([x,y])=>new THREE.Vector3(x,y,lift).applyMatrix4(helper.matrixWorld));
- frame.geometry.setFromPoints([c[0],c[1],c[1],c[2],c[2],c[3],c[3],c[0]]);
+ frame.geometry.setFromPoints([c[0],c[1],c[1],c[2],c[2],c[3],c[3],c[0]]);handles.geometry.setFromPoints(c);handles.visible=true;frameCorners=c;
 }
 async function decode(file){const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});const scale=Math.min(1,MAX_SIDE/Math.max(bitmap.width,bitmap.height));if(scale===1)return bitmap;const c=document.createElement('canvas');c.width=Math.round(bitmap.width*scale);c.height=Math.round(bitmap.height*scale);c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);bitmap.close?.();return createImageBitmap(c);}
 // Se usa un lienzo (no ImageBitmap) para que WebGL respete la orientación vertical de la imagen.
@@ -102,11 +104,14 @@ const normalizeAngle=a=>{a%=Math.PI*2;if(a>Math.PI)a-=Math.PI*2;if(a<-Math.PI)a+
 function normalizeTarget(az){let d=normalizeAngle(az-orbit.az);return orbit.az+d;}
 // Solo cuentan los diseños del lado visible: los que quedan detrás de la tela no se pueden tomar.
 function visibleDecalHit(){const cloth=raycaster.intersectObjects(targetMeshes(),false)[0],limit=cloth?cloth.distance+.02:Infinity;return raycaster.intersectObjects(items.map(i=>i.mesh).filter(Boolean),false).filter(h=>h.distance<=limit).sort((a,b)=>b.object.renderOrder-a.object.renderOrder||a.distance-b.distance)[0]||null;}
+function screenOf(v){const r=canvas.getBoundingClientRect(),p=v.clone().project(camera);return {x:r.left+(p.x+1)/2*r.width,y:r.top+(1-p.y)/2*r.height};}
+function cornerAt(event){if(!handles.visible||!frameCorners.length)return false;return frameCorners.some(c=>{const s=screenOf(c);return Math.hypot(s.x-event.clientX,s.y-event.clientY)<=14;});}
 function ndc(event){const r=canvas.getBoundingClientRect();return new THREE.Vector2((event.clientX-r.left)/r.width*2-1,-((event.clientY-r.top)/r.height)*2+1);}
 let drag=null;const pointers=new Map();
 canvas.addEventListener('pointerdown',event=>{
  if(event.button!==0&&event.pointerType==='mouse')return;canvas.setPointerCapture(event.pointerId);pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
  if(pointers.size===2){drag={type:'pinch',dist:pinchDistance(),start:orbit.dist};return;}
+ if(current()&&cornerAt(event)){const item=current(),c=screenOf(item.point);drag={type:'resize',item,cx:c.x,cy:c.y,start:Math.max(4,Math.hypot(event.clientX-c.x,event.clientY-c.y)),width:item.widthCm,moved:false};canvas.classList.add('resizing');return;}
  raycaster.setFromCamera(ndc(event),camera);
  const hitDecal=visibleDecalHit();
  const panMode=$('m3dPan').getAttribute('aria-pressed')==='true';
@@ -115,17 +120,19 @@ canvas.addEventListener('pointerdown',event=>{
 });
 canvas.addEventListener('pointermove',event=>{
  if(pointers.has(event.pointerId))pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
- if(!drag){raycaster.setFromCamera(ndc(event),camera);const over=visibleDecalHit()&&$('m3dPan').getAttribute('aria-pressed')!=='true';canvas.style.cursor=over?'move':'grab';return;}
+ if(!drag){if(current()&&cornerAt(event)){canvas.style.cursor='nwse-resize';return;}raycaster.setFromCamera(ndc(event),camera);const over=visibleDecalHit()&&$('m3dPan').getAttribute('aria-pressed')!=='true';canvas.style.cursor=over?'move':'grab';return;}
  if(drag.type==='pinch'&&pointers.size===2){userZoom=true;orbit.dist=Math.max(1.6,Math.min(9,drag.start*drag.dist/pinchDistance()));draw();return;}
  if(drag.type==='orbit'){orbit.az=drag.az-(event.clientX-drag.x)*.008;orbit.el=Math.max(-.5,Math.min(.6,drag.el+(event.clientY-drag.y)*.005));draw();return;}
+ if(drag.type==='resize'){const d=Math.hypot(event.clientX-drag.cx,event.clientY-drag.cy);drag.item.widthCm=Math.max(2,Math.min(60,Math.round(drag.width*d/drag.start*10)/10));rebuild(drag.item);syncControls();drag.moved=true;draw();return;}
  if(drag.type==='move'){raycaster.setFromCamera(ndc(event),camera);const hit=raycaster.intersectObjects(targetMeshes(),false)[0];if(!hit)return;applyHit(drag.item,hit);rebuild(drag.item);drag.moved=true;draw();}
 });
-function endDrag(event){pointers.delete(event.pointerId);if(drag?.type==='move'&&drag.moved){renderList();record();}if(pointers.size<2)drag=null;canvas.classList.remove('dragging','orbiting');}
+function endDrag(event){pointers.delete(event.pointerId);if((drag?.type==='move'||drag?.type==='resize')&&drag.moved){renderList();record();}if(pointers.size<2)drag=null;canvas.classList.remove('dragging','orbiting','resizing');}
 canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
 function pinchDistance(){const [a,b]=[...pointers.values()];return Math.max(1,Math.hypot(a.x-b.x,a.y-b.y));}
 canvas.addEventListener('wheel',event=>{event.preventDefault();userZoom=true;orbit.dist=Math.max(1.6,Math.min(9,orbit.dist*(event.deltaY>0?1.08:1/1.08)));draw();},{passive:false});
 canvas.addEventListener('keydown',event=>{const item=current();
  if(event.key==='Delete'||event.key==='Backspace'){if(item){event.preventDefault();removeItem(item);}return;}
+ if(item&&['+','=','-'].includes(event.key)){event.preventDefault();item.widthCm=Math.max(2,Math.min(60,Math.round(item.widthCm*(event.key==='-'?1/1.05:1.05)*10)/10));rebuild(item);syncControls();renderList();draw();clearTimeout(keyTimer);keyTimer=setTimeout(record,350);return;}
  if(!item||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;event.preventDefault();
  // Mover con flechas: se proyecta un punto desplazado sobre la tela.
  const step=(event.shiftKey?2:.5)/UNIT_CM,right=new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0),item.normal).normalize(),up=new THREE.Vector3(0,1,0);
@@ -150,16 +157,17 @@ for(const b of document.querySelectorAll('[data-garment]'))b.addEventListener('c
 function setColor(value){state.color=value;$('m3dColor').value=value;garment?.material.color.set(value);draw();}
 $('m3dColor').addEventListener('input',()=>setColor($('m3dColor').value));$('m3dColor').addEventListener('change',()=>record());
 for(const b of document.querySelectorAll('[data-color]'))b.addEventListener('click',()=>{setColor(b.dataset.color);record();});
-$('m3dBackground').addEventListener('change',()=>{state.background=$('m3dBackground').value;wrap.classList.toggle('checker',state.background==='transparent');draw();});
+function applyBackground(){const v=$('m3dBackground').value;$('m3dBgColor').hidden=v!=='custom';state.background=v==='custom'?$('m3dBgColor').value:v;wrap.classList.toggle('checker',state.background==='transparent');draw();}
+$('m3dBackground').addEventListener('change',applyBackground);$('m3dBgColor').addEventListener('input',applyBackground);
 for(const b of document.querySelectorAll('[data-view]'))b.addEventListener('click',()=>animateTo({front:0,back:Math.PI,left:Math.PI/2,right:-Math.PI/2}[b.dataset.view]));
 $('m3dPan').addEventListener('click',()=>{const on=$('m3dPan').getAttribute('aria-pressed')!=='true';$('m3dPan').setAttribute('aria-pressed',String(on));status(on?'Girar vista activado: arrastrar gira la prenda aunque toques un diseño.':'Arrastra un diseño para moverlo; arrastra fuera de él para girar.');});
-$('m3dZoomIn').onclick=()=>{userZoom=true;orbit.dist=Math.max(1.6,orbit.dist/1.15);draw();};$('m3dZoomOut').onclick=()=>{userZoom=true;orbit.dist=Math.min(6,orbit.dist*1.15);draw();};$('m3dFit').onclick=()=>{userZoom=false;orbit.dist=fitDist();orbit.el=.06;draw();};
+$('m3dZoomIn').onclick=()=>{userZoom=true;orbit.dist=Math.max(1.6,orbit.dist/1.15);draw();};$('m3dZoomOut').onclick=()=>{userZoom=true;orbit.dist=Math.min(6,orbit.dist*1.15);draw();};$('m3dFit').onclick=()=>{userZoom=false;orbit.dist=fitDist();orbit.el=.05;draw();};
 
 /* Exportar ---------------------------------------------------------------- */
-function renderAt(az,size,dist=orbit.dist){const keep={az:orbit.az,el:orbit.el,dist:orbit.dist,w:renderer.domElement.width,h:renderer.domElement.height,pr:renderer.getPixelRatio(),aspect:camera.aspect},sel=frame.visible;
+function renderAt(az,size,dist=orbit.dist){const handlesShown=handles.visible;handles.visible=false;const keep={az:orbit.az,el:orbit.el,dist:orbit.dist,w:renderer.domElement.width,h:renderer.domElement.height,pr:renderer.getPixelRatio(),aspect:camera.aspect},sel=frame.visible;
  frame.visible=false;renderer.setPixelRatio(1);renderer.setSize(size,size,false);camera.aspect=1;camera.updateProjectionMatrix();orbit.az=az;orbit.dist=dist;placeCamera();renderer.setClearColor(state.background==='transparent'?0x000000:state.background,state.background==='transparent'?0:1);renderer.render(scene,camera);
  const out=document.createElement('canvas');out.width=out.height=size;out.getContext('2d').drawImage(renderer.domElement,0,0);
- orbit.az=keep.az;orbit.el=keep.el;orbit.dist=keep.dist;renderer.setPixelRatio(keep.pr);camera.aspect=keep.aspect;camera.updateProjectionMatrix();frame.visible=sel;resize();return out;}
+ orbit.az=keep.az;orbit.el=keep.el;orbit.dist=keep.dist;renderer.setPixelRatio(keep.pr);camera.aspect=keep.aspect;camera.updateProjectionMatrix();frame.visible=sel;handles.visible=handlesShown;resize();return out;}
 async function exportPng(){
  const mode=$('m3dExport').value,size=1600;let out;
  if(mode==='both'){const f=renderAt(0,size,3.6),b=renderAt(Math.PI,size,3.6);out=document.createElement('canvas');out.width=size*2;out.height=size;const c=out.getContext('2d');c.drawImage(f,0,0);c.drawImage(b,size,0);}

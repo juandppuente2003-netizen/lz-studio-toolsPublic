@@ -4220,84 +4220,123 @@ export function resizeMockup(start,startScale,corner,pointer,zone){
   const center=toWorld({...start,x:anchor.x,y:anchor.y},sx*width/2,sy*height/2);
   return {scale,x:clamp((center.x-zone.x)/(zone.w*.5)*100,-300,300),y:clamp((center.y-zone.y)/(zone.h*.5)*100,-300,300)};
 }
-`,type:"text/javascript; charset=utf-8",public:!1},"/mockup3d-garment.js":{body:`// Prendas 3D param\xE9tricas para Mockups 3D. Unidades: 1 unidad = 52 cm (ancho de pecho de una playera talla M).
+`,type:"text/javascript; charset=utf-8",public:!1},"/mockup3d-garment.js":{body:`// Prendas 3D para Mockups 3D, construidas desde su patr\xF3n plano real (silueta en cm) e infladas
+// como una prenda en maniqu\xED invisible: panel delantero y trasero unidos en las costuras.
+// Unidades de escena: 1 unidad = 52 cm.
 import * as THREE from './box/vendor/three.module.min.js';
 
 export const UNIT_CM=52;
-export const garments={
- tee:{name:'Playera',sleeve:{length:.40,start:.165,end:.145,angle:-34},width:.50,depth:.205,hem:-.80,shoulder:.40},
- oversized:{name:'Playera oversize',sleeve:{length:.44,start:.19,end:.175,angle:-30},width:.56,depth:.22,hem:-.76,shoulder:.47},
- long:{name:'Manga larga',sleeve:{length:.98,start:.165,end:.095,angle:-67,inset:.07,y:.37},width:.49,depth:.20,hem:-.82,shoulder:.39}
-};
-const smooth=(a,b,t)=>{t=Math.min(1,Math.max(0,(t-a)/(b-a)));return t*t*(3-2*t);};
-const lerp=(a,b,t)=>a+(b-a)*t;
-// Secci\xF3n superel\xEDptica: se parece m\xE1s a una prenda (lados m\xE1s rectos) que una elipse.
-function section(theta,w,d,n=2.6){const c=Math.cos(theta),s=Math.sin(theta);return [Math.sign(c)*w*Math.abs(c)**(2/n),Math.sign(s)*d*Math.abs(s)**(2/n)];}
+const OFFSET_Y=.36;
 
-function bodyGeometry(g){
- const rows=96,cols=128,top=.60,positions=[],uvs=[],index=[];
- for(let r=0;r<=rows;r++){
-  const v=r/rows,y=lerp(g.hem,top,v);
-  // Ancho: cadera, cintura, pecho, hombros y cuello.
-  let w=g.width*(1.02-.03*smooth(g.hem,-.35,y)+.02*smooth(-.35,.15,y));
-  w=lerp(w,g.shoulder,smooth(.28,.50,y));w=lerp(w,.165,smooth(.49,top,y));
-  let d=g.depth*(1+.05*smooth(-.4,.12,y)-.05*smooth(.12,.35,y));d=lerp(d,.135,smooth(.40,top,y));
-  for(let c=0;c<=cols;c++){
-   // La costura de la malla queda al costado (bajo el brazo), no en el centro de la espalda.
-   const u=c/cols,theta=u*Math.PI*2;let [x,z]=section(theta,w,d);
-   // Pecho un poco m\xE1s abombado que la espalda.
-   if(z>0)z*=1+.06*smooth(-.3,.2,y)*(1-smooth(.35,.55,y));
-   let yy=y;
-   // Escote: m\xE1s bajo al frente.
-   const front=Math.max(0,z/Math.max(1e-6,d));if(v>.9)yy-=.07*front**1.6*smooth(.9,1,v);
-   // Pliegues suaves en cintura y axilas (no alteran las zonas de estampado).
-   const fold=.004*Math.sin(theta*7+y*9)*smooth(-.75,-.4,y)*(1-smooth(-.2,0,y))+.003*Math.sin(theta*11)*smooth(.25,.4,y)*(1-smooth(.45,.55,y));
-   x+=x*fold*4;z+=z*fold*4;
-   positions.push(x,yy,z);uvs.push(u,v);
+// Media silueta (lado derecho de la imagen = lado izquierdo de quien la viste), en cm.
+// y = 0 en el punto alto del hombro junto al cuello. Cada punto: [x, y, esquina].
+const patterns={
+ tee:{name:'Playera regular',neck:{w:9.2,front:9.5,back:2.2},depth:10,shoulder:22.8,
+  half:[[9.2,0,1],[16,-2.4],[22.8,-4.6,1],[30.5,-11.5],[36.5,-18.2,1],[30.8,-27.6,1],[26.6,-24.4,1],[26.2,-36],[25.6,-50],[26.4,-70.5,1],[13,-71.2],[0,-71.4]],
+  chest:-21,back:-17,sleeve:[31,-18],raglan:false,armpit:[26.6,-24.4]},
+ dryfit:{name:'Dry fit deportiva',neck:{w:8.6,front:8.8,back:2},depth:9,shoulder:21.6,
+  half:[[8.6,0,1],[15.5,-2.6],[21.6,-4.8,1],[28.8,-11.8],[33.6,-17.4,1],[28.6,-25.8,1],[24.8,-23.2,1],[24,-34],[22.6,-47],[23.8,-69.5,1],[12,-70.6],[0,-71]],
+  chest:-20,back:-16,sleeve:[28.6,-17],raglan:true,armpit:[24.8,-23.2]},
+ oversized:{name:'Playera oversize',neck:{w:10,front:9,back:2.4},depth:10.5,shoulder:29.5,
+  half:[[10,0,1],[19,-3],[29.5,-6.5,1],[36,-15.5],[40.5,-24.5,1],[33.2,-33.5,1],[30.6,-31,1],[30.4,-45],[30.4,-68.5,1],[15,-69.2],[0,-69.4]],
+  chest:-22,back:-18,sleeve:[35.5,-22],raglan:false,armpit:[30.6,-31]},
+ long:{name:'Manga larga',neck:{w:9,front:9.2,back:2.1},depth:9.6,shoulder:22.6,
+  half:[[9,0,1],[16,-2.4],[22.6,-4.6,1],[27.5,-16],[32,-34],[36.6,-58.5],[37.6,-63.6,1],[31,-65,1],[29.6,-58],[28.4,-40],[26.4,-24.6,1],[26,-36],[25.4,-50],[26.2,-71,1],[13,-71.8],[0,-72]],
+  chest:-21,back:-17,sleeve:[32.4,-44],raglan:true,armpit:[26.4,-24.6]}
+};
+export const garments=Object.fromEntries(Object.entries(patterns).map(([id,p])=>[id,{name:p.name}]));
+
+/* Geometr\xEDa 2D --------------------------------------------------------- */
+const backNeckY=(p,x)=>-p.neck.back*Math.max(0,1-(x/p.neck.w)**2)**.9;
+const frontNeckY=(p,x)=>-p.neck.front*Math.max(0,1-(x/p.neck.w)**2)**.75;
+// Contorno completo, suavizado (Chaikin) salvo en las esquinas marcadas.
+function outline(p){
+ const right=p.half;
+ const loop=[...right.map(v=>[...v]),...right.slice(0,-1).reverse().map(([x,y,c])=>[-x,y,c])];
+ // Borde superior: escote trasero, del cuello izquierdo al derecho.
+ for(let i=1;i<12;i++){const x=-p.neck.w+2*p.neck.w*i/12;loop.push([x,backNeckY(p,x),0]);}
+ let out=loop;
+ for(let k=0;k<3;k++){const next=[];for(let i=0;i<out.length;i++){const a=out[i],b=out[(i+1)%out.length];if(a[2])next.push(a);else next.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25,0]);next.push([a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75,0]);}out=next;}
+ return out.map(([x,y])=>[x,y]);
+}
+function frontNeck(p){const pts=[];for(let i=0;i<=28;i++){const x=-p.neck.w+2*p.neck.w*i/28;pts.push([x,frontNeckY(p,x)]);}return pts;}
+function inside(poly,x,y){let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,yi]=poly[i],[xj,yj]=poly[j];if(((yi>y)!==(yj>y))&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c;}return c;}
+function segDist(px,py,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((px-a[0])*dx+(py-a[1])*dy)/(dx*dx+dy*dy||1)));const x=a[0]+t*dx,y=a[1]+t*dy;return [Math.hypot(x-px,y-py),x,y];}
+function nearest(poly,x,y,closed=true){let best=[Infinity,x,y];const n=poly.length;for(let i=0;i<(closed?n:n-1);i++){const r=segDist(x,y,poly[i],poly[(i+1)%n]);if(r[0]<best[0])best=r;}return best;}
+// Ruido suave para arrugas leves.
+const noise=(x,y)=>Math.sin(x*.37+y*.11)*.5+Math.sin(x*.13-y*.29+1.7)*.35+Math.sin(x*.71+y*.53+.4)*.15;
+
+/* Panel inflado ------------------------------------------------------- */
+function panel(p,side){
+ const poly=outline(p),neckCurve=frontNeck(p),h=.7,isFront=side>0;
+ let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;for(const [x,y] of poly){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);}
+ const nx=Math.ceil((maxX-minX)/h)+3,ny=Math.ceil((maxY-minY)/h)+3,x0=minX-h,y0=minY-h,idx=new Int32Array(nx*ny).fill(-1),pos=[],uv=[],dist=[];
+ const belowNeck=(x,y)=>Math.abs(x)>=p.neck.w||y<=frontNeckY(p,x);
+ const valid=(x,y)=>inside(poly,x,y)&&(!isFront||belowNeck(x,y));
+ for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){
+  let x=x0+i*h,y=y0+j*h;
+  if(!valid(x,y)){
+   // V\xE9rtices exteriores vecinos del borde: se llevan al contorno para una silueta limpia.
+   let near=false;for(const [di,dj] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]])if(valid(x+di*h,y+dj*h)){near=true;break;}
+   if(!near)continue;
+   const a=nearest(poly,x,y);let bx=a[1],by=a[2];
+   if(isFront&&Math.abs(x)<p.neck.w+h&&y>-p.neck.front-2*h){const b=nearest(neckCurve,x,y,false);if(b[0]<a[0]){bx=b[1];by=b[2];}}
+   x=bx;y=by;
   }
+  idx[j*nx+i]=pos.length/3;
+  let d=nearest(poly,x,y)[0];if(isFront&&Math.abs(x)<p.neck.w+4&&y>-p.neck.front-4)d=Math.min(d,nearest(neckCurve,x,y,false)[0]+.8);
+  dist.push(d);pos.push(x,y,0);uv.push((x-minX)/(maxX-minX),(y-minY)/(maxY-minY));
  }
- for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const a=r*(cols+1)+c,b=a+cols+1;index.push(a,b,a+1,b,b+1,a+1);}
- const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));geo.setIndex(index);geo.computeVertexNormals();return geo;
+ // Inflado: perfil redondeado junto a la costura y casi plano al centro.
+ const R=p.depth*1.6;
+ for(let k=0;k<dist.length;k++){
+  const x=pos[k*3],y=pos[k*3+1],t=Math.min(1,dist[k]/R),prof=Math.sqrt(1-(1-t)**2);
+  let z=p.depth*prof*(isFront?1:.85);
+  const chest=Math.exp(-(((y+20)/15)**2))*(isFront?1.1:.45),sleeve=Math.abs(x)>p.shoulder-1?1:0;
+  z+=chest*prof+prof*(.32*noise(x,y)*(.35+.65*sleeve)+.3*noise(x*1.7,y*1.3)*Math.exp(-(((y+68)/6)**2)));
+  pos[k*3+2]=side*z;
+ }
+ const index=[];
+ for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++){
+  const a=idx[j*nx+i],b=idx[j*nx+i+1],c=idx[(j+1)*nx+i],d=idx[(j+1)*nx+i+1];
+  const tri=(u,v,w)=>{if(u<0||v<0||w<0)return;const cx=(pos[u*3]+pos[v*3]+pos[w*3])/3,cy=(pos[u*3+1]+pos[v*3+1]+pos[w*3+1])/3;if(!valid(cx,cy))return;if(side>0)index.push(u,v,w);else index.push(u,w,v);};
+  tri(a,b,d);tri(a,d,c);
+ }
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos.map(v=>v/UNIT_CM),3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(index);geo.computeVertexNormals();
+ return {geo,neckCurve};
 }
-function sleeveGeometry(g,side){
- const s=g.sleeve,rows=40,cols=64,positions=[],index=[],uvs=[];
- const start=new THREE.Vector3(side*(g.shoulder-(s.inset??.03)),s.y??.40,0),a=THREE.MathUtils.degToRad(s.angle),dir=new THREE.Vector3(side*Math.cos(a),Math.sin(a),0).normalize();
- const ax=new THREE.Vector3(0,0,1),ay=new THREE.Vector3().crossVectors(dir,ax).normalize();
- for(let r=0;r<=rows;r++){const v=r/rows,center=start.clone().addScaledVector(dir,v*s.length),rad=lerp(s.start,s.end,v)*(1+.03*Math.sin(v*Math.PI));
-  for(let c=0;c<=cols;c++){const t=c/cols*Math.PI*2,p=center.clone().addScaledVector(ay,Math.cos(t)*rad).addScaledVector(ax,Math.sin(t)*rad*.86);positions.push(p.x,p.y,p.z);uvs.push(c/cols,v);}}
- for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const i=r*(cols+1)+c,j=i+cols+1;index.push(i,j,i+1,j,j+1,i+1);}
- const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));geo.setIndex(index);geo.computeVertexNormals();
- // Pu\xF1o o dobladillo
- const end=start.clone().addScaledVector(dir,s.length),cuff=new THREE.TorusGeometry(s.end*.93,.012,10,48);cuff.lookAt(dir);cuff.translate(end.x,end.y,end.z);
- return {geo,cuff};
-}
-function fabricNormal(){
- // Textura de punto: ruido fino + trama vertical, como mapa normal en mosaico.
- const size=256,c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d'),img=x.createImageData(size,size);
- const h=new Float32Array(size*size);for(let i=0;i<h.length;i++){const px=i%size,py=(i/size)|0;h[i]=.5+.18*Math.sin(px*Math.PI/2)*.5+.25*(Math.random()-.5)+.08*Math.sin(py*.7);}
- for(let py=0;py<size;py++)for(let px=0;px<size;px++){const i=py*size+px,dx=h[py*size+(px+1)%size]-h[py*size+(px+size-1)%size],dy=h[((py+1)%size)*size+px]-h[((py+size-1)%size)*size+px];img.data[i*4]=128+dx*90;img.data[i*4+1]=128+dy*90;img.data[i*4+2]=255;img.data[i*4+3]=255;}
- x.putImageData(img,0,0);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(10,10);return t;
+
+function knitNormal(){
+ const size=256,c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d'),img=x.createImageData(size,size),h=new Float32Array(size*size);
+ for(let py=0;py<size;py++)for(let px=0;px<size;px++){const rib=Math.sin(px*Math.PI/2)*.5+.5,row=Math.sin(py*Math.PI/3+((px>>1)&1)*Math.PI)*.5+.5;h[py*size+px]=rib*.6+row*.25+Math.random()*.15;}
+ for(let py=0;py<size;py++)for(let px=0;px<size;px++){const i=py*size+px,dx=h[py*size+(px+1)%size]-h[py*size+(px+size-1)%size],dy=h[((py+1)%size)*size+px]-h[((py+size-1)%size)*size+px];img.data[i*4]=128+dx*70;img.data[i*4+1]=128+dy*70;img.data[i*4+2]=255;img.data[i*4+3]=255;}
+ x.putImageData(img,0,0);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(14,14);return t;
 }
 let normalMap=null;
+function tubeAlong(points,radius,material){const curve=new THREE.CatmullRomCurve3(points.map(([x,y,z])=>new THREE.Vector3(x/UNIT_CM,y/UNIT_CM,z/UNIT_CM)));return new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(32,points.length*3),radius/UNIT_CM,10,false),material);}
+
 export function buildGarment(type,color){
- const g=garments[type]||garments.tee;normalMap??=fabricNormal();
- const material=new THREE.MeshStandardMaterial({color,roughness:.93,metalness:0,normalMap,normalScale:new THREE.Vector2(.35,.35),side:THREE.DoubleSide});
+ const p=patterns[type]||patterns.tee;normalMap??=knitNormal();
+ const material=new THREE.MeshPhysicalMaterial({color,roughness:.88,metalness:0,sheen:1,sheenRoughness:.55,sheenColor:new THREE.Color(0x8a8a8a),normalMap,normalScale:new THREE.Vector2(.28,.28),side:THREE.DoubleSide});
  const group=new THREE.Group();group.name=type;
- const body=new THREE.Mesh(bodyGeometry(g),material);body.name='body';group.add(body);
- const meshes={body};
- for(const side of [-1,1]){const {geo,cuff}=sleeveGeometry(g,side),sleeve=new THREE.Mesh(geo,material);sleeve.name=side<0?'sleeveR':'sleeveL';group.add(sleeve,new THREE.Mesh(cuff,material));meshes[sleeve.name]=sleeve;}
- // Cuello acanalado y dobladillo
- const collarCurve=[];for(let i=0;i<=64;i++){const t=i/64*Math.PI*2-Math.PI/2,[x,z]=section(t,.165,.135),front=Math.max(0,z/.135);collarCurve.push(new THREE.Vector3(x,.60-.07*front**1.6,z));}
- const collar=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(collarCurve,true),96,.016,10,true),material);group.add(collar);
- const hemCurve=[];for(let i=0;i<=64;i++){const t=i/64*Math.PI*2-Math.PI/2,[x,z]=section(t,g.width*1.02,g.depth);hemCurve.push(new THREE.Vector3(x,g.hem,z));}
- group.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(hemCurve,true),128,.008,8,true),material));
- return {group,material,meshes,spec:g};
+ const front=panel(p,1),back=panel(p,-1);
+ const frontMesh=new THREE.Mesh(front.geo,material),backMesh=new THREE.Mesh(back.geo,material);frontMesh.name='front';backMesh.name='back';group.add(frontMesh,backMesh);
+ // Cuello acanalado: escote delantero y trasero.
+ group.add(tubeAlong(front.neckCurve.map(([x,y])=>[x,y-.5,p.depth*.12]),.8,material));
+ const neckBack=[];for(let i=0;i<=24;i++){const x=-p.neck.w+2*p.neck.w*i/24;neckBack.push([x,backNeckY(p,x)-.3,-p.depth*.08]);}group.add(tubeAlong(neckBack,.75,material));
+ // Costuras ragl\xE1n (deportiva y manga larga): del cuello a la axila, al frente y atr\xE1s.
+ if(p.raglan){const seam=material.clone();seam.color.multiplyScalar(.78);seam.normalMap=null;
+  for(const s of [-1,1])for(const face of [1,-1]){const a=[s*p.neck.w*.8,backNeckY(p,p.neck.w*.8)-1.2],b=[s*p.armpit[0]*.98,p.armpit[1]+1.2],pts=[];for(let i=0;i<=18;i++){const t=i/18,x=a[0]+(b[0]-a[0])*t,y=a[1]+(b[1]-a[1])*t-Math.sin(t*Math.PI)*2.4;pts.push([x,y,face*p.depth*(face>0?1:.85)*(.55+.45*Math.sin(Math.min(1,t*1.2)*Math.PI/2))]);}group.add(tubeAlong(pts,.16,seam));}}
+ group.position.y=OFFSET_Y;group.updateMatrixWorld(true);
+ return {group,material,meshes:{front:frontMesh,back:backMesh},spec:p};
 }
-// Puntos de colocaci\xF3n r\xE1pida (en coordenadas de la prenda).
-export function placements(spec){
- const s=spec.sleeve,a=THREE.MathUtils.degToRad(s.angle),mid=v=>new THREE.Vector3((spec.shoulder-(s.inset??.03))+Math.cos(a)*s.length*v,(s.y??.40)+Math.sin(a)*s.length*v,0);
- return {front:{target:'body',from:new THREE.Vector3(0,.18,2),to:new THREE.Vector3(0,.18,0)},back:{target:'body',from:new THREE.Vector3(0,.22,-2),to:new THREE.Vector3(0,.22,0)},sleeveL:{target:'sleeveL',from:mid(.5).add(new THREE.Vector3(1.5,0,0)),to:mid(.5)},sleeveR:{target:'sleeveR',from:mid(.5).multiply(new THREE.Vector3(-1,1,1)).add(new THREE.Vector3(-1.5,0,0)),to:mid(.5).multiply(new THREE.Vector3(-1,1,1))},chestLeft:{target:'body',from:new THREE.Vector3(.16,.30,2),to:new THREE.Vector3(.16,.30,0)}};
+// Puntos de colocaci\xF3n r\xE1pida, en coordenadas de escena.
+export function placements(p){
+ const s=v=>v/UNIT_CM,at=(x,y,z)=>({from:new THREE.Vector3(s(x),s(y)+OFFSET_Y,z*2),to:new THREE.Vector3(s(x),s(y)+OFFSET_Y,0)});
+ return {front:at(0,p.chest,1),back:at(0,p.back,-1),chestLeft:at(p.neck.w+2,p.chest+5,1),sleeveL:at(p.sleeve[0],p.sleeve[1],1),sleeveR:at(-p.sleeve[0],p.sleeve[1],1)};
 }
+// Zona seg\xFAn el punto: mangas fuera del ancho de hombros.
+export function zoneOf(p,point,face){const x=point.x*UNIT_CM,y=(point.y-OFFSET_Y)*UNIT_CM,ax=Math.abs(x);if(ax>p.armpit[0]+.5||(ax>p.shoulder&&y>p.armpit[1]))return x>0?'sleeveL':'sleeveR';return face;}
 `,type:"text/javascript; charset=utf-8",public:!1},"/mockups-3d.html":{body:`<!doctype html>
 <html lang="es">
 <head>
@@ -4313,9 +4352,9 @@ export function placements(spec){
 <div id="menuBackdrop" class="menu-backdrop" hidden></div><nav id="moduleMenu" class="module-menu" aria-label="M\xF3dulos de LZ Studio Tools" hidden><div class="menu-head"><span class="eyebrow">LZ_STUDIO_TOOLS</span><button id="menuClose" aria-label="Cerrar men\xFA">\xD7</button></div><h2>Herramientas del taller</h2><a class="module" href="index.html"><span>00</span><strong>Inicio</strong><small>Todas las herramientas</small></a><a class="module" href="editor.html"><span>01</span><strong>Semitonos</strong><small>Tramas f\xEDsicas y resoluci\xF3n \xD72</small></a><a class="module" href="premium.html"><span>\u2605</span><strong>Semitonos Premium</strong><small>V\xEDvido, IA y correcciones autom\xE1ticas</small></a><a class="module" href="editor.html?tool=remove"><span>02</span><strong>Quitar fondo color</strong><small>Eliminar un color del original</small></a><a class="module" href="editor.html?tool=recolor"><span>03</span><strong>Reemplazar color</strong><small>Elegir color original y nuevo</small></a><a class="module" href="textures.html"><span>04</span><strong>Texturas</strong><small>Desgaste, grano y patrones</small></a><a class="module" href="text-creator.html"><span>05</span><strong>Textos</strong><small>Tipograf\xEDa y efectos</small></a><a class="module" href="mockups.html"><span>06</span><strong>Mockups</strong><small>Prendas y gorras</small></a><a class="module active" href="mockups-3d.html"><span>06</span><strong>Mockups 3D</strong><small>Varios dise\xF1os en 3D</small></a><a class="module" href="vectorize.html"><span>07</span><strong>Vectorizar</strong><small>SVG de colores s\xF3lidos</small></a><a class="module" href="analyzer.html"><span>08</span><strong>Preparar para impresi\xF3n</strong><small>Auditor\xEDa y correcci\xF3n</small></a><a class="module" href="gang-sheet.html"><span>09</span><strong>Pliego DTF</strong><small>Acomodo a medida real</small></a><a class="module" href="color-enhance.html"><span>10</span><strong>Mejorar colores</strong><small>Luz, vibrancia y estilos r\xE1pidos</small></a><a class="module" href="upscale.html"><span>11</span><strong>Mejorar im\xE1genes</strong><small>Aumento de resoluci\xF3n \xD72 con IA</small></a><a class="module" href="opacity.html"><span>03</span><strong>Semitransparencias</strong><small>Trama de alfa o transparencia s\xF3lida</small></a><a class="module" href="thickness.html"><span>12</span><strong>Auditor de grosor</strong><small>Puntos peque\xF1os y correcci\xF3n autom\xE1tica</small></a><a class="module" href="extract.html"><span>\u03B2</span><strong>Extraer dise\xF1o \xB7 Beta</strong><small>Selecci\xF3n manual desde una foto</small></a><a class="module" href="crop.html"><span>\u2702</span><strong>Recortar imagen</strong><small>Quitar espacio sobrante</small></a></nav>
 <main class="mockup-studio m3d-studio">
   <aside class="mockup-tools m3d-tools" aria-label="Controles del mockup 3D">
-    <div class="tool-intro"><span class="eyebrow">PRESENTAR DISE\xD1O</span><h1>Mockups 3D</h1><p>Coloca varios dise\xF1os sobre la prenda y g\xEDrala para verla desde cualquier lado.</p></div>
+    <div class="tool-intro"><span class="eyebrow">PRESENTAR DISE\xD1O</span><h1>Mockups 3D</h1><p>Coloca varios dise\xF1os sobre playera regular, dry fit, oversize o manga larga y g\xEDrala para verla desde cualquier lado.</p></div>
     <section class="panel"><h2><span class="number">01</span> Prenda</h2>
-      <div class="m3d-segmented" role="group" aria-label="Modelo"><button type="button" data-garment="tee" aria-pressed="true" class="active">Playera</button><button type="button" data-garment="oversized" aria-pressed="false">Oversize</button><button type="button" data-garment="long" aria-pressed="false">Manga larga</button></div>
+      <div class="m3d-segmented m3d-garments" role="group" aria-label="Modelo"><button type="button" data-garment="tee" aria-pressed="true" class="active">Regular</button><button type="button" data-garment="dryfit" aria-pressed="false">Dry fit</button><button type="button" data-garment="oversized" aria-pressed="false">Oversize</button><button type="button" data-garment="long" aria-pressed="false">Manga larga</button></div>
       <div class="color-row"><label for="m3dColor">Color de la prenda</label><input id="m3dColor" type="color" value="#17191b"></div>
       <div class="swatches" aria-label="Colores r\xE1pidos"><button type="button" data-color="#17191b" style="--swatch:#17191b" aria-label="Negro"></button><button type="button" data-color="#ffffff" style="--swatch:#ffffff" aria-label="Blanco"></button><button type="button" data-color="#74787c" style="--swatch:#74787c" aria-label="Gris"></button><button type="button" data-color="#152a45" style="--swatch:#152a45" aria-label="Azul marino"></button><button type="button" data-color="#12613d" style="--swatch:#12613d" aria-label="Verde"></button><button type="button" data-color="#9f1f28" style="--swatch:#9f1f28" aria-label="Rojo"></button><button type="button" data-color="#dc789b" style="--swatch:#dc789b" aria-label="Rosa"></button></div>
     </section>
@@ -4326,23 +4365,23 @@ export function placements(spec){
     </section>
     <section id="m3dItemControls" class="panel" hidden><h2><span class="number">03</span> Dise\xF1o seleccionado</h2>
       <p id="m3dSelectedName" class="m3d-selected"></p>
-      <label class="range-label" for="m3dWidth">Ancho <output id="m3dWidthOut">26 cm</output></label><input id="m3dWidth" type="range" min="3" max="45" step="0.5" value="26"><p id="m3dHeightOut" class="hint"></p>
+      <label class="range-label" for="m3dWidth">Ancho <output id="m3dWidthOut">26 cm</output></label><input id="m3dWidth" type="range" min="2" max="60" step="0.5" value="26"><p id="m3dHeightOut" class="hint"></p>
       <label class="range-label" for="m3dRotation">Rotaci\xF3n <output id="m3dRotationOut">0\xB0</output></label><input id="m3dRotation" type="range" min="-180" max="180" step="1" value="0">
       <p class="m3d-label">Llevar a</p>
       <div class="m3d-places"><button type="button" data-place="front">Frente</button><button type="button" data-place="back">Espalda</button><button type="button" data-place="chestLeft">Pecho izq.</button><button type="button" data-place="sleeveL">Manga izq.</button><button type="button" data-place="sleeveR">Manga der.</button></div>
       <div class="m3d-actions"><button type="button" id="m3dBackward" title="Enviar atr\xE1s">Atr\xE1s</button><button type="button" id="m3dForward" title="Traer adelante">Adelante</button><button type="button" id="m3dDuplicate">Duplicar</button><button type="button" id="m3dDelete" class="danger">Eliminar</button></div>
-      <p class="hint">Arrastra el dise\xF1o sobre la prenda para moverlo. Flechas: mover 0.5 cm (May\xFAs: 2 cm). Supr: eliminar.</p>
+      <p class="hint">Arrastra el dise\xF1o para moverlo y sus esquinas blancas para agrandarlo o achicarlo. Teclado: flechas para mover, + y \u2212 para el tama\xF1o, Supr para eliminar.</p>
     </section>
     <section class="panel"><h2><span class="number">04</span> Descarga</h2>
       <label class="m3d-field">Imagen<select id="m3dExport"><option value="current">Vista actual \xB7 1600 \xD7 1600 px</option><option value="both">Frente y espalda \xB7 3200 \xD7 1600 px</option><option value="four">Cuatro vistas \xB7 6400 \xD7 1600 px</option></select></label>
-      <label class="m3d-field">Fondo<select id="m3dBackground"><option value="#e3e6e8">Estudio gris</option><option value="#ffffff">Blanco</option><option value="#17191b">Negro</option><option value="transparent">Transparente</option></select></label>
+      <label class="m3d-field">Fondo<select id="m3dBackground"><option value="#e3e6e8">Estudio gris</option><option value="#ffffff">Blanco</option><option value="#17191b">Negro</option><option value="transparent">Transparente</option><option value="custom">Color personalizado</option></select></label><label class="m3d-field" for="m3dBgColor"><span class="sr-only">Color de fondo</span><input id="m3dBgColor" type="color" value="#d9cfc0" hidden></label>
     </section>
   </aside>
   <section class="mockup-workspace m3d-workspace" aria-label="Vista 3D">
     <div class="mockup-toolbar m3d-toolbar"><div class="m3d-views" role="group" aria-label="Vista"><button type="button" data-view="front" aria-pressed="true" class="active">Frente</button><button type="button" data-view="back" aria-pressed="false">Espalda</button><button type="button" data-view="left" aria-pressed="false">Izquierda</button><button type="button" data-view="right" aria-pressed="false">Derecha</button></div>
       <div class="toolbar-controls"><button id="m3dUndo" type="button" disabled>Deshacer</button><button id="m3dRedo" type="button" disabled>Rehacer</button><button id="m3dPan" type="button" aria-pressed="false" title="Arrastrar siempre gira la prenda">Girar vista</button><div class="zoom-controls"><button id="m3dZoomOut" type="button" aria-label="Alejar">\u2212</button><button id="m3dZoomIn" type="button" aria-label="Acercar">+</button><button id="m3dFit" type="button">Ajustar</button></div></div></div>
     <div id="m3dStage" class="m3d-stage"><canvas id="m3dCanvas" tabindex="0" aria-label="Prenda 3D: arrastra un dise\xF1o para moverlo; arrastra fuera de \xE9l para girar; rueda para acercar" aria-describedby="m3dHelp"></canvas><div id="m3dLoading" class="processing">Preparando la prenda 3D\u2026</div></div>
-    <p id="m3dHelp" class="mockup-edit-help">Arrastra un dise\xF1o para moverlo sobre la tela. Arrastra fuera de \xE9l para girar la prenda. Rueda o pellizca para acercar.</p>
+    <p id="m3dHelp" class="mockup-edit-help">Arrastra un dise\xF1o para moverlo y sus esquinas para cambiar el tama\xF1o. Arrastra fuera de \xE9l para girar la prenda. Rueda o pellizca para acercar.</p>
     <div id="m3dStatus" class="status" role="status" aria-live="polite">Preparando\u2026</div>
   </section>
 </main>
@@ -4352,7 +4391,7 @@ export function placements(spec){
 // y se puede arrastrar sobre la superficie, escalar en cm y rotar.
 import * as THREE from './box/vendor/three.module.min.js';
 import {DecalGeometry} from './vendor/three-decal.js';
-import {buildGarment,garments,placements,UNIT_CM} from './mockup3d-garment.js';
+import {buildGarment,placements,zoneOf,UNIT_CM} from './mockup3d-garment.js';
 import {registerStudioModule} from './studio-shell.js';
 
 const $=id=>document.getElementById(id);
@@ -4369,13 +4408,15 @@ scene.add(new THREE.HemisphereLight(0xffffff,0x3a3d40,1.15));
 const key=new THREE.DirectionalLight(0xffffff,2.1);key.position.set(2.4,3,3.2);scene.add(key);
 const fill=new THREE.DirectionalLight(0xffffff,.7);fill.position.set(-3,1,2);scene.add(fill);
 const rim=new THREE.DirectionalLight(0xffffff,.9);rim.position.set(0,2.5,-3.5);scene.add(rim);
-const orbit={az:0,el:.06,dist:3.4,target:new THREE.Vector3(0,-.08,0)};
+const orbit={az:0,el:.05,dist:3.4,target:new THREE.Vector3(0,-.33,0)};
 let garment=null;const decalGroup=new THREE.Group();scene.add(decalGroup);
 const frame=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0xb8ff3d,depthTest:false,transparent:true}));frame.renderOrder=999;scene.add(frame);
+// Esquinas para cambiar el tama\xF1o arrastrando, como en Mockups.
+const handles=new THREE.Points(new THREE.BufferGeometry(),new THREE.PointsMaterial({color:0xffffff,size:11,sizeAttenuation:false,depthTest:false,transparent:true}));handles.renderOrder=1000;scene.add(handles);let frameCorners=[];
 
 function placeCamera(){const {az,el,dist,target}=orbit;camera.position.set(target.x+dist*Math.sin(az)*Math.cos(el),target.y+dist*Math.sin(el),target.z+dist*Math.cos(az)*Math.cos(el));camera.lookAt(target);}
 // En pantallas angostas la c\xE1mara se aleja para que entren las mangas.
-let userZoom=false;const fitDist=()=>3.4*Math.max(1,1/camera.aspect)**.85;
+let userZoom=false;const fitDist=()=>3.3*Math.max(1,1/camera.aspect)**.85;
 function resize(){const w=wrap.clientWidth,h=wrap.clientHeight;if(!w||!h)return;renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(!userZoom)orbit.dist=fitDist();draw();}
 let pending=false;
 function draw(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;placeCamera();updateFrame();renderer.setClearColor(state.background==='transparent'?0x000000:state.background,state.background==='transparent'?0:1);renderer.render(scene,camera);});}
@@ -4392,28 +4433,28 @@ function setGarment(type){
 
 /* Dise\xF1os -------------------------------------------------------------- */
 const raycaster=new THREE.Raycaster(),helper=new THREE.Object3D();
-function targetMeshes(){return garment?[garment.meshes.body,garment.meshes.sleeveL,garment.meshes.sleeveR]:[];}
+function targetMeshes(){return garment?Object.values(garment.meshes):[];}
 function hitGarment(from,to){from=from.clone();from.x+=1e-4;to=to.clone();to.x+=1e-4;raycaster.set(from,to.clone().sub(from).normalize());const hit=raycaster.intersectObjects(targetMeshes(),false)[0];return hit||null;}
-function zoneFor(hit){if(hit.object.name!=='body')return hit.object.name;return hit.face.normal.z>=0||hit.point.z>=0?'front':'back';}
+function zoneFor(hit){return zoneOf(garment.spec,hit.point,hit.object.name==='back'?'back':'front');}
 function applyHit(item,hit){const normal=hit.face.normal.clone().transformDirection(hit.object.matrixWorld);if(normal.dot(raycaster.ray.direction)>0)normal.negate();item.point=hit.point.clone();item.normal=normal;item.target=hit.object.name;item.zone=zoneFor(hit);}
 function positionAt(item,where){const p=placements(garment.spec)[where]||placements(garment.spec).front;const hit=hitGarment(p.from,p.to);if(hit)applyHit(item,hit);item.zone=where;}
 function sizeOf(item){const w=item.widthCm/UNIT_CM;return new THREE.Vector3(w,w/item.aspect,Math.max(.12,Math.min(.3,w*.8)));}
 function orientation(item){helper.position.copy(item.point);helper.up.set(0,1,0);if(Math.abs(item.normal.y)>.95)helper.up.set(0,0,1);helper.lookAt(item.point.clone().add(item.normal));helper.rotateZ(THREE.MathUtils.degToRad(item.rotation));return helper.rotation.clone();}
 function rebuild(item){
  if(item.mesh){decalGroup.remove(item.mesh);item.mesh.geometry.dispose();}
- const target=garment.meshes[item.target]||garment.meshes.body;
+ const target=garment.meshes[item.target]||garment.meshes.front;
  const geometry=new DecalGeometry(target,item.point,orientation(item),sizeOf(item));
- item.material??=new THREE.MeshStandardMaterial({map:item.texture,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4,roughness:.86,metalness:0});
+ item.material??=new THREE.MeshStandardMaterial({map:item.texture,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4,roughness:1,metalness:0});
  item.mesh=new THREE.Mesh(geometry,item.material);item.mesh.renderOrder=10+item.order;item.mesh.userData.id=item.id;decalGroup.add(item.mesh);
 }
 function rebuildAll(){items.forEach((item,i)=>{item.order=i;rebuild(item);});renderList();}
 function updateFrame(){
- const item=items.find(i=>i.id===selected);if(!item||!item.point){frame.visible=false;return;}
+ const item=items.find(i=>i.id===selected);frameCorners=[];if(!item||!item.point){frame.visible=handles.visible=false;return;}
  // El marco solo se ve si el dise\xF1o est\xE1 del lado que mira a la c\xE1mara.
- if(item.normal.dot(camera.position.clone().sub(item.point))<=0){frame.visible=false;return;}
+ if(item.normal.dot(camera.position.clone().sub(item.point))<=0){frame.visible=handles.visible=false;return;}
  frame.visible=true;const s=sizeOf(item);helper.position.copy(item.point);helper.rotation.copy(orientation(item));helper.updateMatrixWorld(true);
  const hw=s.x/2,hh=s.y/2,lift=.006,c=[[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].map(([x,y])=>new THREE.Vector3(x,y,lift).applyMatrix4(helper.matrixWorld));
- frame.geometry.setFromPoints([c[0],c[1],c[1],c[2],c[2],c[3],c[3],c[0]]);
+ frame.geometry.setFromPoints([c[0],c[1],c[1],c[2],c[2],c[3],c[3],c[0]]);handles.geometry.setFromPoints(c);handles.visible=true;frameCorners=c;
 }
 async function decode(file){const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});const scale=Math.min(1,MAX_SIDE/Math.max(bitmap.width,bitmap.height));if(scale===1)return bitmap;const c=document.createElement('canvas');c.width=Math.round(bitmap.width*scale);c.height=Math.round(bitmap.height*scale);c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);bitmap.close?.();return createImageBitmap(c);}
 // Se usa un lienzo (no ImageBitmap) para que WebGL respete la orientaci\xF3n vertical de la imagen.
@@ -4452,11 +4493,14 @@ const normalizeAngle=a=>{a%=Math.PI*2;if(a>Math.PI)a-=Math.PI*2;if(a<-Math.PI)a+
 function normalizeTarget(az){let d=normalizeAngle(az-orbit.az);return orbit.az+d;}
 // Solo cuentan los dise\xF1os del lado visible: los que quedan detr\xE1s de la tela no se pueden tomar.
 function visibleDecalHit(){const cloth=raycaster.intersectObjects(targetMeshes(),false)[0],limit=cloth?cloth.distance+.02:Infinity;return raycaster.intersectObjects(items.map(i=>i.mesh).filter(Boolean),false).filter(h=>h.distance<=limit).sort((a,b)=>b.object.renderOrder-a.object.renderOrder||a.distance-b.distance)[0]||null;}
+function screenOf(v){const r=canvas.getBoundingClientRect(),p=v.clone().project(camera);return {x:r.left+(p.x+1)/2*r.width,y:r.top+(1-p.y)/2*r.height};}
+function cornerAt(event){if(!handles.visible||!frameCorners.length)return false;return frameCorners.some(c=>{const s=screenOf(c);return Math.hypot(s.x-event.clientX,s.y-event.clientY)<=14;});}
 function ndc(event){const r=canvas.getBoundingClientRect();return new THREE.Vector2((event.clientX-r.left)/r.width*2-1,-((event.clientY-r.top)/r.height)*2+1);}
 let drag=null;const pointers=new Map();
 canvas.addEventListener('pointerdown',event=>{
  if(event.button!==0&&event.pointerType==='mouse')return;canvas.setPointerCapture(event.pointerId);pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
  if(pointers.size===2){drag={type:'pinch',dist:pinchDistance(),start:orbit.dist};return;}
+ if(current()&&cornerAt(event)){const item=current(),c=screenOf(item.point);drag={type:'resize',item,cx:c.x,cy:c.y,start:Math.max(4,Math.hypot(event.clientX-c.x,event.clientY-c.y)),width:item.widthCm,moved:false};canvas.classList.add('resizing');return;}
  raycaster.setFromCamera(ndc(event),camera);
  const hitDecal=visibleDecalHit();
  const panMode=$('m3dPan').getAttribute('aria-pressed')==='true';
@@ -4465,17 +4509,19 @@ canvas.addEventListener('pointerdown',event=>{
 });
 canvas.addEventListener('pointermove',event=>{
  if(pointers.has(event.pointerId))pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
- if(!drag){raycaster.setFromCamera(ndc(event),camera);const over=visibleDecalHit()&&$('m3dPan').getAttribute('aria-pressed')!=='true';canvas.style.cursor=over?'move':'grab';return;}
+ if(!drag){if(current()&&cornerAt(event)){canvas.style.cursor='nwse-resize';return;}raycaster.setFromCamera(ndc(event),camera);const over=visibleDecalHit()&&$('m3dPan').getAttribute('aria-pressed')!=='true';canvas.style.cursor=over?'move':'grab';return;}
  if(drag.type==='pinch'&&pointers.size===2){userZoom=true;orbit.dist=Math.max(1.6,Math.min(9,drag.start*drag.dist/pinchDistance()));draw();return;}
  if(drag.type==='orbit'){orbit.az=drag.az-(event.clientX-drag.x)*.008;orbit.el=Math.max(-.5,Math.min(.6,drag.el+(event.clientY-drag.y)*.005));draw();return;}
+ if(drag.type==='resize'){const d=Math.hypot(event.clientX-drag.cx,event.clientY-drag.cy);drag.item.widthCm=Math.max(2,Math.min(60,Math.round(drag.width*d/drag.start*10)/10));rebuild(drag.item);syncControls();drag.moved=true;draw();return;}
  if(drag.type==='move'){raycaster.setFromCamera(ndc(event),camera);const hit=raycaster.intersectObjects(targetMeshes(),false)[0];if(!hit)return;applyHit(drag.item,hit);rebuild(drag.item);drag.moved=true;draw();}
 });
-function endDrag(event){pointers.delete(event.pointerId);if(drag?.type==='move'&&drag.moved){renderList();record();}if(pointers.size<2)drag=null;canvas.classList.remove('dragging','orbiting');}
+function endDrag(event){pointers.delete(event.pointerId);if((drag?.type==='move'||drag?.type==='resize')&&drag.moved){renderList();record();}if(pointers.size<2)drag=null;canvas.classList.remove('dragging','orbiting','resizing');}
 canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
 function pinchDistance(){const [a,b]=[...pointers.values()];return Math.max(1,Math.hypot(a.x-b.x,a.y-b.y));}
 canvas.addEventListener('wheel',event=>{event.preventDefault();userZoom=true;orbit.dist=Math.max(1.6,Math.min(9,orbit.dist*(event.deltaY>0?1.08:1/1.08)));draw();},{passive:false});
 canvas.addEventListener('keydown',event=>{const item=current();
  if(event.key==='Delete'||event.key==='Backspace'){if(item){event.preventDefault();removeItem(item);}return;}
+ if(item&&['+','=','-'].includes(event.key)){event.preventDefault();item.widthCm=Math.max(2,Math.min(60,Math.round(item.widthCm*(event.key==='-'?1/1.05:1.05)*10)/10));rebuild(item);syncControls();renderList();draw();clearTimeout(keyTimer);keyTimer=setTimeout(record,350);return;}
  if(!item||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;event.preventDefault();
  // Mover con flechas: se proyecta un punto desplazado sobre la tela.
  const step=(event.shiftKey?2:.5)/UNIT_CM,right=new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0),item.normal).normalize(),up=new THREE.Vector3(0,1,0);
@@ -4500,16 +4546,17 @@ for(const b of document.querySelectorAll('[data-garment]'))b.addEventListener('c
 function setColor(value){state.color=value;$('m3dColor').value=value;garment?.material.color.set(value);draw();}
 $('m3dColor').addEventListener('input',()=>setColor($('m3dColor').value));$('m3dColor').addEventListener('change',()=>record());
 for(const b of document.querySelectorAll('[data-color]'))b.addEventListener('click',()=>{setColor(b.dataset.color);record();});
-$('m3dBackground').addEventListener('change',()=>{state.background=$('m3dBackground').value;wrap.classList.toggle('checker',state.background==='transparent');draw();});
+function applyBackground(){const v=$('m3dBackground').value;$('m3dBgColor').hidden=v!=='custom';state.background=v==='custom'?$('m3dBgColor').value:v;wrap.classList.toggle('checker',state.background==='transparent');draw();}
+$('m3dBackground').addEventListener('change',applyBackground);$('m3dBgColor').addEventListener('input',applyBackground);
 for(const b of document.querySelectorAll('[data-view]'))b.addEventListener('click',()=>animateTo({front:0,back:Math.PI,left:Math.PI/2,right:-Math.PI/2}[b.dataset.view]));
 $('m3dPan').addEventListener('click',()=>{const on=$('m3dPan').getAttribute('aria-pressed')!=='true';$('m3dPan').setAttribute('aria-pressed',String(on));status(on?'Girar vista activado: arrastrar gira la prenda aunque toques un dise\xF1o.':'Arrastra un dise\xF1o para moverlo; arrastra fuera de \xE9l para girar.');});
-$('m3dZoomIn').onclick=()=>{userZoom=true;orbit.dist=Math.max(1.6,orbit.dist/1.15);draw();};$('m3dZoomOut').onclick=()=>{userZoom=true;orbit.dist=Math.min(6,orbit.dist*1.15);draw();};$('m3dFit').onclick=()=>{userZoom=false;orbit.dist=fitDist();orbit.el=.06;draw();};
+$('m3dZoomIn').onclick=()=>{userZoom=true;orbit.dist=Math.max(1.6,orbit.dist/1.15);draw();};$('m3dZoomOut').onclick=()=>{userZoom=true;orbit.dist=Math.min(6,orbit.dist*1.15);draw();};$('m3dFit').onclick=()=>{userZoom=false;orbit.dist=fitDist();orbit.el=.05;draw();};
 
 /* Exportar ---------------------------------------------------------------- */
-function renderAt(az,size,dist=orbit.dist){const keep={az:orbit.az,el:orbit.el,dist:orbit.dist,w:renderer.domElement.width,h:renderer.domElement.height,pr:renderer.getPixelRatio(),aspect:camera.aspect},sel=frame.visible;
+function renderAt(az,size,dist=orbit.dist){const handlesShown=handles.visible;handles.visible=false;const keep={az:orbit.az,el:orbit.el,dist:orbit.dist,w:renderer.domElement.width,h:renderer.domElement.height,pr:renderer.getPixelRatio(),aspect:camera.aspect},sel=frame.visible;
  frame.visible=false;renderer.setPixelRatio(1);renderer.setSize(size,size,false);camera.aspect=1;camera.updateProjectionMatrix();orbit.az=az;orbit.dist=dist;placeCamera();renderer.setClearColor(state.background==='transparent'?0x000000:state.background,state.background==='transparent'?0:1);renderer.render(scene,camera);
  const out=document.createElement('canvas');out.width=out.height=size;out.getContext('2d').drawImage(renderer.domElement,0,0);
- orbit.az=keep.az;orbit.el=keep.el;orbit.dist=keep.dist;renderer.setPixelRatio(keep.pr);camera.aspect=keep.aspect;camera.updateProjectionMatrix();frame.visible=sel;resize();return out;}
+ orbit.az=keep.az;orbit.el=keep.el;orbit.dist=keep.dist;renderer.setPixelRatio(keep.pr);camera.aspect=keep.aspect;camera.updateProjectionMatrix();frame.visible=sel;handles.visible=handlesShown;resize();return out;}
 async function exportPng(){
  const mode=$('m3dExport').value,size=1600;let out;
  if(mode==='both'){const f=renderAt(0,size,3.6),b=renderAt(Math.PI,size,3.6);out=document.createElement('canvas');out.width=size*2;out.height=size;const c=out.getContext('2d');c.drawImage(f,0,0);c.drawImage(b,size,0);}
