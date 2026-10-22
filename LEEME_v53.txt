@@ -1,0 +1,22 @@
+LZ STUDIO TOOLS — v53
+
+Catálogo y navegación
+- El buscador, los filtros, Restablecer y el menú Módulos vuelven a funcionar sin sesión. home.js ya no depende de
+  módulos protegidos ni del servicio de cuenta; studio-navigation.js (solo interfaz) es público.
+- Contadores calculados desde el panel: «13 herramientas disponibles · 16 en total, 3 desactivadas».
+- Una sola barra superior en Inicio, Herramientas DTF, Mi cuenta y LZ Box Studio.
+- Tarjetas con qué acepta y qué entrega cada herramienta; sección Recientes.
+
+Acceso
+- Antes de pedir la cuenta se explica que es gratuita y qué herramienta se pidió.
+- Después de iniciar sesión se continúa en la herramienta, con sus parámetros (también LZ Box Studio).
+- Errores junto al campo; estados de carga, error y éxito. «Premium» = flujo automático de semitonos, no un plan.
+
+Precisión
+- Auditor de grosor y comprobación final: los puntos se miden por su parte imprimible (alfa ≥ 50 %).
+- Pliego: el largo usado se muestra junto al campo; los píxeles mostrados coinciden con el archivo.
+
+Rendimiento
+- LZ Box Studio: textura y miniaturas en WebP (5.9 MB → 2.2 MB por carga).
+
+Pruebas nuevas: catalog-tests.mjs, dot-precision-tests.mjs.
