@@ -19,9 +19,21 @@ export const client = configured ? createClient(AUTH_CONFIG.supabaseUrl,AUTH_CON
 export const routes={premium:"premium.html",crop:'crop.html',editor:'editor.html',remove:'editor.html?tool=remove',recolor:'editor.html?tool=recolor',opacity:'opacity.html',thickness:'thickness.html',texture:'textures.html',text:'text-creator.html',mockups:'mockups.html',vectorize:'vectorize.html',analyzer:'analyzer.html',sheet:'gang-sheet.html',color:'color-enhance.html',upscale:'upscale.html',extract:'extract.html'};
 export async function rpc(name,args={}) {const {data,error}=await client.rpc(name,args);if(error)throw error;return data;}
 export async function rows(table) {let result=[];for(let offset=0;;offset+=1000){const {data,error}=await client.from(table).select('*').order('id').range(offset,offset+999);if(error)throw error;result.push(...data);if(data.length<1000)return result;}}
-export function safeReturn(value){return Object.values(routes).includes(value)?value:'index.html';}
+// Rutas protegidas a las que se puede volver después de iniciar sesión.
+export const protectedPages={...Object.fromEntries(Object.entries(routes).map(([id,route])=>[route,id])),'box/index.html':'box'};
+export const toolNames={premium:'Semitonos Premium',editor:'Semitonos',remove:'Quitar fondo color',recolor:'Reemplazar color',crop:'Recortar imagen',opacity:'Semitransparencias',thickness:'Auditor de grosor',texture:'Texturas',text:'Creador de textos',mockups:'Mockups',vectorize:'Vectorizar',analyzer:'Preparar para impresión',sheet:'Pliego DTF',color:'Mejorar colores',upscale:'Mejorar imágenes',extract:'Extraer diseño',box:'LZ Box Studio'};
+// Conserva la página y sus parámetros; solo acepta destinos internos conocidos.
+export function parseReturn(value){
+ if(typeof value!=='string'||value.length>600)return null;let url;
+ try{url=new URL(value.replace(/^\/+/,''),location.origin+'/');}catch{return null;}
+ if(url.origin!==location.origin)return null;const page=url.pathname.replace(/^\//,'')||'index.html';
+ const id=page==='editor.html'&&['remove','recolor'].includes(url.searchParams.get('tool'))?url.searchParams.get('tool'):protectedPages[page];
+ if(!id)return null;return {id,page,href:page+url.search+url.hash,name:toolNames[id]||'la herramienta'};
+}
+export function safeReturn(value){return parseReturn(value)?.href||'index.html';}
+export function toolCatalogId(id){return ['remove','premium'].includes(id)?'editor':id;}
 export async function identity(){if(!client)return null;const {data,error}=await client.auth.getUser();if(error||!data.user)return null;await rpc('lz_ensure_profile');const [profiles,isAdmin,tools]=await Promise.all([rows('lz_profiles'),rpc('lz_is_admin'),rows('lz_tools')]);return {user:data.user,profile:profiles.find(p=>p.id===data.user.id),profiles,isAdmin,tools};}
 export function allowed(state,id){return Boolean(state&&state.profile&&!state.profile.blocked&&routes[id]&&state.tools.some(t=>t.id===(['remove','premium'].includes(id)?'editor':id)&&t.enabled!==false));}
-export async function syncServerSession(session){const response=await fetch('/api/account/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session?.access_token||null,remember:rememberSession()}),credentials:'same-origin'});if(!response.ok){const data=await response.json();throw new Error(data.message||'No pudimos verificar tu sesión.');}}
+export async function syncServerSession(session){const response=await fetch('/api/account/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session?.access_token||null,remember:rememberSession()}),credentials:'same-origin'});if(!response.ok){let data={};try{data=await response.json();}catch{}const error=new Error(data.message||'No pudimos verificar tu sesión.');error.status=response.status;throw error;}}
 
 export async function setToolEnabled(id,enabled){const {data,error}=await client.from('lz_tools').update({enabled}).eq('id',id).select('id,enabled');if(error)throw error;if(!data?.length)throw new Error('No tienes permiso para cambiar esta herramienta.');}

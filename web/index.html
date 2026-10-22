@@ -3,380 +3,69 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LZ Studio Tools · Suite de herramientas para diseño y fabricación</title>
-<meta name="description" content="Suite completa: herramientas DTF para preparar diseños de impresión y Box Studio para diseñar cajas y piezas de MDF con corte láser.">
+<title>LZ Studio Tools · Herramientas DTF y cajas de MDF</title>
+<meta name="description" content="Herramientas DTF para preparar diseños de impresión y LZ Box Studio para diseñar cajas y piezas de MDF con corte láser.">
+<meta name="theme-color" content="#0e0f10">
 <link rel="icon" type="image/svg+xml" href="assets/lz-studio-green.svg">
+<link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="lz-system.css">
-<style>
-/* ── Landing page ─────────────────────────────────────────── */
-:root {
-  --lz-land-bg: #080808;
-  --lz-land-card: #111111;
-  --lz-land-line: #1e1e1e;
-  --lz-land-line2: #2a2a2a;
-  --lz-land-text: #e8e8e8;
-  --lz-land-muted: #888;
-  --lz-land-dtf: #ffffff;
-  --lz-land-box: #cfae7e;
-  --lz-land-radius: 16px;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--lz-land-bg);
-  color: var(--lz-land-text);
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Top bar */
-.land-topbar {
-  height: 58px;
-  background: #0a0a0a;
-  border-bottom: 1px solid var(--lz-land-line);
-  display: flex;
-  align-items: center;
-  padding: 0 32px;
-  gap: 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.land-logo {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #fff;
-  text-decoration: none;
-}
-.land-logo span {
-  color: #888;
-  font-weight: 400;
-}
-
-.land-nav { display: flex; align-items: center; gap: 4px; margin-left: 28px; padding-left: 28px; border-left: 1px solid var(--lz-land-line2); }
-.land-nav-link { font-size: 13px; font-weight: 500; color: #aaa; text-decoration: none; padding: 6px 12px; border-radius: 8px; transition: color .15s, background .15s; }
-.land-nav-link:hover { color: #fff; background: #151515; }
-.land-nav-link.active { color: #fff; background: #1a1a1a; }
-.land-nav-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-
-/* Main content */
-.land-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px 80px;
-  gap: 0;
-}
-
-.land-hero {
-  text-align: center;
-  margin-bottom: 56px;
-}
-.land-title {
-  font-size: clamp(32px, 5vw, 52px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: #fff;
-}
-.land-title em {
-  font-style: normal;
-  color: #777;
-}
-.land-sub {
-  margin-top: 16px;
-  font-size: 15px;
-  color: var(--lz-land-muted);
-  max-width: 440px;
-  line-height: 1.6;
-}
-
-/* Cards grid */
-.land-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  width: 100%;
-  max-width: 900px;
-}
-
-.land-card {
-  background: var(--lz-land-card);
-  border: 1px solid var(--lz-land-line);
-  border-radius: var(--lz-land-radius);
-  padding: 40px 36px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.2s, background 0.2s;
-}
-.land-card:hover {
-  border-color: #333;
-  background: #151515;
-}
-.land-card:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-}
-
-/* Card visual area */
-.land-card-visual {
-  width: 100%;
-  height: 180px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-  margin-bottom: 8px;
-}
-
-/* DTF card visuals */
-.land-card--dtf .land-card-visual {
-  background: #141414;
-  border: 1px solid #1e1e1e;
-}
-.dtf-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 20px;
-  width: 100%;
-}
-.dtf-dot {
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0.08;
-}
-.dtf-dot:nth-child(odd) { opacity: 0.14; }
-.dtf-dot:nth-child(3n) { opacity: 0.22; background: #ddd; }
-.dtf-tool-icons {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 10px;
-  padding: 20px;
-  align-items: center;
-  justify-items: center;
-}
-.dtf-tool-icon {
-  width: 36px;
-  height: 36px;
-  background: #191919;
-  border: 1px solid #252525;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  opacity: 0.7;
-}
-.dtf-tool-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-
-/* Box card visuals */
-.land-card--box .land-card-visual {
-  background: #0f0f0d;
-  border: 1px solid #211e17;
-}
-.box-3d {
-  width: 110px;
-  height: 110px;
-  position: relative;
-}
-.box-3d svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* Card text */
-.land-card-tag {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--lz-land-muted);
-  border: 1px solid #252525;
-  border-radius: 4px;
-  padding: 3px 8px;
-  align-self: flex-start;
-}
-.land-card--dtf .land-card-tag { color: #aaa; border-color: #2a2a2a; }
-.land-card--box .land-card-tag { color: #9a805a; border-color: #352d20; }
-
-.land-card-title {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: #fff;
-  line-height: 1.15;
-}
-
-.land-card-desc {
-  font-size: 13px;
-  color: #999;
-  line-height: 1.6;
-  flex: 1;
-}
-
-.land-card-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #aaa;
-  margin-top: 8px;
-  transition: color 0.15s;
-}
-.land-card:hover .land-card-cta { color: #fff; }
-.land-card-cta svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; transition: transform 0.15s; }
-.land-card:hover .land-card-cta svg { transform: translateX(3px); }
-
-/* Footer */
-.land-footer {
-  text-align: center;
-  padding: 24px;
-  font-size: 11px;
-  color: #777;
-  border-top: 1px solid var(--lz-land-line);
-}
-
-/* Mobile */
-@media (max-width: 680px) {
-  .land-topbar { padding: 0 16px; overflow-x: auto; }
-  .land-nav { margin-left: 12px; padding-left: 12px; }
-  .land-nav-link { padding: 6px 8px; white-space: nowrap; }
-  .land-logo { white-space: nowrap; }
-  .land-main { padding: 36px 16px 56px; }
-  .land-hero { margin-bottom: 40px; }
-  .land-cards { grid-template-columns: 1fr; gap: 14px; }
-  .land-card { padding: 28px 24px; }
-  .land-card-visual { height: 140px; }
-}
-</style>
+<link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="landing.css">
+<script type="module" src="account/account-nav.js"></script>
 </head>
-<body>
-
-<header class="land-topbar">
-  <a class="land-logo" href="index.html">LZ <span>STUDIO</span> TOOLS</a>
-  <nav class="land-nav" aria-label="Secciones">
-    <a class="land-nav-link active" href="index.html" aria-current="page">Inicio</a>
-    <a class="land-nav-link" href="dtf.html">Herramientas DTF</a>
-    <a class="land-nav-link" href="box/index.html">LZ Box Studio</a>
-  </nav>
+<body class="lz-site landing">
+<a class="skip-link" href="#main">Ir al contenido</a>
+<header class="topbar lz-appbar">
+ <a class="brand" href="index.html" aria-label="LZ Studio Tools · Inicio"><span class="brand-name">LZ <span class="brand-studio">STUDIO</span> TOOLS</span></a>
+ <nav class="lz-sections" aria-label="Secciones"><a href="index.html" aria-current="page">Inicio</a><a href="dtf.html">Herramientas DTF</a><a href="box/index.html">LZ Box Studio</a></nav>
+ <div class="lz-appbar-end" data-account-slot></div>
 </header>
 
-<main class="land-main">
+<main id="main" class="landing-main">
+ <section class="landing-intro">
+  <h1>Prepara diseños DTF y cajas de MDF listos para producir.</h1>
+  <p>Dos áreas de trabajo con medidas reales. Gratis con tu cuenta.</p>
+ </section>
 
-  <div class="land-hero">
-    <h1 class="land-title">Tu taller<br><em>digital.</em></h1>
-    <p class="land-sub">Diseño DTF e impresión, más creación de cajas y piezas en MDF. Dos herramientas en un solo lugar.</p>
-  </div>
+ <div class="landing-areas">
+  <article class="area" aria-labelledby="dtfTitle">
+   <figure class="area-example">
+    <div class="example-pair">
+     <div class="example-frame"><img src="assets/examples/dtf-original.webp" width="480" height="480" alt="Diseño original con sol degradado y montañas sobre fondo negro" loading="eager"><span>Original</span></div>
+     <div class="example-frame on-fabric"><img src="assets/examples/dtf-semitono.webp" width="480" height="480" alt="El mismo diseño convertido en semitono: el negro desaparece y los degradados se vuelven puntos" loading="eager"><span>Semitono</span></div>
+    </div>
+    <figcaption>Resultado real de Semitonos: el negro se elimina y los degradados pasan a puntos imprimibles sobre la prenda.</figcaption>
+   </figure>
+   <div class="area-body">
+    <span class="area-tag"><!--lz-dtf-count-->Herramientas DTF<!--/lz-dtf-count--></span>
+    <h2 id="dtfTitle">Herramientas DTF</h2>
+    <p>Semitonos, quitar o reemplazar colores, semitransparencias, auditor de grosor de 0.5 mm, texturas, mockups y pliegos de 58 cm.</p>
+    <ul class="area-points"><li>Acepta PNG, JPG y WebP</li><li>Entrega PNG a la medida de impresión</li></ul>
+    <a class="area-cta" href="dtf.html">Ver Herramientas DTF</a>
+   </div>
+  </article>
 
-  <div class="land-cards">
+  <article class="area" aria-labelledby="boxTitle">
+   <figure class="area-example">
+    <div class="example-pair">
+     <div class="example-frame"><img src="assets/examples/mdf-box.webp" width="320" height="200" alt="Vista 3D de una caja de MDF con uniones de peine" loading="eager"><span>Vista 3D</span></div>
+     <div class="example-frame plan"><img src="assets/examples/mdf-plano.svg" width="374" height="340" alt="Plano de corte de la misma caja: cinco piezas con sus encastres" loading="eager"><span>Plano de corte</span></div>
+    </div>
+    <figcaption>Caja de 180 × 120 × 100 mm en MDF de 3 mm: modelo 3D y plano generado por Box Studio.</figcaption>
+   </figure>
+   <div class="area-body">
+    <span class="area-tag">17 modelos · MDF · láser</span>
+    <h2 id="boxTitle">LZ Box Studio</h2>
+    <p>Cajas, charolas, canastas y organizadores con encastres. Ajusta medidas y espesor, revisa el armado en 3D y exporta para corte láser.</p>
+    <ul class="area-points"><li>Medidas en milímetros y espesor del MDF</li><li>Exporta SVG, DXF o PDF técnico a escala 1:1</li></ul>
+    <a class="area-cta" href="box/index.html">Abrir LZ Box Studio</a>
+   </div>
+  </article>
+ </div>
 
-    <!-- DTF Card -->
-    <a class="land-card land-card--dtf" href="dtf.html" aria-label="Ir a Herramientas DTF Premium">
-      <div class="land-card-visual" aria-hidden="true">
-        <div class="dtf-tool-icons">
-          <!-- Halftone icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/><path d="M9 5v4m6 1v4m-8 1v4"/></svg>
-          </div>
-          <!-- Color icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/></svg>
-          </div>
-          <!-- Mockup icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>
-          </div>
-          <!-- Sheet icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h4v5H8zm6 0h3v3h-3zM8 15h9v3H8z"/></svg>
-          </div>
-          <!-- AI icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><path d="M4 17 17 4m-6 0h6v6M5 5v4m-2-2h4M17 16v5m-2-3h4"/></svg>
-          </div>
-          <!-- Texture icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><path d="M4 5h4m4 0h8M4 10h10m4 0h2M4 15h3m4 0h9M4 20h12m3 0h1"/></svg>
-          </div>
-          <!-- Vector icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="4" height="4"/><rect x="17" y="17" width="4" height="4"/><path d="M7 5h7a5 5 0 0 1 5 5v7M5 7v7a5 5 0 0 0 5 5h7"/></svg>
-          </div>
-          <!-- Check icon -->
-          <div class="dtf-tool-icon">
-            <svg viewBox="0 0 24 24"><path d="m8 12 3 3 6-7"/><rect x="3" y="3" width="18" height="18" rx="5"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <span class="land-card-tag">16 herramientas · DTF</span>
-      <h2 class="land-card-title">Herramientas DTF Premium</h2>
-      <p class="land-card-desc">Semitonos, mejora con IA, pliegos de 58 cm, mockups, colores, texturas y más. Todo lo que necesitas para preparar y presentar diseños de impresión.</p>
-      <span class="land-card-cta">
-        Entrar a Herramientas DTF
-        <svg viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-      </span>
-    </a>
-
-    <!-- Box Studio Card -->
-    <a class="land-card land-card--box" href="box/index.html" aria-label="Ir a LZ Box Studio">
-      <div class="land-card-visual" aria-hidden="true">
-        <div class="box-3d">
-          <svg viewBox="-20 -20 100 100" fill="none">
-            <!-- Box 3D isometric -->
-            <polygon points="30,5 60,20 60,55 30,70 0,55 0,20" fill="#1a1710" stroke="#cfae7e" stroke-width="1.5" stroke-linejoin="round"/>
-            <!-- Top face -->
-            <polygon points="30,5 60,20 30,35 0,20" fill="#252218" stroke="#cfae7e" stroke-width="1.5" stroke-linejoin="round"/>
-            <!-- Left face -->
-            <polygon points="0,20 30,35 30,70 0,55" fill="#1a1710" stroke="#cfae7e" stroke-width="1" stroke-linejoin="round" opacity="0.7"/>
-            <!-- Right face -->
-            <polygon points="60,20 30,35 30,70 60,55" fill="#201d14" stroke="#cfae7e" stroke-width="1" stroke-linejoin="round" opacity="0.85"/>
-            <!-- Finger joints top -->
-            <line x1="15" y1="12.5" x2="15" y2="5.5" stroke="#cfae7e" stroke-width="1" opacity="0.5"/>
-            <line x1="45" y1="12.5" x2="45" y2="5.5" stroke="#cfae7e" stroke-width="1" opacity="0.5"/>
-            <line x1="22" y1="8.5" x2="22" y2="2.5" stroke="#cfae7e" stroke-width="1" opacity="0.35"/>
-            <line x1="38" y1="8.5" x2="38" y2="2.5" stroke="#cfae7e" stroke-width="1" opacity="0.35"/>
-          </svg>
-        </div>
-      </div>
-
-      <span class="land-card-tag">17 modelos · MDF · Láser</span>
-      <h2 class="land-card-title">LZ Box Studio</h2>
-      <p class="land-card-desc">Diseña cajas, charolas y piezas de MDF con encastres precisos. Visualiza el armado en 3D y exporta planos SVG, DXF o PDF para corte láser.</p>
-      <span class="land-card-cta">
-        Entrar a Box Studio
-        <svg viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-      </span>
-    </a>
-
-  </div>
-
+ <p class="landing-note">Las herramientas requieren una cuenta gratuita. «Premium» es el nombre del flujo automático de semitonos, no un plan de pago. Tus archivos se procesan en tu dispositivo.</p>
 </main>
 
-<footer class="land-footer">
-  LZ STUDIO TOOLS · Tu archivo se procesa en tu dispositivo
-</footer>
-
+<footer class="lz-footer"><span>LZ Studio Tools</span><span>Tu archivo se procesa en tu dispositivo.</span></footer>
 </body>
 </html>

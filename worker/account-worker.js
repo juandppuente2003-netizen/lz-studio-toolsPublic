@@ -9,7 +9,10 @@ function routeTool(url){if(url.pathname==='/premium.html')return 'editor';if(url
 function pruneTools(html,tools){
  const enabled=new Set(tools.filter(t=>t.enabled).map(t=>t.id));
  const visible=href=>{const id=routeTool(new URL(href,'https://local.test'));return !id||enabled.has(id);};
- return html.replace(/<article\b[^>]*class="tool-card"[^>]*>[\s\S]*?<\/article>/g,card=>{const href=card.match(/class="open-tool" href="([^"]+)"/);return href&&!visible(href[1])?'':card;}).replace(/<a\b[^>]*href="([^"]+)"[^>]*>[\s\S]*?<\/a>/g,(link,href)=>visible(href)?link:'');
+ const cardPattern=/<article\b[^>]*class="tool-card"[^>]*>[\s\S]*?<\/article>/g;
+ // Total de tarjetas configuradas antes de quitar las desactivadas: el catálogo muestra «disponibles de total».
+ const total=(html.match(cardPattern)||[]).length;if(total)html=html.replace('id="toolCatalog"','id="toolCatalog" data-tools-total="'+total+'"');
+ return html.replace(cardPattern,card=>{const href=card.match(/class="open-tool" href="([^"]+)"/);return href&&!visible(href[1])?'':card;}).replace(/<a\b[^>]*href="([^"]+)"[^>]*>[\s\S]*?<\/a>/g,(link,href)=>visible(href)?link:'');
 }
 export function createHandler({assets,fetchUpstream=fetch}={}){
  async function tools(){const response=await fetchUpstream(AUTH_CONFIG.supabaseUrl+'/rest/v1/lz_tools?select=id,name,enabled',{headers:{apikey:AUTH_CONFIG.publishableKey,Authorization:'Bearer '+AUTH_CONFIG.publishableKey}});if(!response.ok)throw new Error('No se pudo consultar las herramientas.');return response.json();}
@@ -45,6 +48,8 @@ export function createHandler({assets,fetchUpstream=fetch}={}){
     const catalog=await tools(),id=routeTool(url);
     if(id&&!catalog.some(t=>t.id===id&&t.enabled))return new Response('<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Herramienta desactivada</title><link rel="stylesheet" href="account.css"><body class="account-body"><main class="account-main"><h1>Herramienta desactivada</h1><p>El administrador ha desactivado esta herramienta.</p><a class="account-primary" href="/index.html">Ver herramientas disponibles</a></main></body></html>',{status:403,headers:{...headers,'Content-Type':'text/html; charset=utf-8'}});
     body=pruneTools(body,catalog);
+    // Contador de la portada calculado desde la configuración del panel.
+    if(body.includes('<!--lz-dtf-count-->')&&assets['/dtf.html']){const all=assets['/dtf.html'].body,count=html=>(html.match(/<article\b[^>]*class="tool-card"/g)||[]).length,total=count(all),available=count(pruneTools(all,catalog));body=body.replace(/<!--lz-dtf-count-->[\s\S]*?<!--\/lz-dtf-count-->/,available===total?`${total} herramientas`:`${available} de ${total} herramientas activas`);}
     if(path==='/editor.html'&&!catalog.some(t=>t.id==='recolor'&&t.enabled))body=body.replace('<body','<body data-recolor-disabled="true"');
    }
    return new Response(request.method==='HEAD'?null:body,{headers:{...headers,'Content-Type':asset.type}});

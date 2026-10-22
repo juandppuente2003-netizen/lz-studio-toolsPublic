@@ -1,7 +1,8 @@
 import {readFile,readdir,mkdir,rm,copyFile,writeFile} from 'node:fs/promises';
 import {build} from 'esbuild';
 import './build-accounts.mjs';
-const publicScripts=new Set(['/home.js','/account/account-nav.js','/account/account-page.js']);
+// Scripts públicos: solo interfaz y navegación. Los motores de las herramientas siguen protegidos.
+const publicScripts=new Set(['/home.js','/studio-navigation.js','/account/account-nav.js','/account/account-page.js']);
 // Auth bundles use shared chunks; the app modules themselves remain protected.
 const assets={};
 async function walk(dir,prefix=''){for(const entry of await readdir(dir,{withFileTypes:true})){const relative=prefix+'/'+entry.name;if(entry.isDirectory())await walk(dir+'/'+entry.name,relative);else{

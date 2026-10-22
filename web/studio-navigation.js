@@ -1,10 +1,15 @@
 // Reorder existing links without changing routes or tool access controls.
 export function groupStudioNavigation(){
  const menu=document.querySelector('.module-menu');if(!menu||menu.dataset.grouped)return;menu.dataset.grouped='true';
- const version=menu.querySelector('.menu-head .eyebrow');if(version)version.textContent='LZ_STUDIO_TOOLS · v53';
- // Add Box Studio link if not already present
- if(!menu.querySelector('a[data-box-link]')){const boxLink=document.createElement('a');boxLink.className='module';boxLink.dataset.boxLink='1';boxLink.href='box/index.html';boxLink.innerHTML='<span>📦</span><strong>LZ Box Studio</strong><small>Cajas y piezas de MDF</small>';menu.querySelector('.menu-head')?.after(boxLink)||(menu.prepend(boxLink));}
+ document.getElementById('menuButton')?.setAttribute('aria-label','Módulos');
+ const version=menu.querySelector('.menu-head .eyebrow');if(version)version.textContent='LZ Studio Tools';
 
+ // Secciones del sitio y herramienta actual, iguales en todas las páginas.
+ if(!menu.querySelector('.lz-menu-sections')){const page=location.pathname.split('/').pop()||'index.html',nav=document.createElement('nav');nav.className='lz-menu-sections';nav.setAttribute('aria-label','Secciones');
+  for(const [href,label] of [['index.html','Inicio'],['dtf.html','Herramientas DTF'],['box/index.html','LZ Box Studio'],['account.html','Mi cuenta']]){const a=document.createElement('a');a.href=href;a.textContent=label;const current=href===page||(href==='dtf.html'&&!['index.html','account.html'].includes(page));if(current)a.setAttribute('aria-current','page');nav.append(a);}
+  menu.querySelector('.menu-head')?.after(nav);}
+ for(const a of menu.querySelectorAll('a.module[href="index.html"]')){a.href='dtf.html';const title=a.querySelector('strong');if(title)title.textContent='Catálogo DTF';}
+ const here=location.pathname.split('/').pop()+location.search;for(const a of menu.querySelectorAll('a.module')){if(a.getAttribute('href')===here||(here==='editor.html'&&a.getAttribute('href')==='editor.html'))a.setAttribute('aria-current','page');}
  const groups=[['Preparar',['crop','extract','remove','recolor','upscale','color-enhance']],['Diseñar',['editor','premium','text-creator','textures','vectorize']],['Producir',['opacity','thickness','analyzer','gang-sheet']],['Presentar',['mockups']]];
  const links=[...menu.querySelectorAll('a.module')];
  const id=link=>{const url=new URL(link.getAttribute('href'),document.baseURI);return url.searchParams.get('tool')||url.pathname.split('/').pop().replace('.html','');};

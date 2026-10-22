@@ -13,13 +13,16 @@ export function authError(error){
 }
 
 export function mountAuth(container,{onSuccess=()=>{},mode='login'}={}){
- container.innerHTML=`<div class="auth-tabs" role="tablist" aria-label="Acceso"><button type="button" role="tab" data-mode="login">Iniciar sesión</button><button type="button" role="tab" data-mode="register">Registrarse</button></div><h2 class="auth-title"></h2><p class="auth-intro"></p><form class="auth-form"><div class="auth-name"><label>Nombre<input name="full_name" autocomplete="name" maxlength="120"></label></div><label class="auth-email">Correo electrónico<input name="email" type="email" autocomplete="email" required maxlength="254" placeholder="tu@correo.com"></label><label class="auth-password">Contraseña<input name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label><label class="auth-confirm">Confirmar contraseña<input name="confirm" type="password" autocomplete="new-password" minlength="8" maxlength="128"></label><label class="auth-remember"><input name="remember" type="checkbox" checked> Mantener sesión iniciada</label><p class="account-hint auth-password-hint">Usa al menos 8 caracteres.</p><button class="account-primary auth-submit" type="submit">Iniciar sesión</button></form><button type="button" class="auth-forgot">Olvidé mi contraseña</button><button type="button" class="auth-back" hidden>Volver a iniciar sesión</button><p class="auth-message" role="status" aria-live="polite" tabindex="-1"></p><div class="auth-delivery" hidden><p class="account-hint">La cuenta necesita confirmar su correo antes de entrar. Si no llega el mensaje, revisa Spam. Reenviar una confirmación no crea otra cuenta.</p><button type="button" class="auth-resend">Reenviar confirmación</button><button type="button" class="auth-check-login">Ya confirmé mi correo</button></div><p class="account-hint auth-free">Cuenta gratuita. Todas las herramientas están incluidas.</p>`;
+ container.innerHTML=`<div class="auth-tabs" role="tablist" aria-label="Acceso"><button type="button" role="tab" data-mode="login">Iniciar sesión</button><button type="button" role="tab" data-mode="register">Registrarse</button></div><h2 class="auth-title"></h2><p class="auth-intro"></p><form class="auth-form"><div class="auth-name"><label>Nombre<input name="full_name" autocomplete="name" maxlength="120"></label></div><label class="auth-email">Correo electrónico<input name="email" type="email" autocomplete="email" required maxlength="254" placeholder="tu@correo.com"></label><label class="auth-password">Contraseña<input name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label><label class="auth-confirm">Confirmar contraseña<input name="confirm" type="password" autocomplete="new-password" minlength="8" maxlength="128"></label><label class="auth-remember"><input name="remember" type="checkbox" checked> Mantener sesión iniciada</label><p class="account-hint auth-password-hint">Usa al menos 8 caracteres.</p><button class="account-primary auth-submit" type="submit">Iniciar sesión</button></form><button type="button" class="auth-forgot">Olvidé mi contraseña</button><button type="button" class="auth-back" hidden>Volver a iniciar sesión</button><p class="auth-message" role="status" aria-live="polite" tabindex="-1"></p><div class="auth-delivery" hidden><p class="account-hint">La cuenta necesita confirmar su correo antes de entrar. Si no llega el mensaje, revisa Spam. Reenviar una confirmación no crea otra cuenta.</p><button type="button" class="auth-resend">Reenviar confirmación</button><button type="button" class="auth-check-login">Ya confirmé mi correo</button></div><p class="auth-free"><strong>Cuenta gratuita.</strong> Incluye todas las herramientas activas; «Premium» es el nombre del flujo automático de semitonos, no un plan de pago.</p>`;
  const $=s=>container.querySelector(s),form=$('.auth-form'),fields=form.elements;
  let current,working=false,pendingEmail='',lastEmailRequest=0;
- const notify=text=>{$('.auth-message').textContent=text;$('.auth-message').focus();};
- const busy=value=>{working=value;for(const button of container.querySelectorAll('button'))button.disabled=value;};
+ // Mensajes de estado: 'loading', 'error' o 'success'. Los errores de un campo se muestran junto a él.
+ const clearFieldErrors=()=>{for(const input of form.querySelectorAll('[aria-invalid]')){input.removeAttribute('aria-invalid');input.removeAttribute('aria-describedby');}for(const node of form.querySelectorAll('.auth-field-error'))node.remove();};
+ const fieldError=(field,text)=>{clearFieldErrors();const id='auth-error-'+field.name+'-'+Math.random().toString(36).slice(2,7);const note=document.createElement('span');note.className='auth-field-error';note.id=id;note.textContent=text;field.setAttribute('aria-invalid','true');field.setAttribute('aria-describedby',id);field.closest('label').append(note);field.focus();};
+ const notify=(text,kind='')=>{const box=$('.auth-message');box.textContent=text;box.className='auth-message'+(kind?' is-'+kind:'');if(kind!=='loading')box.focus();};
+ const busy=value=>{working=value;for(const button of container.querySelectorAll('button'))button.disabled=value;$('.auth-submit').setAttribute('aria-busy',String(value));};
  function setMode(next){
-  current=next;pendingEmail='';$('.auth-message').textContent='';$('.auth-delivery').hidden=true;form.hidden=false;form.reset();
+  current=next;clearFieldErrors();pendingEmail='';$('.auth-message').textContent='';$('.auth-delivery').hidden=true;form.hidden=false;form.reset();
   $('.auth-remember').hidden=!['login','register'].includes(next);fields.remember.checked=rememberSession();
   $('.auth-tabs').hidden=next==='update';$('.auth-name').hidden=next!=='register';fields.full_name.required=next==='register';
   $('.auth-email').hidden=next==='update';fields.email.required=next!=='update';$('.auth-password').hidden=next==='reset';fields.password.required=next!=='reset';
@@ -37,7 +40,9 @@ export function mountAuth(container,{onSuccess=()=>{},mode='login'}={}){
  }
  $('.auth-forgot').onclick=()=>setMode('reset');$('.auth-back').onclick=()=>setMode('login');
  $('.auth-check-login').onclick=()=>{const email=pendingEmail;setMode('login');fields.email.value=email;fields.password.focus();};
- form.addEventListener('invalid',event=>{const field=event.target;notify(field.name==='password'&&field.validity.tooShort?'La contraseña debe tener al menos 8 caracteres.':field.validationMessage||'Revisa los campos antes de continuar.');},true);
+ form.addEventListener('invalid',event=>{event.preventDefault();const field=event.target;if(form.querySelector('[aria-invalid=true]'))return;const text=field.validity.valueMissing?'Completa este campo.':field.name==='password'&&field.validity.tooShort?'La contraseña debe tener al menos 8 caracteres.':field.type==='email'?'Escribe un correo válido, por ejemplo tu@correo.com.':field.validationMessage||'Revisa este campo.';fieldError(field,text);$('.auth-message').textContent='';},true);
+ form.addEventListener('input',event=>{if(event.target.getAttribute('aria-invalid')==='true')clearFieldErrors();});
+ form.querySelector('.auth-submit').addEventListener('click',()=>clearFieldErrors());
  $('.auth-resend').onclick=async()=>{
   if(working||!pendingEmail)return;
   const remaining=Math.ceil((60000-(Date.now()-lastEmailRequest))/1000);
@@ -48,9 +53,9 @@ export function mountAuth(container,{onSuccess=()=>{},mode='login'}={}){
  form.onsubmit=async event=>{
   event.preventDefault();if(working)return;
   const email=fields.email.value.trim(),password=fields.password.value;
-  if(['register','update'].includes(current)&&password!==fields.confirm.value){notify('Las contraseñas no coinciden.');return;}
+  if(['register','update'].includes(current)&&password!==fields.confirm.value){fieldError(fields.confirm,'Las contraseñas no coinciden.');notify('Las contraseñas no coinciden.','error');return;}
   if(!configured){notify('Las cuentas no están disponibles en este momento.');return;}
-  busy(true);const active=current;notify('Procesando…');
+  busy(true);const active=current;notify({login:'Iniciando sesión…',register:'Creando tu cuenta…',reset:'Enviando enlace…',update:'Guardando contraseña…'}[active],'loading');
   try{
    let result;const callback=new URL('account.html',location.href);
    if(['login','register'].includes(active))setRememberSession(fields.remember.checked);
@@ -60,14 +65,14 @@ export function mountAuth(container,{onSuccess=()=>{},mode='login'}={}){
    else result=await client.auth.updateUser({password});
    if(result.error)throw result.error;
    fields.password.value='';fields.confirm.value='';
-   if(active==='reset')notify('Si ese correo tiene una cuenta, solicitamos un enlace para recuperar la contraseña. Revisa también Spam.');
+   if(active==='reset')notify('Si ese correo tiene una cuenta, solicitamos un enlace para recuperar la contraseña. Revisa también Spam.','success');
    else if(active==='register'&&!result.data.session){
     if(Array.isArray(result.data.user?.identities)&&result.data.user.identities.length===0){setMode('login');fields.email.value=email;notify('Ese correo ya tiene una cuenta. Inicia sesión o pulsa «Olvidé mi contraseña» para establecer tu contraseña.');}
-    else{pendingEmail=email;lastEmailRequest=Date.now();form.hidden=true;$('.auth-title').textContent='Confirma tu correo';$('.auth-intro').textContent=email;$('.auth-delivery').hidden=false;notify('Solicitud de registro recibida. Falta confirmar tu correo para activar el acceso.');}
+    else{pendingEmail=email;lastEmailRequest=Date.now();form.hidden=true;$('.auth-title').textContent='Confirma tu correo';$('.auth-intro').textContent=email;$('.auth-delivery').hidden=false;notify('Solicitud de registro recibida. Falta confirmar tu correo para activar el acceso.','success');}
    }else{
-    const {data}=await client.auth.getSession();await syncServerSession(data.session);notify(active==='update'?'Contraseña guardada.':'Sesión iniciada.');await onSuccess();
+    const {data}=await client.auth.getSession();await syncServerSession(data.session);notify(active==='update'?'Contraseña guardada.':'Sesión iniciada.','success');await onSuccess();
    }
-  }catch(error){notify(authError(error));}finally{busy(false);}
+  }catch(error){const text=authError(error);if(/incorrectos/.test(text))fieldError(fields.password,text);notify(text,'error');}finally{busy(false);}
  };
  setMode(mode);return {setMode};
 }

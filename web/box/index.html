@@ -1,62 +1,9 @@
 <!doctype html>
 <html lang="es" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#121614"><script>try{document.documentElement.dataset.theme=localStorage.getItem("lzbox-theme")==="light"?"light":"dark";}catch{}</script><meta name="description" content="Diseña cajas de MDF a medida. Ajusta espesor y encastres, visualiza el armado en 3D y descarga planos SVG o DXF a escala real."><title>LZ Box Studio · LZ Studio Tools</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23213029'/%3E%3Ctext x='5' y='28' font-family='sans-serif' font-size='23' fill='white'%3ELZ%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="styles.css?v=3.5.0"><link rel="stylesheet" href="workflow-plus.css?v=3.5">
-<style>
-/* LZ Nav bar overrides for Box Studio */
-.lz-top-nav {
-  height: 50px;
-  background: #0f0f0f;
-  border-bottom: 1px solid #1e1e1e;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 0 20px;
-  position: sticky;
-  top: 0;
-  z-index: 9999;
-  font-family: Inter, -apple-system, sans-serif;
-}
-.lz-top-nav .lz-logo {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #fff;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.lz-top-nav .lz-nav-divider {
-  width: 1px;
-  height: 20px;
-  background: #2a2a2a;
-  margin: 0 16px;
-}
-.lz-top-nav a.lz-nav-link {
-  font-size: 12px;
-  color: #888;
-  text-decoration: none;
-  padding: 6px 10px;
-  border-radius: 5px;
-  white-space: nowrap;
-}
-.lz-top-nav a.lz-nav-link:hover {
-  color: #fff;
-  background: #1e1e1e;
-}
-.lz-top-nav a.lz-nav-link.active {
-  color: #fff;
-  background: #1e1e1e;
-}
-/* Move Box's topbar below our nav */
-.topbar { position: sticky; top: 50px; z-index: 999; }
-</style>
+<link rel="stylesheet" href="lz-box.css">
 </head>
 <body>
-<nav class="lz-top-nav" aria-label="LZ Studio Tools navegación">
-  <a class="lz-logo" href="../index.html">LZ STUDIO TOOLS</a>
-  <span class="lz-nav-divider"></span>
-  <a class="lz-nav-link" href="../index.html">Inicio</a>
-  <a class="lz-nav-link" href="../editor.html">Herramientas DTF</a>
-  <a class="lz-nav-link active" href="index.html">LZ Box Studio</a>
-</nav>
+<a class="skip-link" href="#configForm">Ir a la configuración</a>
 
 <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
 <symbol id="i-box" viewBox="0 0 24 24"><path d="m12 3 9 5v9l-9 5-9-5V8l9-5Zm-9 5 9 5 9-5M12 13v9M7.5 5.5l9 5"/></symbol>
@@ -68,7 +15,7 @@
 <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 4 3c-1 .4-1 1-1 2m0 2v1"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
 </defs></svg>
-<header class="topbar"><a class="brand" href="./" aria-label="LZ Studio inicio"><span class="logo">LZ<span>STUDIO</span></span><span class="brand-divider"></span><span class="brand-name">Box Studio <span class="version">ESTUDIO 3.5</span></span></a><div class="top-actions"><div class="top-history" role="group" aria-label="Historial"><button type="button" id="topUndo" class="icon-btn" aria-label="Deshacer" title="Deshacer · Ctrl+Z" disabled><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><button type="button" id="topRedo" class="icon-btn" aria-label="Rehacer" title="Rehacer · Ctrl+Y" disabled><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button></div><span id="autosaveState" class="autosave-state" title="El trabajo en curso se guarda automáticamente en este navegador y se recupera al volver a abrir la página.">Autoguardado</span><span id="saveState" class="save-state" role="status" data-state="new">Sin guardar</span><button id="saveBtn" class="btn quiet" title="Guardar diseño · Ctrl+S"><svg><use href="#i-save"/></svg><span>Guardar</span></button><button id="topExport" type="button" class="btn primary top-export" title="Descargar planos SVG, DXF o PDF"><svg><use href="#i-down"/></svg><span>Exportar</span></button><button id="themeBtn" class="btn theme-toggle" aria-label="Cambiar a tema claro" aria-pressed="true"><svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="themeLabel">Tema claro</span></button><button id="projectsBtn" class="btn quiet"><svg><use href="#i-folder"/></svg><span>Mis diseños</span><span id="savedCount" class="count">0</span></button><button id="helpBtn" class="icon-btn" aria-label="Cómo usar el diseñador"><svg><use href="#i-help"/></svg></button><span class="avatar" title="Espacio de LZ Studio">LZ</span></div></header>
+<header class="topbar"><a class="brand lz-brand" href="../index.html" aria-label="LZ Studio Tools · Inicio"><span class="lz-brand-name">LZ <span>STUDIO</span> TOOLS</span></a><nav class="lz-sections" aria-label="Secciones"><a href="../index.html">Inicio</a><a href="../dtf.html">Herramientas DTF</a><a href="index.html" aria-current="page">LZ Box Studio <span class="version" title="Versión del diseñador">3.5</span></a></nav><div class="top-actions"><div class="top-history" role="group" aria-label="Historial"><button type="button" id="topUndo" class="icon-btn" aria-label="Deshacer" title="Deshacer · Ctrl+Z" disabled><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><button type="button" id="topRedo" class="icon-btn" aria-label="Rehacer" title="Rehacer · Ctrl+Y" disabled><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button></div><span id="autosaveState" class="autosave-state" title="El trabajo en curso se guarda automáticamente en este navegador y se recupera al volver a abrir la página.">Autoguardado</span><span id="saveState" class="save-state" role="status" data-state="new">Sin guardar</span><button id="saveBtn" class="btn quiet" aria-label="Guardar diseño" title="Guardar diseño · Ctrl+S"><svg><use href="#i-save"/></svg><span>Guardar</span></button><button id="topExport" type="button" class="btn primary top-export" title="Descargar planos SVG, DXF o PDF"><svg><use href="#i-down"/></svg><span>Exportar</span></button><button id="themeBtn" class="btn theme-toggle" aria-label="Cambiar a tema claro" aria-pressed="true"><svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="themeLabel">Tema claro</span></button><button id="projectsBtn" class="btn quiet" aria-label="Mis diseños" title="Mis diseños"><svg><use href="#i-folder"/></svg><span>Mis diseños</span><span id="savedCount" class="count">0</span></button><button id="helpBtn" class="icon-btn" aria-label="Cómo usar el diseñador"><svg><use href="#i-help"/></svg></button><a class="lz-account" href="../account.html">Mi cuenta</a></div></header>
 
 <main class="workspace">
 <aside class="config"><div class="panel-head"><h2>Configura tu caja</h2><span class="small-badge">01</span></div><form id="configForm" novalidate>

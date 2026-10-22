@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build:accounts": "node build-accounts.mjs",
-    "test": "node --experimental-vm-modules premium-tests.mjs && node tests.mjs && node halftone-limits-tests.mjs && node interaction-tests.mjs && node site-tests.mjs && node enhance-tests.mjs && node audit-tests.mjs && node handoff-tests.mjs && node preflight-tests.mjs && node account-tests.mjs && node auth-server-tests.mjs && node workspace-tests.mjs && node crop-tests.mjs && node vercel-tests.mjs && node large-files-tests.mjs && node export-dialog-tests.mjs && node manual-operation-tests.mjs && node --experimental-vm-modules dom-boot-tests.mjs && node --experimental-vm-modules dom-boot-tests.mjs --eyedropper && node --experimental-vm-modules dom-boot-tests.mjs --premium",
+    "test": "node --experimental-vm-modules premium-tests.mjs && node tests.mjs && node halftone-limits-tests.mjs && node interaction-tests.mjs && node site-tests.mjs && node catalog-tests.mjs && node enhance-tests.mjs && node audit-tests.mjs && node handoff-tests.mjs && node preflight-tests.mjs && node account-tests.mjs && node auth-server-tests.mjs && node workspace-tests.mjs && node crop-tests.mjs && node vercel-tests.mjs && node large-files-tests.mjs && node export-dialog-tests.mjs && node manual-operation-tests.mjs && node --experimental-vm-modules dom-boot-tests.mjs && node --experimental-vm-modules dom-boot-tests.mjs --eyedropper && node --experimental-vm-modules dom-boot-tests.mjs --premium",
     "build": "node build-site.mjs",
     "build:vercel": "node build-vercel.mjs"
   },

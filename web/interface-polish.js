@@ -3,7 +3,7 @@ export function setupInterfacePolish(config){
  const doc=document,win=doc.defaultView||window;
  const names={premium:"Semitonos Premium",editor:'Semitonos',remove:'Quitar fondo color',recolor:'Reemplazar color',extract:'Extraer diseño',crop:'Recortar imagen',color:'Mejorar colores',upscale:'Mejorar imágenes',thickness:'Auditor de grosor',opacity:'Semitransparencias',texture:'Texturas',text:'Creador de textos',mockups:'Mockups',vectorize:'Vectorizar',analyzer:'Preparar para impresión',sheet:'Pliego DTF'};
  const header=doc.querySelector('.topbar');
- if(header){const context=doc.createElement('div');context.className='lz-tool-context';const caption=doc.createElement('span');caption.textContent='MESA DE TRABAJO';const title=doc.createElement('strong');title.textContent=names[config.id]||'LZ Studio';context.append(caption,title);header.querySelector('.brand')?.after(context);}
+ if(header){const context=doc.createElement('div');context.className='lz-tool-context';const caption=doc.createElement('a');caption.href='dtf.html';caption.textContent='Herramientas DTF';const title=doc.createElement('strong');title.textContent=names[config.id]||'LZ Studio';context.append(caption,title);header.querySelector('.brand')?.after(context);}
  for(const status of doc.querySelectorAll('.status,[id$="Status"]')){status.setAttribute('role','status');status.setAttribute('aria-live','polite');}
  const colors=[...doc.querySelectorAll('input[type="color"]')].map(input=>{const output=doc.createElement('output');output.className='lz-color-value';output.setAttribute('for',input.id);input.after(output);return {input,output};});
  const workspace=doc.querySelector('.workspace,.lab-workspace');let banner,label;
