@@ -27,11 +27,38 @@ las coordenadas ya compensadas por kerf a LHYMicro-GL usando MeerK40t 0.9.9100.
    Copia el código del conector en el campo y pulsa **Conectar**.
 6. Revisa el trabajo y ejecuta la simulación. El estado debe indicar SIMULACIÓN.
 
-El código cambia al reiniciar, no se incluye en URLs y se borra del panel al
-cerrarlo. El puente solo escucha en `127.0.0.1:17840`; nunca en la red del taller.
-Permite por defecto únicamente los orígenes HTTPS de lzstudiotools.com.
+El código del conector se conserva al reiniciar. Marca **Recordar esta computadora**
+después de pegarlo y conectar: el navegador lo recupera en las siguientes visitas.
+Se guarda únicamente en ese perfil y origen del navegador; borrar sus datos, usar
+modo privado, cambiar de navegador/sitio o restablecer el código requiere emparejar
+otra vez. El secreto local vive en el directorio de datos de tu usuario, fuera del
+proyecto. No se incluye en URLs ni se envía a Vercel. **Olvidar esta computadora**
+borra el emparejamiento de ese navegador. Para invalidar todos los códigos guardados,
+cierra el conector e inícialo con `--reset-pairing`. El puente solo escucha en `127.0.0.1:17840`; nunca en la red del taller.
+Permite únicamente los orígenes HTTPS de lzstudiotools.com y la URL exacta de
+esta versión de prueba; no se permiten comodines de Vercel.
 Chrome/Edge pueden solicitar permiso de red local; los navegadores que bloqueen
 estas peticiones no podrán conectar. No se ha verificado Safari/iPhone.
+
+## Usar también Sagaon/K40 Whisperer
+
+El instalador crea su propio entorno Python; no instala, reemplaza ni desinstala
+drivers USB y no modifica los archivos ni ajustes de Sagaon/K40 Whisperer.
+El acceso al USB se toma solo al pulsar **Conectar** en modo USB; recordar el código
+no conecta automáticamente ni inicia movimientos. Usa un programa a la vez:
+
+1. Termina el trabajo y confirma que la máquina se detuvo.
+2. Pulsa **Desconectar y liberar USB**, o cierra el panel de K40 para liberarlo.
+   También puedes cerrar la ventana del conector local.
+3. Abre tu programa habitual. Para volver a Box, libera/cierra el otro programa
+   y pulsa **Conectar**. El emparejamiento permanece guardado.
+
+La liberación del motor está probada con pruebas automatizadas; la compatibilidad
+física del driver existente sigue pendiente en tu PC. Si un driver no es compatible,
+no lo sustituyas sin revisar cómo conservar el funcionamiento de tu programa actual.
+
+Para esta actualización reemplaza el conector anterior por los nuevos archivos y
+reinícialo; la web te indicará si tu conector es demasiado antiguo.
 
 ## Primera prueba USB, siempre junto a la máquina
 

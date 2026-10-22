@@ -1,10 +1,13 @@
 import copy
 import http.client
 import json
+import os
+import tempfile
+from pathlib import Path
 import threading
 import time
 import unittest
-from bridge import Bridge, M2Engine, make_server, validate_job, PROTOCOL
+from bridge import Bridge, M2Engine, make_server, validate_job, PROTOCOL, load_pairing_token
 
 BED = {'width': 400, 'height': 400}
 def job():
@@ -13,7 +16,7 @@ def job():
 
 class FakeEngine:
     def __init__(self, bed):
-        self.sent = []; self.left = 50; self.lost = False
+        self.sent = []; self.left = 50; self.lost = False; self.closed = False
     def compile(self, job, mode): return b'IPP\nM2-test-bytes'
     def connect(self): pass
     def connected(self): return not self.lost
@@ -21,9 +24,33 @@ class FakeEngine:
     def remaining(self): return self.left
     def failed(self): return self.lost
     def cancel(self): self.left = 0
-    def close(self): pass
+    def close(self): self.closed = True
+
+class PairingTests(unittest.TestCase):
+    def test_restart_retains_code_and_reset_rotates_it(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'user' / 'pairing.json'
+            first = load_pairing_token(path)
+            self.assertEqual(first, load_pairing_token(path))
+            second = load_pairing_token(path, reset=True)
+            self.assertNotEqual(first, second)
+            self.assertEqual(second, load_pairing_token(path))
+            if os.name != 'nt': self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+    def test_corrupt_pairing_is_not_silently_replaced(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'pairing.json'; path.write_text('{"token":"bad"}')
+            with self.assertRaises(ValueError): load_pairing_token(path)
+            self.assertEqual(path.read_text(), '{"token":"bad"}')
 
 class JobTests(unittest.TestCase):
+    def test_disconnect_releases_engine_and_invalidates_prepared_job(self):
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); p = b.prepare(job(), 'cut'); engine = b.engine
+        b.disconnect(); self.assertTrue(engine.closed); self.assertIsNone(b.engine)
+        with self.assertRaises(ValueError): b.run(p['id'], True)
+        b.connect(); p = b.prepare(job(), 'cut'); b.run(p['id'], True)
+        with self.assertRaises(ValueError): b.disconnect()
+        self.assertFalse(b.engine.closed)
     def test_bounds_speed_passes_nonfinite_and_board(self):
         for field, value in [('speed', 0), ('speed', float('nan')), ('speed', True), ('passes', 1.5), ('board', 'M3')]:
             raw = job(); raw[field] = value
@@ -90,6 +117,7 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(self.request('/run',{'id':p['id'],'confirmed':True})[1]['state'],'simulated')
         self.assertEqual(self.request('/run',{'id':p['id'],'confirmed':True})[0],400)
         self.assertEqual(self.request('/acknowledge',{'confirmed':True})[0],200)
+        self.assertEqual(self.request('/disconnect',{})[0],200)
 
 class RealCompilerTests(unittest.TestCase):
     @classmethod

@@ -9,15 +9,52 @@ import hmac
 import io
 import json
 import math
+import os
+import re
 import secrets
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 PROTOCOL = 'lz-k40-m2/v1'
 ENGINE_VERSION = '0.9.9100'
 MAX_BODY = 4_000_000
-DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com'}
+DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com',
+                   'https://lz-studio-tools-d-git-a183ed-juandppuente2003-netizens-projects.vercel.app'}
+
+
+def pairing_path():
+    if os.name == 'nt':
+        base = Path(os.environ.get('LOCALAPPDATA', Path.home() / 'AppData' / 'Local'))
+    else:
+        base = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config'))
+    return base / 'LZStudioTools' / 'K40' / 'pairing.json'
+
+
+def load_pairing_token(path=None, reset=False):
+    """A per-user credential, outside the source tree, retained across restarts."""
+    path = Path(path) if path is not None else pairing_path()
+    if path.exists() and not reset:
+        data = json.loads(path.read_text(encoding='utf-8'))
+        token = data.get('token') if isinstance(data, dict) else None
+        if not isinstance(token, str) or not re.fullmatch(r'[A-Za-z0-9_-]{40,100}', token):
+            raise ValueError('Emparejamiento inválido. Usa --reset-pairing para generar otro código.')
+        return token
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    token = secrets.token_urlsafe(32)
+    # A complete private file is prepared before replacement; no partial reads.
+    temporary = path.with_name(path.name + '.' + secrets.token_hex(8) + '.tmp')
+    try:
+        fd = os.open(str(temporary), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, 'w', encoding='utf-8') as out:
+            json.dump({'version': 1, 'token': token}, out)
+            out.flush()
+            os.fsync(out.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return token
 
 
 def numeric(value, minimum, maximum, label):
@@ -190,7 +227,8 @@ class Bridge:
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
-                'simulation': self.simulation, 'powerControl': 'manual'}
+                'simulation': self.simulation, 'powerControl': 'manual',
+                'bridgeVersion': '0.2.0', 'features': ['persistent-pairing', 'disconnect']}
 
     def get_engine(self):
         if self.engine is None:
@@ -275,6 +313,17 @@ class Bridge:
             self.state, self.message, self.id, self.payload = 'idle', 'Lista para preparar otra hoja.', None, b''
             return self.status()
 
+    def disconnect(self):
+        with self.lock:
+            if self.state not in ('idle', 'prepared'):
+                raise ValueError('Espera o cancela el envío y confirma que la máquina se detuvo antes de liberar el USB.')
+            if self.engine:
+                self.engine.close()
+                self.engine = None
+            self.id, self.payload, self.job = None, b'', None
+            self.state, self.message = 'idle', 'USB liberado. Puedes usar Sagaon/K40 Whisperer.'
+            return self.status()
+
     def close(self):
         if self.engine:
             self.engine.close()
@@ -306,7 +355,7 @@ def make_server(bridge, token, origins, port=17840):
             if self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}' or self.headers.get('Origin') not in origins:
                 self.reply(403, {'error': 'Origen no permitido.'})
                 return False
-            if authenticate and not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + token):
+            if authenticate and not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + self.server.pairing_token):
                 self.reply(401, {'error': 'Código del conector incorrecto.'})
                 return False
             return True
@@ -337,6 +386,8 @@ def make_server(bridge, token, origins, port=17840):
                     raise ValueError('Solicitud inválida.')
                 if self.path == '/connect':
                     result = bridge.connect()
+                elif self.path == '/disconnect':
+                    result = bridge.disconnect()
                 elif self.path == '/prepare':
                     result = bridge.prepare(data.get('job'), data.get('mode'))
                 elif self.path == '/run':
@@ -358,6 +409,7 @@ def make_server(bridge, token, origins, port=17840):
             except Exception:
                 self.reply(503, {'error': 'No se pudo completar la operación. Comprueba el USB, el driver y que Sagaon/K40 Whisperer esté cerrado.'})
     server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    server.pairing_token = token
     server.daemon_threads = True
     return server
 
@@ -368,14 +420,21 @@ def main():
     parser.add_argument('--width', type=float, default=400)
     parser.add_argument('--height', type=float, default=400)
     parser.add_argument('--origin', action='append', default=[], help='Origen exacto adicional para pruebas; sin barra final.')
+    parser.add_argument('--reset-pairing', action='store_true', help='Genera un nuevo código e invalida los guardados anteriormente.')
     args = parser.parse_args()
     bed = {'width': numeric(args.width, 50, 2500, 'Ancho'), 'height': numeric(args.height, 50, 2500, 'Alto')}
-    token = secrets.token_urlsafe(32)
     bridge = Bridge(bed, simulation=not args.usb)
-    server = make_server(bridge, token, DEFAULT_ORIGINS | set(args.origin))
+    # Bind first: a second launch must not rotate the running bridge's credential.
+    server = make_server(bridge, '', DEFAULT_ORIGINS | set(args.origin))
+    try:
+        token = load_pairing_token(reset=args.reset_pairing)
+        server.pairing_token = token
+    except Exception:
+        server.server_close()
+        raise
     print('LZ K40 M2 · ' + ('USB REAL · experimental' if args.usb else 'SIMULACIÓN · no mueve la máquina'))
     print(f"Cama: {bed['width']} × {bed['height']} mm · Home superior izquierdo")
-    print('Código para pegar en Box (cambia al reiniciar): ' + token)
+    print('Código para emparejar Box (se conserva al reiniciar): ' + token)
     print('Deja esta ventana abierta. Ctrl+C cierra el conector.')
     try:
         server.serve_forever()
