@@ -13,7 +13,7 @@
 .auth-tabs button[aria-selected=true]{background:var(--lz-surface-3);color:var(--lz-text);border-color:var(--lz-line-strong);font-weight:600}
 .auth-title{font-size:22px;font-weight:650;letter-spacing:-.01em;line-height:1.2;margin:0 0 4px}
 .auth-intro{margin:0 0 16px;font-size:14.5px;line-height:1.5;color:var(--lz-text-2);overflow-wrap:anywhere}
-.auth-form{display:grid;gap:14px}
+.auth-form{display:grid;gap:14px;margin-top:16px}
 .auth-form label{display:grid;gap:6px;font-size:13.5px;font-weight:500;color:var(--lz-text-2)}
 .auth-form input:not([type=checkbox]){width:100%;box-sizing:border-box;min-height:46px;padding:10px 12px;border:1px solid var(--lz-line-strong);border-radius:var(--lz-radius);background:var(--lz-canvas);color:var(--lz-text);font:inherit;font-size:16px}
 .auth-form input:not([type=checkbox]):hover{border-color:var(--lz-line-hover)}

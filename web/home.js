@@ -67,4 +67,5 @@ renderRecent();
 
 /* Módulos secundarios: nunca bloquean lo anterior. ------------------- */
 import('./studio-navigation.js').then(m=>m.groupStudioNavigation()).catch(error=>console.warn('Navegación agrupada no disponible:',error.message));
-import('./account/account-nav.js').catch(error=>console.warn('Servicio de cuenta no disponible:',error.message));
+const loadAccount=()=>import('./account/account-nav.js').catch(error=>console.warn('Servicio de cuenta no disponible:',error.message));
+if(document.readyState==='complete')loadAccount();else addEventListener('load',loadAccount,{once:true});
