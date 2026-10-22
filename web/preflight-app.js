@@ -22,7 +22,7 @@ function controls(){
   $('effectOriginal').disabled=!source;$('effectResult').disabled=!result;
   for(const id of ['dotGrow','dotShrink'])if($(id))$(id).disabled=!source||busy||loading||!selection;
   if($('dotDelta'))$('dotDelta').textContent=delta===0?(mode==='auto'?'Automático':'Sin ajuste'):`${mode==='auto'?'Auto ':''}${delta>0?'+':''}${delta} px`;
-  try{const d=dimensions();$('effectHeight').value=source?(d.widthCm*source.height/source.width).toFixed(2):'';$('effectPixels').textContent=source?`${d.width.toLocaleString()} × ${d.height.toLocaleString()} px · ${d.dpi} ppp`:''}catch(error){$('effectPixels').textContent=error.message;$('runPreflight').disabled=$('autoPreflight').disabled=true}
+  try{const d=dimensions();$('effectHeight').value=source?(d.widthCm*source.height/source.width).toFixed(2):'';$('effectPixels').textContent=source?`${d.width.toLocaleString()} × ${d.height.toLocaleString()} px · ${Math.round(d.dpi*10)/10} ppp`:''}catch(error){$('effectPixels').textContent=error.message;$('runPreflight').disabled=$('autoPreflight').disabled=true}
 }
 function smallPreview(image){const c=document.createElement('canvas'),scale=Math.min(1,1100/Math.max(image.width,image.height));c.width=Math.max(1,Math.round(image.width*scale));c.height=Math.max(1,Math.round(image.height*scale));c.getContext('2d').drawImage(image,0,0,c.width,c.height);return c}
 function imageCanvas(buffer,width,height){const c=document.createElement('canvas');c.width=width;c.height=height;c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(buffer),width,height),0,0);return c}

@@ -70,6 +70,10 @@ canvas:focus-visible,canvas[tabindex]:focus-visible{outline:1px solid #ffffff59!
 .topbar>.menu-button:hover{background:var(--lz-surface-2);border-color:var(--lz-line-hover)}
 .topbar>.menu-button[aria-expanded=true]{background:var(--lz-surface-2);border-color:var(--lz-accent-line)}
 
+/* Mensajes junto al control */
+.field-error{display:block;margin-top:4px;font-size:12.5px;font-weight:500;line-height:1.35;color:var(--lz-danger)}
+[aria-invalid=true]{border-color:var(--lz-danger)}
+
 /* Botones ------------------------------------------------------------- */
 button{background:var(--lz-surface-2);color:var(--lz-text);border:1px solid var(--lz-line-strong);border-radius:var(--lz-radius);font-weight:500;font-size:13px;min-height:36px;transition:background-color .15s var(--lz-ease),border-color .15s var(--lz-ease),color .15s var(--lz-ease),opacity .15s}
 button:hover:not(:disabled){background:var(--lz-surface-3);border-color:var(--lz-line-hover)}
