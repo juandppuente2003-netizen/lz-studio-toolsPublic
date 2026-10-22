@@ -3530,7 +3530,7 @@ import {registerStudioModule} from './studio-shell.js';
 import {CORNERS,cornerPosition,resizeFromCorner} from './sheet-transform.js';
 import {imagePrintSize} from './image-print-size.js';
 // Mensaje junto al campo: aparece debajo del control y se anuncia a lectores de pantalla.
-function fieldNote(input,text){if(!input)return;const label=input.closest('label')||input.parentElement;let note=label.querySelector('.field-error');if(!text){note?.remove();input.removeAttribute('aria-invalid');return;}if(!note){note=document.createElement('span');note.className='field-error';note.id=input.id+'Error';note.setAttribute('role','alert');label.append(note);}note.textContent=text;input.setAttribute('aria-invalid','true');input.setAttribute('aria-describedby',note.id);}
+function fieldNote(input,text){if(!input)return;const label=input.closest?.('label')||input.parentElement;if(!label?.querySelector)return;let note=label.querySelector('.field-error');if(!text){note?.remove();input.removeAttribute('aria-invalid');return;}if(!note){note=document.createElement('span');note.className='field-error';note.id=input.id+'Error';note.setAttribute('role','alert');label.append(note);}note.textContent=text;input.setAttribute('aria-invalid','true');input.setAttribute('aria-describedby',note.id);}
 // v49: the sheet width is a user setting (default 58 cm) and is never forced or reduced.
 const $=id=>document.getElementById(id),PREVIEW_PPCM=10,DEFAULT_SHEET_WIDTH_CM=58,MIN_SHEET_WIDTH_CM=20,MAX_SHEET_WIDTH_CM=160,ROTATE_SNAP_DEG=4;
 const OUTPUT_OPTIONS=['sheetCheckAlpha','sheetCheckThickness','sheetVibrance','cmykSafe','sheetSolidAlpha'];
