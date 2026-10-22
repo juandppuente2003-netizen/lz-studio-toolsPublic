@@ -1,0 +1,390 @@
+"""Loopback-only Box Studio bridge. Simulation is the default; USB is opt-in.
+
+M2 power is adjusted on the physical panel. This bridge never exposes a shell,
+arbitrary console commands, arbitrary files, or arbitrary EGV over HTTP.
+"""
+import argparse
+import hashlib
+import hmac
+import io
+import json
+import math
+import secrets
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+PROTOCOL = 'lz-k40-m2/v1'
+ENGINE_VERSION = '0.9.9100'
+MAX_BODY = 4_000_000
+DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com'}
+
+
+def numeric(value, minimum, maximum, label):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f'{label}: número inválido.')
+    if not math.isfinite(value) or not minimum <= value <= maximum:
+        raise ValueError(f'{label}: fuera del rango {minimum}–{maximum}.')
+    return value
+
+
+def validate_job(raw, bed):
+    if not isinstance(raw, dict) or raw.get('protocol') != PROTOCOL or raw.get('board') != 'M2':
+        raise ValueError('Trabajo incompatible. Se requiere M2.')
+    if raw.get('bed') != bed:
+        raise ValueError('El área de trabajo no coincide con la configurada en el conector.')
+    speed = numeric(raw.get('speed'), 1, 100, 'Velocidad')
+    passes = numeric(raw.get('passes'), 1, 10, 'Pasadas')
+    if int(passes) != passes:
+        raise ValueError('Las pasadas deben ser enteras.')
+    paths = raw.get('paths')
+    if not isinstance(paths, list) or not 1 <= len(paths) <= 4000:
+        raise ValueError('Cantidad de trayectorias inválida.')
+    cleaned, count, length = [], 0, 0
+    for path in paths:
+        if not isinstance(path, dict) or type(path.get('closed')) is not bool:
+            raise ValueError('Trayectoria inválida.')
+        points = path.get('points')
+        if not isinstance(points, list) or len(points) < (3 if path['closed'] else 2):
+            raise ValueError('Faltan puntos en una trayectoria.')
+        count += len(points)
+        if count > 50000:
+            raise ValueError('El trabajo excede 50,000 puntos.')
+        ring = []
+        for point in points:
+            if not isinstance(point, list) or len(point) != 2:
+                raise ValueError('Coordenadas inválidas.')
+            ring.append([numeric(point[0], 0, bed['width'], 'X'),
+                         numeric(point[1], 0, bed['height'], 'Y')])
+        pairs = list(zip(ring, ring[1:]))
+        if path['closed']:
+            pairs.append((ring[-1], ring[0]))
+        path_length = sum(math.dist(a, b) for a, b in pairs)
+        if path_length < 0.0254:
+            raise ValueError('Trayectoria demasiado pequeña para la resolución de la M2.')
+        length += path_length
+        if length * passes > 500000:
+            raise ValueError('El recorrido supera el límite de esta versión.')
+        cleaned.append({'points': ring, 'closed': path['closed'],
+                        'role': 'hole' if path.get('role') == 'hole' else 'outer'})
+    # The UI already orders holes; enforce the phase ordering again at the bridge.
+    cleaned.sort(key=lambda p: p['role'] != 'hole')
+    return {'protocol': PROTOCOL, 'board': 'M2', 'bed': dict(bed),
+            'name': str(raw.get('name', 'Caja MDF'))[:80],
+            'speed': speed, 'passes': int(passes), 'paths': cleaned}
+
+
+class M2Engine:
+    """Compile using MeerK40t's real M2 driver. Compilation never opens USB."""
+    def __init__(self, bed):
+        from importlib.metadata import version
+        if version('meerk40t') != ENGINE_VERSION:
+            raise RuntimeError(f'Instala meerk40t=={ENGINE_VERSION} con requirements.txt.')
+        from meerk40t.kernel import Kernel
+        from meerk40t.internal_plugins import plugin
+        from meerk40t.main import parser
+        from meerk40t.lihuiyu.device import LihuiyuDevice
+        self.kernel = Kernel('LZ-K40-Bridge', '0.1.0', 'LZ-K40-Bridge', ignore_settings=True)
+        self.kernel.args = parser.parse_args(['-z'])
+        self.kernel.add_plugin(plugin)
+        self.kernel(partial=True)
+        self.device = LihuiyuDevice(self.kernel, 'lz-box-m2', choices=[
+            {'attr': 'board', 'default': 'M2'},
+            {'attr': 'bedwidth', 'default': f"{bed['width']}mm"},
+            {'attr': 'bedheight', 'default': f"{bed['height']}mm"},
+            {'attr': 'supports_pwm', 'default': False},
+            {'attr': 'mock', 'default': False},
+            {'attr': 'home_corner', 'default': 'top-left'}])
+        self.kernel.add_service('device', self.device, registered_path='provider/device/lhystudios')
+        self.device.realize()
+        self.usb_failed = False
+        # MeerK40t normally retries USB errors. This bridge must NOT resume an
+        # unattended job after a lost cable: stop at the first transport error.
+        controller = self.device.controller
+        process_queue = controller.process_queue
+        def fail_closed_queue():
+            try:
+                if not self.connected():
+                    raise ConnectionError('USB desconectado.')
+                return process_queue()
+            except ConnectionError:
+                self.usb_failed = True
+                controller.abort_retry()
+                controller.abort()
+                raise
+        controller.process_queue = fail_closed_queue
+
+    def compile(self, job, mode):
+        from meerk40t.lihuiyu.driver import LihuiyuDriver
+        from meerk40t.core.cutcode.linecut import LineCut
+        from meerk40t.core.units import UNITS_PER_MM
+        driver, output = LihuiyuDriver(self.device), io.BytesIO()
+        driver.out_pipe = output
+        # Every job establishes a known origin; no guessed current-head position.
+        driver.home()
+        if mode == 'frame':
+            points = [p for path in job['paths'] for p in path['points']]
+            xs, ys = [p[0] for p in points], [p[1] for p in points]
+            x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+            for x, y in [(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)]:
+                driver.move_abs(x * UNITS_PER_MM, y * UNITS_PER_MM)
+            # No LineCut and no laser_on in the frame branch.
+        else:
+            settings = {'speed': job['speed'], 'power': 1000,
+                        'raster_step_x': 0, 'raster_step_y': 0}
+            # power=1000 is continuous firing/PPI, NOT a software power setting.
+            for _ in range(job['passes']):
+                for path in job['paths']:
+                    points = [self.device.view.position(x * UNITS_PER_MM, y * UNITS_PER_MM)
+                              for x, y in path['points']]
+                    pairs = list(zip(points, points[1:]))
+                    if path['closed']:
+                        pairs.append((points[-1], points[0]))
+                    for start, end in pairs:
+                        if start != end:
+                            driver.plot(LineCut(start, end, settings=settings))
+                    driver.plot_start()
+            driver.rapid_mode()
+            driver.laser_off()
+        return output.getvalue()
+
+    def connect(self):
+        self.device.controller.open()
+        connection = self.device.controller.connection
+        if connection is None or not connection.is_connected():
+            raise ConnectionError('No se encontró una M2 disponible por USB. Cierra Sagaon/K40 Whisperer.')
+
+    def send(self, data):
+        self.device.controller.write(data)
+
+    def remaining(self):
+        return len(self.device.controller)
+
+    def connected(self):
+        c = self.device.controller.connection
+        return c is not None and c.is_connected()
+
+    def failed(self):
+        return self.usb_failed or self.device.controller.state == 'terminate' or not self.connected()
+
+    def cancel(self):
+        # Stop further transmission. This cannot retract data already in the board.
+        self.device.controller.abort_retry()
+        self.device.controller.abort()
+
+    def close(self):
+        try:
+            self.cancel()
+            self.device.controller.close()
+        finally:
+            self.kernel()
+
+
+class Bridge:
+    def __init__(self, bed, simulation=True, engine_factory=M2Engine):
+        self.bed, self.simulation = bed, simulation
+        self.engine_factory, self.engine = engine_factory, None
+        self.state, self.message = 'idle', 'Sin trabajo activo.'
+        self.job, self.payload, self.id, self.expires = None, b'', None, 0
+        self.lock = threading.RLock()
+
+    def info(self):
+        return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
+                'simulation': self.simulation, 'powerControl': 'manual'}
+
+    def get_engine(self):
+        if self.engine is None:
+            self.engine = self.engine_factory(self.bed)
+        return self.engine
+
+    def connect(self):
+        with self.lock:
+            if self.state in ('sending', 'sent', 'cancelled', 'error'):
+                raise ValueError('Confirma primero que la máquina se detuvo.')
+            engine = self.get_engine()
+            if not self.simulation:
+                engine.connect()
+            return self.info()
+
+    def prepare(self, raw, mode):
+        with self.lock:
+            if self.state not in ('idle', 'prepared'):
+                raise ValueError('Hay un trabajo pendiente. Verifica la máquina antes de continuar.')
+            if mode not in ('cut', 'frame'):
+                raise ValueError('Operación no compatible.')
+            self.id, self.payload, self.state = None, b'', 'idle'
+            job = validate_job(raw, self.bed)
+            payload = self.get_engine().compile(job, mode)
+            if not payload:
+                raise ValueError('El motor no generó instrucciones.')
+            self.job, self.payload = job, payload
+            self.id = hashlib.sha256(payload + secrets.token_bytes(32)).hexdigest()
+            self.expires = time.monotonic() + 300
+            self.state = 'prepared'
+            return {'id': self.id, 'bytes': len(payload), 'mode': mode, **self.info()}
+
+    def run(self, job_id, confirmed):
+        with self.lock:
+            if confirmed is not True or self.state != 'prepared' or not self.id or not isinstance(job_id, str) or not hmac.compare_digest(job_id, self.id):
+                raise ValueError('El trabajo no está preparado, ya se envió o falta confirmarlo.')
+            if time.monotonic() > self.expires:
+                self.state, self.id = 'idle', None
+                raise ValueError('El trabajo preparado expiró. Prepáralo nuevamente.')
+            self.state = 'sending'
+            if self.simulation:
+                self.state, self.message = 'simulated', 'Simulación completada: instrucciones M2 generadas, sin conexión USB ni movimiento.'
+            else:
+                try:
+                    engine = self.get_engine()
+                    if not engine.connected():
+                        raise ConnectionError('La conexión USB se perdió. No se reenvió el trabajo.')
+                    engine.send(self.payload)
+                    self.message = 'Enviando instrucciones a la controladora.'
+                except Exception:
+                    self.state, self.message = 'error', 'Falló el envío. Verifica físicamente la máquina; no se reintentará este trabajo automáticamente.'
+                    raise
+            return self.status()
+
+    def status(self):
+        with self.lock:
+            remaining = 0
+            if self.state == 'sending':
+                remaining = self.engine.remaining()
+                if self.engine.failed():
+                    self.state, self.message = 'error', 'Se perdió la comunicación USB. Verifica la máquina; no reinicies el trabajo automáticamente.'
+                elif remaining == 0:
+                    self.state, self.message = 'sent', 'Todos los datos fueron enviados. La finalización física NO está confirmada: espera a que la máquina termine antes de continuar.'
+            percent = max(0, min(100, round(100 * (1 - remaining / max(1, len(self.payload))))))
+            return {'state': self.state, 'message': self.message, 'percent': percent, **self.info()}
+
+    def cancel(self):
+        with self.lock:
+            if self.engine and not self.simulation:
+                self.engine.cancel()
+            self.state, self.message = 'cancelled', 'Envío cancelado. Puede quedar movimiento en la memoria de la placa. Comprueba que la máquina se detuvo.'
+            self.id = None
+            return self.status()
+
+    def acknowledge(self, confirmed):
+        with self.lock:
+            if confirmed is not True or self.state not in ('sent', 'simulated', 'cancelled', 'error'):
+                raise ValueError('Cancela o espera el envío y verifica que la máquina se detuvo.')
+            if self.engine:
+                self.engine.close()
+                self.engine = None
+            self.state, self.message, self.id, self.payload = 'idle', 'Lista para preparar otra hoja.', None, b''
+            return self.status()
+
+    def close(self):
+        if self.engine:
+            self.engine.close()
+
+
+def make_server(bridge, token, origins, port=17840):
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass  # Never log the Authorization header or design content.
+
+        def reply(self, code, data):
+            body = json.dumps(data, ensure_ascii=False, allow_nan=False).encode()
+            self.send_response(code)
+            origin = self.headers.get('Origin')
+            if origin in origins:
+                self.send_header('Access-Control-Allow-Origin', origin)
+                self.send_header('Vary', 'Origin')
+                self.send_header('Access-Control-Allow-Headers', 'Authorization, Content-Type')
+                self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                self.send_header('Access-Control-Allow-Private-Network', 'true')
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def allowed(self, authenticate=True):
+            if self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}' or self.headers.get('Origin') not in origins:
+                self.reply(403, {'error': 'Origen no permitido.'})
+                return False
+            if authenticate and not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + token):
+                self.reply(401, {'error': 'Código del conector incorrecto.'})
+                return False
+            return True
+
+        def do_OPTIONS(self):
+            if self.allowed(False):
+                self.reply(200, {})
+
+        def do_GET(self):
+            if not self.allowed():
+                return
+            if self.path == '/status':
+                self.reply(200, bridge.status())
+            else:
+                self.reply(404, {'error': 'Ruta no encontrada.'})
+
+        def do_POST(self):
+            if not self.allowed():
+                return
+            try:
+                if self.headers.get('Content-Type') != 'application/json' or self.headers.get('Transfer-Encoding'):
+                    raise ValueError('Envía JSON con longitud conocida.')
+                length = int(self.headers.get('Content-Length', '0'))
+                if not 0 < length <= MAX_BODY:
+                    raise ValueError('El cuerpo de la solicitud es demasiado grande o está vacío.')
+                data = json.loads(self.rfile.read(length), parse_constant=lambda _: (_ for _ in ()).throw(ValueError('JSON no finito.')))
+                if not isinstance(data, dict):
+                    raise ValueError('Solicitud inválida.')
+                if self.path == '/connect':
+                    result = bridge.connect()
+                elif self.path == '/prepare':
+                    result = bridge.prepare(data.get('job'), data.get('mode'))
+                elif self.path == '/run':
+                    result = bridge.run(data.get('id'), data.get('confirmed'))
+                elif self.path == '/cancel':
+                    if data.get('confirmed') is not True:
+                        raise ValueError('Falta confirmar la cancelación.')
+                    result = bridge.cancel()
+                elif self.path == '/acknowledge':
+                    result = bridge.acknowledge(data.get('confirmed'))
+                else:
+                    self.reply(404, {'error': 'Ruta no encontrada.'})
+                    return
+                self.reply(200, result)
+            except (ValueError, TypeError, KeyError, json.JSONDecodeError) as error:
+                self.reply(400, {'error': str(error)})
+            except (ImportError, RuntimeError) as error:
+                self.reply(503, {'error': str(error)})
+            except Exception:
+                self.reply(503, {'error': 'No se pudo completar la operación. Comprueba el USB, el driver y que Sagaon/K40 Whisperer esté cerrado.'})
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    server.daemon_threads = True
+    return server
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Conector local experimental LZ K40 M2. Simulación por defecto.')
+    parser.add_argument('--usb', action='store_true', help='Habilita USB real; los cortes aún requieren confirmación desde Box.')
+    parser.add_argument('--width', type=float, default=400)
+    parser.add_argument('--height', type=float, default=400)
+    parser.add_argument('--origin', action='append', default=[], help='Origen exacto adicional para pruebas; sin barra final.')
+    args = parser.parse_args()
+    bed = {'width': numeric(args.width, 50, 2500, 'Ancho'), 'height': numeric(args.height, 50, 2500, 'Alto')}
+    token = secrets.token_urlsafe(32)
+    bridge = Bridge(bed, simulation=not args.usb)
+    server = make_server(bridge, token, DEFAULT_ORIGINS | set(args.origin))
+    print('LZ K40 M2 · ' + ('USB REAL · experimental' if args.usb else 'SIMULACIÓN · no mueve la máquina'))
+    print(f"Cama: {bed['width']} × {bed['height']} mm · Home superior izquierdo")
+    print('Código para pegar en Box (cambia al reiniciar): ' + token)
+    print('Deja esta ventana abierta. Ctrl+C cierra el conector.')
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+        bridge.close()
+
+
+if __name__ == '__main__':
+    main()
