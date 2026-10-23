@@ -34,5 +34,5 @@ response=await app.fetch(req('api/account/session',{method:'POST',headers:{Origi
 response=await app.fetch(req('api/account/session',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:'{"access_token":null}'}));assert.equal(response.status,200);assert.match(response.headers.get('Set-Cookie'),/Max-Age=0/);
 response=await app.fetch(req('unknown.html'));assert.equal(response.status,404);
 async function files(dir){for(const e of await readdir(dir,{withFileTypes:true})){const p=dir+'/'+e.name;if(e.isDirectory())await files(p);else assert.ok(!/\.(html|js|mjs)$/.test(p),'Tool code must not be static: '+p)}}await files('dist/client');
-const config=JSON.parse(await readFile('vercel.json','utf8'));assert.equal(config.outputDirectory,'dist/client');assert.equal(config.buildCommand,'npm run build:vercel');
+const config=JSON.parse(await readFile('vercel.json','utf8'));for(const source of ['/box','/box/'])assert.ok(config.redirects.some(r=>r.source===source&&r.destination==='/box/index.html'&&r.permanent===false));assert.equal(config.outputDirectory,'dist/client');assert.equal(config.buildCommand,'npm run build:vercel');
 console.log('PASS: Vercel routing, public home/current password account, protected crop page/scripts, suspension, disabled tools, CSRF, persistent/session cookies, logout and private/static asset separation.');
