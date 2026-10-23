@@ -1,0 +1,23 @@
+LZ STUDIO - K40 0.5.0 - WINDOWS
+
+1. Termina el trabajo y cierra el conector anterior y Sagaon.
+2. Extrae esta carpeta COMPLETA en una ubicacion fija.
+3. Ejecuta instalar-windows.bat una vez (requiere Python 3.10+).
+4. En la ventana LZ Studio pulsa Copiar codigo. Pegalo una vez en Box
+   y deja Recordar esta computadora marcado.
+5. Al actualizar comprueba que diga Conector 0.5.0. Si sigue otra version,
+   reinicia Windows: cerrar solo la ventana NO cierra el proceso anterior.
+
+El instalador activa el inicio con Windows sin consola. No cambia drivers.
+En adelante abre Box > Controlar mi K40. No hay descargas por cada corte.
+Abrir-conector.vbs muestra el panel local cuando lo necesites.
+
+Primera prueba: EMISION FISICAMENTE DESHABILITADA.
+Home una vez > flechas > Usar esta posicion como origen > recorrer marco.
+Comprueba direcciones, escala y cancelacion antes de cortar.
+STOP / PAUSA conserva la cola. Reanudar continua; Cancelar la descarta.
+Se espera la aceptacion USB; los datos ya almacenados pueden seguir ejecutandose.
+No hay boton de confirmar maquina detenida. Tras reset aceptado libera USB.
+La posicion es estimada. Cancelar por software no sustituye al paro fisico.
+
+Lee README.md para actualizar, liberar USB para Sagaon o quitar inicio automatico.

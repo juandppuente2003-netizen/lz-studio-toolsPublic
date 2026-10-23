@@ -18,6 +18,8 @@ const {default:app}=await import('./api/site.js');
 const req=(path,options={})=>new Request(origin+'/api/site?__lz_path='+encodeURIComponent(path),options);
 let response=await app.fetch(req(''));assert.equal(response.status,200);{const landing=await response.text();assert.match(landing,/Herramientas DTF Premium/);assert.match(landing,/LZ Box Studio/);}
 response=await app.fetch(req('dtf.html'));assert.equal(response.status,200);assert.match(await response.text(),/Recortar imagen/);
+for(const route of ['box','box/']){response=await app.fetch(req(route));assert.equal(response.status,307);assert.equal(response.headers.get('Location'),'/box/index.html');}
+response=await app.fetch(new Request(origin+'/api/site?__lz_path=box/&test=usb'));assert.equal(response.status,307);assert.equal(response.headers.get('Location'),'/box/index.html?test=usb');
 response=await app.fetch(req('box/index.html'));assert.equal(response.status,303);assert.equal(response.headers.get('Location'),'/account.html?return=box%2Findex.html');
 response=await app.fetch(req('account.html'));assert.equal(response.status,200);const html=await response.text();assert.match(html,/Cambiar contraseña/);assert.doesNotMatch(html,/Recibir enlace de acceso/);
 response=await app.fetch(req('crop.html'));assert.equal(response.status,303);assert.equal(response.headers.get('Location'),'/account.html?return=crop.html');
@@ -32,5 +34,5 @@ response=await app.fetch(req('api/account/session',{method:'POST',headers:{Origi
 response=await app.fetch(req('api/account/session',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:'{"access_token":null}'}));assert.equal(response.status,200);assert.match(response.headers.get('Set-Cookie'),/Max-Age=0/);
 response=await app.fetch(req('unknown.html'));assert.equal(response.status,404);
 async function files(dir){for(const e of await readdir(dir,{withFileTypes:true})){const p=dir+'/'+e.name;if(e.isDirectory())await files(p);else assert.ok(!/\.(html|js|mjs)$/.test(p),'Tool code must not be static: '+p)}}await files('dist/client');
-const config=JSON.parse(await readFile('vercel.json','utf8'));assert.equal(config.outputDirectory,'dist/client');assert.equal(config.buildCommand,'npm run build:vercel');
+const config=JSON.parse(await readFile('vercel.json','utf8'));for(const source of ['/box','/box/'])assert.ok(config.redirects.some(r=>r.source===source&&r.destination==='/box/index.html'&&r.permanent===false));assert.equal(config.outputDirectory,'dist/client');assert.equal(config.buildCommand,'npm run build:vercel');
 console.log('PASS: Vercel routing, public home/current password account, protected crop page/scripts, suspension, disabled tools, CSRF, persistent/session cookies, logout and private/static asset separation.');

@@ -12,5 +12,17 @@
       "source": "/:path*",
       "destination": "/api/site?__lz_path=:path*"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/box",
+      "destination": "/box/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/box/",
+      "destination": "/box/index.html",
+      "permanent": false
+    }
   ]
 }

@@ -37,6 +37,7 @@ export function createHandler({assets,fetchUpstream=fetch}={}){
     // The token's validity is verified by Supabase; expiry only controls cookie persistence.
     return json({ok:true},200,{'Set-Cookie':cookie(token,data.remember===false?null:3600)});
    }
+   if(path==='/box'||path==='/box/'){if(!['GET','HEAD'].includes(request.method))return json({message:'Método no permitido.'},405);return new Response(null,{status:307,headers:{...headers,Location:'/box/index.html'+url.search}});}
    const asset=assets[path];if(!asset)return new Response('No encontrado',{status:404,headers});
    if(!['GET','HEAD'].includes(request.method))return json({message:'Método no permitido.'},405);
    if(!asset.public){const identity=await verify(tokenFrom(request));if(!identity||identity.blocked){if(asset.type.startsWith('text/html')){const target=path.slice(1)+url.search;return new Response(null,{status:303,headers:{...headers,Location:'/account.html?return='+encodeURIComponent(target),'Set-Cookie':cookie(null,0)}});}return json({message:identity?.blocked?'Cuenta suspendida.':'Inicia sesión para usar las herramientas.'},identity?.blocked?403:401);}}
