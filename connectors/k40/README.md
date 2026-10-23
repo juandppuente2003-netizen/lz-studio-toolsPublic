@@ -1,4 +1,4 @@
-# LZ K40 · conector 0.4.0 para Box Studio
+# LZ K40 · conector 0.4.1 para Box Studio
 
 Control por USB para M2 Nano conservando libusb-win32 y Sagaon/K40 Whisperer.
 El navegador usa un conector local; no hay que descargar/importar diseños para
@@ -35,7 +35,7 @@ el conector. Si mueves la carpeta, vuelve a activar desde la nueva ubicación.
 
 ## Mover el cabezal y elegir origen
 
-1. Con la emisión físicamente deshabilitada, conecta y confirma que el recorrido
+1. Con la emisión físicamente deshabilitada, conecta y verifica que el recorrido
    esté libre. Pulsa **Home** una vez para establecer la referencia de la sesión.
 2. Usa las flechas: un clic es un movimiento de 0.1, 1, 5, 10, 25 o 50 mm.
    No se acumulan pulsaciones mientras la controladora no indique fin.
@@ -62,12 +62,19 @@ reanuda automáticamente. Las pruebas de protocolo no sustituyen la prueba físi
 
 **Cancelar y solicitar parada** permanece disponible durante envío y fin de datos.
 Descarta la cola y solicita el reinicio prioritario soportado por MeerK40t.
+La cancelación ya no espera el candado del envío: interrumpe las esperas normales
+y bloquea nuevas escrituras del trabajo, conservando el envío del reinicio.
+Una transferencia USB ya iniciada puede terminar; la parada física inmediata no
+está garantizada por software.
 No sustituye al paro físico: si continúa, utiliza el paro físico de la máquina.
-**Confirmar máquina detenida** es otro botón y se usa tras verificar la parada.
+**Confirmar máquina detenida** queda para cancelación/error o comunicación desconocida.
+En operación normal, Home, flechas, marco y corte vuelven a estar listos
+automáticamente cuando la controladora indica fin; enviar datos no basta.
+Se eliminó la casilla repetitiva: cada botón inicia solamente su propia operación.
 El porcentaje solo mide datos transmitidos. La parada modificada requiere
 validación física con emisión deshabilitada antes de otro corte.
 
-Después de confirmar un trabajo normal se conserva la conexión y el origen,
+Después de terminar un trabajo normal se conserva la conexión y el origen,
 para evitar reconectar en cada hoja. Después de cancelación/error se descarta la
 posición y se requiere reconectar. Para Sagaon pulsa **Liberar USB para Sagaon**.
 Usa solo un programa a la vez. No se garantiza que WebUSB funcione con libusb-win32;

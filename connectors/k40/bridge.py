@@ -112,6 +112,10 @@ def validate_job(raw, bed):
             'speed': speed, 'passes': int(passes), 'paths': cleaned}
 
 
+class _StopRequested(Exception):
+    """Interrupt a normal packet wait so the priority stop can run."""
+
+
 class M2Engine:
     """Compile using MeerK40t's real M2 driver. Compilation never opens USB."""
     def __init__(self, bed):
@@ -136,16 +140,32 @@ class M2Engine:
         self.kernel.add_service('device', self.device, registered_path='provider/device/lhystudios')
         self.device.realize()
         self.usb_failed = False
+        self.last_controller_status = None
+        self.stop_requested = threading.Event()
+        self.sending_stop = False
         self.transport_lock = threading.RLock()
         # MeerK40t normally retries USB errors. This bridge must NOT resume an
         # unattended job after a lost cable: stop at the first transport error.
         controller = self.device.controller
+        read_status = controller.update_status
+        def interruptible_status():
+            if self.stop_requested.is_set() and not self.sending_stop:
+                raise _StopRequested()
+            return read_status()
+        controller.update_status = interruptible_status
         send_packet = controller._send_and_confirm_packet
         def confirmed_packet(packet, checksum):
-            result = send_packet(packet, checksum)
-            if not result:
-                raise ConnectionError('La M2 no confirmó el paquete; no se avanzará la cola.')
-            return result
+            stop_packet = packet == b'I' + b'F' * 29
+            if self.stop_requested.is_set() and not stop_packet:
+                raise _StopRequested()
+            self.sending_stop = stop_packet
+            try:
+                result = send_packet(packet, checksum)
+                if not result:
+                    raise ConnectionError('La M2 no confirmó el paquete; no se avanzará la cola.')
+                return result
+            finally:
+                self.sending_stop = False
         controller._send_and_confirm_packet = confirmed_packet
         process_queue = controller.process_queue
         def fail_closed_queue():
@@ -154,6 +174,9 @@ class M2Engine:
                     raise ConnectionError('USB desconectado.')
                 with self.transport_lock:
                     return process_queue()
+            except _StopRequested:
+                # Do not terminate here: the queued priority reset must still run.
+                return False
             except ConnectionError:
                 self.usb_failed = True
                 controller.abort_retry()
@@ -225,7 +248,10 @@ class M2Engine:
                 return False
             self.device.controller.update_status()
             status = self.device.controller._status
+            self.last_controller_status = status[1] if status and len(status) > 1 else None
             return bool(status and len(status) > 1 and status[1] in (0xEC, 0xCC))
+        except _StopRequested:
+            return False
         except ConnectionError:
             self.usb_failed = True
             self.device.controller.abort_retry()
@@ -234,11 +260,23 @@ class M2Engine:
         finally:
             self.transport_lock.release()
 
+    def _guard_connection(self, connection):
+        if getattr(connection, '_lz_stop_guard', False):
+            return
+        write = connection.write
+        def guarded_write(packet):
+            if self.stop_requested.is_set() and not self.sending_stop:
+                raise _StopRequested()
+            return write(packet)
+        connection.write = guarded_write
+        connection._lz_stop_guard = True
+
     def connect(self):
         self.device.controller.open()
         connection = self.device.controller.connection
         if connection is None or not connection.is_connected():
             raise ConnectionError('No se encontró una M2 disponible por USB. Cierra Sagaon/K40 Whisperer.')
+        self._guard_connection(connection)
 
     def send(self, data):
         self.device.controller.write(data)
@@ -255,27 +293,27 @@ class M2Engine:
 
     def cancel(self):
         controller = self.device.controller
-        # Pause ordinary packets first. An in-flight USB operation may finish;
-        # serialize against it before dropping queues and requesting real reset.
+        self.stop_requested.set()
         controller.pause()
-        with self.transport_lock:
-            if self.usb_failed or not self.connected() or controller.aborted_retries:
-                controller.abort_retry()
-                controller.abort()
-                raise ConnectionError('Sin USB para solicitar parada. Usa el paro físico.')
-            # Pinned MeerK40t buffers: abort() alone also misses _preempt.
-            controller._acquire_all_buffer_locks()
-            try:
-                controller._buffer.clear()
-                controller._queue.clear()
-                controller._realtime_buffer.clear()
-                controller._preempt.clear()
-            finally:
-                controller._release_all_buffer_locks()
-            # Supported driver reset queues priority ~I*\n~. The controller
-            # sends I, confirms the packet, then * discards queues and terminates.
-            # Do NOT abort_retry/abort here: that would suppress the reset packet.
-            self.device.driver.reset()
+        controller.abort_waiting = True
+        if self.usb_failed or not self.connected() or controller.aborted_retries:
+            controller.abort_retry()
+            controller.abort()
+            raise ConnectionError('Sin USB para solicitar parada. Usa el paro físico.')
+        # Never acquire transport_lock here: process_queue may hold it while
+        # waiting for the very movement we are trying to cancel. Queue locks
+        # only protect memory, not USB. An in-flight USB call may still finish.
+        controller._acquire_all_buffer_locks()
+        try:
+            controller._buffer.clear()
+            controller._queue.clear()
+            controller._realtime_buffer.clear()
+            controller._preempt.clear()
+        finally:
+            controller._release_all_buffer_locks()
+        # This wakes the queue and transmits MeerK40t's priority reset. Normal
+        # packet waits are interrupted above; reset waits remain allowed.
+        self.device.driver.reset()
 
     def close(self):
         try:
@@ -299,8 +337,9 @@ class Bridge:
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.4.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin'],
+                'bridgeVersion': '0.4.1', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion'],
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
+                'controllerStatus': getattr(self.engine, 'last_controller_status', None),
                 'connected': self.engine is not None and (self.simulation or self.engine.connected())}
 
     def get_engine(self):
@@ -425,14 +464,15 @@ class Bridge:
                 if self.engine.failed():
                     self.state, self.message = 'error', 'Se perdió la comunicación USB. Verifica la máquina; no reinicies el trabajo automáticamente.'
                 elif remaining == 0:
-                    self.state, self.message = 'sent', 'Todos los datos fueron enviados. La finalización física NO está confirmada: espera a que la máquina termine antes de continuar.'
+                    self.state, self.message = 'sent', 'Datos enviados. Esperando fin de la controladora; el panel quedará listo automáticamente.'
             if self.state == 'error':
                 self.position, self.pending_position = None, None
-            if self.state == 'sent' and self.operation in ('home', 'jog'):
+            if self.state == 'sent' and self.operation in ('home', 'jog', 'frame', 'cut'):
                 try:
                     if self.engine.finished():
                         self.position, self.pending_position, self.state = self.pending_position, None, 'idle'
-                        self.message = 'La controladora indicó fin. Posición estimada lista.'
+                        self.message = 'Operación terminada según la controladora. Lista para continuar.'
+                        self.id, self.payload = None, b''
                 except ConnectionError:
                     self.state, self.position, self.pending_position = 'error', None, None
                     self.message = 'Se perdió USB al comprobar el movimiento. Haz Home tras recuperar la conexión.'

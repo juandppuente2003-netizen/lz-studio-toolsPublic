@@ -45,16 +45,17 @@ test('kerf is preserved once, offsets transform coordinates without altering the
 test('UI: home, one jog per click, current origin, priority cancellation and remembered auto-connection',async()=>{
  const {JSDOM}=await import('jsdom');
  const dom=new JSDOM('<div class="export-actions"></div>',{url:'https://www.lzstudiotools.com/box/index.html'});
- const previous={document:globalThis.document,fetch:globalThis.fetch};globalThis.document=dom.window.document;
+ const previous={document:globalThis.document,fetch:globalThis.fetch,setInterval:globalThis.setInterval,clearInterval:globalThis.clearInterval};globalThis.document=dom.window.document;
  dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
+ let pollTick;globalThis.setInterval=fn=>{pollTick=fn;return 12345678;};globalThis.clearInterval=()=>{};
  const requests=[];let phase='idle',position=null,connected=false,operation=null,pending=null,oldBridge=false,delayRun=false,releaseRun;
- const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:true,position,connected,operation,features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin']});
+ const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:false,position,connected,operation,features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion']});
  globalThis.fetch=async(url,options)=>{
   const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):null;requests.push({path,body});
   if(path==='/connect')connected=true;
   if(path==='/prepare'){pending=body.origin==='current'?[...position]:[0,0];return {ok:true,json:async()=>({id:'test-job',...info()})};}
   if(path==='/motion'){operation=body.action;position=body.action==='home'?[0,0]:[position[0]+body.dx,position[1]+body.dy];phase='idle';}
-  if(path==='/run'){phase='simulated';position=null;operation='cut';if(delayRun){delayRun=false;await new Promise(resolve=>{releaseRun=resolve;});}}
+  if(path==='/run'){phase='sent';position=null;operation='cut';if(delayRun){delayRun=false;await new Promise(resolve=>{releaseRun=resolve;});}}
   if(path==='/cancel'){phase='cancelled';position=null;pending=null;}
   if(path==='/acknowledge'){if(phase==='cancelled')connected=false;position=pending;phase='idle';}
   if(path==='/disconnect'){phase='idle';position=null;connected=false;}
@@ -64,26 +65,26 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
  try{
   const {dialog}=mountK40({...example(),onUpdate(){},setView(){}}),$=id=>dialog.querySelector('#'+id),open=()=>dom.window.document.querySelector('#k40Open').click();
   open();$('k40Remember').checked=false;$('k40Token').value='test-code';$('k40Connect').click();await settle();
-  assert.equal($('k40Home').disabled,true);assert.equal($('k40Right').disabled,true);
-  $('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));$('k40Home').click();$('k40Home').click();await settle();await settle();
+  assert.equal($('k40Confirm'),null);assert.equal($('k40Home').disabled,false);assert.equal($('k40Right').disabled,true);
+  $('k40Home').click();$('k40Home').click();await settle();await settle();
   assert.equal(requests.filter(r=>r.path==='/motion').length,1);assert.equal($('k40Right').disabled,false);assert.match($('k40Position').textContent,/0.00/);
   $('k40Right').click();$('k40Right').click();await settle();await settle();assert.deepEqual(position,[5,0]);
-  $('k40UsePosition').click();assert.equal($('k40Origin').value,'current');assert.equal($('k40Run').disabled,true);
-  $('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));$('k40Run').click();$('k40Run').click();await settle();await settle();
+  $('k40UsePosition').click();assert.equal($('k40Origin').value,'current');assert.equal($('k40Run').disabled,false);
+  $('k40Run').click();$('k40Run').click();await settle();await settle();
   assert.equal(requests.filter(r=>r.path==='/run').length,1);assert.equal(requests.find(r=>r.path==='/prepare').body.origin,'current');
-  assert.equal($('k40Cancel').disabled,false);assert.equal($('k40Acknowledge').hidden,false);$('k40Close').click();assert.equal(dialog.open,true);
-  $('k40Acknowledge').click();await settle();assert.equal($('k40Connect').disabled,true);assert.match($('k40Position').textContent,/5.00/);
-  $('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));delayRun=true;$('k40Run').click();await settle();
+  assert.equal($('k40Cancel').disabled,false);assert.equal($('k40Acknowledge').hidden,true);$('k40Close').click();assert.equal(dialog.open,true);
+  phase='idle';position=pending;await pollTick();await settle();assert.equal($('k40Right').disabled,false);assert.equal(requests.filter(r=>r.path==='/acknowledge').length,0);assert.equal($('k40Connect').disabled,true);assert.match($('k40Position').textContent,/5.00/);
+  delayRun=true;$('k40Run').click();await settle();
   assert.equal(typeof releaseRun,'function');assert.equal($('k40Cancel').disabled,false);$('k40Cancel').click();await settle();assert.equal(phase,'cancelled');
   releaseRun();await settle();await settle();assert.equal($('k40Acknowledge').hidden,false);assert.match($('k40Status').textContent,/cancelled/);
   $('k40Acknowledge').click();await settle();$('k40Close').click();await settle();assert.equal(dialog.open,false);
   open();$('k40Origin').value='home';$('k40Origin').dispatchEvent(new dom.window.Event('input'));$('k40Token').value='remembered-code';$('k40Remember').checked=true;$('k40Connect').click();await settle();
   assert.equal(dom.window.localStorage.getItem('lzbox-k40-pairing-v1'),'remembered-code');$('k40Close').click();await settle();assert.equal(dialog.open,false);
   const sends=requests.filter(r=>r.path==='/run'||r.path==='/motion').length,connections=requests.filter(r=>r.path==='/connect').length;
-  open();await settle();await settle();assert.equal(requests.filter(r=>r.path==='/connect').length,connections+1);assert.equal(requests.filter(r=>r.path==='/run'||r.path==='/motion').length,sends);assert.equal($('k40Confirm').checked,false);
+  open();await settle();await settle();assert.equal(requests.filter(r=>r.path==='/connect').length,connections+1);assert.equal(requests.filter(r=>r.path==='/run'||r.path==='/motion').length,sends);assert.equal($('k40Confirm'),null);
   $('k40Forget').click();await settle();await settle();assert.equal(dom.window.localStorage.getItem('lzbox-k40-pairing-v1'),null);$('k40Close').click();
   oldBridge=true;open();$('k40Token').value='old-code';const attempts=requests.filter(r=>r.path==='/connect').length;$('k40Connect').click();await settle();assert.equal(requests.filter(r=>r.path==='/connect').length,attempts);assert.match($('k40Status').textContent,/Actualiza/);$('k40Close').click();
- }finally{globalThis.document=previous.document;globalThis.fetch=previous.fetch;dom.window.close();}
+ }finally{globalThis.document=previous.document;globalThis.fetch=previous.fetch;globalThis.setInterval=previous.setInterval;globalThis.clearInterval=previous.clearInterval;dom.window.close();}
 });
 
 test('WebUSB probe filters CH341, claims/releases it and sends no device commands',async()=>{

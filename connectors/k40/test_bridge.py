@@ -19,10 +19,10 @@ def job():
 
 class FakeEngine:
     def __init__(self, bed):
-        self.sent = []; self.left = 50; self.lost = False; self.closed = False
+        self.sent = []; self.done = True; self.left = 50; self.lost = False; self.closed = False
     def compile(self, job, mode): return b'IPP\nM2-test-bytes'
     def compile_motion(self, start, target, home=False): return b'IPP\n' if home else b'IBaS1P\n'
-    def finished(self): return not self.lost and self.left == 0
+    def finished(self): return self.done and not self.lost and self.left == 0
     def connect(self): pass
     def connected(self): return not self.lost
     def send(self, data): self.sent.append(data)
@@ -84,12 +84,18 @@ class JobTests(unittest.TestCase):
         with self.assertRaises(ValueError): b.run(p['id'], True)
         self.assertEqual(b.state, 'idle')
 
-    def test_usb_sent_is_not_finished_and_requires_acknowledgement(self):
-        b = Bridge(BED, simulation=False, engine_factory=FakeEngine); b.connect(); p = b.prepare(job(), 'cut'); b.run(p['id'], True)
-        self.assertEqual(b.state, 'sending'); b.engine.left = 0
-        s = b.status(); self.assertEqual(s['state'], 'sent'); self.assertIn('NO', s['message'])
-        with self.assertRaises(ValueError): b.prepare(job(), 'cut')
-        b.acknowledge(True); self.assertEqual(b.state, 'idle'); self.assertIsNotNone(b.engine); self.assertEqual(b.position, [0, 0])
+    def test_transmitted_is_not_finished_then_automatically_ready(self):
+        for operation in ('frame', 'cut'):
+            b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+            b.connect(); prepared = b.prepare(job(), operation); b.run(prepared['id'], True)
+            b.engine.done = False; b.engine.left = 0
+            self.assertEqual(b.status()['state'], 'sent')
+            with self.assertRaises(ValueError): b.prepare(job(), operation)
+            b.engine.done = True
+            self.assertEqual(b.status()['state'], 'idle')
+            self.assertEqual(b.position, [0, 0]); self.assertIsNotNone(b.engine)
+            with self.assertRaises(ValueError): b.run(prepared['id'], True)
+            self.assertTrue(b.prepare(job(), operation)['id'])
 
     def test_lost_usb_does_not_resubmit_and_cancel_locks(self):
         b = Bridge(BED, simulation=False, engine_factory=FakeEngine); b.connect(); p = b.prepare(job(), 'cut'); b.run(p['id'], True)
@@ -237,6 +243,52 @@ class RealCompilerTests(unittest.TestCase):
                     self.engine.compile(raw, mode)
                 expected = [int(round(v)) for v in self.engine.device.view.position(origin[0] * UNITS_PER_MM, origin[1] * UNITS_PER_MM)]
                 self.assertEqual([drivers[-1].native_x, drivers[-1].native_y], expected)
+
+    def test_cancel_does_not_wait_for_busy_packet_and_only_writes_reset(self):
+        engine = M2Engine(BED); c = engine.device.controller
+        c.stop()  # No background sender competes with the deterministic test thread.
+        entered, release = threading.Event(), threading.Event()
+        packets = []
+        class BusyUSB:
+            stopped = False
+            ready = False
+            def is_connected(self): return True
+            def get_status(self):
+                entered.set()
+                time.sleep(.005)
+                return [0, 0xCE if self.stopped or self.ready else 0xEE]
+            def write(self, packet):
+                packets.append(packet)
+                self.stopped = packet[1:31] == b'I' + b'F' * 29
+            def close(self): pass
+        connection = BusyUSB(); c.connection = connection
+        engine._guard_connection(connection)
+        c.start = lambda: None
+        c.open = lambda: None
+        c.update_state('active'); c.pre_ok = False
+        c.write(b'IBaS1P\n'); c._check_transfer_buffer()
+        worker = threading.Thread(target=c.process_queue)
+        try:
+            worker.start(); self.assertTrue(entered.wait(1))
+            cancelled = threading.Event()
+            def request_stop():
+                engine.cancel(); cancelled.set()
+            cancel_worker = threading.Thread(target=request_stop)
+            cancel_worker.start()
+            self.assertTrue(cancelled.wait(.5), 'Cancellation blocked behind transport lock')
+            cancel_worker.join(1); worker.join(1)
+            self.assertFalse(worker.is_alive())
+            self.assertEqual(packets, [], 'An old movement was sent after cancellation')
+            self.assertFalse(c.aborted_retries)
+            connection.ready = True
+            c._check_transfer_buffer(); c.process_queue()
+            self.assertEqual(len(packets), 1)
+            self.assertEqual(packets[0][1:31], b'I' + b'F' * 29)
+            self.assertEqual(c.state, 'terminate')
+        finally:
+            c.abort_waiting = True
+            worker.join(1)
+            engine.close()
 
     def test_transport_fail_closed(self):
         with self.assertRaises(ConnectionError): self.engine.device.controller.process_queue()

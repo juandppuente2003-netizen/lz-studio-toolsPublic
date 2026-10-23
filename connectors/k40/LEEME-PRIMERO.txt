@@ -1,4 +1,4 @@
-LZ STUDIO - K40 0.4.0 - WINDOWS
+LZ STUDIO - K40 0.4.1 - WINDOWS
 
 1. Termina el trabajo y cierra el conector anterior y Sagaon.
 2. Extrae esta carpeta COMPLETA en una ubicacion fija.
