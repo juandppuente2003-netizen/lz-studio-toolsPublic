@@ -116,6 +116,10 @@ class _StopRequested(Exception):
     """Interrupt a normal packet wait so the priority stop can run."""
 
 
+class _PauseRequested(Exception):
+    """Yield an unsent packet without discarding it or replaying a sent one."""
+
+
 class M2Engine:
     """Compile using MeerK40t's real M2 driver. Compilation never opens USB."""
     def __init__(self, bed):
@@ -142,7 +146,14 @@ class M2Engine:
         self.usb_failed = False
         self.last_controller_status = None
         self.stop_requested = threading.Event()
+        self.pause_requested = threading.Event()
+        self.pause_confirmed = threading.Event()
+        self.resume_confirmed = threading.Event()
+        self.reset_confirmed = threading.Event()
+        self.pending_control = None
         self.sending_stop = False
+        self.sending_control = False
+        self.packet_written = False
         self.transport_lock = threading.RLock()
         # MeerK40t normally retries USB errors. This bridge must NOT resume an
         # unattended job after a lost cable: stop at the first transport error.
@@ -151,21 +162,40 @@ class M2Engine:
         def interruptible_status():
             if self.stop_requested.is_set() and not self.sending_stop:
                 raise _StopRequested()
+            if self.pause_requested.is_set() and not self.sending_control and not self.packet_written:
+                raise _PauseRequested()
             return read_status()
         controller.update_status = interruptible_status
         send_packet = controller._send_and_confirm_packet
         def confirmed_packet(packet, checksum):
             stop_packet = packet == b'I' + b'F' * 29
+            control_packet = stop_packet or (packet == b'PN' + b'F' * 28 and self.pending_control is not None)
             if self.stop_requested.is_set() and not stop_packet:
                 raise _StopRequested()
+            if self.pause_requested.is_set() and not control_packet:
+                raise _PauseRequested()
             self.sending_stop = stop_packet
+            self.sending_control = control_packet
+            self.packet_written = False
+            control = self.pending_control if control_packet else None
             try:
                 result = send_packet(packet, checksum)
                 if not result:
                     raise ConnectionError('La M2 no confirmó el paquete; no se avanzará la cola.')
+                if stop_packet:
+                    self.reset_confirmed.set()
+                elif control == 'pause':
+                    self.pause_confirmed.set()
+                    self.pending_control = None
+                elif control == 'resume':
+                    self.pause_requested.clear()
+                    self.resume_confirmed.set()
+                    self.pending_control = None
                 return result
             finally:
                 self.sending_stop = False
+                self.sending_control = False
+                self.packet_written = False
         controller._send_and_confirm_packet = confirmed_packet
         process_queue = controller.process_queue
         def fail_closed_queue():
@@ -174,7 +204,7 @@ class M2Engine:
                     raise ConnectionError('USB desconectado.')
                 with self.transport_lock:
                     return process_queue()
-            except _StopRequested:
+            except (_StopRequested, _PauseRequested):
                 # Do not terminate here: the queued priority reset must still run.
                 return False
             except ConnectionError:
@@ -250,7 +280,7 @@ class M2Engine:
             status = self.device.controller._status
             self.last_controller_status = status[1] if status and len(status) > 1 else None
             return bool(status and len(status) > 1 and status[1] in (0xEC, 0xCC))
-        except _StopRequested:
+        except (_StopRequested, _PauseRequested):
             return False
         except ConnectionError:
             self.usb_failed = True
@@ -267,6 +297,10 @@ class M2Engine:
         def guarded_write(packet):
             if self.stop_requested.is_set() and not self.sending_stop:
                 raise _StopRequested()
+            if self.pause_requested.is_set() and not self.sending_control:
+                raise _PauseRequested()
+            if not self.sending_control:
+                self.packet_written = True
             return write(packet)
         connection.write = guarded_write
         connection._lz_stop_guard = True
@@ -291,9 +325,38 @@ class M2Engine:
     def failed(self):
         return self.usb_failed or self.device.controller.state == 'terminate' or not self.connected()
 
+    def pause(self):
+        if self.failed():
+            raise ConnectionError('No hay USB disponible para pausar.')
+        self.pause_confirmed.clear()
+        self.resume_confirmed.clear()
+        self.pause_requested.set()
+        self.device.controller.pause()
+        self.pending_control = 'pause'
+        # Use the pinned driver's PN priority pause; preserve normal buffers.
+        self.device.driver.pause()
+
+    def resume(self):
+        if self.failed() or not self.pause_confirmed.is_set() or self.stop_requested.is_set():
+            raise ConnectionError('La pausa no fue aceptada o se canceló el trabajo.')
+        self.resume_confirmed.clear()
+        self.pending_control = 'resume'
+        # Keep the write guard until the resume packet is acknowledged.
+        self.device.driver.resume()
+
+    def pause_complete(self):
+        return self.pause_confirmed.is_set()
+
+    def resume_complete(self):
+        return self.resume_confirmed.is_set()
+
+    def cancel_complete(self):
+        return self.reset_confirmed.is_set() and self.device.controller.state in ('terminate', 'end')
+
     def cancel(self):
         controller = self.device.controller
         self.stop_requested.set()
+        self.pending_control = None
         controller.pause()
         controller.abort_waiting = True
         if self.usb_failed or not self.connected() or controller.aborted_retries:
@@ -333,11 +396,13 @@ class Bridge:
         self.lock = threading.RLock()
         self.position, self.pending_position, self.operation = None, None, None
         self.shutting_down = False
+        self.control_started = 0
+        self.cleanup_thread = None
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.4.1', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion'],
+                'bridgeVersion': '0.5.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery'],
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
                 'controllerStatus': getattr(self.engine, 'last_controller_status', None),
                 'connected': self.engine is not None and (self.simulation or self.engine.connected())}
@@ -351,8 +416,8 @@ class Bridge:
 
     def connect(self):
         with self.lock:
-            if self.state in ('sending', 'sent', 'cancelled', 'error'):
-                raise ValueError('Confirma primero que la máquina se detuvo.')
+            if self.state not in ('idle', 'prepared'):
+                raise ValueError('Hay una operación activa. Usa Stop para pausar o cancelar.')
             engine = self.get_engine()
             if not self.simulation:
                 engine.connect()
@@ -410,7 +475,7 @@ class Bridge:
                     self.state, self.message = 'error', 'Falló el envío. Verifica físicamente la máquina; no se reintentará este trabajo automáticamente.'
                     raise
             self.position = None  # Unknown until completion/explicit acknowledgement.
-            return self.status()
+        return self.status()
 
     def motion(self, action, dx=0, dy=0, confirmed=False):
         with self.lock:
@@ -454,9 +519,11 @@ class Bridge:
                     self.state, self.pending_position = 'error', None
                     self.message = 'Falló el movimiento. La posición quedó sin referencia.'
                     raise
-            return self.status()
+        return self.status()
 
     def status(self):
+        # USB reads must never hold the HTTP/state lock: Stop needs that lock.
+        probe = None
         with self.lock:
             remaining = 0
             if self.state == 'sending':
@@ -468,29 +535,121 @@ class Bridge:
             if self.state == 'error':
                 self.position, self.pending_position = None, None
             if self.state == 'sent' and self.operation in ('home', 'jog', 'frame', 'cut'):
-                try:
-                    if self.engine.finished():
+                probe = self.engine
+        if probe is not None:
+            try:
+                finished = probe.finished()
+                with self.lock:
+                    if finished and self.engine is probe and self.state == 'sent':
                         self.position, self.pending_position, self.state = self.pending_position, None, 'idle'
                         self.message = 'Operación terminada según la controladora. Lista para continuar.'
                         self.id, self.payload = None, b''
-                except ConnectionError:
+            except ConnectionError:
+                with self.lock:
+                    if self.engine is probe and self.state not in ('cancelling', 'recovering'):
+                        self.state, self.position, self.pending_position = 'error', None, None
+                        self.message = 'Se perdió USB. Restablece la conexión; el trabajo no se reenvía.'
+        with self.lock:
+            if self.state in ('pausing', 'paused', 'resuming'):
+                if self.engine.failed():
                     self.state, self.position, self.pending_position = 'error', None, None
-                    self.message = 'Se perdió USB al comprobar el movimiento. Haz Home tras recuperar la conexión.'
+                    self.message = 'Se perdió USB durante la pausa. No se reanudará automáticamente.'
+                elif self.state == 'pausing' and self.engine.pause_complete():
+                    self.state, self.message = 'paused', 'Pausa aceptada por la M2. Puedes reanudar o cancelar el trabajo.'
+                elif self.state == 'resuming' and self.engine.resume_complete():
+                    self.state, self.message = 'sending', 'Trabajo reanudado desde la cola conservada.'
+                elif self.state != 'paused' and time.monotonic() - self.control_started > 15:
+                    self.state, self.message = 'error', 'La M2 no confirmó la orden. Usa el paro físico si sigue activa; puedes cancelar o restablecer USB.'
+                    self.position, self.pending_position = None, None
+                    # A delayed resume must not start streaming after timeout.
+                    try:
+                        self.engine.cancel()
+                    except Exception:
+                        pass
+            if self.state == 'cancelling':
+                if self.simulation or self.engine.cancel_complete():
+                    self._begin_cleanup('Cancelado. Cola eliminada y reset aceptado. Reconecta y establece Home para el siguiente trabajo.')
+                elif self.engine.usb_failed or not self.engine.connected() or time.monotonic() - self.control_started > 15:
+                    self.state, self.message = 'error', 'No llegó confirmación del reset. Usa el paro físico si sigue activa; restablece USB después.'
             if self.state == 'idle' and self.engine and not self.simulation and not self.engine.connected():
                 self.position = None
+            remaining = self.engine.remaining() if self.engine and self.state in ('sending', 'sent', 'pausing', 'paused', 'resuming') else 0
             percent = max(0, min(100, round(100 * (1 - remaining / max(1, len(self.payload))))))
             return {'state': self.state, 'message': self.message, 'percent': percent, **self.info()}
 
+    def pause(self):
+        with self.lock:
+            if self.state in ('pausing', 'paused'):
+                return self.status()
+            if self.state not in ('sending', 'sent'):
+                raise ValueError('No hay un trabajo ejecutándose para pausar.')
+            self.state, self.control_started = 'pausing', time.monotonic()
+            self.message = 'Solicitando pausa. Los datos ya recibidos pueden seguir ejecutándose hasta que la M2 acepte la orden.'
+            try:
+                self.engine.pause()
+            except Exception:
+                self.state, self.message = 'error', 'No se pudo solicitar la pausa por USB. Usa el paro físico si continúa.'
+                raise
+            return self.status()
+
+    def resume(self):
+        with self.lock:
+            if self.state != 'paused':
+                raise ValueError('Espera a que la M2 acepte la pausa antes de reanudar.')
+            self.state, self.control_started = 'resuming', time.monotonic()
+            self.message = 'Solicitando reanudación…'
+            try:
+                self.engine.resume()
+            except Exception:
+                self.state, self.message = 'error', 'No se pudo reanudar. El trabajo no se reenviará.'
+                raise
+            return self.status()
+
+    def _begin_cleanup(self, message):
+        """Release a reset/failed engine off the HTTP thread, never pretend finish."""
+        engine = self.engine
+        self.state, self.message = 'recovering', 'Liberando la sesión USB…'
+        self.id, self.payload, self.job = None, b'', None
+        self.position, self.pending_position = None, None
+        def cleanup():
+            try:
+                if engine:
+                    engine.close()
+                with self.lock:
+                    if self.engine is engine:
+                        self.engine = None
+                        self.operation = None
+                        self.state, self.message = 'idle', message
+            except Exception:
+                with self.lock:
+                    self.state, self.message = 'error', 'No se pudo liberar USB. Reinicia el conector con la máquina apagada.'
+        self.cleanup_thread = threading.Thread(target=cleanup, daemon=True)
+        self.cleanup_thread.start()
+
+    def recover(self):
+        with self.lock:
+            if self.state == 'recovering':
+                return self.status()
+            if self.state != 'error':
+                raise ValueError('Usa Stop para cancelar primero la operación activa.')
+            self._begin_cleanup('Sesión restablecida. Reconecta y haz Home; no se reenvió ningún trabajo.')
+            return self.status()
+
     def cancel(self):
         with self.lock:
+            if self.state in ('cancelling', 'recovering'):
+                return self.status()
+            if self.state == 'idle':
+                return self.status()
             self.position, self.pending_position = None, None
+            self.state, self.control_started = 'cancelling', time.monotonic()
             if self.engine and not self.simulation:
                 try:
                     self.engine.cancel()
                 except Exception:
                     self.state, self.message, self.id = 'error', 'No se pudo solicitar parada por USB. Usa el paro físico; no se reintentará el trabajo.', None
                     raise
-            self.state, self.message = 'cancelled', 'Cancelación solicitada: cola descartada y reinicio M2 solicitado. La parada física NO está confirmada. Si sigue funcionando, usa el paro físico.'
+            self.message = 'Cancelando: cola descartada, esperando aceptación del reset M2. Si continúa, usa el paro físico.'
             self.id = None
             return self.status()
 
@@ -604,6 +763,12 @@ def make_server(bridge, token, origins, port=17840):
                     if data.get('confirmed') is not True:
                         raise ValueError('Falta confirmar la cancelación.')
                     result = bridge.cancel()
+                elif self.path == '/pause':
+                    result = bridge.pause()
+                elif self.path == '/resume':
+                    result = bridge.resume()
+                elif self.path == '/recover':
+                    result = bridge.recover()
                 elif self.path == '/acknowledge':
                     result = bridge.acknowledge(data.get('confirmed'))
                 else:

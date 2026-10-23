@@ -20,6 +20,7 @@ def job():
 class FakeEngine:
     def __init__(self, bed):
         self.sent = []; self.done = True; self.left = 50; self.lost = False; self.closed = False
+        self.usb_failed = False; self.paused = False; self.resumed = False; self.reset_done = False
     def compile(self, job, mode): return b'IPP\nM2-test-bytes'
     def compile_motion(self, start, target, home=False): return b'IPP\n' if home else b'IBaS1P\n'
     def finished(self): return self.done and not self.lost and self.left == 0
@@ -28,6 +29,11 @@ class FakeEngine:
     def send(self, data): self.sent.append(data)
     def remaining(self): return self.left
     def failed(self): return self.lost
+    def pause(self): self.paused = True
+    def resume(self): self.resumed = True
+    def pause_complete(self): return self.paused
+    def resume_complete(self): return self.resumed
+    def cancel_complete(self): return self.reset_done
     def cancel(self): self.left = 0
     def close(self): self.closed = True
 
@@ -100,9 +106,56 @@ class JobTests(unittest.TestCase):
     def test_lost_usb_does_not_resubmit_and_cancel_locks(self):
         b = Bridge(BED, simulation=False, engine_factory=FakeEngine); b.connect(); p = b.prepare(job(), 'cut'); b.run(p['id'], True)
         b.engine.lost = True; self.assertEqual(b.status()['state'], 'error'); self.assertEqual(len(b.engine.sent), 1)
-        b.cancel(); self.assertEqual(b.state, 'cancelled')
+        b.cancel(); self.assertEqual(b.state, 'error')
         with self.assertRaises(ValueError): b.prepare(job(), 'cut')
-        b.acknowledge(True)
+        b.recover(); b.cleanup_thread.join(1)
+        self.assertEqual(b.state, 'idle'); self.assertIsNone(b.engine)
+
+    def test_pause_resume_keeps_job_and_cancel_recovers_without_acknowledgement(self):
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); prepared = b.prepare(job(), 'cut'); b.run(prepared['id'], True)
+        engine, payload = b.engine, b.payload
+        self.assertEqual(b.pause()['state'], 'paused')
+        self.assertEqual(b.pause()['state'], 'paused')
+        self.assertEqual(b.payload, payload); self.assertEqual(b.id, prepared['id'])
+        with self.assertRaises(ValueError): b.prepare(job(), 'cut')
+        b.resume(); self.assertEqual(b.state, 'sending')
+        self.assertEqual(engine.sent, [payload])  # No second submission.
+        b.pause(); b.cancel(); self.assertEqual(b.state, 'cancelling')
+        with self.assertRaises(ValueError): b.resume()
+        self.assertIsNone(b.position); self.assertIsNone(b.id)
+        engine.reset_done = True; b.status(); b.cleanup_thread.join(1)
+        self.assertEqual(b.status()['state'], 'idle'); self.assertIsNone(b.engine)
+        b.connect(); self.assertTrue(b.prepare(job(), 'frame')['id'])
+
+    def test_stop_is_not_blocked_by_usb_status_query(self):
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); b.prepare(job(), 'cut'); b.state = 'sent'; b.engine.left = 0
+        entered, release = threading.Event(), threading.Event()
+        def slow_finished():
+            entered.set(); release.wait(2); return True
+        b.engine.finished = slow_finished
+        worker = threading.Thread(target=b.status); worker.start()
+        try:
+            self.assertTrue(entered.wait(1))
+            start = time.monotonic(); result = b.pause()
+            self.assertLess(time.monotonic()-start, .5)
+            self.assertEqual(result['state'], 'paused')
+        finally:
+            release.set(); worker.join(1)
+        self.assertEqual(b.state, 'paused')  # A stale FINISH must not erase pause.
+
+    def test_unacknowledged_control_times_out_without_unlocking_motion(self):
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); p = b.prepare(job(), 'cut'); b.run(p['id'], True)
+        b.engine.pause_complete = lambda: False
+        self.assertEqual(b.pause()['state'], 'pausing')
+        with self.assertRaises(ValueError): b.resume()
+        b.control_started -= 16
+        self.assertEqual(b.status()['state'], 'error')
+        with self.assertRaises(ValueError): b.motion('home', confirmed=True)
+        b.recover(); b.cleanup_thread.join(1)
+        self.assertEqual(b.state, 'idle'); self.assertIsNone(b.position)
 
 class MotionTests(unittest.TestCase):
     def bridge(self, simulation=False):
@@ -142,8 +195,8 @@ class MotionTests(unittest.TestCase):
         b.acknowledge(True); self.assertEqual(b.position, position)
         b.position = [399, 399]
         with self.assertRaises(ValueError): b.prepare(job(), 'cut', 'current')
-        b.state = 'idle'; b.cancel(); self.assertIsNone(b.position)
-        b.acknowledge(True); b.connect(); b.motion('home', confirmed=True); b.disconnect()
+        b.state = 'prepared'; b.cancel(); b.cleanup_thread.join(1); self.assertIsNone(b.position)
+        b.connect(); b.motion('home', confirmed=True); b.disconnect()
         self.assertIsNone(b.position)
 
     def test_prepared_job_cannot_be_sent_after_jog(self):
@@ -178,6 +231,23 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(self.request('/run',{'id':p['id'],'confirmed':True})[0],400)
         self.assertEqual(self.request('/acknowledge',{'confirmed':True})[0],200)
         self.assertEqual(self.request('/disconnect',{})[0],200)
+
+    def test_http_pause_resume_cancel_and_automatic_recovery(self):
+        self.b.simulation = False
+        self.request('/connect', {})
+        _, p, _ = self.request('/prepare', {'job':job(), 'mode':'cut'})
+        self.request('/run', {'id':p['id'], 'confirmed':True})
+        engine = self.b.engine
+        self.assertEqual(self.request('/pause', {})[1]['state'], 'paused')
+        self.assertEqual(self.request('/motion', {'action':'home', 'confirmed':True})[0], 400)
+        self.assertEqual(self.request('/resume', {})[1]['state'], 'sending')
+        self.assertEqual(len(engine.sent), 1)
+        self.assertEqual(self.request('/cancel', {'confirmed':True})[1]['state'], 'cancelling')
+        self.assertEqual(self.request('/resume', {})[0], 400)
+        engine.reset_done = True
+        self.request('/status'); self.b.cleanup_thread.join(1)
+        self.assertEqual(self.request('/status')[1]['state'], 'idle')
+        self.assertEqual(self.request('/connect', {})[0], 200)
 
 class RealCompilerTests(unittest.TestCase):
     @classmethod
@@ -293,5 +363,62 @@ class RealCompilerTests(unittest.TestCase):
     def test_transport_fail_closed(self):
         with self.assertRaises(ConnectionError): self.engine.device.controller.process_queue()
         self.assertTrue(self.engine.usb_failed); self.assertTrue(self.engine.device.controller.aborted_retries)
+
+    def test_real_pause_resume_preserves_unsent_packet_and_no_usb_before_ready(self):
+        engine = M2Engine(BED); c = engine.device.controller; c.stop()
+        entered = threading.Event(); packets = []
+        class USB:
+            ready = False
+            def is_connected(self): return True
+            def get_status(self):
+                entered.set(); return [0, 0xCE if self.ready else 0xEE]
+            def write(self, packet): packets.append(packet[1:31])
+            def close(self): pass
+        usb = USB(); c.connection = usb; engine._guard_connection(usb)
+        c.open = lambda: None; c.start = lambda: None
+        c.update_state('active'); c.pre_ok = False
+        c.write(b'IBaS1P\n'); c._check_transfer_buffer()
+        before = bytes(c._buffer)
+        worker = threading.Thread(target=c.process_queue)
+        try:
+            worker.start(); self.assertTrue(entered.wait(1))
+            engine.pause(); worker.join(1); self.assertFalse(worker.is_alive())
+            self.assertEqual(packets, []); self.assertEqual(bytes(c._buffer), before)
+            self.assertFalse(engine.pause_complete())
+            usb.ready = True; c._check_transfer_buffer(); c.process_queue()
+            self.assertEqual(packets, [b'PN' + b'F' * 28])
+            self.assertTrue(engine.pause_complete()); self.assertEqual(bytes(c._buffer), before)
+            c.process_queue(); self.assertEqual(len(packets), 1)
+            engine.resume(); c._check_transfer_buffer(); c.process_queue()
+            self.assertTrue(engine.resume_complete()); self.assertFalse(engine.pause_requested.is_set())
+            c.process_queue(); self.assertEqual(len(packets), 3)
+            self.assertTrue(packets[-1].startswith(b'IBaS1P'))
+            self.assertEqual(len(c), 0)
+        finally:
+            engine.cancel(); worker.join(1); engine.close()
+
+    def test_pause_after_write_confirms_packet_before_queuing_pause_no_replay(self):
+        engine = M2Engine(BED); c = engine.device.controller; c.stop(); packets = []
+        class USB:
+            pause_on_write = True
+            def is_connected(self): return True
+            def get_status(self): return [0, 0xCE]
+            def write(self, packet):
+                packets.append(packet[1:31])
+                if self.pause_on_write:
+                    self.pause_on_write = False
+                    engine.pause()  # Pause arrives during an in-flight write.
+            def close(self): pass
+        usb = USB(); c.connection = usb; engine._guard_connection(usb)
+        c.open = lambda: None; c.start = lambda: None; c.update_state('active')
+        try:
+            c.write(b'IBaS1P\n'); c._check_transfer_buffer(); c.process_queue()
+            self.assertEqual(len(c._buffer), 0)  # Confirmed packet already consumed.
+            c._check_transfer_buffer(); c.process_queue(); self.assertTrue(engine.pause_complete())
+            engine.resume(); c._check_transfer_buffer(); c.process_queue(); c.process_queue()
+            self.assertEqual(len(packets), 3)
+            self.assertEqual(sum(p.startswith(b'IBaS1P') for p in packets), 1)
+        finally:
+            engine.close()
 
 if __name__ == '__main__': unittest.main()

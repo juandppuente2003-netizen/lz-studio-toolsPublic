@@ -49,14 +49,16 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
  dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
  let pollTick;globalThis.setInterval=fn=>{pollTick=fn;return 12345678;};globalThis.clearInterval=()=>{};
  const requests=[];let phase='idle',position=null,connected=false,operation=null,pending=null,oldBridge=false,delayRun=false,releaseRun;
- const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:false,position,connected,operation,features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion']});
+ const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:false,position,connected,operation,features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion','pause-resume','automatic-cancel-recovery']});
  globalThis.fetch=async(url,options)=>{
   const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):null;requests.push({path,body});
   if(path==='/connect')connected=true;
   if(path==='/prepare'){pending=body.origin==='current'?[...position]:[0,0];return {ok:true,json:async()=>({id:'test-job',...info()})};}
   if(path==='/motion'){operation=body.action;position=body.action==='home'?[0,0]:[position[0]+body.dx,position[1]+body.dy];phase='idle';}
   if(path==='/run'){phase='sent';position=null;operation='cut';if(delayRun){delayRun=false;await new Promise(resolve=>{releaseRun=resolve;});}}
-  if(path==='/cancel'){phase='cancelled';position=null;pending=null;}
+  if(path==='/pause')phase='pausing';
+  if(path==='/resume')phase='resuming';
+  if(path==='/cancel'){phase='cancelling';position=null;pending=null;}
   if(path==='/acknowledge'){if(phase==='cancelled')connected=false;position=pending;phase='idle';}
   if(path==='/disconnect'){phase='idle';position=null;connected=false;}
   return {ok:true,json:async()=>({state:phase,message:'Estado '+phase,percent:100,...info()})};
@@ -72,12 +74,20 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
   $('k40UsePosition').click();assert.equal($('k40Origin').value,'current');assert.equal($('k40Run').disabled,false);
   $('k40Run').click();$('k40Run').click();await settle();await settle();
   assert.equal(requests.filter(r=>r.path==='/run').length,1);assert.equal(requests.find(r=>r.path==='/prepare').body.origin,'current');
-  assert.equal($('k40Cancel').disabled,false);assert.equal($('k40Acknowledge').hidden,true);$('k40Close').click();assert.equal(dialog.open,true);
+  assert.equal($('k40Stop').disabled,false);assert.equal($('k40Acknowledge'),null);$('k40Close').click();assert.equal(dialog.open,true);
+  $('k40Stop').click();$('k40Stop').click();await settle();
+  assert.equal(requests.filter(r=>r.path==='/pause').length,1);assert.equal($('k40PausePanel').hidden,false);assert.equal($('k40Resume').disabled,true);
+  phase='paused';await pollTick();await settle();assert.equal($('k40Resume').disabled,false);assert.equal($('k40Run').disabled,true);
+  $('k40Resume').click();$('k40Resume').click();await settle();assert.equal(requests.filter(r=>r.path==='/resume').length,1);assert.equal(requests.filter(r=>r.path==='/run').length,1);
+  phase='sent';await pollTick();await settle();assert.equal($('k40Stop').disabled,false);
   phase='idle';position=pending;await pollTick();await settle();assert.equal($('k40Right').disabled,false);assert.equal(requests.filter(r=>r.path==='/acknowledge').length,0);assert.equal($('k40Connect').disabled,true);assert.match($('k40Position').textContent,/5.00/);
   delayRun=true;$('k40Run').click();await settle();
-  assert.equal(typeof releaseRun,'function');assert.equal($('k40Cancel').disabled,false);$('k40Cancel').click();await settle();assert.equal(phase,'cancelled');
-  releaseRun();await settle();await settle();assert.equal($('k40Acknowledge').hidden,false);assert.match($('k40Status').textContent,/cancelled/);
-  $('k40Acknowledge').click();await settle();$('k40Close').click();await settle();assert.equal(dialog.open,false);
+  assert.equal(typeof releaseRun,'function');assert.equal($('k40Stop').disabled,false);$('k40Stop').click();await settle();$('k40Cancel').click();await settle();assert.equal(phase,'cancelling');
+  releaseRun();await settle();await settle();assert.equal($('k40Acknowledge'),null);assert.match($('k40Status').textContent,/cancelling/);
+  phase='recovering';await pollTick();await settle();assert.equal($('k40Run').disabled,true);
+  phase='idle';connected=false;await pollTick();await settle();assert.equal($('k40Reconnect').hidden,false);assert.equal(requests.filter(r=>r.path==='/acknowledge').length,0);
+  $('k40Reconnect').click();await settle();assert.equal(connected,true);assert.equal($('k40Right').disabled,true);
+  $('k40Close').click();await settle();assert.equal(dialog.open,false);
   open();$('k40Origin').value='home';$('k40Origin').dispatchEvent(new dom.window.Event('input'));$('k40Token').value='remembered-code';$('k40Remember').checked=true;$('k40Connect').click();await settle();
   assert.equal(dom.window.localStorage.getItem('lzbox-k40-pairing-v1'),'remembered-code');$('k40Close').click();await settle();assert.equal(dialog.open,false);
   const sends=requests.filter(r=>r.path==='/run'||r.path==='/motion').length,connections=requests.filter(r=>r.path==='/connect').length;

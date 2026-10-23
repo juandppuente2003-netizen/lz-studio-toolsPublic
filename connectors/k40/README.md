@@ -1,4 +1,4 @@
-# LZ K40 · conector 0.4.1 para Box Studio
+# LZ K40 · conector 0.5.0 para Box Studio
 
 Control por USB para M2 Nano conservando libusb-win32 y Sagaon/K40 Whisperer.
 El navegador usa un conector local; no hay que descargar/importar diseños para
@@ -12,6 +12,9 @@ cada trabajo. La potencia se ajusta en el panel físico de la M2.
 3. Ejecuta **instalar-windows.bat**. Requiere Python 3.10 o posterior con el comando
    `py` y Tkinter de la instalación oficial. Instala dependencias en su `.venv`,
    comprueba el motor sin USB, activa el inicio automático y abre el panel local.
+   Si estás actualizando, cierra por completo el conector anterior antes. Cerrar
+   solo la ventana no lo termina. Tras instalar, reinicia Windows si el panel local
+   sigue mostrando otra versión; debe indicar **Conector 0.5.0**.
 4. Pulsa **Copiar código** y pégalo una vez en Box. Deja **Recordar esta computadora**
    marcado. Si ya estaba emparejado, el código se conserva y no se repite este paso.
 5. En adelante, el conector inicia en segundo plano al iniciar sesión en Windows.
@@ -58,16 +61,31 @@ recibidos por HTTP. Los movimientos se compilan con el driver M2 de MeerK40t
 El motor requiere confirmación de cada paquete; una comunicación fallida no se
 reanuda automáticamente. Las pruebas de protocolo no sustituyen la prueba física.
 
-## Cancelación y uso de Sagaon
+## Stop / Pausa, reanudación y cancelación
 
-**Cancelar y solicitar parada** permanece disponible durante envío y fin de datos.
-Descarta la cola y solicita el reinicio prioritario soportado por MeerK40t.
+**STOP / PAUSA** permanece visible en la barra inferior durante el trabajo.
+Solicita la pausa prioritaria `PN` del driver M2 y conserva los datos pendientes.
+Hasta que el USB confirme su recepción, el panel dice **Solicitando pausa** y
+mantiene **Reanudar** deshabilitado. Los datos ya almacenados en la placa pueden
+seguir ejecutándose antes de que la orden sea aceptada; una confirmación USB no
+es un sensor de movimiento ni una parada de emergencia.
+
+En pausa, **Reanudar trabajo** continúa la cola conservada sin preparar ni enviar
+otra vez el diseño. **Cancelar trabajo** descarta la cola y solicita el reinicio
+prioritario soportado por MeerK40t; también está disponible mientras se solicita
+la pausa. Una cancelación nunca permite reanudar ese trabajo.
 La cancelación ya no espera el candado del envío: interrumpe las esperas normales
 y bloquea nuevas escrituras del trabajo, conservando el envío del reinicio.
+Las lecturas de estado tampoco retienen el candado HTTP que necesita Stop.
 Una transferencia USB ya iniciada puede terminar; la parada física inmediata no
 está garantizada por software.
 No sustituye al paro físico: si continúa, utiliza el paro físico de la máquina.
-**Confirmar máquina detenida** queda para cancelación/error o comunicación desconocida.
+Se eliminó **Confirmar máquina detenida** del panel. Cuando el reset se acepta,
+la sesión USB se libera automáticamente y aparece **Reconectar M2**. Si no se
+confirma en 15 segundos, se muestra el error y **Restablecer conexión USB**;
+no se habilitan cortes ni reanudaciones basados en un temporizador. Restablecer
+libera una sesión fallida; no confirma la parada física. Ante una máquina aún
+activa, utiliza primero su paro físico.
 En operación normal, Home, flechas, marco y corte vuelven a estar listos
 automáticamente cuando la controladora indica fin; enviar datos no basta.
 Se eliminó la casilla repetitiva: cada botón inicia solamente su propia operación.
@@ -99,7 +117,9 @@ reenviar el trabajo. No prepares de nuevo un corte cuya respuesta se haya perdid
 - Probados en Linux: compilador real M2 sin abrir USB; movimientos y fin de
   controladora con transporte de prueba; origen, límites, cancelación, sesión,
   persistencia del código y arranque/cierre HTTP en segundo plano sin USB.
-- Probado el flujo DOM del panel, geometría de 17 modelos y vista de origen actual.
+- Probado el flujo DOM del panel, geometría de 17 modelos y vista de origen actual;
+  pausa/reanudación/cancelación por HTTP y parser real con transporte USB de prueba,
+  incluyendo pausa antes y durante un envío, sin duplicar paquetes.
 - La instalación, el panel Tkinter y la entrada de inicio requieren verificación
   en Windows. Las pruebas del registro usan un sustituto, no modifican el sistema.
 - Pendientes: revisión visual en navegador del nuevo panel y prueba física con
