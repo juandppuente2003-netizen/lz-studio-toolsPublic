@@ -38,6 +38,11 @@ try{
   assert.equal((await api('/status')).state,'simulated');await api('/acknowledge',{confirmed:true});
   console.log(`${mode}: ${job.summary.pieces} piezas, ${prepared.bytes} bytes M2, simulación sin USB OK`);
  }
+ const homed=await api('/motion',{action:'home',confirmed:true});assert.equal(homed.state,'idle');assert.deepEqual(homed.position,[0,0]);
+ const moved=await api('/motion',{action:'jog',dx:5,dy:0,confirmed:true});assert.equal(moved.state,'idle');assert.ok(Math.abs(moved.position[0]-5)<0.0254);
+ const placed=await api('/prepare',{job,mode:'frame',origin:'current'});assert.ok(placed.bytes>0);
+ await api('/run',{id:placed.id,confirmed:true});const done=await api('/acknowledge',{confirmed:true});assert.deepEqual(done.position,moved.position);assert.equal(done.connected,true);
+ console.log('Home → jog → marco desde posición actual, sin USB OK');
  console.log('Integración Box → HTTP local → motor M2 verificada.');
 }finally{
  if(child.exitCode===null){child.kill('SIGINT');await once(child,'exit');}

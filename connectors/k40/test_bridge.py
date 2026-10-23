@@ -1,4 +1,7 @@
 import copy
+import subprocess
+import sys
+from unittest.mock import patch
 import http.client
 import json
 import os
@@ -18,6 +21,8 @@ class FakeEngine:
     def __init__(self, bed):
         self.sent = []; self.left = 50; self.lost = False; self.closed = False
     def compile(self, job, mode): return b'IPP\nM2-test-bytes'
+    def compile_motion(self, start, target, home=False): return b'IPP\n' if home else b'IBaS1P\n'
+    def finished(self): return not self.lost and self.left == 0
     def connect(self): pass
     def connected(self): return not self.lost
     def send(self, data): self.sent.append(data)
@@ -84,7 +89,7 @@ class JobTests(unittest.TestCase):
         self.assertEqual(b.state, 'sending'); b.engine.left = 0
         s = b.status(); self.assertEqual(s['state'], 'sent'); self.assertIn('NO', s['message'])
         with self.assertRaises(ValueError): b.prepare(job(), 'cut')
-        b.acknowledge(True); self.assertEqual(b.state, 'idle'); self.assertIsNone(b.engine)
+        b.acknowledge(True); self.assertEqual(b.state, 'idle'); self.assertIsNotNone(b.engine); self.assertEqual(b.position, [0, 0])
 
     def test_lost_usb_does_not_resubmit_and_cancel_locks(self):
         b = Bridge(BED, simulation=False, engine_factory=FakeEngine); b.connect(); p = b.prepare(job(), 'cut'); b.run(p['id'], True)
@@ -92,6 +97,55 @@ class JobTests(unittest.TestCase):
         b.cancel(); self.assertEqual(b.state, 'cancelled')
         with self.assertRaises(ValueError): b.prepare(job(), 'cut')
         b.acknowledge(True)
+
+class MotionTests(unittest.TestCase):
+    def bridge(self, simulation=False):
+        b = Bridge(BED, simulation=simulation, engine_factory=FakeEngine)
+        b.connect()
+        return b
+
+    def test_home_then_jog_waits_for_controller_finish(self):
+        b = self.bridge()
+        with self.assertRaises(ValueError): b.motion('jog', 5, 0, True)
+        with self.assertRaises(ValueError): b.motion('home', confirmed=False)
+        b.motion('home', confirmed=True)
+        self.assertIsNone(b.position)
+        with self.assertRaises(ValueError): b.motion('home', confirmed=True)
+        b.engine.left = 0
+        self.assertEqual(b.status()['state'], 'idle')
+        self.assertEqual(b.position, [0, 0])
+        b.engine.left = 50
+        b.motion('jog', 5, 0, True)
+        self.assertIsNone(b.position)
+        b.engine.left = 0
+        b.status()
+        self.assertAlmostEqual(b.position[0], 5, delta=0.0254)
+        for dx, dy in [(-50, 0), (0, -1), (1, 1), (0, 0), (51, 0), (float('nan'), 0)]:
+            with self.subTest(dx=dx, dy=dy), self.assertRaises(ValueError): b.motion('jog', dx, dy, True)
+
+    def test_current_origin_bounds_cancel_and_disconnect_invalidate_reference(self):
+        b = self.bridge(simulation=True)
+        with self.assertRaises(ValueError): b.prepare(job(), 'cut', 'current')
+        b.motion('home', confirmed=True); b.motion('jog', 25, 0, True)
+        position = list(b.position)
+        prepared = b.prepare(job(), 'cut', 'current')
+        self.assertFalse(b.job['_home'])
+        self.assertEqual(b.job['_start'], position)
+        self.assertAlmostEqual(b.job['paths'][0]['points'][0][0], position[0])
+        b.run(prepared['id'], True); self.assertIsNone(b.position)
+        b.acknowledge(True); self.assertEqual(b.position, position)
+        b.position = [399, 399]
+        with self.assertRaises(ValueError): b.prepare(job(), 'cut', 'current')
+        b.state = 'idle'; b.cancel(); self.assertIsNone(b.position)
+        b.acknowledge(True); b.connect(); b.motion('home', confirmed=True); b.disconnect()
+        self.assertIsNone(b.position)
+
+    def test_prepared_job_cannot_be_sent_after_jog(self):
+        b = self.bridge(simulation=True); b.motion('home', confirmed=True)
+        prepared = b.prepare(job(), 'frame', 'current')
+        b.motion('jog', 10, 0, True)
+        with self.assertRaises(ValueError): b.run(prepared['id'], True)
+
 
 class HttpTests(unittest.TestCase):
     def setUp(self):
@@ -154,6 +208,35 @@ class RealCompilerTests(unittest.TestCase):
             self.assertIsNone(c.connection)
         finally:
             engine.close()
+
+    def test_current_origin_and_jog_compile_without_home_or_laser(self):
+        raw = validate_job(job(), BED)
+        raw['_start'], raw['_home'] = [10, 10], False
+        frame = self.engine.compile(raw, 'frame')
+        cut = self.engine.compile(raw, 'cut')
+        self.assertNotIn(b'IPP', frame); self.assertNotIn(b'D', frame)
+        self.assertNotIn(b'IPP', cut); self.assertIn(b'D', cut)
+        jog = self.engine.compile_motion([10, 10], [20, 10])
+        self.assertTrue(jog); self.assertNotIn(b'D', jog); self.assertNotIn(b'IPP', jog)
+        self.assertIn(b'IPP', self.engine.compile_motion([0, 0], [0, 0], home=True))
+        self.assertIsNone(self.engine.device.controller.connection)
+
+    def test_job_returns_to_mm_origin_not_last_native_segment(self):
+        from meerk40t.lihuiyu.driver import LihuiyuDriver
+        from meerk40t.core.units import UNITS_PER_MM
+        drivers = []
+        def capture(*args, **kwargs):
+            driver = LihuiyuDriver(*args, **kwargs)
+            drivers.append(driver)
+            return driver
+        for mode in ('cut', 'frame'):
+            for home, origin in [(True, [0, 0]), (False, [10, 10])]:
+                raw = validate_job(job(), BED)
+                raw['_start'], raw['_home'] = origin, home
+                with patch('meerk40t.lihuiyu.driver.LihuiyuDriver', side_effect=capture):
+                    self.engine.compile(raw, mode)
+                expected = [int(round(v)) for v in self.engine.device.view.position(origin[0] * UNITS_PER_MM, origin[1] * UNITS_PER_MM)]
+                self.assertEqual([drivers[-1].native_x, drivers[-1].native_y], expected)
 
     def test_transport_fail_closed(self):
         with self.assertRaises(ConnectionError): self.engine.device.controller.process_queue()

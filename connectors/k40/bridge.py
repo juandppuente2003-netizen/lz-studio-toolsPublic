@@ -4,6 +4,7 @@ M2 power is adjusted on the physical panel. This bridge never exposes a shell,
 arbitrary console commands, arbitrary files, or arbitrary EGV over HTTP.
 """
 import argparse
+import copy
 import hashlib
 import hmac
 import io
@@ -139,6 +140,13 @@ class M2Engine:
         # MeerK40t normally retries USB errors. This bridge must NOT resume an
         # unattended job after a lost cable: stop at the first transport error.
         controller = self.device.controller
+        send_packet = controller._send_and_confirm_packet
+        def confirmed_packet(packet, checksum):
+            result = send_packet(packet, checksum)
+            if not result:
+                raise ConnectionError('La M2 no confirmó el paquete; no se avanzará la cola.')
+            return result
+        controller._send_and_confirm_packet = confirmed_packet
         process_queue = controller.process_queue
         def fail_closed_queue():
             try:
@@ -159,8 +167,12 @@ class M2Engine:
         from meerk40t.core.units import UNITS_PER_MM
         driver, output = LihuiyuDriver(self.device), io.BytesIO()
         driver.out_pipe = output
-        # Every job establishes a known origin; no guessed current-head position.
-        driver.home()
+        origin = job.get('_start', [0, 0])
+        if job.get('_home', True):
+            driver.home()
+        else:
+            native = self.device.view.position(origin[0] * UNITS_PER_MM, origin[1] * UNITS_PER_MM)
+            driver.native_x, driver.native_y = map(lambda n: int(round(n)), native)
         if mode == 'frame':
             points = [p for path in job['paths'] for p in path['points']]
             xs, ys = [p[0] for p in points], [p[1] for p in points]
@@ -185,7 +197,42 @@ class M2Engine:
                     driver.plot_start()
             driver.rapid_mode()
             driver.laser_off()
+        # Return to the selected work origin, never to Home in current mode.
+        if '_start' in job:
+            driver.move_abs(origin[0] * UNITS_PER_MM, origin[1] * UNITS_PER_MM)
         return output.getvalue()
+
+    def compile_motion(self, start, target, home=False):
+        from meerk40t.lihuiyu.driver import LihuiyuDriver
+        from meerk40t.core.units import UNITS_PER_MM
+        driver, output = LihuiyuDriver(self.device), io.BytesIO()
+        driver.out_pipe = output
+        if home:
+            driver.home()
+        else:
+            driver.native_x, driver.native_y = [int(round(v)) for v in
+                self.device.view.position(start[0] * UNITS_PER_MM, start[1] * UNITS_PER_MM)]
+            driver.laser_off()
+            driver.move_abs(target[0] * UNITS_PER_MM, target[1] * UNITS_PER_MM)
+        return output.getvalue()
+
+    def finished(self):
+        # Same FINISH statuses used by the pinned driver's wait_finished().
+        if not self.transport_lock.acquire(blocking=False):
+            return False
+        try:
+            if self.remaining() or self.failed():
+                return False
+            self.device.controller.update_status()
+            status = self.device.controller._status
+            return bool(status and len(status) > 1 and status[1] in (0xEC, 0xCC))
+        except ConnectionError:
+            self.usb_failed = True
+            self.device.controller.abort_retry()
+            self.device.controller.abort()
+            raise
+        finally:
+            self.transport_lock.release()
 
     def connect(self):
         self.device.controller.open()
@@ -246,13 +293,19 @@ class Bridge:
         self.state, self.message = 'idle', 'Sin trabajo activo.'
         self.job, self.payload, self.id, self.expires = None, b'', None, 0
         self.lock = threading.RLock()
+        self.position, self.pending_position, self.operation = None, None, None
+        self.shutting_down = False
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.3.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop']}
+                'bridgeVersion': '0.4.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin'],
+                'position': self.position, 'positionEstimated': True, 'operation': self.operation,
+                'connected': self.engine is not None and (self.simulation or self.engine.connected())}
 
     def get_engine(self):
+        if self.shutting_down:
+            raise RuntimeError('El conector se está cerrando.')
         if self.engine is None:
             self.engine = self.engine_factory(self.bed)
         return self.engine
@@ -266,7 +319,7 @@ class Bridge:
                 engine.connect()
             return self.info()
 
-    def prepare(self, raw, mode):
+    def prepare(self, raw, mode, origin='home'):
         with self.lock:
             if self.state not in ('idle', 'prepared'):
                 raise ValueError('Hay un trabajo pendiente. Verifica la máquina antes de continuar.')
@@ -274,6 +327,20 @@ class Bridge:
                 raise ValueError('Operación no compatible.')
             self.id, self.payload, self.state = None, b'', 'idle'
             job = validate_job(raw, self.bed)
+            if origin not in ('home', 'current'):
+                raise ValueError('Origen no compatible.')
+            start = [0, 0]
+            if origin == 'current':
+                if self.position is None:
+                    raise ValueError('Haz Home una vez para establecer la posición antes de usar el origen actual.')
+                start = list(self.position)
+                minimum = [min(p[axis] for path in job['paths'] for p in path['points']) for axis in (0, 1)]
+                placed = copy.deepcopy(job)
+                for path in placed['paths']:
+                    path['points'] = [[round(p[axis] - minimum[axis] + start[axis], 6) for axis in (0, 1)] for p in path['points']]
+                job = validate_job(placed, self.bed)
+            job['_start'], job['_home'] = start, origin == 'home'
+            self.pending_position, self.operation = start, mode
             payload = self.get_engine().compile(job, mode)
             if not payload:
                 raise ValueError('El motor no generó instrucciones.')
@@ -303,6 +370,51 @@ class Bridge:
                 except Exception:
                     self.state, self.message = 'error', 'Falló el envío. Verifica físicamente la máquina; no se reintentará este trabajo automáticamente.'
                     raise
+            self.position = None  # Unknown until completion/explicit acknowledgement.
+            return self.status()
+
+    def motion(self, action, dx=0, dy=0, confirmed=False):
+        with self.lock:
+            if confirmed is not True:
+                raise ValueError('Confirma el área libre antes de mover el cabezal.')
+            if self.state not in ('idle', 'prepared'):
+                raise ValueError('Hay una operación pendiente. No se acumulan movimientos.')
+            if not self.engine or (not self.simulation and not self.engine.connected()):
+                self.position = None
+                raise ConnectionError('Conecta la M2 antes de moverla.')
+            if action == 'home':
+                start, target = [0, 0], [0, 0]
+            elif action == 'jog':
+                if self.position is None:
+                    raise ValueError('Haz Home una vez para establecer la posición.')
+                dx, dy = numeric(dx, -50, 50, 'Movimiento X'), numeric(dy, -50, 50, 'Movimiento Y')
+                if (dx == 0) == (dy == 0):
+                    raise ValueError('Mueve solo un eje por pulsación, entre 0.1 y 50 mm.')
+                if max(abs(dx), abs(dy)) < 0.1:
+                    raise ValueError('El paso mínimo es 0.1 mm.')
+                start = list(self.position)
+                target = [round(round((start[i] + d) / 0.0254) * 0.0254, 6) for i, d in enumerate((dx, dy))]
+                for i, size in enumerate((self.bed['width'], self.bed['height'])):
+                    numeric(target[i], 0, size, 'Posición destino')
+            else:
+                raise ValueError('Movimiento no compatible.')
+            payload = self.engine.compile_motion(start, target, home=action == 'home')
+            if not payload or b'D' in payload:
+                raise ValueError('El movimiento no produjo instrucciones válidas sin láser.')
+            self.payload, self.id, self.job = payload, None, None
+            self.operation, self.pending_position, self.position = action, target, None
+            self.state = 'sending'
+            if self.simulation:
+                self.position, self.pending_position, self.state = target, None, 'idle'
+                self.message = 'Simulación: movimiento calculado, sin USB ni movimiento físico.'
+            else:
+                try:
+                    self.engine.send(payload)
+                    self.message = 'Movimiento enviado. Esperando que la controladora indique fin.'
+                except Exception:
+                    self.state, self.pending_position = 'error', None
+                    self.message = 'Falló el movimiento. La posición quedó sin referencia.'
+                    raise
             return self.status()
 
     def status(self):
@@ -314,11 +426,24 @@ class Bridge:
                     self.state, self.message = 'error', 'Se perdió la comunicación USB. Verifica la máquina; no reinicies el trabajo automáticamente.'
                 elif remaining == 0:
                     self.state, self.message = 'sent', 'Todos los datos fueron enviados. La finalización física NO está confirmada: espera a que la máquina termine antes de continuar.'
+            if self.state == 'error':
+                self.position, self.pending_position = None, None
+            if self.state == 'sent' and self.operation in ('home', 'jog'):
+                try:
+                    if self.engine.finished():
+                        self.position, self.pending_position, self.state = self.pending_position, None, 'idle'
+                        self.message = 'La controladora indicó fin. Posición estimada lista.'
+                except ConnectionError:
+                    self.state, self.position, self.pending_position = 'error', None, None
+                    self.message = 'Se perdió USB al comprobar el movimiento. Haz Home tras recuperar la conexión.'
+            if self.state == 'idle' and self.engine and not self.simulation and not self.engine.connected():
+                self.position = None
             percent = max(0, min(100, round(100 * (1 - remaining / max(1, len(self.payload))))))
             return {'state': self.state, 'message': self.message, 'percent': percent, **self.info()}
 
     def cancel(self):
         with self.lock:
+            self.position, self.pending_position = None, None
             if self.engine and not self.simulation:
                 try:
                     self.engine.cancel()
@@ -333,10 +458,15 @@ class Bridge:
         with self.lock:
             if confirmed is not True or self.state not in ('sent', 'simulated', 'cancelled', 'error'):
                 raise ValueError('Cancela o espera el envío y verifica que la máquina se detuvo.')
-            if self.engine:
-                self.engine.close()
-                self.engine = None
-            self.state, self.message, self.id, self.payload = 'idle', 'Lista para preparar otra hoja.', None, b''
+            if self.state in ('sent', 'simulated'):
+                self.position = self.pending_position
+            else:
+                self.position = None
+                if self.engine:
+                    self.engine.close()
+                    self.engine = None
+            self.pending_position = None
+            self.state, self.message, self.id, self.payload = 'idle', 'Lista para otra operación.', None, b''
             return self.status()
 
     def disconnect(self):
@@ -347,8 +477,15 @@ class Bridge:
                 self.engine.close()
                 self.engine = None
             self.id, self.payload, self.job = None, b'', None
+            self.position, self.pending_position = None, None
             self.state, self.message = 'idle', 'USB liberado. Puedes usar Sagaon/K40 Whisperer.'
             return self.status()
+
+    def shutdown(self):
+        with self.lock:
+            result = self.disconnect()
+            self.shutting_down = True
+            return result
 
     def close(self):
         if self.engine:
@@ -415,7 +552,12 @@ def make_server(bridge, token, origins, port=17840):
                 elif self.path == '/disconnect':
                     result = bridge.disconnect()
                 elif self.path == '/prepare':
-                    result = bridge.prepare(data.get('job'), data.get('mode'))
+                    result = bridge.prepare(data.get('job'), data.get('mode'), data.get('origin', 'home'))
+                elif self.path == '/motion':
+                    result = bridge.motion(data.get('action'), data.get('dx', 0), data.get('dy', 0), data.get('confirmed'))
+                elif self.path == '/shutdown':
+                    result = bridge.shutdown()
+                    threading.Thread(target=self.server.shutdown, daemon=True).start()
                 elif self.path == '/run':
                     result = bridge.run(data.get('id'), data.get('confirmed'))
                 elif self.path == '/cancel':

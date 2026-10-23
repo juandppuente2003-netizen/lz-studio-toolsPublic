@@ -7,7 +7,13 @@ if errorlevel 1 goto error
 echo Verificando el motor M2 sin conectar el USB...
 .venv\Scripts\python.exe -c "from bridge import M2Engine; engine=M2Engine({'width':400,'height':400}); engine.close()"
 if errorlevel 1 goto error
-echo Instalacion terminada. Abre simular-windows.bat para la primera prueba.
+.venv\Scripts\python.exe -c "import tkinter"
+if errorlevel 1 goto error
+.venv\Scripts\python.exe windows_setup.py --enable
+if errorlevel 1 goto error
+start "" abrir-conector.vbs
+echo Instalacion terminada. Inicio automatico activado sin consola.
+echo Conserva esta carpeta en su ubicacion. El conector NO mueve ni toma el USB al iniciar.
 pause
 exit /b 0
 :error

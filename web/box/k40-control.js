@@ -1,99 +1,134 @@
-import {prepareK40Job,k40Preview,K40_PROTOCOL} from './k40-job.js?v=1';
-
-import {connectM2USB} from './k40-usb.js?v=2';
-
-const ADDRESS='http://127.0.0.1:17840';
-const PAIRING_KEY='lzbox-k40-pairing-v1';
+import {prepareK40Job,k40Preview,placeK40Job,K40_PROTOCOL} from './k40-job.js?v=2';
+const ADDRESS='http://127.0.0.1:17840',PAIRING_KEY='lzbox-k40-pairing-v1';
+const TERMINAL=['sent','simulated','cancelled','error'];
 export function mountK40(app){
- const launch=document.createElement('button');launch.type='button';launch.className='btn outline';launch.id='k40Open';launch.textContent='Cortar en mi K40';
- document.querySelector('.export-actions')?.append(launch);
+ const launch=document.createElement('button');launch.type='button';launch.className='btn outline';launch.id='k40Open';launch.textContent='Controlar mi K40';document.querySelector('.export-actions')?.append(launch);
  const dialog=document.createElement('dialog');dialog.className='k40-dialog';dialog.id='k40Dialog';
- dialog.innerHTML=`<div class="dialog-header"><div><span class="eyebrow">BOX → TU MÁQUINA</span><h2>Cortar en mi K40</h2></div><button type="button" class="icon-btn" id="k40Close" aria-label="Cerrar panel de corte">×</button></div>
- <div class="k40-machine"><strong>M2 Nano · potencia manual</strong><span class="k40-badge" id="k40Mode">Sin conectar</span></div>
- <div class="k40-layout"><div><div id="k40Preview" class="k40-preview"></div><p id="k40Summary" class="k40-summary"></p><p class="k40-note">Verde: contornos · azul: interiores. Se conserva el kerf del plano y se eliminan tramos repetidos. El recorrido parte de Home, en la esquina superior izquierda.</p><button type="button" class="btn outline" id="k40Arrange">Volver a acomodar piezas</button></div>
- <div><div class="k40-fields"><label>Hoja<select id="k40Sheet"></select></label><label>Velocidad · mm/s<input id="k40Speed" type="number" min="1" max="100" step="0.1" value="10"></label><label>Pasadas<input id="k40Passes" type="number" min="1" max="10" step="1" value="1"></label><label>Ancho cama · mm<input id="k40Width" type="number" min="50" max="2500" value="400"></label><label>Alto cama · mm<input id="k40Height" type="number" min="50" max="2500" value="400"></label><label>Desplazar X · mm<input id="k40X" type="number" min="0" step="0.1" value="0"></label><label>Desplazar Y · mm<input id="k40Y" type="number" min="0" step="0.1" value="0"></label></div>
- <label class="k40-connection-choice" for="k40Connection">Conexión<select id="k40Connection"><option value="usb">USB directo · sin código</option><option value="bridge">Conector local · con código</option></select></label><section class="k40-usb" id="k40USBPanel"><strong>USB directo desde el navegador</strong><p class="k40-note">Selecciona tu máquina en la ventana de Chrome. No necesitas código ni conector local. Cierra Sagaon antes de conectar. El envío de cortes y marco por WebUSB aún no está implementado.</p><button type="button" class="btn outline" id="k40USB">Conectar USB directo</button><button type="button" class="btn outline" id="k40USBDisconnect" disabled>Desconectar USB</button><p id="k40USBStatus" class="k40-note" role="status" aria-live="polite"></p></section><details class="k40-pairing" id="k40BridgePanel" hidden open><summary>Conectar con esta computadora</summary><p class="k40-note">Ejecuta el conector LZ K40 en la computadora conectada por USB. La primera vez pega el código del conector. Con «Recordar esta computadora» se recupera al volver a abrir este sitio en el mismo navegador.</p><label for="k40Token">Código del conector</label><input id="k40Token" type="password" autocomplete="off" spellcheck="false"><label class="k40-confirm"><input id="k40Remember" type="checkbox">Recordar esta computadora</label><div class="k40-actions"><button type="button" id="k40Connect" class="btn outline">Conectar</button><button type="button" id="k40Disconnect" class="btn outline" disabled>Desconectar y liberar USB</button><button type="button" id="k40Forget" class="btn quiet">Olvidar esta computadora</button></div><p class="k40-note">Conectar no inicia un corte. Para volver a Sagaon/K40 Whisperer, libera el USB aquí o cierra el conector local.</p></details>
- <div id="k40Status" class="k40-status" role="status" aria-live="polite">Conecta el puente local para preparar el envío. No se iniciará ningún movimiento al conectar.</div><progress id="k40Progress" class="k40-progress" max="100" value="0" aria-label="Datos enviados a la controladora" hidden></progress>
- <div id="k40SendPanel" hidden><label class="k40-confirm"><input id="k40Confirm" type="checkbox">He revisado la hoja, la potencia en el panel y el área libre para volver a Home. Estoy junto a la máquina para iniciar.</label>
- <button type="button" id="k40Run" class="btn primary wide" disabled>Enviar hoja a cortar</button><div class="k40-actions"><button type="button" id="k40Frame" class="btn outline" disabled>Recorrer marco sin láser</button><button type="button" id="k40Cancel" class="btn outline" disabled>Cancelar y solicitar parada</button></div><button type="button" id="k40Acknowledge" class="btn outline wide" hidden disabled>Confirmar máquina detenida</button><p class="k40-note">Cancelar solicita un reinicio de la M2 y descarta el envío pendiente; no sustituye al paro físico. Confirma por separado cuando la máquina esté detenida. Las hojas siguientes se inician manualmente.</p></div></div></div>`;
+ dialog.innerHTML=`<header class="k40-header"><div><span class="eyebrow">LZ BOX · CONTROL DE MÁQUINA</span><h2>Mi K40</h2><p>M2 Nano · potencia en el panel físico</p></div><div class="k40-header-actions"><span class="k40-badge" id="k40Mode">Sin conectar</span><button type="button" class="icon-btn" id="k40Close" aria-label="Cerrar panel">×</button></div></header>
+ <div class="k40-layout"><section class="k40-canvas-panel" aria-label="Vista del trabajo"><div class="k40-section-heading"><h3>Área de trabajo</h3><label>Hoja<select id="k40Sheet"></select></label></div><div id="k40Preview" class="k40-preview"></div><p id="k40Summary" class="k40-summary"></p><p class="k40-note">Azul: interiores · verde: contornos. Se conserva el kerf y se eliminan tramos repetidos. La vista muestra el origen elegido.</p><button type="button" class="btn outline" id="k40Arrange">Volver a acomodar piezas</button>
+ <details class="k40-bed"><summary>Medidas de cama y desplazamiento</summary><div class="k40-fields"><label>Ancho · mm<input id="k40Width" type="number" min="50" max="2500" value="400"></label><label>Alto · mm<input id="k40Height" type="number" min="50" max="2500" value="400"></label><label>Desplazar X · mm<input id="k40X" type="number" min="0" step="0.1" value="0"></label><label>Desplazar Y · mm<input id="k40Y" type="number" min="0" step="0.1" value="0"></label></div><p class="k40-note">Las medidas deben coincidir con las del conector. En origen actual, el contorno del diseño se alinea al cabezal.</p></details></section>
+ <section class="k40-controls" aria-label="Controles de máquina"><details class="k40-pairing" id="k40BridgePanel" open><summary>Conexión con esta computadora</summary><p class="k40-note">El conector puede iniciar con Windows sin consola. Pega su código una vez y marca Recordar. Conectar no mueve la máquina. <a href="https://raw.githubusercontent.com/juandppuente2003-netizen/lz-studio-toolsPublic/codex/box-k40-m2/connectors/k40/LZ-K40-Windows.zip" target="_blank" rel="noopener">Descargar conector 0.4.0 para Windows</a>.</p><label for="k40Token">Código del conector</label><div class="k40-connect-row"><input id="k40Token" type="password" autocomplete="off" spellcheck="false"><button type="button" id="k40Connect" class="btn outline">Conectar</button></div><label class="k40-confirm"><input id="k40Remember" type="checkbox" checked>Recordar esta computadora</label><div class="k40-actions"><button type="button" id="k40Disconnect" class="btn quiet" disabled>Liberar USB para Sagaon</button><button type="button" id="k40Forget" class="btn quiet">Olvidar código</button></div></details>
+ <section class="k40-jog-panel"><div class="k40-section-heading"><h3>Mover cabezal</h3><span id="k40Position" class="k40-position">Sin referencia</span></div><div class="k40-motion-layout"><div class="k40-jog-pad"><button type="button" id="k40Up" class="k40-jog" aria-label="Mover hacia arriba">↑</button><button type="button" id="k40Left" class="k40-jog" aria-label="Mover hacia la izquierda">←</button><button type="button" id="k40Home" class="k40-home" title="Ir a la esquina superior izquierda">Home</button><button type="button" id="k40Right" class="k40-jog" aria-label="Mover hacia la derecha">→</button><button type="button" id="k40Down" class="k40-jog" aria-label="Mover hacia abajo">↓</button></div><div><label for="k40Step">Paso · mm</label><select id="k40Step"><option>0.1</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select><button type="button" id="k40UsePosition" class="btn outline wide">Usar esta posición como origen</button></div></div><p class="k40-note">Un clic = un movimiento. Haz Home una vez al conectar. Posición estimada; si mueves el cabezal a mano, libera USB y vuelve a establecer Home.</p></section>
+ <section class="k40-job-settings"><h3>Preparar hoja</h3><label for="k40Origin">Origen del trabajo</label><select id="k40Origin"><option value="home">Desde Home · esquina superior izquierda</option><option value="current">Desde la posición actual · sin volver a Home</option></select><p id="k40OriginNote" class="k40-note"></p><div class="k40-fields"><label>Velocidad · mm/s<input id="k40Speed" type="number" min="1" max="100" step="0.1" value="10"></label><label>Pasadas<input id="k40Passes" type="number" min="1" max="10" step="1" value="1"></label></div></section>
+ <label class="k40-confirm"><input id="k40Confirm" type="checkbox">Estoy junto a la máquina, revisé la potencia y el recorrido está libre. Autorizo el próximo movimiento o envío.</label>
+ <div id="k40Status" class="k40-status" role="status" aria-live="polite">Conecta el conector local para continuar.</div><progress id="k40Progress" class="k40-progress" max="100" value="0" aria-label="Datos enviados a la controladora" hidden></progress>
+ <div class="k40-run-actions"><button type="button" id="k40Frame" class="btn outline" disabled>Recorrer marco sin láser</button><button type="button" id="k40Run" class="btn primary" disabled>Enviar hoja a cortar</button></div><button type="button" id="k40Cancel" class="btn k40-stop wide" disabled>Cancelar y solicitar parada</button><button type="button" id="k40Acknowledge" class="btn outline wide" hidden disabled>Confirmar máquina detenida</button><p class="k40-note">Cancelar solicita parada por USB y descarta la cola; no sustituye al paro físico. El porcentaje mide datos enviados. La parada modificada requiere prueba con emisión físicamente deshabilitada.</p></section></div>`;
  document.body.append(dialog);
- const $=id=>dialog.querySelector('#'+id);let machine=null,job=null,prepared=null,requesting=false,active=false,timer=null,lastState=null,verifiedToken='',cancelling=false,usbProbing=false,usbSession=null,runEpoch=0;
- const isUSB=()=>$('k40Connection').value==='usb';
- const inputs=['k40Sheet','k40Speed','k40Passes','k40Width','k40Height','k40X','k40Y'];
- const status=(message,error=false)=>{ $('k40Status').textContent=message;$('k40Status').dataset.error=String(error);};
- function buttons(){const ready=!isUSB()&&!!machine&&!!job&&!requesting&&!usbProbing&&!active;$('k40Run').disabled=!ready||!$('k40Confirm').checked;$('k40Frame').disabled=!ready||!$('k40Confirm').checked;$('k40Cancel').disabled=!active||cancelling;$('k40Acknowledge').hidden=!active||!['sent','simulated','cancelled','error'].includes(lastState);$('k40Acknowledge').disabled=requesting||cancelling;$('k40USB').disabled=active||requesting||usbProbing||!!usbSession||!!machine;inputs.forEach(id=>$(id).disabled=active||requesting||usbProbing);$('k40Token').disabled=isUSB()||active||requesting||usbProbing;$('k40Connect').disabled=isUSB()||active||requesting||usbProbing;$('k40Arrange').disabled=active||requesting||usbProbing;$('k40Disconnect').disabled=!machine||active||requesting||usbProbing;$('k40Remember').disabled=active||requesting||usbProbing;$('k40Forget').disabled=active||requesting||usbProbing;$('k40Connection').disabled=active||requesting||usbProbing||!!usbSession||!!machine;$('k40USBDisconnect').disabled=!usbSession||usbProbing;}
- function refresh(){
-  prepared=null;$('k40Confirm').checked=false;
-  try{job=prepareK40Job(app,{sheet:+$('k40Sheet').value,speed:$('k40Speed').value,passes:$('k40Passes').value,bedWidth:$('k40Width').value,bedHeight:$('k40Height').value,offsetX:$('k40X').value,offsetY:$('k40Y').value});
+ const $=id=>dialog.querySelector('#'+id);
+ let machine=null,job=null,previewOK=false,requesting=false,active=false,cancelling=false,timer=null,lastState=null,verifiedToken='',epoch=0;
+ const inputs=['k40Sheet','k40Speed','k40Passes','k40Width','k40Height','k40X','k40Y','k40Origin'];
+ const motionIds=['k40Up','k40Left','k40Right','k40Down'];
+ const status=(message,error=false)=>{$('k40Status').textContent=message;$('k40Status').dataset.error=String(error);};
+ const hasPosition=()=>Array.isArray(machine?.position)&&machine.position.length===2&&machine.position.every(Number.isFinite);
+ function buttons(){
+  const idle=!!machine&&!requesting&&!active,ready=idle&&!!job&&previewOK&&$('k40Confirm').checked;
+  $('k40Run').disabled=!ready;$('k40Frame').disabled=!ready;$('k40Cancel').disabled=!active||cancelling;
+  $('k40Acknowledge').hidden=!active||!TERMINAL.includes(lastState);$('k40Acknowledge').disabled=requesting||cancelling;
+  inputs.forEach(id=>$(id).disabled=active||requesting);$('k40Step').disabled=active||requesting;
+  $('k40Token').disabled=active||requesting;$('k40Connect').disabled=active||requesting||!!machine;
+  $('k40Arrange').disabled=active||requesting;$('k40Disconnect').disabled=!idle;$('k40Remember').disabled=active||requesting;$('k40Forget').disabled=active||requesting;
+  $('k40Home').disabled=!idle||!$('k40Confirm').checked;motionIds.forEach(id=>$(id).disabled=!idle||!hasPosition()||!$('k40Confirm').checked);
+  $('k40UsePosition').disabled=!idle||!hasPosition();
+  $('k40Position').textContent=hasPosition()?`X ${machine.position[0].toFixed(2)} · Y ${machine.position[1].toFixed(2)} mm · estimada`:'Sin referencia';
+ }
+ function refresh(announce=true){
+  job=null;previewOK=false;
+  try{
+   job=prepareK40Job(app,{sheet:+$('k40Sheet').value,speed:$('k40Speed').value,passes:$('k40Passes').value,bedWidth:$('k40Width').value,bedHeight:$('k40Height').value,offsetX:$('k40X').value,offsetY:$('k40Y').value});
    if(machine&&(job.bed.width!==machine.bed.width||job.bed.height!==machine.bed.height))throw Error('Las medidas deben coincidir con la cama configurada en el conector.');
-   $('k40Preview').innerHTML=k40Preview(job);const s=job.summary;$('k40Summary').textContent=`Hoja ${job.sheet} · ${s.pieces} piezas · ${s.paths} trayectorias · ${(s.cutLengthMm/1000).toFixed(2)} m de corte. Mínimo de corte: ${Math.ceil(s.minimumCutSeconds)} s, más desplazamientos y aceleraciones.`;
-   if(!active)status(isUSB()?(usbSession?'USB conectado directamente. No necesita código. El envío de cortes por WebUSB aún no está implementado.':'Conecta el USB directamente. Este modo no necesita código; el envío de cortes aún está pendiente.'):machine?'Hoja revisada. Confirma la preparación para habilitar el envío.':'Plano listo. Conecta el puente local para continuar.');
-  }catch(e){job=null;$('k40Preview').textContent=e.message;$('k40Summary').textContent='';if(!active)status(e.message,true);}buttons();
+   const current=$('k40Origin').value==='current',view=current?placeK40Job(job,machine?.position):job;
+   $('k40Preview').innerHTML=k40Preview(view);
+   if(hasPosition()){
+    const svg=$('k40Preview').querySelector('svg'),marker=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    marker.setAttribute('cx',machine.position[0]);marker.setAttribute('cy',machine.position[1]);marker.setAttribute('r','2');marker.setAttribute('fill','#f3c983');marker.setAttribute('stroke','#151c18');marker.setAttribute('stroke-width','0.8');svg.append(marker);
+   }
+   $('k40OriginNote').textContent=current?'El contorno superior izquierdo se alinea al cabezal. Al terminar vuelve a este origen; no ejecuta Home.':'El envío ejecuta Home y vuelve a esa esquina al terminar.';
+   const s=job.summary;$('k40Summary').textContent=`Hoja ${job.sheet} · ${s.pieces} piezas · ${s.paths} trayectorias · ${(s.cutLengthMm/1000).toFixed(2)} m. Tiempo mínimo de corte: ${Math.ceil(s.minimumCutSeconds)} s, más movimientos y aceleraciones.`;
+   previewOK=true;if(announce&&!active)status(machine?'Trabajo revisado. Confirma la preparación para mover o enviar.':'Plano listo. Conecta el conector local para continuar.');
+  }catch(e){$('k40Preview').textContent=e.message;$('k40Summary').textContent='';if(announce&&!active)status(e.message,true);}
+  buttons();
  }
  async function api(path,body){
-  if(isUSB())throw Error('USB directo no utiliza el conector por código.');
-  const token=$('k40Token').value.trim();if(!token)throw Error('Pega el código que muestra el conector local.');
-  let response;try{response=await fetch(ADDRESS+path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(path==='/prepare'?60000:12000),cache:'no-store'});}catch{throw Error('No se pudo comunicar con el conector. Comprueba que esté abierto en esta computadora y permite el acceso a la red local si el navegador lo solicita.');}
-  const result=await response.json();if(!response.ok){if(response.status===401)throw Error('El código ya no es válido. Pega el código actual del conector y vuelve a emparejar.');throw Error(result.error||'El conector rechazó la solicitud.');}return result;
+  const token=$('k40Token').value.trim();if(!token)throw Error('Pega el código del conector una vez y marca Recordar esta computadora.');
+  let response;try{response=await fetch(ADDRESS+path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(path==='/prepare'?60000:12000),cache:'no-store'});}catch{throw Error('No se pudo comunicar con el conector. Comprueba que esté iniciado y permite el acceso a la red local si Chrome lo solicita.');}
+  const result=await response.json();if(!response.ok)throw Error(response.status===401?'El código no es válido. Copia el código permanente desde Abrir conector.':result.error||'El conector rechazó la solicitud.');return result;
  }
- function storedCode(){try{return document.defaultView.localStorage.getItem(PAIRING_KEY)||'';}catch{return '';}}
- function forgetCode(){try{document.defaultView.localStorage.removeItem(PAIRING_KEY);return true;}catch{return false;}}
+ function savedCode(){try{return document.defaultView.localStorage.getItem(PAIRING_KEY)||'';}catch{return '';}}
+ function forgetCode(){try{document.defaultView.localStorage.removeItem(PAIRING_KEY);}catch{}}
  function rememberCode(){
-  if(!$('k40Remember').checked)return forgetCode();
+  if(!$('k40Remember').checked){forgetCode();return true;}
   if(!verifiedToken||verifiedToken!==$('k40Token').value.trim())return false;
-  try{document.defaultView.localStorage.setItem(PAIRING_KEY,verifiedToken);return true;}catch{$('k40Remember').checked=false;return false;}
+  try{document.defaultView.localStorage.setItem(PAIRING_KEY,verifiedToken);return true;}catch{return false;}
+ }
+ function setMachine(info){machine=info;$('k40Mode').textContent=info.simulation?'SIMULACIÓN · sin USB':'M2 USB · conectada';$('k40Width').value=info.bed.width;$('k40Height').value=info.bed.height;buttons();}
+ function stopPolling(){clearInterval(timer);timer=null;}
+ function startPolling(){stopPolling();timer=setInterval(poll,700);}
+ async function connect(){
+  if(requesting||active||machine)return;requesting=true;buttons();status('Conectando con la M2…');
+  try{
+   const info=await api('/status');if(!['persistent-pairing','disconnect','priority-stop','jog','current-origin'].every(feature=>info.features?.includes(feature)))throw Error('Actualiza y reinicia el conector local a la versión 0.4.0 para usar movimientos y origen actual.');
+   if(info.protocol!==K40_PROTOCOL||info.board!=='M2')throw Error('El conector no es compatible con M2.');
+   if(['sending',...TERMINAL].includes(info.state)){setMachine(info);active=true;lastState=info.state;startPolling();status(info.message+' Se recuperó la operación pendiente; no se reenvió.');}
+   else{setMachine(await api('/connect',{}));status(machine.simulation?'Conectado en simulación. No se abre USB.':'M2 conectada. Haz Home una vez para habilitar las flechas.');}
+   verifiedToken=$('k40Token').value.trim();if(!rememberCode())status('Conectado, pero este navegador no permitió guardar el código.',true);
+   $('k40BridgePanel').open=false;refresh(false);
+  }catch(e){machine=null;$('k40BridgePanel').open=true;status(e.message,true);}finally{requesting=false;buttons();}
  }
  async function disconnect(){
-  if(active||requesting)return false;
-  requesting=true;buttons();
-  try{await api('/disconnect',{});machine=null;verifiedToken='';prepared=null;$('k40Mode').textContent='Sin conectar';$('k40Confirm').checked=false;status('USB liberado. Ya puedes abrir Sagaon/K40 Whisperer.');return true;}
-  catch(e){status(e.message+' Si no puedes liberar el USB, cierra la ventana del conector local.',true);return false;}
-  finally{requesting=false;buttons();}
+  if(active||requesting)return false;requesting=true;buttons();
+  try{await api('/disconnect',{});machine=null;verifiedToken='';$('k40Mode').textContent='Sin conectar';$('k40Confirm').checked=false;refresh(false);status('USB liberado. Ya puedes abrir Sagaon. La posición se restablecerá con Home al reconectar.');return true;}
+  catch(e){status(e.message,true);return false;}finally{requesting=false;buttons();}
  }
- async function connect(){if(isUSB())return;requesting=true;buttons();status('Comprobando el conector y la máquina…');try{const info=await api('/status');if(!info.features?.includes('persistent-pairing')||!info.features?.includes('disconnect')||!info.features?.includes('priority-stop'))throw Error('Actualiza y reinicia el conector local para usar la cancelación corregida.');machine=await api('/connect',{});if(machine.protocol!==K40_PROTOCOL||machine.board!=='M2')throw Error('El conector no es compatible con M2.');verifiedToken=$('k40Token').value.trim();const remembered=rememberCode();$('k40Width').value=machine.bed.width;$('k40Height').value=machine.bed.height;$('k40Mode').textContent=machine.simulation?'SIMULACIÓN · sin USB':'USB · experimental';refresh();status(machine.simulation?'Conectado en simulación: no se moverá ni disparará el láser.':'M2 conectada por USB. Revisa las medidas y prepara el marco antes de cortar.');if($('k40Remember').checked&&!remembered)status('Conectado, pero el navegador no permitió guardar el emparejamiento.',true);}catch(e){machine=null;status(e.message,true);}finally{requesting=false;buttons();}}
+ function consume(s){
+  if(machine)machine={...machine,...s};lastState=s.state;
+  if(s.state==='idle'&&active){active=false;stopPolling();$('k40Progress').hidden=true;refresh(false);status(s.message);}
+  else if(s.state==='sending'){$('k40Progress').hidden=false;$('k40Progress').value=s.percent;status(s.operation==='home'||s.operation==='jog'?'Moviendo cabezal. Esperando fin de la controladora…':`Enviando ${s.percent}% de datos. No mide el avance físico del corte.`);}
+  else if(TERMINAL.includes(s.state)){if(!['home','jog'].includes(s.operation)||s.state!=='sent')stopPolling();status(s.message,s.state==='error');}
+  buttons();
+ }
  async function poll(){
-  const epoch=runEpoch;try{const s=await api('/status');if(epoch!==runEpoch)return;if(s.state==='sending'){$('k40Progress').hidden=false;$('k40Progress').value=s.percent;status(`Enviando a la M2: ${s.percent}% de datos. Esto no mide el avance físico del corte.`);}else if(s.state==='sent'||s.state==='simulated'||s.state==='cancelled'||s.state==='error'){
-   // Keep the machine locked until the operator verifies it has physically stopped.
-   clearInterval(timer);timer=null;status(s.message,s.state==='error');lastState=s.state;buttons();
-  }}catch(e){clearInterval(timer);timer=null;status(e.message+' No reenvíes el trabajo. Verifica la máquina y usa su paro físico si es necesario.',true);lastState='unknown';buttons();}
+  const generation=epoch;try{const s=await api('/status');if(generation===epoch)consume(s);}catch(e){if(generation!==epoch)return;stopPolling();lastState='unknown';if(machine)machine.position=null;status(e.message+' No reenvíes. Comprueba la máquina y usa su paro físico si continúa.',true);buttons();}
  }
  async function run(mode){
-  if(isUSB()||!job||!machine||requesting||active||!$('k40Confirm').checked)return;
-  let epoch;requesting=true;buttons();status('Preparando las instrucciones para M2…');
-  try{prepared=await api('/prepare',{job,mode});if(!prepared.id)throw Error('El conector no devolvió un trabajo válido.');
-   active=true;lastState=null;epoch=++runEpoch;buttons();await api('/run',{id:prepared.id,confirmed:true});if(epoch!==runEpoch)return;$('k40Confirm').checked=false;$('k40Progress').value=0;status(machine.simulation?'Comprobando el trabajo en simulación…':'Enviando el trabajo. Mantente junto a la máquina.');timer=setInterval(poll,1000);await poll();
-  }catch(e){if(epoch!==undefined&&epoch!==runEpoch)return;status(e.message,true);if(active){lastState='unknown';buttons();}}finally{requesting=false;buttons();}
+  if(!job||!machine||requesting||active||!previewOK||!$('k40Confirm').checked)return;
+  let generation;requesting=true;buttons();status('Preparando instrucciones M2…');
+  try{
+   const prepared=await api('/prepare',{job,mode,origin:$('k40Origin').value});if(!prepared.id)throw Error('El conector no preparó un trabajo válido.');
+   active=true;lastState=null;generation=++epoch;buttons();const result=await api('/run',{id:prepared.id,confirmed:true});if(generation!==epoch)return;
+   $('k40Confirm').checked=false;consume(result);if(result.state==='sending')startPolling();await poll();
+  }catch(e){if(generation!==undefined&&generation!==epoch)return;status(e.message,true);if(active)lastState='unknown';}finally{requesting=false;buttons();}
  }
- $('k40Connect').onclick=connect;$('k40Run').onclick=()=>run('cut');$('k40Frame').onclick=()=>run('frame');$('k40Confirm').onchange=buttons;
- $('k40Cancel').onclick=async()=>{if(!active||cancelling)return;cancelling=true;++runEpoch;clearInterval(timer);timer=null;buttons();status('Solicitando parada de la M2…');try{
-  await api('/cancel',{confirmed:true});await poll();
- }catch(e){lastState='unknown';status(e.message+' Usa el paro físico si continúa funcionando.',true);}finally{cancelling=false;buttons();}};
- $('k40Acknowledge').onclick=async()=>{if(requesting||cancelling)return;requesting=true;buttons();try{
-  await api('/acknowledge',{confirmed:true});active=false;prepared=null;lastState=null;machine=null;$('k40Mode').textContent='Sin conectar';$('k40Progress').hidden=true;refresh();
- }catch(e){status(e.message,true);}finally{requesting=false;buttons();}};
- function connectionView(){
-  $('k40USBPanel').hidden=!isUSB();$('k40BridgePanel').hidden=isUSB();$('k40SendPanel').hidden=isUSB();
-  $('k40Mode').textContent=isUSB()?(usbSession?'USB directo conectado':'USB directo · sin conectar'):(machine?(machine.simulation?'SIMULACIÓN · sin USB':'Conector local · USB'):'Conector local · sin conectar');
-  refresh();
+ async function motion(action,dx=0,dy=0){
+  if(!machine||requesting||active||!$('k40Confirm').checked)return;
+  requesting=true;active=true;lastState=null;const generation=++epoch;buttons();status(action==='home'?'Solicitando Home…':'Solicitando movimiento…');
+  try{const result=await api('/motion',{action,dx,dy,confirmed:true});if(generation!==epoch)return;consume(result);if(active)startPolling();}
+  catch(e){if(generation!==epoch)return;await poll();if(!active)status(e.message,true);else{lastState='unknown';status(e.message+' Verifica la máquina antes de continuar.',true);}}
+  finally{requesting=false;buttons();}
  }
- $('k40Connection').onchange=connectionView;
- async function releaseUSB(){if(!usbSession)return true;try{await usbSession.disconnect();usbSession=null;$('k40USBStatus').textContent='USB liberado.';connectionView();return true;}catch(e){status('No se pudo liberar el USB: '+e.message,true);return false;}}
- $('k40USBDisconnect').onclick=releaseUSB;
- $('k40USB').onclick=async()=>{if(!isUSB()||active||requesting||usbProbing||usbSession||machine)return;usbProbing=true;buttons();status('Selecciona el dispositivo en Chrome y pulsa Conectar en esa ventana.');$('k40USBStatus').textContent='Esperando selección del USB…';try{
-  usbSession=await connectM2USB(document.defaultView.navigator.usb);
-  $('k40USBStatus').textContent=`${usbSession.info.name} (1a86:5512) conectado por WebUSB. Sin código ni conector local.`;
-  connectionView();
- }catch(e){$('k40USBStatus').textContent=e.message;status(e.message,true);}finally{usbProbing=false;buttons();}};
- document.defaultView.navigator.usb?.addEventListener?.('disconnect',event=>{if(usbSession?.device===event.device){usbSession=null;$('k40USBStatus').textContent='Se desconectó el cable USB.';connectionView();}});
- $('k40Disconnect').onclick=disconnect;
- $('k40Remember').onchange=()=>{if(!$('k40Remember').checked)forgetCode();else if(verifiedToken){if(rememberCode())status('Computadora recordada. Los cortes siguen requiriendo tu confirmación.');else status('El navegador no permitió guardar el emparejamiento.',true);}};
- $('k40Forget').onclick=async()=>{if(machine&&!await disconnect())return;forgetCode();$('k40Remember').checked=false;$('k40Token').value='';verifiedToken='';status('Emparejamiento eliminado de este navegador.');};
- inputs.forEach(id=>$(id).addEventListener('input',refresh));
- async function close(){if(usbProbing)return false;if(active||requesting){status('Confirma primero que la máquina se detuvo. El conector conserva el trabajo aunque cierres esta página.',true);return;}if(usbSession&&!await releaseUSB())return false;if(machine&&!await disconnect())return false;clearInterval(timer);timer=null;$('k40Token').value='';machine=null;verifiedToken='';dialog.close();return true;}
+ $('k40Connect').onclick=connect;$('k40Disconnect').onclick=disconnect;$('k40Run').onclick=()=>run('cut');$('k40Frame').onclick=()=>run('frame');$('k40Confirm').onchange=buttons;
+ $('k40Home').onclick=()=>motion('home');
+ for(const [id,x,y] of [['k40Up',0,-1],['k40Left',-1,0],['k40Right',1,0],['k40Down',0,1]])$(id).onclick=()=>motion('jog',x*Number($('k40Step').value),y*Number($('k40Step').value));
+ $('k40UsePosition').onclick=()=>{if(active||requesting||!hasPosition())return;$('k40Origin').value='current';$('k40Confirm').checked=false;refresh();};
+ $('k40Cancel').onclick=async()=>{
+  if(!active||cancelling)return;cancelling=true;++epoch;stopPolling();buttons();status('Solicitando parada de la M2…');
+  try{consume(await api('/cancel',{confirmed:true}));}catch(e){lastState='unknown';if(machine)machine.position=null;status(e.message+' Usa el paro físico si continúa.',true);}finally{cancelling=false;buttons();}
+ };
+ $('k40Acknowledge').onclick=async()=>{
+  if(requesting||cancelling)return;requesting=true;buttons();
+  try{const result=await api('/acknowledge',{confirmed:true});active=false;lastState=null;stopPolling();$('k40Confirm').checked=false;$('k40Progress').hidden=true;if(result.connected)setMachine(result);else{machine=null;$('k40Mode').textContent='Sin conectar';}refresh(false);status(result.message);}
+  catch(e){status(e.message,true);}finally{requesting=false;buttons();}
+ };
+ $('k40Remember').onchange=()=>{if(!$('k40Remember').checked)forgetCode();else rememberCode();};
+ $('k40Forget').onclick=async()=>{if(machine&&!await disconnect())return;forgetCode();$('k40Remember').checked=false;$('k40Token').value='';verifiedToken='';status('Código olvidado en este navegador.');};
+ inputs.forEach(id=>$(id).addEventListener('input',()=>{$('k40Confirm').checked=false;refresh();}));
+ async function close(){if(active||requesting){status('Espera o cancela la operación y confirma que la máquina se detuvo.',true);return false;}if(machine&&!await disconnect())return false;stopPolling();$('k40Token').value='';verifiedToken='';dialog.close();return true;}
  $('k40Close').onclick=close;dialog.addEventListener('cancel',e=>{e.preventDefault();close();});$('k40Arrange').onclick=async()=>{if(await close())app.setView('2d');};
- launch.onclick=()=>{lastState=null;const saved=storedCode();$('k40Token').value=saved;$('k40Remember').checked=!!saved;$('k40Sheet').replaceChildren(...Array.from({length:app.packed?.count||1},(_,i)=>{const o=document.createElement('option');o.value=i;o.textContent='Hoja '+(i+1);return o;}));$('k40Connection').value='usb';dialog.showModal();connectionView();};
- app.onUpdate(()=>{if(dialog.open&&!active&&!requesting)refresh();});
- return {dialog,refresh};
+ launch.onclick=()=>{
+  lastState=null;$('k40Confirm').checked=false;const saved=savedCode();$('k40Token').value=saved;$('k40Remember').checked=true;$('k40BridgePanel').open=!saved;
+  $('k40Sheet').replaceChildren(...Array.from({length:app.packed?.count||1},(_,i)=>{const option=document.createElement('option');option.value=i;option.textContent='Hoja '+(i+1);return option;}));
+  dialog.showModal();refresh();if(saved)connect();
+ };
+ app.onUpdate(()=>{if(dialog.open&&!active&&!requesting)refresh();});return {dialog,refresh};
 }
 if(typeof document!=='undefined'){
  if(globalThis.lzApp)mountK40(globalThis.lzApp);else{let count=0;const wait=setInterval(()=>{if(globalThis.lzApp||++count>200){clearInterval(wait);if(globalThis.lzApp)mountK40(globalThis.lzApp);}},25);}

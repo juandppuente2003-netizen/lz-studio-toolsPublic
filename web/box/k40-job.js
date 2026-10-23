@@ -42,3 +42,15 @@ export function k40Preview(job){
  const {width,height}=job.bed;
  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Recorrido de la hoja seleccionada"><rect width="${width}" height="${height}" fill="none" stroke="currentColor" stroke-width="0.6"/>${job.paths.map(p=>`<path d="M${p.points.map(q=>q.join(' ')).join('L')}${p.closed?'Z':''}" fill="none" stroke="${p.role==='hole'?'#78b1f3':'#86ccaa'}" stroke-width="0.7"/>`).join('')}</svg>`;
 }
+
+/** Anchor the design's upper-left bounding point to the tracked head position. */
+export function placeK40Job(job,position){
+ if(!Array.isArray(position)||position.length!==2||!position.every(Number.isFinite))throw Error('Haz Home una vez para establecer la posición del cabezal.');
+ const minimum=[0,1].map(axis=>Math.min(...job.paths.flatMap(path=>path.points.map(p=>p[axis]))));
+ const paths=job.paths.map(path=>({...path,points:path.points.map(p=>p.map((n,axis)=>{
+  const value=Math.round((n-minimum[axis]+position[axis])*1e6)/1e6;
+  if(value<0||value>(axis===0?job.bed.width:job.bed.height))throw Error('El diseño excede la cama desde esta posición. Mueve el cabezal o reduce el área de corte.');
+  return value;
+ }))}));
+ return {...job,paths};
+}

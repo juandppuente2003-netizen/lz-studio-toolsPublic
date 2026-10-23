@@ -1,170 +1,118 @@
-# LZ Box → K40 M2 · primera versión experimental
+# LZ K40 · conector 0.4.0 para Box Studio
 
-Conecta el plano de Box con una M2 Nano por USB mediante un puente local.
-El sitio sigue en GitHub/Vercel; el acceso USB ocurre en la computadora del taller.
-No hace falta descargar/importar SVG o DXF para cada trabajo. El motor convierte
-las coordenadas ya compensadas por kerf a LHYMicro-GL usando MeerK40t 0.9.9100.
+Control por USB para M2 Nano conservando libusb-win32 y Sagaon/K40 Whisperer.
+El navegador usa un conector local; no hay que descargar/importar diseños para
+cada trabajo. La potencia se ajusta en el panel físico de la M2.
 
-## Estado de esta entrega
+## Instalar o actualizar una vez en Windows
 
-- Integrados: selección de hoja, vista de trayectorias, velocidad, pasadas,
-  desplazamiento, bloqueo de superposiciones y límites, marco sin disparo y envío.
-- La simulación genera instrucciones con el controlador M2 real de MeerK40t,
-  pero nunca abre USB. Se distingue del modo USB en pantalla y en el conector.
-- Comprobados en Linux: compilación, HTTP local, validaciones, repetición de
-  trabajos, pérdida de conexión y flujo del panel mediante DOM automatizado.
-- Pendientes: instalación en Windows, compatibilidad del driver USB existente,
-  revisión visual en navegador de la nueva versión y prueba física supervisada.
-  No se declara listo para producción ni idéntico a K40 Whisperer.
+1. Termina cualquier trabajo. Cierra el conector anterior y Sagaon.
+2. Extrae **LZ-K40-Windows.zip** en una carpeta fija, por ejemplo
+   `Documentos\LZ-K40`. No lo ejecutes dentro del ZIP ni borres/muevas esa carpeta.
+3. Ejecuta **instalar-windows.bat**. Requiere Python 3.10 o posterior con el comando
+   `py` y Tkinter de la instalación oficial. Instala dependencias en su `.venv`,
+   comprueba el motor sin USB, activa el inicio automático y abre el panel local.
+4. Pulsa **Copiar código** y pégalo una vez en Box. Deja **Recordar esta computadora**
+   marcado. Si ya estaba emparejado, el código se conserva y no se repite este paso.
+5. En adelante, el conector inicia en segundo plano al iniciar sesión en Windows.
+   Abre Box y pulsa **Controlar mi K40**: el panel recupera el código e intenta
+   conectar. No inicia movimientos ni cortes al abrirse.
 
-## Preparación en Windows
+El inicio automático escribe únicamente el valor `LZStudioK40` en
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`; ejecuta `pythonw.exe`
+con `background.pyw`, sin consola. No instala servicios ni pide administrador.
+No abre/retiene USB hasta conectar desde Box. No modifica drivers ni Sagaon.
+El perfil de segundo plano usa cama **400 × 400 mm**, no una calibración.
 
-1. Instala Python 3.10 o posterior desde su fuente oficial, con `py` disponible.
-2. Descarga esta carpeta desde la rama de desarrollo del repositorio.
-3. Abre `instalar-windows.bat`. Crea un entorno local e instala las dependencias.
-4. Abre `simular-windows.bat` y deja esa ventana abierta.
-5. En la versión de Box que incluye este cambio, pulsa **Cortar en mi K40**.
-   Copia el código del conector en el campo y pulsa **Conectar**.
-6. Revisa el trabajo y ejecuta la simulación. El estado debe indicar SIMULACIÓN.
+Para abrir el panel local manualmente usa **abrir-conector.vbs**. Permite copiar
+el código, ver el estado, abrir Box y activar/desactivar el inicio automático.
+**Cerrar conector** rechaza la operación si hay trabajo pendiente. Cerrar solo
+la ventana del panel mantiene el conector en segundo plano.
 
-El código del conector se conserva al reiniciar. Marca **Recordar esta computadora**
-después de pegarlo y conectar: el navegador lo recupera en las siguientes visitas.
-Se guarda únicamente en ese perfil y origen del navegador; borrar sus datos, usar
-modo privado, cambiar de navegador/sitio o restablecer el código requiere emparejar
-otra vez. El secreto local vive en el directorio de datos de tu usuario, fuera del
-proyecto. No se incluye en URLs ni se envía a Vercel. **Olvidar esta computadora**
-borra el emparejamiento de ese navegador. Para invalidar todos los códigos guardados,
-cierra el conector e inícialo con `--reset-pairing`. El puente solo escucha en `127.0.0.1:17840`; nunca en la red del taller.
-Permite únicamente los orígenes HTTPS de lzstudiotools.com y la URL exacta de
-esta versión de prueba; no se permiten comodines de Vercel.
-Chrome/Edge pueden solicitar permiso de red local; los navegadores que bloqueen
-estas peticiones no podrán conectar. No se ha verificado Safari/iPhone.
+**desactivar-inicio-windows.bat** quita exclusivamente su entrada de inicio para
+las próximas sesiones. **activar-inicio-windows.bat** la vuelve a crear y arranca
+el conector. Si mueves la carpeta, vuelve a activar desde la nueva ubicación.
 
-## Usar también Sagaon/K40 Whisperer
+## Mover el cabezal y elegir origen
 
-Si aparece **No module named 'PIL'**, a la instalación anterior le falta Pillow.
-Cierra el conector, actualiza `requirements.txt` y `instalar-windows.bat` desde
-esta rama y vuelve a ejecutar el instalador. También puedes abrir una terminal en
-esta carpeta y ejecutar `.venv\Scripts\python.exe -m pip install Pillow==12.3.0`.
-Después vuelve a abrir el conector. Esto no cambia los drivers ni borra el código
-de emparejamiento. El instalador actualizado verifica que el motor M2 arranque
-sin abrir el USB antes de anunciar que terminó.
+1. Con la emisión físicamente deshabilitada, conecta y confirma que el recorrido
+   esté libre. Pulsa **Home** una vez para establecer la referencia de la sesión.
+2. Usa las flechas: un clic es un movimiento de 0.1, 1, 5, 10, 25 o 50 mm.
+   No se acumulan pulsaciones mientras la controladora no indique fin.
+3. En la posición deseada pulsa **Usar esta posición como origen**. La vista
+   alinea la esquina superior izquierda del contorno del diseño con el cabezal.
+4. Prueba **Recorrer marco sin láser**. En origen actual no se ejecuta Home.
+   Al terminar el marco o corte vuelve al origen elegido, no al otro lado de la cama.
+5. Valida direcciones, escala, límites y cancelación antes de habilitar la emisión.
+   Después puedes enviar la hoja desde Box, sin descargar SVG/DXF.
 
-El instalador crea su propio entorno Python; no instala, reemplaza ni desinstala
-drivers USB y no modifica los archivos ni ajustes de Sagaon/K40 Whisperer.
-El acceso al USB se toma solo al pulsar **Conectar** en modo USB; recordar el código
-no conecta automáticamente ni inicia movimientos. Usa un programa a la vez:
+La posición es **estimada a partir de las órdenes**, no medida por un encoder.
+Se descarta al cancelar, perder comunicación, reiniciar o liberar el USB. Si mueves
+el cabezal a mano, libera/reconecta y establece Home. El modo **Desde Home** sigue
+existiendo para los trabajos que deban referenciarse a la esquina de la cama.
 
-1. Termina el trabajo y confirma que la máquina se detuvo.
-2. Pulsa **Desconectar y liberar USB**, o cierra el panel de K40 para liberarlo.
-   También puedes cerrar la ventana del conector local.
-3. Abre tu programa habitual. Para volver a Box, libera/cierra el otro programa
-   y pulsa **Conectar**. El emparejamiento permanece guardado.
+El conector valida nuevamente los límites después de situar el diseño en el
+origen actual. No envía coordenadas EGV arbitrarias, comandos de consola ni archivos
+recibidos por HTTP. Los movimientos se compilan con el driver M2 de MeerK40t
+0.9.9100; Home, flechas y marco no incluyen órdenes de encendido del láser.
+El motor requiere confirmación de cada paquete; una comunicación fallida no se
+reanuda automáticamente. Las pruebas de protocolo no sustituyen la prueba física.
 
-La liberación del motor está probada con pruebas automatizadas; la compatibilidad
-física del driver existente sigue pendiente en tu PC. Si un driver no es compatible,
-no lo sustituyas sin revisar cómo conservar el funcionamiento de tu programa actual.
+## Cancelación y uso de Sagaon
 
-Para esta actualización reemplaza el conector anterior por los nuevos archivos y
-reinícialo; la web te indicará si tu conector es demasiado antiguo.
+**Cancelar y solicitar parada** permanece disponible durante envío y fin de datos.
+Descarta la cola y solicita el reinicio prioritario soportado por MeerK40t.
+No sustituye al paro físico: si continúa, utiliza el paro físico de la máquina.
+**Confirmar máquina detenida** es otro botón y se usa tras verificar la parada.
+El porcentaje solo mide datos transmitidos. La parada modificada requiere
+validación física con emisión deshabilitada antes de otro corte.
 
-## Primera prueba USB, siempre junto a la máquina
+Después de confirmar un trabajo normal se conserva la conexión y el origen,
+para evitar reconectar en cada hoja. Después de cancelación/error se descarta la
+posición y se requiere reconectar. Para Sagaon pulsa **Liberar USB para Sagaon**.
+Usa solo un programa a la vez. No se garantiza que WebUSB funcione con libusb-win32;
+este panel vuelve al conector local que funcionó con el driver existente.
 
-1. Confirma la cama útil REAL y que Home sea la esquina superior izquierda.
-   El perfil inicial es **400 × 400 mm**, editable en `usb-windows.bat` con
-   `--width` y `--height`. No es una medición ni una calibración de tu equipo.
-2. Cierra Sagaon Laser/K40 Whisperer para liberar el USB. Esta entrega no cambia
-   los drivers instalados. Si no conecta, diagnostica el driver antes de cambiarlo.
-3. Cierra el simulador y abre `usb-windows.bat`.
-4. Conecta desde Box con el nuevo código. Debe indicar **USB · experimental**.
-5. Haz primero **Recorrer marco sin láser**, con la emisión del láser físicamente
-   deshabilitada. El trabajo vuelve a Home antes de recorrer el contorno.
-6. Durante el marco, pulsa **Cancelar y solicitar parada**, manteniendo la emisión
-   físicamente deshabilitada. Comprueba que se detiene. La parada modificada todavía
-   requiere esta validación física: no hagas otro corte hasta comprobarla.
-7. Tras verificar parada, escala, dirección y límites, haz un corte sencillo de prueba.
-   Ajusta la potencia en el panel físico; la M2 no recibe un porcentaje de potencia.
+## Emparejamiento y recuperación
 
-Cada envío establece Home; no se admite un origen relativo a una posición
-desconocida. Las hojas se procesan una por una, con confirmación individual.
-Los interiores van primero, luego los contornos. Pasadas: 1–10, velocidad: 1–100
-mm/s; estos límites de software NO son parámetros recomendados para tu material.
+El secreto se conserva en `%LOCALAPPDATA%\LZStudioTools\K40\pairing.json`, fuera
+del código. No se incluye en URLs ni se manda a Vercel. El navegador lo guarda
+únicamente para el origen/perfil actual si marcas Recordar. Cambiar entre la URL
+de prueba y producción requiere emparejar ese origen una vez. Olvidar código lo
+borra de ese navegador. `bridge.py --reset-pairing` lo rota al iniciar el conector.
 
-**Cancelar y solicitar parada no es un paro de emergencia.** Ahora solicita el
-reinicio prioritario soportado por el controlador M2 de MeerK40t, descarta las colas
-pendientes y deja que se transmita ese reinicio antes de terminar el transporte.
-La versión anterior solo cancelaba datos en la computadora. Además, el botón de
-cancelación se conserva cuando termina el envío de datos y funciona mientras la
-respuesta de envío siga pendiente. **Confirmar máquina detenida** es otro botón:
-solo libera el trabajo tras tu verificación física; no envía ninguna parada.
-El porcentaje corresponde a datos enviados, no al avance físico. Hay que actualizar
-la web y el conector a 0.3.0; la web rechaza el conector anterior para este flujo.
-Si se pierde USB, el puente abandona la cola en lugar de reconectarla y continuar.
-No reinicies un corte interrumpido sin revisar la pieza y la posición.
+El conector escucha solo en **127.0.0.1:17840**, con Origin exacto y token. Una
+segunda instancia no reemplaza el código. El registro local de errores está en
+el mismo directorio de datos (`connector.log`) y no registra el código.
+Si cierras/reabres el panel web durante una operación, recupera el estado sin
+reenviar el trabajo. No prepares de nuevo un corte cuya respuesta se haya perdido.
 
-## Probar acceso USB directamente desde el navegador
+## Verificación y desarrollo
 
-El panel abre por defecto en **USB directo · sin código**. Pulsa **Conectar USB
-directo**, sin abrir el conector local, y selecciona
-el CH341 de la máquina. Cierra Sagaon y el conector antes de hacerlo. WebUSB requiere
-HTTPS y un navegador que lo implemente (por ejemplo Chrome de escritorio).
-
-La prueba filtra el USB `1a86:5512`, abre su interfaz de datos y conserva la conexión
-hasta pulsar **Desconectar USB** o cerrar el panel. Si falla, intenta liberarla. No cambia drivers, no inicializa el modo paralelo,
-no envía comandos del fabricante ni instrucciones de movimiento o láser.
-Un resultado correcto confirma acceso al CH341; no identifica por sí solo la placa
-M2 ni valida corte o parada. El modo USB oculta y deshabilita el campo de código y los controles de envío
-que dependen del conector. No hace peticiones al servicio local. Para usar el
-flujo anterior, elige **Conector local · con código** antes de conectar.
-**El envío de cortes sigue usando el conector local**:
-el transporte completo por WebUSB aún no está implementado.
-
-Windows necesita un controlador compatible con WinUSB para WebUSB. Si aparece
-pero no se puede abrir, no cambies el driver a ciegas: primero hay que comprobar
-cómo mantener Sagaon/K40 Whisperer funcionando. Referencias de Chrome:
-https://developer.chrome.com/docs/capabilities/usb y
-https://developer.chrome.com/docs/capabilities/build-for-webusb .
-
-## Desarrollo y comprobaciones
-
-Desde la raíz del repositorio:
+- Probados en Linux: compilador real M2 sin abrir USB; movimientos y fin de
+  controladora con transporte de prueba; origen, límites, cancelación, sesión,
+  persistencia del código y arranque/cierre HTTP en segundo plano sin USB.
+- Probado el flujo DOM del panel, geometría de 17 modelos y vista de origen actual.
+- La instalación, el panel Tkinter y la entrada de inicio requieren verificación
+  en Windows. Las pruebas del registro usan un sustituto, no modifican el sistema.
+- Pendientes: revisión visual en navegador del nuevo panel y prueba física con
+  emisión deshabilitada. No se declara idéntico a K40 Whisperer ni listo para producción.
 
 ```sh
 npm ci
 node --test k40-tests.mjs
 python -m pip install -r connectors/k40/requirements.txt
-python -m unittest discover -s connectors/k40 -p test_bridge.py -v
+python -m unittest discover -s connectors/k40 -p 'test_*.py' -v
+PYTHON=python node k40-http-integration.mjs
 npm run build:vercel
+node vercel-tests.mjs
 ```
 
-Prueba de integración real, aún sin USB:
+Se conservan **simular-windows.bat** (sin USB) y **usb-windows.bat** (con consola)
+para diagnóstico. No ejecutes ambos junto al conector de segundo plano.
 
-```sh
-node k40-http-integration.mjs
-```
-
-El último comando requiere las dependencias Python anteriores en el mismo entorno
-que `python`. Inicia y cierra un servidor de prueba con un código desechable.
-
-Para probar una versión de Box con otro origen, inicia el puente con ese origen
-exacto (sin barra final). No uses comodines ni expongas este puerto a Internet:
-
-```sh
-python connectors/k40/bridge.py --origin http://127.0.0.1:17841
-```
-
-La integración usa `k40-job.js` para construir un snapshot de las trayectorias de
-`app.packed`; no vuelve a importar el diseño ni compensa el kerf otra vez.
-`k40-control.js` añade el panel a `lzApp` sin cambiar generadores ni exportadores.
-Los archivos generados de `dist/` y `api/site.js` se regeneran al ejecutar el build
-de Vercel; la rama mantiene los cambios en el código fuente.
-
-## Licencias y referencias
-
-MeerK40t es una dependencia externa bajo licencia MIT. Esta entrega lo instala
-desde PyPI y no copia su código en el sitio ni redistribuye sus binarios.
-Conserva las licencias de MeerK40t y sus dependencias si empaquetas un instalador.
-
-- https://github.com/meerk40t/meerk40t
-- https://pypi.org/project/meerk40t/0.9.9100/
-- https://www.scorchworks.com/K40whisperer/k40whisperer.html
+Referencias: https://github.com/meerk40t/meerk40t (MIT),
+https://www.scorchworks.com/K40whisperer/k40w_manual.html y
+https://support.microsoft.com/es-es/windows/experience/startup-boot/configure-startup-applications-in-windows .
+No se redistribuyen binarios de MeerK40t ni de los controladores; se instalan las
+dependencias fijadas en requirements.txt. Conserva sus licencias al empaquetarlas.
