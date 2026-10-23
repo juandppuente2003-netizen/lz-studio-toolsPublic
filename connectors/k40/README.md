@@ -42,6 +42,14 @@ estas peticiones no podrán conectar. No se ha verificado Safari/iPhone.
 
 ## Usar también Sagaon/K40 Whisperer
 
+Si aparece **No module named 'PIL'**, a la instalación anterior le falta Pillow.
+Cierra el conector, actualiza `requirements.txt` y `instalar-windows.bat` desde
+esta rama y vuelve a ejecutar el instalador. También puedes abrir una terminal en
+esta carpeta y ejecutar `.venv\Scripts\python.exe -m pip install Pillow==12.3.0`.
+Después vuelve a abrir el conector. Esto no cambia los drivers ni borra el código
+de emparejamiento. El instalador actualizado verifica que el motor M2 arranque
+sin abrir el USB antes de anunciar que terminó.
+
 El instalador crea su propio entorno Python; no instala, reemplaza ni desinstala
 drivers USB y no modifica los archivos ni ajustes de Sagaon/K40 Whisperer.
 El acceso al USB se toma solo al pulsar **Conectar** en modo USB; recordar el código

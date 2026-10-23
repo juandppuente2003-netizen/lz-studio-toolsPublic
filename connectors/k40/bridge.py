@@ -404,7 +404,12 @@ def make_server(bridge, token, origins, port=17840):
                 self.reply(200, result)
             except (ValueError, TypeError, KeyError, json.JSONDecodeError) as error:
                 self.reply(400, {'error': str(error)})
-            except (ImportError, RuntimeError) as error:
+            except ImportError as error:
+                message = ('Falta Pillow (PIL). Cierra el conector y vuelve a ejecutar instalar-windows.bat actualizado.'
+                           if getattr(error, 'name', None) == 'PIL' else
+                           'Falta una dependencia del conector. Cierra el conector y vuelve a ejecutar instalar-windows.bat actualizado.')
+                self.reply(503, {'error': message})
+            except RuntimeError as error:
                 self.reply(503, {'error': str(error)})
             except Exception:
                 self.reply(503, {'error': 'No se pudo completar la operación. Comprueba el USB, el driver y que Sagaon/K40 Whisperer esté cerrado.'})
