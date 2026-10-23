@@ -135,6 +135,7 @@ class M2Engine:
         self.kernel.add_service('device', self.device, registered_path='provider/device/lhystudios')
         self.device.realize()
         self.usb_failed = False
+        self.transport_lock = threading.RLock()
         # MeerK40t normally retries USB errors. This bridge must NOT resume an
         # unattended job after a lost cable: stop at the first transport error.
         controller = self.device.controller
@@ -143,7 +144,8 @@ class M2Engine:
             try:
                 if not self.connected():
                     raise ConnectionError('USB desconectado.')
-                return process_queue()
+                with self.transport_lock:
+                    return process_queue()
             except ConnectionError:
                 self.usb_failed = True
                 controller.abort_retry()
@@ -205,13 +207,33 @@ class M2Engine:
         return self.usb_failed or self.device.controller.state == 'terminate' or not self.connected()
 
     def cancel(self):
-        # Stop further transmission. This cannot retract data already in the board.
-        self.device.controller.abort_retry()
-        self.device.controller.abort()
+        controller = self.device.controller
+        # Pause ordinary packets first. An in-flight USB operation may finish;
+        # serialize against it before dropping queues and requesting real reset.
+        controller.pause()
+        with self.transport_lock:
+            if self.usb_failed or not self.connected() or controller.aborted_retries:
+                controller.abort_retry()
+                controller.abort()
+                raise ConnectionError('Sin USB para solicitar parada. Usa el paro físico.')
+            # Pinned MeerK40t buffers: abort() alone also misses _preempt.
+            controller._acquire_all_buffer_locks()
+            try:
+                controller._buffer.clear()
+                controller._queue.clear()
+                controller._realtime_buffer.clear()
+                controller._preempt.clear()
+            finally:
+                controller._release_all_buffer_locks()
+            # Supported driver reset queues priority ~I*\n~. The controller
+            # sends I, confirms the packet, then * discards queues and terminates.
+            # Do NOT abort_retry/abort here: that would suppress the reset packet.
+            self.device.driver.reset()
 
     def close(self):
         try:
-            self.cancel()
+            self.device.controller.abort_retry()
+            self.device.controller.abort()
             self.device.controller.close()
         finally:
             self.kernel()
@@ -228,7 +250,7 @@ class Bridge:
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.2.0', 'features': ['persistent-pairing', 'disconnect']}
+                'bridgeVersion': '0.3.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop']}
 
     def get_engine(self):
         if self.engine is None:
@@ -298,8 +320,12 @@ class Bridge:
     def cancel(self):
         with self.lock:
             if self.engine and not self.simulation:
-                self.engine.cancel()
-            self.state, self.message = 'cancelled', 'Envío cancelado. Puede quedar movimiento en la memoria de la placa. Comprueba que la máquina se detuvo.'
+                try:
+                    self.engine.cancel()
+                except Exception:
+                    self.state, self.message, self.id = 'error', 'No se pudo solicitar parada por USB. Usa el paro físico; no se reintentará el trabajo.', None
+                    raise
+            self.state, self.message = 'cancelled', 'Cancelación solicitada: cola descartada y reinicio M2 solicitado. La parada física NO está confirmada. Si sigue funcionando, usa el paro físico.'
             self.id = None
             return self.status()
 

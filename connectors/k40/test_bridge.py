@@ -133,6 +133,28 @@ class RealCompilerTests(unittest.TestCase):
     def test_real_driver_preserves_multiple_passes(self):
         a = validate_job(job(),BED); once = self.engine.compile(a,'cut'); a['passes']=2
         twice = self.engine.compile(a,'cut'); self.assertGreater(len(twice),len(once)); self.assertEqual(twice.count(b'D'),2)
+    def test_cancel_sends_priority_reset_before_terminating_without_usb(self):
+        engine = M2Engine(BED)
+        c = engine.device.controller
+        packets = []
+        c.start = lambda: None  # Drive the real packet parser synchronously.
+        engine.connected = lambda: True
+        c._send_and_confirm_packet = lambda packet, checksum: packets.append(packet) or True
+        try:
+            c.update_state('active')
+            c.write(b'Dangerous-old-job\n')
+            c._check_transfer_buffer()
+            engine.cancel()
+            self.assertFalse(c.aborted_retries)  # Must let the reset get through.
+            c._check_transfer_buffer()
+            c.process_queue()
+            self.assertEqual(packets, [b'I' + b'F' * 29])
+            self.assertEqual(c.state, 'terminate')
+            self.assertEqual(len(c), 0)
+            self.assertIsNone(c.connection)
+        finally:
+            engine.close()
+
     def test_transport_fail_closed(self):
         with self.assertRaises(ConnectionError): self.engine.device.controller.process_queue()
         self.assertTrue(self.engine.usb_failed); self.assertTrue(self.engine.device.controller.aborted_retries)

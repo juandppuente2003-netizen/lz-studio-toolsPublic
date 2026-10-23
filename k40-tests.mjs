@@ -49,13 +49,14 @@ test('UI: pairing, explicit confirmation, one send, physical completion acknowle
  dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
  dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
  const app={...example(),onUpdate(){},setView(){}};const requests=[];
- let phase='idle',dropRunResponse=false,oldBridge=false;
+ let phase='idle',dropRunResponse=false,oldBridge=false,delayRunResponse=false,releaseRun;
  globalThis.fetch=async(url,options)=>{
   const path=new URL(url).pathname;requests.push({path,options});
-  const info={protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:true,features:['persistent-pairing','disconnect']};
+  const info={protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:true,features:['persistent-pairing','disconnect','priority-stop']};
   if(oldBridge)info.features=[];
   const body=path==='/prepare'?{id:'test-job'}:path==='/status'?{state:phase,message:'Simulación sin USB.',...info}:info;
   if(path==='/run'){phase='simulated';body.state=phase;if(dropRunResponse){dropRunResponse=false;throw Error('Response lost after acceptance');}}
+  if(path==='/run'&&delayRunResponse){delayRunResponse=false;await new Promise(resolve=>{releaseRun=resolve;});}
   if(path==='/cancel')phase='cancelled';
   if(path==='/acknowledge')phase='idle';
   if(path==='/disconnect')phase='idle';
@@ -69,14 +70,20 @@ test('UI: pairing, explicit confirmation, one send, physical completion acknowle
   $('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));
   assert.equal($('k40Run').disabled,false);$('k40Run').click();$('k40Run').click();await settle();await settle();assert.equal($('k40Token').disabled,true);
   assert.equal(requests.filter(r=>r.path==='/run').length,1);assert.equal($('k40Run').disabled,true);
-  assert.equal($('k40Cancel').textContent,'Confirmar máquina detenida');
+  assert.equal($('k40Cancel').disabled,false);assert.equal($('k40Acknowledge').hidden,false);
   $('k40Close').click();assert.equal(dialog.open,true);
-  $('k40Cancel').click();await settle();assert.equal($('k40Run').disabled,true);
+  $('k40Cancel').click();await settle();await settle();assert.equal(requests.at(-2).path,'/cancel');assert.equal($('k40Acknowledge').hidden,false);$('k40Acknowledge').click();await settle();assert.equal($('k40Run').disabled,true);
   $('k40Connect').click();await settle();$('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));
-  dropRunResponse=true;$('k40Run').click();await settle();await settle();assert.equal($('k40Cancel').textContent,'Cancelar envío');
-  $('k40Cancel').click();await settle();await settle();assert.equal($('k40Cancel').textContent,'Confirmar máquina detenida');
-  $('k40Cancel').click();await settle();
+  dropRunResponse=true;$('k40Run').click();await settle();await settle();assert.equal($('k40Cancel').disabled,false);
+  $('k40Cancel').click();await settle();await settle();assert.equal($('k40Cancel').disabled,false);assert.equal($('k40Acknowledge').hidden,false);
+  $('k40Acknowledge').click();await settle();
   $('k40Close').click();assert.equal(dialog.open,false);assert.equal($('k40Token').value,'');
+  dom.window.document.querySelector('#k40Open').click();$('k40Token').value='test-code';$('k40Connect').click();await settle();
+  $('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));delayRunResponse=true;
+  $('k40Run').click();await settle();assert.equal($('k40Cancel').disabled,false);assert.equal(typeof releaseRun,'function');
+  $('k40Cancel').click();await settle();await settle();assert.equal(phase,'cancelled');
+  releaseRun();await settle();await settle();assert.equal($('k40Acknowledge').hidden,false);assert.equal($('k40Acknowledge').disabled,false);
+  assert.doesNotMatch($('k40Status').textContent,/Enviando el trabajo/);$('k40Acknowledge').click();await settle();$('k40Close').click();
   dom.window.document.querySelector('#k40Open').click();$('k40Token').value='remembered-test-code';$('k40Remember').checked=true;
   $('k40Connect').click();await settle();assert.equal(dom.window.localStorage.getItem('lzbox-k40-pairing-v1'),'remembered-test-code');
   const beforeClose=requests.filter(r=>r.path==='/disconnect').length;
@@ -91,4 +98,19 @@ test('UI: pairing, explicit confirmation, one send, physical completion acknowle
   dom.window.document.querySelector('#k40Open').click();$('k40Token').value='old-bridge-code';$('k40Connect').click();await settle();
   assert.equal(requests.filter(r=>r.path==='/connect').length,attempts);assert.match($('k40Status').textContent,/Actualiza/);$('k40Close').click();
  }finally{globalThis.document=previous.document;globalThis.fetch=previous.fetch;dom.window.close();}
+});
+
+test('WebUSB probe filters CH341, claims/releases it and sends no device commands',async()=>{
+ const {probeM2USB}=await import('./web/box/k40-usb.js');
+ const calls=[];
+ const device={vendorId:0x1a86,productId:0x5512,productName:'CH341',opened:false,
+  configuration:{interfaces:[{interfaceNumber:0,alternates:[{endpoints:[{type:'bulk',direction:'out'},{type:'bulk',direction:'in'}]}]}]},
+  async open(){calls.push('open');this.opened=true;},async claimInterface(n){calls.push('claim:'+n);},async releaseInterface(n){calls.push('release:'+n);},async close(){calls.push('close');this.opened=false;}
+ };
+ const usb={async requestDevice(options){assert.deepEqual(options.filters,[{vendorId:0x1a86,productId:0x5512}]);return device;}};
+ const result=await probeM2USB(usb);assert.equal(result.vendorId,0x1a86);assert.deepEqual(calls,['open','claim:0','release:0','close']);
+ calls.length=0;device.claimInterface=async()=>{throw Object.assign(Error('busy'),{name:'NetworkError'});};
+ await assert.rejects(()=>probeM2USB(usb),/WinUSB/);assert.deepEqual(calls,['open','close']);
+ await assert.rejects(()=>probeM2USB(undefined),/WebUSB/);
+ await assert.rejects(()=>probeM2USB({requestDevice:async()=>{throw Object.assign(Error(),{name:'NotFoundError'});}}),/No seleccionaste/);
 });

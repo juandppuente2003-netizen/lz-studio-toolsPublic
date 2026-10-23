@@ -79,7 +79,10 @@ reinícialo; la web te indicará si tu conector es demasiado antiguo.
 4. Conecta desde Box con el nuevo código. Debe indicar **USB · experimental**.
 5. Haz primero **Recorrer marco sin láser**, con la emisión del láser físicamente
    deshabilitada. El trabajo vuelve a Home antes de recorrer el contorno.
-6. Tras verificar la escala, dirección y límites, haz un corte sencillo de prueba.
+6. Durante el marco, pulsa **Cancelar y solicitar parada**, manteniendo la emisión
+   físicamente deshabilitada. Comprueba que se detiene. La parada modificada todavía
+   requiere esta validación física: no hagas otro corte hasta comprobarla.
+7. Tras verificar parada, escala, dirección y límites, haz un corte sencillo de prueba.
    Ajusta la potencia en el panel físico; la M2 no recibe un porcentaje de potencia.
 
 Cada envío establece Home; no se admite un origen relativo a una posición
@@ -87,12 +90,36 @@ desconocida. Las hojas se procesan una por una, con confirmación individual.
 Los interiores van primero, luego los contornos. Pasadas: 1–10, velocidad: 1–100
 mm/s; estos límites de software NO son parámetros recomendados para tu material.
 
-**Cancelar envío no es un paro de emergencia.** Detiene datos pendientes en el
-conector, pero la placa puede ejecutar lo recibido. El porcentaje corresponde a
-datos transmitidos, no al avance físico. Después de enviar/cancelar, el panel exige
-confirmar que la máquina se detuvo y volver a conectar antes de preparar otra hoja.
+**Cancelar y solicitar parada no es un paro de emergencia.** Ahora solicita el
+reinicio prioritario soportado por el controlador M2 de MeerK40t, descarta las colas
+pendientes y deja que se transmita ese reinicio antes de terminar el transporte.
+La versión anterior solo cancelaba datos en la computadora. Además, el botón de
+cancelación se conserva cuando termina el envío de datos y funciona mientras la
+respuesta de envío siga pendiente. **Confirmar máquina detenida** es otro botón:
+solo libera el trabajo tras tu verificación física; no envía ninguna parada.
+El porcentaje corresponde a datos enviados, no al avance físico. Hay que actualizar
+la web y el conector a 0.3.0; la web rechaza el conector anterior para este flujo.
 Si se pierde USB, el puente abandona la cola en lugar de reconectarla y continuar.
 No reinicies un corte interrumpido sin revisar la pieza y la posición.
+
+## Probar acceso USB directamente desde el navegador
+
+En el panel pulsa **Probar USB directo**, sin abrir el conector local, y selecciona
+el CH341 de la máquina. Cierra Sagaon y el conector antes de hacerlo. WebUSB requiere
+HTTPS y un navegador que lo implemente (por ejemplo Chrome de escritorio).
+
+La prueba filtra el USB `1a86:5512`, abre su interfaz de datos y la libera al
+terminar, también si falla. No cambia drivers, no inicializa el modo paralelo,
+no envía comandos del fabricante ni instrucciones de movimiento o láser.
+Un resultado correcto confirma acceso al CH341; no identifica por sí solo la placa
+M2 ni valida corte o parada. **El envío de cortes sigue usando el conector local**:
+el transporte completo por WebUSB aún no está implementado.
+
+Windows necesita un controlador compatible con WinUSB para WebUSB. Si aparece
+pero no se puede abrir, no cambies el driver a ciegas: primero hay que comprobar
+cómo mantener Sagaon/K40 Whisperer funcionando. Referencias de Chrome:
+https://developer.chrome.com/docs/capabilities/usb y
+https://developer.chrome.com/docs/capabilities/build-for-webusb .
 
 ## Desarrollo y comprobaciones
 
