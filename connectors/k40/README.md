@@ -104,15 +104,19 @@ No reinicies un corte interrumpido sin revisar la pieza y la posición.
 
 ## Probar acceso USB directamente desde el navegador
 
-En el panel pulsa **Probar USB directo**, sin abrir el conector local, y selecciona
+El panel abre por defecto en **USB directo · sin código**. Pulsa **Conectar USB
+directo**, sin abrir el conector local, y selecciona
 el CH341 de la máquina. Cierra Sagaon y el conector antes de hacerlo. WebUSB requiere
 HTTPS y un navegador que lo implemente (por ejemplo Chrome de escritorio).
 
-La prueba filtra el USB `1a86:5512`, abre su interfaz de datos y la libera al
-terminar, también si falla. No cambia drivers, no inicializa el modo paralelo,
+La prueba filtra el USB `1a86:5512`, abre su interfaz de datos y conserva la conexión
+hasta pulsar **Desconectar USB** o cerrar el panel. Si falla, intenta liberarla. No cambia drivers, no inicializa el modo paralelo,
 no envía comandos del fabricante ni instrucciones de movimiento o láser.
 Un resultado correcto confirma acceso al CH341; no identifica por sí solo la placa
-M2 ni valida corte o parada. **El envío de cortes sigue usando el conector local**:
+M2 ni valida corte o parada. El modo USB oculta y deshabilita el campo de código y los controles de envío
+que dependen del conector. No hace peticiones al servicio local. Para usar el
+flujo anterior, elige **Conector local · con código** antes de conectar.
+**El envío de cortes sigue usando el conector local**:
 el transporte completo por WebUSB aún no está implementado.
 
 Windows necesita un controlador compatible con WinUSB para WebUSB. Si aparece

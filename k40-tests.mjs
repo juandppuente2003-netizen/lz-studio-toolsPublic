@@ -65,7 +65,8 @@ test('UI: pairing, explicit confirmation, one send, physical completion acknowle
  const settle=()=>new Promise(resolve=>setImmediate(resolve));
  try{
   const {dialog}=mountK40(app),$=id=>dialog.querySelector('#'+id);
-  dom.window.document.querySelector('#k40Open').click();assert.equal(dialog.open,true);assert.equal($('k40Run').disabled,true);
+  const openBridge=()=>{dom.window.document.querySelector('#k40Open').click();$('k40Connection').value='bridge';$('k40Connection').dispatchEvent(new dom.window.Event('change'));};
+  openBridge();assert.equal(dialog.open,true);assert.equal($('k40Run').disabled,true);
   $('k40Token').value='test-pairing-code';$('k40Connect').click();await settle();assert.equal($('k40Run').disabled,true);
   $('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));
   assert.equal($('k40Run').disabled,false);$('k40Run').click();$('k40Run').click();await settle();await settle();assert.equal($('k40Token').disabled,true);
@@ -78,24 +79,24 @@ test('UI: pairing, explicit confirmation, one send, physical completion acknowle
   $('k40Cancel').click();await settle();await settle();assert.equal($('k40Cancel').disabled,false);assert.equal($('k40Acknowledge').hidden,false);
   $('k40Acknowledge').click();await settle();
   $('k40Close').click();assert.equal(dialog.open,false);assert.equal($('k40Token').value,'');
-  dom.window.document.querySelector('#k40Open').click();$('k40Token').value='test-code';$('k40Connect').click();await settle();
+  openBridge();$('k40Token').value='test-code';$('k40Connect').click();await settle();
   $('k40Confirm').checked=true;$('k40Confirm').dispatchEvent(new dom.window.Event('change'));delayRunResponse=true;
   $('k40Run').click();await settle();assert.equal($('k40Cancel').disabled,false);assert.equal(typeof releaseRun,'function');
   $('k40Cancel').click();await settle();await settle();assert.equal(phase,'cancelled');
   releaseRun();await settle();await settle();assert.equal($('k40Acknowledge').hidden,false);assert.equal($('k40Acknowledge').disabled,false);
   assert.doesNotMatch($('k40Status').textContent,/Enviando el trabajo/);$('k40Acknowledge').click();await settle();$('k40Close').click();
-  dom.window.document.querySelector('#k40Open').click();$('k40Token').value='remembered-test-code';$('k40Remember').checked=true;
+  openBridge();$('k40Token').value='remembered-test-code';$('k40Remember').checked=true;
   $('k40Connect').click();await settle();assert.equal(dom.window.localStorage.getItem('lzbox-k40-pairing-v1'),'remembered-test-code');
   const beforeClose=requests.filter(r=>r.path==='/disconnect').length;
   $('k40Close').click();await settle();assert.equal(dialog.open,false);assert.equal(requests.filter(r=>r.path==='/disconnect').length,beforeClose+1);
   const beforeOpen=requests.filter(r=>r.path==='/connect').length;
-  dom.window.document.querySelector('#k40Open').click();assert.equal($('k40Token').value,'remembered-test-code');assert.equal($('k40Remember').checked,true);
+  openBridge();assert.equal($('k40Token').value,'remembered-test-code');assert.equal($('k40Remember').checked,true);
   assert.equal(requests.filter(r=>r.path==='/connect').length,beforeOpen);assert.equal($('k40Run').disabled,true);
   $('k40Connect').click();await settle();$('k40Disconnect').click();await settle();assert.equal($('k40Run').disabled,true);
   $('k40Forget').click();await settle();assert.equal(dom.window.localStorage.getItem('lzbox-k40-pairing-v1'),null);assert.equal($('k40Token').value,'');
   $('k40Close').click();
   oldBridge=true;const attempts=requests.filter(r=>r.path==='/connect').length;
-  dom.window.document.querySelector('#k40Open').click();$('k40Token').value='old-bridge-code';$('k40Connect').click();await settle();
+  openBridge();$('k40Token').value='old-bridge-code';$('k40Connect').click();await settle();
   assert.equal(requests.filter(r=>r.path==='/connect').length,attempts);assert.match($('k40Status').textContent,/Actualiza/);$('k40Close').click();
  }finally{globalThis.document=previous.document;globalThis.fetch=previous.fetch;dom.window.close();}
 });
@@ -113,4 +114,28 @@ test('WebUSB probe filters CH341, claims/releases it and sends no device command
  await assert.rejects(()=>probeM2USB(usb),/WinUSB/);assert.deepEqual(calls,['open','close']);
  await assert.rejects(()=>probeM2USB(undefined),/WebUSB/);
  await assert.rejects(()=>probeM2USB({requestDevice:async()=>{throw Object.assign(Error(),{name:'NotFoundError'});}}),/No seleccionaste/);
+});
+
+test('USB mode connects with empty code, keeps USB open and never calls the local bridge',async()=>{
+ const {JSDOM}=await import('jsdom');const dom=new JSDOM('<div class="export-actions"></div>',{url:'https://www.lzstudiotools.com/box/index.html'});
+ const previous={document:globalThis.document,fetch:globalThis.fetch};globalThis.document=dom.window.document;
+ dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
+ let httpCalls=0,claims=0,releases=0;
+ const device={vendorId:0x1a86,productId:0x5512,productName:'USB UART-LPT',opened:false,
+  configuration:{interfaces:[{interfaceNumber:0,alternates:[{endpoints:[{type:'bulk',direction:'out'},{type:'bulk',direction:'in'}]}]}]},
+  async open(){this.opened=true;},async claimInterface(){claims++;},async releaseInterface(){releases++;},async close(){this.opened=false;}};
+ Object.defineProperty(dom.window.navigator,'usb',{value:{async requestDevice(){return device;}}});
+ globalThis.fetch=async()=>{httpCalls++;throw Error('Must not use the local bridge');};
+ const settle=()=>new Promise(resolve=>setImmediate(resolve));
+ try{
+  const {dialog}=mountK40({...example(),onUpdate(){},setView(){}}),$=id=>dialog.querySelector('#'+id);
+  dom.window.document.querySelector('#k40Open').click();
+  assert.equal($('k40Connection').value,'usb');assert.equal($('k40BridgePanel').hidden,true);assert.equal($('k40Token').disabled,true);assert.equal($('k40Token').value,'');
+  $('k40Connect').click();assert.equal(httpCalls,0);
+  $('k40USB').click();await settle();await settle();assert.equal(device.opened,true);assert.equal(claims,1);assert.equal(releases,0);assert.equal(httpCalls,0);
+  assert.match($('k40Mode').textContent,/USB directo conectado/);assert.doesNotMatch($('k40Status').textContent,/Pega el código/);
+  assert.equal($('k40SendPanel').hidden,true);assert.equal($('k40Run').disabled,true);assert.equal($('k40Connection').disabled,true);
+  $('k40USBDisconnect').click();await settle();assert.equal(device.opened,false);assert.equal(releases,1);
+  $('k40USB').click();await settle();$('k40Close').click();await settle();await settle();assert.equal(device.opened,false);assert.equal(dialog.open,false);assert.equal(httpCalls,0);
+ }finally{globalThis.document=previous.document;globalThis.fetch=previous.fetch;dom.window.close();}
 });
