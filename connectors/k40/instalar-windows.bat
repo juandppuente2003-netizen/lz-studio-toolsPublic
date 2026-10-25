@@ -9,6 +9,8 @@ echo Verificando el motor M2 sin conectar el USB...
 if errorlevel 1 goto error
 .venv\Scripts\python.exe -c "import tkinter"
 if errorlevel 1 goto error
+.venv\Scripts\python.exe -c "from windows_setup import configure_startup; configure_startup(True)"
+if errorlevel 1 goto error
 .venv\Scripts\python.exe update_windows.py
 if errorlevel 1 goto error
 .venv\Scripts\python.exe windows_setup.py --enable
@@ -22,5 +24,7 @@ pause
 exit /b 0
 :error
 echo No se completo la actualizacion. Revisa el mensaje anterior. No cierres trabajos activos.
+echo Si el conector anterior no responde, el inicio ya apunta a esta carpeta nueva.
+echo Guarda tus trabajos y reinicia Windows. Tambien puedes usar reparar-inicio-windows.bat.
 pause
 exit /b 1

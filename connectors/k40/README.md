@@ -6,6 +6,13 @@ cada trabajo. La potencia se ajusta en el panel físico de la M2.
 
 ## Instalar o actualizar una vez en Windows
 
+Si una actualización dice `timed out` o el proceso anterior no termina, ejecuta
+`reparar-inicio-windows.bat` dentro de la carpeta nueva que ya tiene `.venv`.
+Registra exclusivamente la entrada LZStudioK40 para esa carpeta, sin contactar
+el servidor bloqueado ni abrir USB. Guarda tus trabajos y reinicia Windows;
+después abre `abrir-conector.vbs` de esa misma carpeta y comprueba 0.6.0.
+No termina otros procesos Python ni cambia el código permanente.
+
 1. Termina cualquier trabajo. Cierra el conector anterior y Sagaon.
 2. Extrae **LZ-K40-Windows.zip** en una carpeta fija, por ejemplo
    `Documentos\LZ-K40`. No lo ejecutes dentro del ZIP ni borres/muevas esa carpeta.
