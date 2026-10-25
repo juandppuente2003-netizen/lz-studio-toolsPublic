@@ -38,5 +38,5 @@ export function mountRemoteHost(app,machine,mount){
  $('peerGrant').onclick=()=>{try{if(channel?.readyState!=='open')throw Error('No hay un celular conectado.');machine.setRemoteOwner(true);$('peerGrant').disabled=true;status('Control de movimientos: celular. Stop sigue disponible en la computadora.');publish(true);}catch(e){status(e.message);}};
  $('peerRevoke').onclick=()=>revoke();
  document.defaultView.addEventListener('pagehide',()=>revoke());
- return {publish,revoke};
+ return {publish,revoke,open:()=>dialog.showModal()};
 }

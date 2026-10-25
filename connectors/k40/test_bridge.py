@@ -208,6 +208,20 @@ class MotionTests(unittest.TestCase):
 
 
 class HttpTests(unittest.TestCase):
+    def test_health_is_authenticated_and_does_not_wait_for_state_or_usb(self):
+        entered,release=threading.Event(),threading.Event()
+        def blocked_operation():
+            with self.b.lock:
+                entered.set();release.wait(3)
+        worker=threading.Thread(target=blocked_operation);worker.start()
+        try:
+            self.assertTrue(entered.wait(1)); start=time.monotonic()
+            code,value,_=self.request('/health')
+            self.assertEqual(code,200);self.assertLess(time.monotonic()-start,.5)
+            self.assertEqual(value['pid'],os.getpid());self.assertTrue(value['ready'])
+            self.assertEqual(self.request('/health',token='incorrect')[0],401)
+        finally:
+            release.set();worker.join(1)
     def setUp(self):
         self.b = Bridge(BED, engine_factory=FakeEngine)
         self.origin = 'https://www.lzstudiotools.com'; self.token = 'test-code'

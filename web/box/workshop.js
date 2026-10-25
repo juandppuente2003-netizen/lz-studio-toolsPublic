@@ -1,7 +1,7 @@
 import {modelInfo} from './models.js?v=3.5';
-import {mountK40} from './k40-control.js?v=9';
+import {mountK40} from './k40-control.js?v=10';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=1';
+import {mountRemoteHost} from './workshop-remote.js?v=2';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};
@@ -93,7 +93,7 @@ export function mountWorkshop(app){
  app.onUpdate(update);document.addEventListener('storage',()=>{if(current==='library')renderLibrary();});
  // Saved designs can change without a geometry update (save and rename).
  for(const id of ['confirmSave','saveCopy'])$(id)?.addEventListener('click',()=>{if(current==='library')renderLibrary();});
- app.workshop={show,get space(){return current;},savePreparation};applyLayout();show(spaces.some(s=>s[0]===preferences.space)?preferences.space:'design');update();return app.workshop;
+ app.workshop={show,get space(){return current;},savePreparation};applyLayout();show(spaces.some(s=>s[0]===preferences.space)?preferences.space:'design');update();if(new URLSearchParams(document.location.search).get('celular')==='1'){show('operate');remote.open();}return app.workshop;
 }
 if(typeof document!=='undefined'){
  if(globalThis.lzApp)mountWorkshop(globalThis.lzApp);else{let count=0;const timer=setInterval(()=>{if(globalThis.lzApp||++count>200){clearInterval(timer);if(globalThis.lzApp)mountWorkshop(globalThis.lzApp);}},25);}

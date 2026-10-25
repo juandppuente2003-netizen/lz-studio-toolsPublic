@@ -88,7 +88,7 @@ def startup(enabled):
 buttons = ttk.Frame(frame)
 buttons.pack(fill='x', pady=8)
 ttk.Button(buttons, text='Copiar código', command=copy_code).pack(side='left')
-ttk.Button(buttons, text='Abrir Box Studio', command=lambda: webbrowser.open(SITE + '/box/index.html')).pack(side='left', padx=8)
+ttk.Button(buttons, text='Abrir Box Studio', command=lambda: webbrowser.open(SITE + '/box/index.html?celular=1')).pack(side='left', padx=8)
 ttk.Button(buttons, text='Actualizar estado', command=refresh).pack(side='left')
 options = ttk.Frame(frame)
 options.pack(fill='x', pady=8)

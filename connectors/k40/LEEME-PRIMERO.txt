@@ -1,16 +1,25 @@
-LZ STUDIO - K40 0.6.1 - WINDOWS
+LZ STUDIO - K40 0.6.2 - WINDOWS
 
-1. Termina el trabajo y cierra el conector anterior y Sagaon.
-2. Extrae esta carpeta COMPLETA en una ubicacion fija.
-3. Ejecuta instalar-windows.bat una vez (requiere Python 3.10+).
-4. En la ventana LZ Studio pulsa Copiar codigo. Pegalo una vez en Box
-   y deja Recordar esta computadora marcado.
-5. Al actualizar comprueba que diga Conector 0.6.1. Si sigue otra version,
-   reinicia Windows: cerrar solo la ventana NO cierra el proceso anterior.
+1. Apaga la maquina, desconecta su cable USB y cierra Sagaon.
+2. Extrae el ZIP completo. No lo ejecutes desde dentro del ZIP.
+3. Ejecuta INICIAR-LZ-BOX.bat y acepta el aviso solo despues del paso 1.
+   Requiere el Python 3.10+ que ya utilizabas.
+4. Espera LISTO: conector 0.6.2 verificado por PID, version y carpeta.
+   Crea una carpeta fija y el acceso LZ Box Studio en el escritorio.
+5. Conecta el USB y conecta desde Box. El codigo permanente se conserva.
+   Si este navegador aun no lo recuerda, copialo una vez desde el panel.
 
 El instalador activa el inicio con Windows sin consola. No cambia drivers.
-En adelante abre Box > Controlar mi K40. No hay descargas por cada corte.
-Abrir-conector.vbs muestra el panel local cuando lo necesites.
+En adelante usa el acceso LZ Box Studio del escritorio o abre Box.
+No vuelvas a ejecutar instalar-windows.bat para esta instalacion nueva.
+
+CELULAR / QR:
+Operar maquina > Control desde celular > Generar emparejamiento.
+PC y celular en la misma Wi-Fi. Escanea el QR, acepta en el telefono,
+pega la respuesta en la computadora y pulsa Ceder control.
+Deja Box abierto en el PC. La vista previa puede pedir acceso de Vercel
+tambien en el telefono. El recorrido real entre dispositivos sigue pendiente
+de comprobar en tu red; no se ha validado fisicamente desde este entorno.
 
 Primera prueba: EMISION FISICAMENTE DESHABILITADA.
 Home una vez > flechas > Usar esta posicion como origen > recorrer marco.

@@ -1,6 +1,34 @@
-# LZ K40 · conector 0.6.1 para Box Studio
+# LZ K40 · conector 0.6.2 para Box Studio
 
-## Corrección de Home y flechas en 0.6.1
+## Entrada única: INICIAR-LZ-BOX.bat
+
+Extrae el ZIP completo y ejecuta INICIAR-LZ-BOX.bat. Antes de aceptar su aviso,
+apaga la máquina y desconecta el USB. Esta preparación de instalación permite
+cerrar las copias anteriores de LZ sin depender del servidor que quedó bloqueado;
+descarta sus operaciones pendientes. Es una comprobación de instalación, no un
+requisito después de cada movimiento.
+
+El instalador usa una carpeta fija en %LOCALAPPDATA%\LZStudioTools\K40\connector,
+conserva pairing.json, prepara dependencias y registra su propia entrada de inicio.
+Identifica únicamente procesos Python del mismo usuario con script LZ verificable;
+no usa taskkill por nombre ni cierra otros programas Python. Verifica nuevamente
+la identidad del PID antes de cerrar cada copia. No modifica drivers ni PWM.
+
+El nuevo /health está autenticado y comprueba versión, PID y ruta sin tocar USB
+ni esperar el candado de una operación. El instalador no muestra LISTO si responde
+otra copia. Crea el acceso LZ Box Studio en el escritorio y abre Box y el panel.
+Después conecta el USB y prueba Home/flechas con emisión deshabilitada.
+
+Para celular, abre Operar máquina > Control desde celular > Generar emparejamiento.
+Escanea el QR, pega la respuesta del teléfono en el PC y cede el control. Deja
+Box abierto en la computadora. Ambos dispositivos deben estar en la misma red.
+La URL de revisión conserva la protección de Vercel y puede pedir iniciar sesión
+también desde el teléfono. El enlace real en el Wi-Fi del taller sigue pendiente
+de validación; el paquete no elimina esa protección ni publica el USB.
+
+Registro de instalación: %LOCALAPPDATA%\LZStudioTools\K40\instalar-lz.log.
+
+## Corrección de Home y flechas en 0.6.2
 
 Diagnóstico real recibido: `state=sent`, `operation=home`, `controllerStatus=0xCE`,
 100% transmitido. El conector 0.6.0 esperaba un estado FINISH para un comando
@@ -26,7 +54,7 @@ Si una actualización dice `timed out` o el proceso anterior no termina, ejecuta
 `reparar-inicio-windows.bat` dentro de la carpeta nueva que ya tiene `.venv`.
 Registra exclusivamente la entrada LZStudioK40 para esa carpeta, sin contactar
 el servidor bloqueado ni abrir USB. Guarda tus trabajos y reinicia Windows;
-después abre `abrir-conector.vbs` de esa misma carpeta y comprueba 0.6.1.
+después abre `abrir-conector.vbs` de esa misma carpeta y comprueba 0.6.2.
 No termina otros procesos Python ni cambia el código permanente.
 
 1. Termina cualquier trabajo. Cierra el conector anterior y Sagaon.
@@ -37,7 +65,7 @@ No termina otros procesos Python ni cambia el código permanente.
    comprueba el motor sin USB, activa el inicio automático y abre el panel local.
    Si estás actualizando, cierra por completo el conector anterior antes. Cerrar
    solo la ventana no lo termina. Tras instalar, reinicia Windows si el panel local
-   sigue mostrando otra versión; debe indicar **Conector 0.6.1**.
+   sigue mostrando otra versión; debe indicar **Conector 0.6.2**.
 4. Pulsa **Copiar código** y pégalo una vez en Box. Deja **Recordar esta computadora**
    marcado. Si ya estaba emparejado, el código se conserva y no se repite este paso.
 5. En adelante, el conector inicia en segundo plano al iniciar sesión en Windows.
@@ -138,7 +166,7 @@ reenviar el trabajo. No prepares de nuevo un corte cuya respuesta se haya perdid
 
 ## Verificación y desarrollo
 
-## Taller 3.6 y registro opcional (conector 0.6.1)
+## Taller 3.6 y registro opcional (conector 0.6.2)
 
 Box conserva una sola sesión al cambiar entre Diseñar, Preparar corte, Operar
 máquina y Biblioteca. Los diseños, preparaciones y plantillas se guardan en este

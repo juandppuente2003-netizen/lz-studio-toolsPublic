@@ -412,7 +412,7 @@ class Bridge:
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.6.1', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance'],
+                'bridgeVersion': '0.6.2', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance'],
                 'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog') and self.position is not None,
                 'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
@@ -750,7 +750,12 @@ def make_server(bridge, token, origins, port=17840):
         def do_GET(self):
             if not self.allowed():
                 return
-            if self.path == '/status':
+            if self.path == '/health':
+                # Installer identity check must never wait for USB or state locks.
+                self.reply(200, {'protocol': PROTOCOL, 'bridgeVersion': '0.6.2',
+                                 'pid': os.getpid(), 'source': str(Path(__file__).resolve()),
+                                 'ready': True})
+            elif self.path == '/status':
                 self.reply(200, bridge.status())
             else:
                 self.reply(404, {'error': 'Ruta no encontrada.'})
