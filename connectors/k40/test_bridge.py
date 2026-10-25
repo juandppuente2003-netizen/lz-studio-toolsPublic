@@ -24,6 +24,7 @@ class FakeEngine:
     def compile(self, job, mode): return b'IPP\nM2-test-bytes'
     def compile_motion(self, start, target, home=False): return b'IPP\n' if home else b'IBaS1P\n'
     def finished(self): return self.done and not self.lost and self.left == 0
+    def rapid_ready(self): return self.finished()
     def connect(self): pass
     def connected(self): return not self.lost
     def send(self, data): self.sent.append(data)
@@ -254,6 +255,37 @@ class RealCompilerTests(unittest.TestCase):
     def setUpClass(cls): cls.engine = M2Engine(BED)
     @classmethod
     def tearDownClass(cls): cls.engine.close()
+    def test_ce_accepts_home_and_jog_but_does_not_complete_a_cut(self):
+        engine = M2Engine(BED); c = engine.device.controller; c.stop()
+        class USB:
+            status = 0xCE
+            def is_connected(self): return True
+            def get_status(self): return [0, self.status]
+            def write(self, packet): pass
+            def close(self): pass
+        usb = USB(); c.connection = usb; engine._guard_connection(usb)
+        c.open = lambda: None; c.start = lambda: None; c.update_state('active')
+        b = Bridge(BED, simulation=False, engine_factory=lambda bed: engine)
+        try:
+            b.connect(); b.motion('home', confirmed=True)
+            c._check_transfer_buffer(); c.process_queue()
+            state = b.status()
+            self.assertEqual(state['state'], 'idle'); self.assertEqual(state['position'], [0,0])
+            self.assertTrue(state['operationAccepted']); self.assertFalse(engine.finished())
+            b.motion('jog', 0, 5, True); c._check_transfer_buffer(); c.process_queue()
+            usb.status = 0xEE
+            self.assertEqual(b.status()['state'], 'sent'); self.assertIsNone(b.position)
+            usb.status = 0xCE
+            self.assertEqual(b.status()['state'], 'idle'); self.assertAlmostEqual(b.position[1],5,delta=.0254)
+            b.motion('jog', 0, -1, True); c._check_transfer_buffer(); c.process_queue()
+            self.assertEqual(b.status()['state'], 'idle'); self.assertAlmostEqual(b.position[1],4,delta=.0254)
+            b.prepare(job(), 'cut'); b.state = 'sent'; b.operation = 'cut'
+            self.assertEqual(b.status()['state'], 'sent')
+            with self.assertRaises(ValueError): b.motion('jog', 1, 0, True)
+            usb.status = 0xEC
+            self.assertEqual(b.status()['state'], 'idle')
+        finally:
+            engine.close()
     def test_real_m2_cut_and_laser_off_frame(self):
         raw = validate_job(job(), BED); cut = self.engine.compile(raw,'cut'); frame = self.engine.compile(raw,'frame')
         self.assertTrue(cut.startswith(b'IPP\n')); self.assertIn(b'D',cut)

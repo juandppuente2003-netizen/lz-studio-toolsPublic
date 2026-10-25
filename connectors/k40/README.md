@@ -1,4 +1,20 @@
-# LZ K40 · conector 0.6.0 para Box Studio
+# LZ K40 · conector 0.6.1 para Box Studio
+
+## Corrección de Home y flechas en 0.6.1
+
+Diagnóstico real recibido: `state=sent`, `operation=home`, `controllerStatus=0xCE`,
+100% transmitido. El conector 0.6.0 esperaba un estado FINISH para un comando
+rápido ya aceptado y mantenía las flechas bloqueadas. Home y jog ahora admiten OK
+(0xCE) cuando la cola del PC está vacía y USB está conectado, y permiten enviar
+la siguiente orden en secuencia. BUSY (0xEE), errores o datos pendientes no habilitan
+controles. No se añade un temporizador que finja terminación.
+
+La interfaz indica Orden aceptada y posición estimada, sin afirmar parada física.
+Para corte y marco se conserva la comprobación estricta de fin; 0xCE por sí solo
+no finaliza esos trabajos. No se modifica potencia, PWM, placa ni paquetes de movimiento.
+Se reproduce el caso con el motor/parser real y USB de prueba: Home, bajar, subir,
+BUSY, recuperación de controles y bloqueo de corte hasta FINISH. Falta comprobación
+física en la máquina del taller.
 
 Control por USB para M2 Nano conservando libusb-win32 y Sagaon/K40 Whisperer.
 El navegador usa un conector local; no hay que descargar/importar diseños para
@@ -10,7 +26,7 @@ Si una actualización dice `timed out` o el proceso anterior no termina, ejecuta
 `reparar-inicio-windows.bat` dentro de la carpeta nueva que ya tiene `.venv`.
 Registra exclusivamente la entrada LZStudioK40 para esa carpeta, sin contactar
 el servidor bloqueado ni abrir USB. Guarda tus trabajos y reinicia Windows;
-después abre `abrir-conector.vbs` de esa misma carpeta y comprueba 0.6.0.
+después abre `abrir-conector.vbs` de esa misma carpeta y comprueba 0.6.1.
 No termina otros procesos Python ni cambia el código permanente.
 
 1. Termina cualquier trabajo. Cierra el conector anterior y Sagaon.
@@ -21,7 +37,7 @@ No termina otros procesos Python ni cambia el código permanente.
    comprueba el motor sin USB, activa el inicio automático y abre el panel local.
    Si estás actualizando, cierra por completo el conector anterior antes. Cerrar
    solo la ventana no lo termina. Tras instalar, reinicia Windows si el panel local
-   sigue mostrando otra versión; debe indicar **Conector 0.6.0**.
+   sigue mostrando otra versión; debe indicar **Conector 0.6.1**.
 4. Pulsa **Copiar código** y pégalo una vez en Box. Deja **Recordar esta computadora**
    marcado. Si ya estaba emparejado, el código se conserva y no se repite este paso.
 5. En adelante, el conector inicia en segundo plano al iniciar sesión en Windows.
@@ -93,8 +109,9 @@ confirma en 15 segundos, se muestra el error y **Restablecer conexión USB**;
 no se habilitan cortes ni reanudaciones basados en un temporizador. Restablecer
 libera una sesión fallida; no confirma la parada física. Ante una máquina aún
 activa, utiliza primero su paro físico.
-En operación normal, Home, flechas, marco y corte vuelven a estar listos
-automáticamente cuando la controladora indica fin; enviar datos no basta.
+Home y flechas admiten la siguiente orden cuando se vacía la cola del PC y la
+placa acepta instrucciones; su posición sigue siendo estimada. Marco y corte
+siguen esperando fin de controladora; enviar datos no basta para darlos por terminados.
 Se eliminó la casilla repetitiva: cada botón inicia solamente su propia operación.
 El porcentaje solo mide datos transmitidos. La parada modificada requiere
 validación física con emisión deshabilitada antes de otro corte.
@@ -121,7 +138,7 @@ reenviar el trabajo. No prepares de nuevo un corte cuya respuesta se haya perdid
 
 ## Verificación y desarrollo
 
-## Taller 3.6 y registro opcional (conector 0.6.0)
+## Taller 3.6 y registro opcional (conector 0.6.1)
 
 Box conserva una sola sesión al cambiar entre Diseñar, Preparar corte, Operar
 máquina y Biblioteca. Los diseños, preparaciones y plantillas se guardan en este

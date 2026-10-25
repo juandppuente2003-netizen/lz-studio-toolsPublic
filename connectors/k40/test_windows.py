@@ -24,7 +24,7 @@ class WindowsSetupTests(unittest.TestCase):
             self.assertEqual(request.call_args_list[-1].args,('/shutdown',{}))
         with patch.object(update_windows, 'listening', return_value=True), patch.object(update_windows, 'request', return_value={'bridgeVersion':'0.4.1'}):
             with self.assertRaises(RuntimeError): update_windows.verify_started()
-        with patch.object(update_windows, 'listening', return_value=True), patch.object(update_windows, 'request', return_value={'bridgeVersion':'0.6.0'}):
+        with patch.object(update_windows, 'listening', return_value=True), patch.object(update_windows, 'request', return_value={'bridgeVersion':'0.6.1'}):
             update_windows.verify_started()
 
     def test_command_quotes_paths_and_requires_runtime(self):

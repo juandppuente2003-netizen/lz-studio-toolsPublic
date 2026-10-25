@@ -11,6 +11,7 @@ FILES = (
     'requirements.txt', 'test_bridge.py', 'test_windows.py',
     'registration.py', 'test_registration.py', 'update_windows.py',
     'reparar-inicio-windows.bat',
+    'diagnosticar-box.bat',
 )
 
 
@@ -23,10 +24,10 @@ def build():
     with ZipFile(archive) as package:
         assert package.testzip() is None
         assert len(package.namelist()) == len(FILES)
-        assert b"'bridgeVersion': '0.6.0'" in package.read('LZ-K40-Windows/bridge.py')
+        assert b"'bridgeVersion': '0.6.1'" in package.read('LZ-K40-Windows/bridge.py')
     checksum = hashlib.sha256(archive.read_bytes()).hexdigest()
     (folder / 'LZ-K40-Windows.sha256').write_text(checksum + '  ' + archive.name + '\n', encoding='utf-8')
-    print(f'{archive.name}: {archive.stat().st_size} bytes, 0.6.0, CRC and SHA-256 OK')
+    print(f'{archive.name}: {archive.stat().st_size} bytes, 0.6.1, CRC and SHA-256 OK')
 
 
 if __name__ == '__main__':

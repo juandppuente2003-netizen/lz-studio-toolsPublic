@@ -271,7 +271,14 @@ class M2Engine:
         return output.getvalue()
 
     def finished(self):
-        # Same FINISH statuses used by the pinned driver's wait_finished().
+        return self._completion_status(allow_ready=False)
+
+    def rapid_ready(self):
+        # Rapid commands can remain at OK (0xCE) after acknowledgement.
+        # This permits the next ordered command; it does NOT prove physical stop.
+        return self._completion_status(allow_ready=True)
+
+    def _completion_status(self, allow_ready):
         if not self.transport_lock.acquire(blocking=False):
             return False
         try:
@@ -280,7 +287,8 @@ class M2Engine:
             self.device.controller.update_status()
             status = self.device.controller._status
             self.last_controller_status = status[1] if status and len(status) > 1 else None
-            return bool(status and len(status) > 1 and status[1] in (0xEC, 0xCC))
+            accepted = (0xCE, 0xEC, 0xCC) if allow_ready else (0xEC, 0xCC)
+            return bool(status and len(status) > 1 and status[1] in accepted)
         except (_StopRequested, _PauseRequested):
             return False
         except ConnectionError:
@@ -404,7 +412,8 @@ class Bridge:
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.6.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration'],
+                'bridgeVersion': '0.6.1', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance'],
+                'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog') and self.position is not None,
                 'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
                 'controllerStatus': getattr(self.engine, 'last_controller_status', None),
@@ -547,11 +556,12 @@ class Bridge:
                 probe = self.engine
         if probe is not None:
             try:
-                finished = probe.finished()
+                rapid = self.operation in ('home', 'jog')
+                finished = probe.rapid_ready() if rapid else probe.finished()
                 with self.lock:
                     if finished and self.engine is probe and self.state == 'sent':
                         self.position, self.pending_position, self.state = self.pending_position, None, 'idle'
-                        self.message = 'Operación terminada según la controladora. Lista para continuar.'
+                        self.message = ('Orden de movimiento aceptada. Posición estimada por instrucciones; puedes enviar la siguiente orden. No es una medición de parada física.' if rapid else 'Operación terminada según la controladora. Lista para continuar.')
                         self.id, self.payload = None, b''
             except ConnectionError:
                 with self.lock:
