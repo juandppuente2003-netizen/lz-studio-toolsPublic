@@ -12,8 +12,21 @@ import types
 import unittest
 from unittest.mock import patch
 import windows_setup
+import update_windows
 
 class WindowsSetupTests(unittest.TestCase):
+    def test_update_rejects_pending_operation_and_verifies_version(self):
+        with patch.object(update_windows, 'listening', return_value=True), patch.object(update_windows, 'request', return_value={'state':'paused'}) as request:
+            with self.assertRaises(RuntimeError): update_windows.stop_previous()
+            request.assert_called_once_with('/status')
+        with patch.object(update_windows, 'listening', side_effect=[True,False]), patch.object(update_windows, 'request', side_effect=[{'state':'idle','bridgeVersion':'0.4.1'},{}]) as request:
+            update_windows.stop_previous()
+            self.assertEqual(request.call_args_list[-1].args,('/shutdown',{}))
+        with patch.object(update_windows, 'listening', return_value=True), patch.object(update_windows, 'request', return_value={'bridgeVersion':'0.4.1'}):
+            with self.assertRaises(RuntimeError): update_windows.verify_started()
+        with patch.object(update_windows, 'listening', return_value=True), patch.object(update_windows, 'request', return_value={'bridgeVersion':'0.6.0'}):
+            update_windows.verify_started()
+
     def test_command_quotes_paths_and_requires_runtime(self):
         with tempfile.TemporaryDirectory(prefix='LZ Studio ') as directory:
             folder=Path(directory)

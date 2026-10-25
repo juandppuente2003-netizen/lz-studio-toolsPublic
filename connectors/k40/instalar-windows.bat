@@ -9,7 +9,11 @@ echo Verificando el motor M2 sin conectar el USB...
 if errorlevel 1 goto error
 .venv\Scripts\python.exe -c "import tkinter"
 if errorlevel 1 goto error
+.venv\Scripts\python.exe update_windows.py
+if errorlevel 1 goto error
 .venv\Scripts\python.exe windows_setup.py --enable
+if errorlevel 1 goto error
+.venv\Scripts\python.exe update_windows.py --verify
 if errorlevel 1 goto error
 start "" abrir-conector.vbs
 echo Instalacion terminada. Inicio automatico activado sin consola.
@@ -17,6 +21,6 @@ echo Conserva esta carpeta en su ubicacion. El conector NO mueve ni toma el USB 
 pause
 exit /b 0
 :error
-echo No se pudo instalar. Se requiere Python 3.10 o posterior con el comando py disponible.
+echo No se completo la actualizacion. Revisa el mensaje anterior. No cierres trabajos activos.
 pause
 exit /b 1

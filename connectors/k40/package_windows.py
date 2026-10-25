@@ -9,7 +9,7 @@ FILES = (
     'instalar-windows.bat', 'simular-windows.bat', 'usb-windows.bat',
     'background.pyw', 'panel.pyw', 'windows_setup.py', 'bridge.py',
     'requirements.txt', 'test_bridge.py', 'test_windows.py',
-    'registration.py', 'test_registration.py',
+    'registration.py', 'test_registration.py', 'update_windows.py',
 )
 
 
