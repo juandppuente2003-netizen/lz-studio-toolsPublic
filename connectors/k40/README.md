@@ -1,4 +1,4 @@
-# LZ K40 · conector 0.5.0 para Box Studio
+# LZ K40 · conector 0.6.0 para Box Studio
 
 Control por USB para M2 Nano conservando libusb-win32 y Sagaon/K40 Whisperer.
 El navegador usa un conector local; no hay que descargar/importar diseños para
@@ -14,7 +14,7 @@ cada trabajo. La potencia se ajusta en el panel físico de la M2.
    comprueba el motor sin USB, activa el inicio automático y abre el panel local.
    Si estás actualizando, cierra por completo el conector anterior antes. Cerrar
    solo la ventana no lo termina. Tras instalar, reinicia Windows si el panel local
-   sigue mostrando otra versión; debe indicar **Conector 0.5.0**.
+   sigue mostrando otra versión; debe indicar **Conector 0.6.0**.
 4. Pulsa **Copiar código** y pégalo una vez en Box. Deja **Recordar esta computadora**
    marcado. Si ya estaba emparejado, el código se conserva y no se repite este paso.
 5. En adelante, el conector inicia en segundo plano al iniciar sesión en Windows.
@@ -113,6 +113,44 @@ Si cierras/reabres el panel web durante una operación, recupera el estado sin
 reenviar el trabajo. No prepares de nuevo un corte cuya respuesta se haya perdido.
 
 ## Verificación y desarrollo
+
+## Taller 3.6 y registro opcional (conector 0.6.0)
+
+Box conserva una sola sesión al cambiar entre Diseñar, Preparar corte, Operar
+máquina y Biblioteca. Los diseños, preparaciones y plantillas se guardan en este
+navegador; no en la placa. Exporta un respaldo antes de borrar datos del navegador.
+
+El registro admite un punto para desplazamiento o dos a ocho para giro y
+desplazamiento. Los puntos adicionales comprueban el error; no se aplica escala
+ni deformación. Se rechazan referencias separadas menos de 10 mm, diferencias
+de escala mayores al 2% y error máximo mayor a 0.5 mm. Estas tolerancias son de
+validación numérica, no una garantía de precisión mecánica. El conector vuelve
+a calcular la transformación, comprueba límites y exige la misma sesión USB.
+Las plantillas conservan referencias de diseño, nunca posiciones físicas válidas
+para otra sesión. Después de cargarlas hay que referenciarlas y recorrer el marco.
+
+### Celular: etapa de validación en red local
+
+En Operar máquina > Control desde celular genera el QR. Escanéalo, acepta el
+emparejamiento en el celular y pega su respuesta en la computadora. Pulsa Ceder
+control solo cuando ambas vistas coincidan. Es un enlace WebRTC cifrado directo,
+sin servidor de señalización ni relay. El teléfono no recibe el código USB.
+Mantén Box abierto en la computadora; ambos equipos necesitan una red local que
+permita comunicación entre clientes. Las redes con aislamiento pueden impedirlo.
+El conector sigue escuchando exclusivamente en 127.0.0.1.
+
+Solo un dispositivo controla movimientos. Stop permanece accesible desde ambos.
+Cerrar el enlace devuelve el control al PC; no inicia, reanuda ni repite trabajos.
+Recargar el celular exige un nuevo enlace. No hay reconexión automática ni reintento
+de una orden cuya respuesta se haya perdido.
+
+El protocolo, el fraccionamiento de vistas grandes y la deduplicación tienen
+pruebas automatizadas. La prueba WebRTC real no obtuvo candidatos de red en el
+entorno de desarrollo: iPhone/Safari, Chrome, QR y funcionamiento entre dos equipos
+en el Wi-Fi del taller siguen pendientes de validación. Tampoco se han validado
+físicamente el registro ni la pausa en una M2. No se cambia potencia, PWM o perfil.
+
+## Pruebas
 
 - Probados en Linux: compilador real M2 sin abrir USB; movimientos y fin de
   controladora con transporte de prueba; origen, límites, cancelación, sesión,

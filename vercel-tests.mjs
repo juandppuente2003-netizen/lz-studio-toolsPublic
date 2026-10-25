@@ -21,6 +21,8 @@ response=await app.fetch(req('dtf.html'));assert.equal(response.status,200);asse
 for(const route of ['box','box/']){response=await app.fetch(req(route));assert.equal(response.status,307);assert.equal(response.headers.get('Location'),'/box/index.html');}
 response=await app.fetch(new Request(origin+'/api/site?__lz_path=box/&test=usb'));assert.equal(response.status,307);assert.equal(response.headers.get('Location'),'/box/index.html?test=usb');
 response=await app.fetch(req('box/index.html'));assert.equal(response.status,303);assert.equal(response.headers.get('Location'),'/account.html?return=box%2Findex.html');
+for(const path of ['box/remote.html','box/remote-client.js','box/peer-transport.js']){response=await app.fetch(req(path));assert.equal(response.status,200,path);}
+for(const path of ['box/workshop.js','box/k40-control.js']){response=await app.fetch(req(path));assert.equal(response.status,401,path);}
 response=await app.fetch(req('account.html'));assert.equal(response.status,200);const html=await response.text();assert.match(html,/Cambiar contraseña/);assert.doesNotMatch(html,/Recibir enlace de acceso/);
 response=await app.fetch(req('crop.html'));assert.equal(response.status,303);assert.equal(response.headers.get('Location'),'/account.html?return=crop.html');
 response=await app.fetch(req('crop-app.js'));assert.equal(response.status,401);

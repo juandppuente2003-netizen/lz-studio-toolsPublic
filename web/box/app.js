@@ -23,7 +23,7 @@ let state={...defaults},panels=[],packed=null,valid=false,view='3d',exportData=n
 const editHistory=new EditHistory();let editor=null;
 const renderer=new BoxRenderer($('scene'));renderer.onRendered=()=>{$('renderStatus').textContent=renderer.engine==='WebGL 2'?'3D HD':'3D compatible';$('renderStatus').title=renderer.engine==='WebGL 2'?'Render acelerado con suavizado y sombras':'Render compatible sin aceleración WebGL 2';};const planViewer=new PlanView($('plan'),()=>updateZoom());let toastTimer;
 renderer.showJoints=false;
-const planEdit=new PlanEdit({state:()=>state,packed:()=>packed,panels:()=>panels,view:()=>view,redraw:()=>drawPlan(),toast:m=>toast(m),commit:next=>{state=next;syncForm();update();}});
+const planEdit=new PlanEdit({state:()=>state,packed:()=>packed,panels:()=>panels,view:()=>view,bed:()=>globalThis.lzApp?.displayBed||null,redraw:()=>drawPlan(),toast:m=>toast(m),commit:next=>{state=next;syncForm();update();}});
 $('showJoints').onchange=()=>{renderer.showJoints=$('showJoints').checked;renderer.draw();};
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),3600);}
 const fmt=n=>Number(n.toFixed(2)).toLocaleString('es-MX');
@@ -60,7 +60,7 @@ function update(record=true,prepared=null){
  }catch(e){valid=false;$('errorBox').textContent=e.message;$('errorBox').hidden=false;}
  for(const fn of globalThis.lzApp?.listeners||[])try{fn();}catch(e){console.error(e);}$('downloadBtn').disabled=!valid||!packed;$('couponBtn').disabled=!valid;$('saveBtn').disabled=!valid;$('pngBtn').disabled=!valid;$('savedCount').textContent=designs().length;refreshSaveState();
 }
-function drawPlan(){if(!packed)return;planViewer.setSheets(planEdit.render(packed,state,panels),+state.sheetW,+state.sheetH);}
+function drawPlan(){if(!packed)return;const bed=globalThis.lzApp?.displayBed;planViewer.setSheets(planEdit.render(packed,state,panels),Math.max(+state.sheetW,bed?.width||0),Math.max(+state.sheetH,bed?.height||0));}
 
 function setView(v){view=v;if(editor){editor.hidden=v!=='3d';$('editInspector').hidden=v!=='3d'||!editor.enabled;}$('edit3d').disabled=v!=='3d';$('fitPlan').hidden=v!=='2d';if($('planTools'))$('planTools').hidden=v!=='2d';if($('editHandles')&&v!=='3d')$('editHandles').hidden=true;$('stage')?.classList?.toggle('is-plan',v==='2d');$('qualityControl').hidden=v==='2d';$('studioMode').disabled=v==='2d';$('renderStatus').hidden=v==='2d';$('scene').hidden=v!=='3d';$('plan').hidden=v!=='2d';$('view3d').classList.toggle('active',v==='3d');$('view2d').classList.toggle('active',v==='2d');$('view3d').setAttribute('aria-selected',String(v==='3d'));$('view2d').setAttribute('aria-selected',String(v==='2d'));$('viewHint').textContent=v==='3d'?'Arrastra para girar · Rueda para zoom':'Rueda para zoom · Arrastra para desplazar';$('explode').disabled=v==='2d';$('opening').disabled=v==='2d';$$('[data-camera]').forEach(b=>b.disabled=v==='2d');$('showDimensions').disabled=v==='2d';update();updateZoom();}
 function updateZoom(){$('zoomValue').textContent=`${Math.round((view==='3d'?renderer.zoom:planViewer.zoom)*100)}%`;}
@@ -188,3 +188,6 @@ activeId=readStorage('lzbox-active',null);if(activeId&&!designs().some(p=>p.id==
 // API for studio-plus.js (shortcuts, piece visibility, extra views). Read-mostly.
 const updateListeners=new Set();
 globalThis.lzApp={get state(){return state;},get activeId(){return activeId;},designs,putStorage,readStorage,onUpdate:fn=>{updateListeners.add(fn);return()=>updateListeners.delete(fn);},commit:(next,record=true)=>{const errors=validate(next);if(errors.length)return errors[0];state=next;syncForm();update(record);return null;},showProjects:()=>showProjects(),get panels(){return panels;},get packed(){return packed;},get view(){return view;},get valid(){return valid;},renderer,editor,setView,toast,quickSave,openExport:()=>openExport('box'),saveAs:()=>{$('designName').value=state.name;$('saveDialog').showModal();},redrawPlan:()=>drawPlan(),listeners:updateListeners};
+Object.assign(globalThis.lzApp,{planEdit,planViewer,thumbnail,validateDesign:raw=>cleanState(raw),saveNamed:storeDesign,
+ loadDesign(raw,id=null){const next=cleanState(raw);state=next;activeId=designs().some(p=>p.id===id)?id:null;editHistory.reset(state);putStorage('lzbox-active',activeId);syncForm();update(false);return state;}
+});

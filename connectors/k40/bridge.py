@@ -17,6 +17,7 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from registration import register_job
 
 PROTOCOL = 'lz-k40-m2/v1'
 ENGINE_VERSION = '0.9.9100'
@@ -398,11 +399,13 @@ class Bridge:
         self.shutting_down = False
         self.control_started = 0
         self.cleanup_thread = None
+        self.session_id = None
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.5.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery'],
+                'bridgeVersion': '0.6.0', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration'],
+                'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
                 'controllerStatus': getattr(self.engine, 'last_controller_status', None),
                 'connected': self.engine is not None and (self.simulation or self.engine.connected())}
@@ -419,11 +422,14 @@ class Bridge:
             if self.state not in ('idle', 'prepared'):
                 raise ValueError('Hay una operación activa. Usa Stop para pausar o cancelar.')
             engine = self.get_engine()
+            already_connected = self.session_id is not None and (self.simulation or engine.connected())
             if not self.simulation:
                 engine.connect()
+            if not already_connected:
+                self.session_id = secrets.token_urlsafe(18)
             return self.info()
 
-    def prepare(self, raw, mode, origin='home'):
+    def prepare(self, raw, mode, origin='home', registration=None):
         with self.lock:
             if self.state not in ('idle', 'prepared'):
                 raise ValueError('Hay un trabajo pendiente. Verifica la máquina antes de continuar.')
@@ -431,10 +437,13 @@ class Bridge:
                 raise ValueError('Operación no compatible.')
             self.id, self.payload, self.state = None, b'', 'idle'
             job = validate_job(raw, self.bed)
-            if origin not in ('home', 'current'):
+            if origin not in ('home', 'current', 'aligned'):
                 raise ValueError('Origen no compatible.')
             start = [0, 0]
-            if origin == 'current':
+            if origin == 'aligned':
+                start = list(self.position) if self.position is not None else [0, 0]
+                job = validate_job(register_job(job, registration, self.session_id, self.position), self.bed)
+            elif origin == 'current':
                 if self.position is None:
                     raise ValueError('Haz Home una vez para establecer la posición antes de usar el origen actual.')
                 start = list(self.position)
@@ -618,6 +627,7 @@ class Bridge:
                 with self.lock:
                     if self.engine is engine:
                         self.engine = None
+                        self.session_id = None
                         self.operation = None
                         self.state, self.message = 'idle', message
             except Exception:
@@ -677,6 +687,7 @@ class Bridge:
                 self.engine = None
             self.id, self.payload, self.job = None, b'', None
             self.position, self.pending_position = None, None
+            self.session_id = None
             self.state, self.message = 'idle', 'USB liberado. Puedes usar Sagaon/K40 Whisperer.'
             return self.status()
 
@@ -751,7 +762,7 @@ def make_server(bridge, token, origins, port=17840):
                 elif self.path == '/disconnect':
                     result = bridge.disconnect()
                 elif self.path == '/prepare':
-                    result = bridge.prepare(data.get('job'), data.get('mode'), data.get('origin', 'home'))
+                    result = bridge.prepare(data.get('job'), data.get('mode'), data.get('origin', 'home'), data.get('registration'))
                 elif self.path == '/motion':
                     result = bridge.motion(data.get('action'), data.get('dx', 0), data.get('dy', 0), data.get('confirmed'))
                 elif self.path == '/shutdown':

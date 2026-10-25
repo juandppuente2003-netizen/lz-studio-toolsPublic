@@ -8,11 +8,13 @@ import {arrange,checkPacked,freeze,place,sheetPresets} from './layout-plus.js?v=
 const esc=s=>String(s).replace(/[<&>"]/g,c=>({'<':'&lt;','&':'&amp;','>':'&gt;','"':'&quot;'}[c]));
 const r2=n=>Math.round(n*100)/100;
 
-export function sheetSVG(packed,s,sheet,{selected=null,status={}}={}){
+export function sheetSVG(packed,s,sheet,{selected=null,status={},bed=null}={}){
  const items=packed.panels.filter(p=>p.sheet===sheet),fs=Math.max(4,+s.sheetW/70),g=+s.gap;
  const body=items.map(p=>{const d=[p.points,...(p.holePoints||[])].map(r=>'M'+r.map(v=>v.map(r2).join(' ')).join('L')+'Z').join('');const cls=['plan-piece',p.id===selected?'is-selected':'',status[p.id]||''].join(' ');const size=Math.min(fs,p.bw/Math.max(4,p.name.length)*1.6,p.bh*.3);
   return `<g class="${cls}" data-piece="${esc(p.id)}"><rect class="plan-hit" x="${r2(p.x)}" y="${r2(p.y)}" width="${r2(p.bw)}" height="${r2(p.bh)}"/><path d="${d}" fill-rule="evenodd"/><text x="${r2(p.x+p.bw/2)}" y="${r2(p.y+p.bh/2+size*.35)}" font-size="${r2(size)}" text-anchor="middle">${esc(p.name)}</text></g>`;}).join('');
- return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${+s.sheetW} ${+s.sheetH}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Hoja ${sheet+1}: ${items.length} piezas"><rect class="plan-margin" x="${g/2}" y="${g/2}" width="${+s.sheetW-g}" height="${+s.sheetH-g}"/>${body}</svg>`;
+ const W=bed?Math.max(+s.sheetW,bed.width):+s.sheetW,H=bed?Math.max(+s.sheetH,bed.height):+s.sheetH,step=Math.max(10,Math.ceil(Math.max(W,H)/10/10)*10);
+ let ruler='';for(let x=0;x<=W;x+=step)ruler+=`<text class="plan-ruler" x="${x+1}" y="${fs}" font-size="${fs*.7}">${x}</text>`;for(let y=step;y<=H;y+=step)ruler+=`<text class="plan-ruler" x="1" y="${y}" font-size="${fs*.7}">${y}</text>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Hoja ${sheet+1}: ${items.length} piezas"><rect class="plan-bed" width="${W}" height="${H}"/><rect class="plan-stock" width="${+s.sheetW}" height="${+s.sheetH}"/><rect class="plan-margin" x="${g/2}" y="${g/2}" width="${+s.sheetW-g}" height="${+s.sheetH-g}"/>${ruler}${body}</svg>`;
 }
 
 export class PlanEdit{
@@ -31,7 +33,7 @@ export class PlanEdit{
  render(packed,s,panels){
   this.check=checkPacked(packed,s,panels);const status={};for(const id of this.check.outside)status[id]='is-outside';for(const [a,b] of this.check.tight){status[a]||='is-tight';status[b]||='is-tight';}for(const [a,b] of this.check.overlaps){status[a]='is-overlap';status[b]='is-overlap';}
   if(this.selected&&!packed.panels.some(p=>p.id===this.selected))this.selected=null;
-  const sheets=[];for(let i=0;i<packed.count;i++){const wrap=document.createElement('div');wrap.className='sheet-wrap';wrap.innerHTML=sheetSVG(packed,s,i,{selected:this.selected,status});const u=this.check.sheets[i];const label=document.createElement('p');label.textContent=`Hoja ${i+1} · ${+s.sheetW} × ${+s.sheetH} mm · ${u?u.pieces:0} piezas · ${u?u.pct.toFixed(1):'0.0'}% aprovechado`;wrap.append(label);if(this.editing)this.bind(wrap,i,packed,s);sheets.push(wrap);}
+  const sheets=[];for(let i=0;i<packed.count;i++){const wrap=document.createElement('div');wrap.className='sheet-wrap';wrap.innerHTML=sheetSVG(packed,s,i,{selected:this.selected,status,bed:this.api.bed?.()});const u=this.check.sheets[i];const label=document.createElement('p');label.textContent=`Hoja ${i+1} · ${+s.sheetW} × ${+s.sheetH} mm · ${u?u.pieces:0} piezas · ${u?u.pct.toFixed(1):'0.0'}% aprovechado`;wrap.append(label);if(this.editing)this.bind(wrap,i,packed,s);sheets.push(wrap);}
   this.refreshTools(packed,s);return sheets;
  }
  bind(wrap,sheet,packed,s){const svg=wrap.querySelector('svg');if(!svg)return;
