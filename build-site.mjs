@@ -3,7 +3,7 @@ import {build} from 'esbuild';
 import './build-accounts.mjs';
 const publicScripts=new Set(['/home.js','/account/account-nav.js','/account/account-page.js',
  // Pairing-only client: no USB credentials, machine API or geometry generator.
- '/box/remote.html','/box/remote-client.js','/box/peer-transport.js']);
+ '/box/remote.html','/box/remote-client.js','/box/peer-transport.js','/box/peer-signaling.js']);
 // Auth bundles use shared chunks; the app modules themselves remain protected.
 const assets={};
 async function walk(dir,prefix=''){for(const entry of await readdir(dir,{withFileTypes:true})){const relative=prefix+'/'+entry.name;if(entry.isDirectory())await walk(dir+'/'+entry.name,relative);else{

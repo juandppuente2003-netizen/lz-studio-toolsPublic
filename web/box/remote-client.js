@@ -1,4 +1,5 @@
 import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader} from './peer-transport.js?v=1';
+import {pairingRequest,parsePairingLink} from './peer-signaling.js?v=1';
 const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false;const pending=new Map();
 const status=message=>{$('remoteStatus').textContent=message;};
 function controls(){const owner=state?.owner==='phone',idle=owner&&!state?.busy&&!awaiting&&channel?.readyState==='open';for(const id of ['remoteUp','remoteLeft','remoteRight','remoteDown'])$(id).disabled=!idle||!state?.hasPosition;$('remoteHome').disabled=!idle;$('remoteFrame').disabled=!idle||!state?.canRun;$('remoteCut').disabled=!idle||!state?.canRun;$('remoteStop').disabled=!state?.canPause||channel?.readyState!=='open';$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||channel?.readyState!=='open';$('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);}
@@ -23,12 +24,17 @@ async function command(action,args={}){
 for(const [id,x,y] of [['remoteUp',0,-1],['remoteLeft',-1,0],['remoteRight',1,0],['remoteDown',0,1]])$(id).onclick=()=>command('jog',{dx:x*Number($('remoteStep').value),dy:y*Number($('remoteStep').value)});
 for(const [id,action] of [['remoteHome','home'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
 $('remotePair').onclick=async()=>{try{
- $('remotePair').disabled=true;const code=new URLSearchParams(location.hash.slice(1)).get('pair');const offer=await decodePairing(code,'offer');
+ $('remotePair').disabled=true;const params=new URLSearchParams(location.hash.slice(1)),automatic=params.has('link');const reference=automatic?parsePairingLink(params.get('link')):null,claim=automatic?crypto.randomUUID():null;
+ const offer=automatic?await pairingRequest('offer',{...reference,claim}):await decodePairing(params.get('pair'),'offer');
+ if(automatic)status('Enlazando automáticamente con tu computadora…');
  session=offer.session;peer=createPeer();const reader=new PeerMessageReader();peer.ondatachannel=event=>{channel=event.channel;if(channel.label!=='lz-box-'+session){channel.close();return;}channel.onopen=()=>{$('remoteLinkState').textContent='Enlazado';status('Esperando el estado de la computadora…');};channel.onclose=disconnected;channel.onmessage=e=>{try{const message=reader.accept(e.data);if(message)receive(message);}catch{status('Estado recibido inválido; vuelve a enlazar si no se recupera.');}};};
  peer.onconnectionstatechange=()=>{if(['failed','disconnected'].includes(peer.connectionState))disconnected();};await peer.setRemoteDescription({type:'offer',sdp:offer.sdp});
- const sdp=await gatherDescription(peer,'answer');$('remoteAnswer').value=await encodePairing({version:1,type:'answer',session,expires:offer.expires,sdp});$('remoteCopy').disabled=false;status('Copia la respuesta a la computadora y pulsa Aceptar respuesta. Después podrás ceder el control.');
+ const sdp=await gatherDescription(peer,'answer');
+ if(automatic){await pairingRequest('answer',{...reference,claim,sdp});status('Respuesta enviada automáticamente. Esperando que la computadora complete el enlace…');}
+ else{$('remoteAnswer').closest('label').hidden=false;$('remoteCopy').hidden=false;$('remoteAnswer').value=await encodePairing({version:1,type:'answer',session,expires:offer.expires,sdp});$('remoteCopy').disabled=false;status('Este QR anterior requiere pegar la respuesta en la computadora. Genera un QR nuevo para enlazar automáticamente.');}
  // The pairing payload stays in memory only and is removed from browser history.
  history.replaceState(null,'',location.pathname+location.search);
 }catch(e){status(e.message);$('remotePair').disabled=false;}};
 $('remoteCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('remoteAnswer').value);status('Respuesta copiada. Pégala en la computadora.');}catch{$('remoteAnswer').focus();$('remoteAnswer').select();status('Selecciona y copia la respuesta.');}};
 window.addEventListener('pagehide',()=>{channel?.close();peer?.close();});controls();
+if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidden=true;$('remoteAnswer').closest('label').hidden=true;$('remoteCopy').hidden=true;status('Conectando con tu computadora…');$('remotePair').onclick();}

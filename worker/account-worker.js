@@ -1,4 +1,5 @@
 import {AUTH_CONFIG} from '../web/auth-config.js';
+import {boxPairing} from './box-pairing.js';
 const COOKIE='__Host-lz_session';
 const headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
 const json=(data,status=200,extra={})=>new Response(JSON.stringify(data),{status,headers:{...headers,'Content-Type':'application/json',...extra}});
@@ -24,6 +25,7 @@ export function createHandler({assets,fetchUpstream=fetch}={}){
  return {async fetch(request){
   const url=new URL(request.url);let path;try{path=decodeURIComponent(url.pathname);}catch{return json({message:'Ruta inválida.'},400);}if(path.includes('\\')||path.includes('\0')||path.split('/').some(s=>s==='..'))return json({message:'Ruta inválida.'},400);if(path==='/')path='/index.html';
   try{
+   if(path==='/api/box/pair')return await boxPairing(request,{fetchUpstream,verify,token:tokenFrom(request)});
    if(path==='/api/account/session'){
     if(request.method!=='POST')return json({message:'Método no permitido.'},405);
     if(request.headers.get('Origin')!==url.origin)return json({message:'Solicitud no permitida.'},403);

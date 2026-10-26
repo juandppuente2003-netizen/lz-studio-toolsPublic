@@ -1,7 +1,7 @@
 import {modelInfo} from './models.js?v=3.5';
 import {mountK40} from './k40-control.js?v=10';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=2';
+import {mountRemoteHost} from './workshop-remote.js?v=3';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};
