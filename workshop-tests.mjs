@@ -69,7 +69,7 @@ test('actual Box boot: all models, four spaces, selection, saved preparations an
  try{
   await import('./web/box/app.js?workshop-test');const app=globalThis.lzApp;assert.equal(app.valid,true);await import('./web/box/studio-plus.js?v=3.5');await import('./web/box/workflow-plus.js?v=3.5');
   const {mountWorkshop}=await import('./web/box/workshop.js?workshop-test');const workshop=mountWorkshop(app),$=id=>dom.window.document.getElementById(id);
-  assert.equal(dom.window.document.querySelectorAll('#modelCatalog [data-model]').length,17);
+  dom.window.lzApp=app;await import('./web/studio-redesign.js?workshop-test');assert.ok($('k40BridgePanel').closest('.studio-job-column'));assert.ok($('pieceBar').closest('.studio-piece-inspector'));assert.equal(dom.window.document.querySelectorAll('#modelCatalog [data-model]').length,17);
   assert.ok($('openingRow').closest('.workshop-preview-controls'));assert.equal(dom.window.document.body.classList.contains('box-booting'),false);assert.equal(dom.window.document.querySelector('.lz-nav-link[href="../dtf.html"]').textContent,'Herramientas DTF');
   assert.equal(workshop.space,'design');assert.equal($('k40Dialog').tagName,'SECTION');
   assert.ok($('workshopFuseCuts').closest('.workshop-prepare-dock'));
