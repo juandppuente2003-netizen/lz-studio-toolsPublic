@@ -1,7 +1,10 @@
 import {AUTH_CONFIG} from '../web/auth-config.js';
 import {boxPairing} from './box-pairing.js';
 const COOKIE='__Host-lz_session';
-const headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
+// Cross-origin isolation lets the image AI use several CPU threads (SharedArrayBuffer).
+// `credentialless` keeps Google Fonts and other public resources loading without CORP headers;
+// browsers that do not support it simply stay non-isolated and use one thread, as before.
+const headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cross-Origin-Opener-Policy':'same-origin','Cross-Origin-Embedder-Policy':'credentialless'};
 const json=(data,status=200,extra={})=>new Response(JSON.stringify(data),{status,headers:{...headers,'Content-Type':'application/json',...extra}});
 function cookie(token,maxAge){return `${COOKIE}=${token||''}; Path=/; HttpOnly; Secure; SameSite=Lax; ${maxAge===null?'':'Max-Age='+maxAge}`;}
 function tokenFrom(request){return request.headers.get('Cookie')?.split(';').map(p=>p.trim()).find(p=>p.startsWith(COOKIE+'='))?.slice(COOKIE.length+1)||null;}

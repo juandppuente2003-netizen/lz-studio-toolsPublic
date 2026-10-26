@@ -1,0 +1,29 @@
+LZ STUDIO TOOLS — v61 · Velocidad de IA ×2 y Semitonos Premium
+
+Medido en una computadora de prueba de 2 núcleos sin tarjeta gráfica (Chrome, IA por CPU):
+- IA ×2 de 1 MP: 112 s → 43 s (2.6× más rápida). Con más núcleos la mejora crece:
+  la IA ahora usa hasta 8 hilos (antes 1, porque el sitio no estaba aislado).
+- Arranque del motor de IA: 3.7 s → 0.5 s.
+- Semitonos Premium después de la IA (28 cm · 300 ppp): 8.3 s → 3.0 s, con el MISMO archivo
+  PNG bit a bit.
+- Los procesos ya no se detienen si cambias de pestaña.
+
+Qué cambió
+1. Aislamiento de origen (Cross-Origin-Opener-Policy: same-origin y
+   Cross-Origin-Embedder-Policy: credentialless) en todas las páginas. Permite que la IA por
+   CPU use varios núcleos. Navegadores sin soporte siguen como antes (1 hilo).
+2. model-x2.onnx: mismos pesos Real-ESRGAN con un promedio 2×2 dentro del modelo. Resultado
+   de 8 bits idéntico; 4 veces menos datos que copiar desde la GPU. Ver scripts/make-cnn-x2.py.
+3. Bloques adaptados a cada imagen (hasta 384 px en GPU y 320 px en CPU, margen 12 px)
+   en lugar de 160 px fijos: menos llamadas y menos relleno en las orillas.
+4. Sin espera de cuadro de pantalla entre bloques y franjas (afectaba IA, Premium,
+   auditorías, exportaciones y pliegos). Se cede el control cada 40 ms con MessageChannel,
+   que no se detiene en segundo plano.
+5. Sin bloque de calentamiento en CPU (era un bloque completo de trabajo extra).
+
+Calidad: la imagen de la IA es prácticamente idéntica (93 % de píxeles exactos, diferencia
+media 0.03 de 255, PSNR 63 dB; solo cambian las uniones entre bloques). Premium,
+auditorías y exportaciones dan el mismo resultado exacto.
+
+Pruebas: npm test, workshop, pairing, móvil, navegación y K40 en verde. enhance-tests verifica
+el plan de bloques (cobertura completa sin traslapes) y el mismo resultado con bloques grandes.

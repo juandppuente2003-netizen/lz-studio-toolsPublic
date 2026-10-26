@@ -1,5 +1,6 @@
 import {pngBlobDensity} from './png.js';
 import {assemblePng} from './exporter.js';
+import {yielder} from './page-yield.js';
 export const OUTPUT_MAX_PIXELS=140_000_000,OUTPUT_MAX_SIDE=24000;
 export function outputDimensions(widthCm,dpi,aspect,maxPixels=OUTPUT_MAX_PIXELS,maxSide=OUTPUT_MAX_SIDE){
  if(!Number.isFinite(widthCm)||widthCm<.5||widthCm>500||!Number.isFinite(dpi)||dpi<1||dpi>9600||!Number.isFinite(aspect)||aspect<=0)throw Error('Indica un ancho de 0.5 a 500 cm y una resolución válida.');
@@ -18,8 +19,8 @@ export function drawBand(canvas,source,width,height,y,rows,rect){
 export async function exportBands({source,width,height,dpi,rect,process,onProgress}){
  if(typeof CompressionStream==='undefined')throw Error('Actualiza el navegador para exportar archivos grandes.');
  const compressor=new CompressionStream('deflate'),writer=compressor.writable.getWriter(),read=new Response(compressor.readable).arrayBuffer();read.catch(()=>{});
- const band=document.createElement('canvas');
- try{for(let y=0;y<height;y+=64){const rows=Math.min(64,height-y),image=drawBand(band,source,width,height,y,rows,rect);if(process)await process(image,y);const raw=new Uint8Array(rows*(width*4+1));for(let r=0;r<rows;r++)raw.set(image.data.subarray(r*width*4,(r+1)*width*4),r*(width*4+1)+1);await writer.write(raw);onProgress?.((y+rows)/height);await new Promise(requestAnimationFrame);}await writer.close();return assemblePng(width,height,dpi,new Uint8Array(await read));}
+ const band=document.createElement('canvas'),tick=yielder();
+ try{for(let y=0;y<height;y+=64){const rows=Math.min(64,height-y),image=drawBand(band,source,width,height,y,rows,rect);if(process)await process(image,y);const raw=new Uint8Array(rows*(width*4+1));for(let r=0;r<rows;r++)raw.set(image.data.subarray(r*width*4,(r+1)*width*4),r*(width*4+1)+1);await writer.write(raw);onProgress?.((y+rows)/height);await tick();}await writer.close();return assemblePng(width,height,dpi,new Uint8Array(await read));}
  catch(error){await writer.abort(error).catch(()=>{});throw error;}finally{band.width=band.height=1;}
 }
 export async function resizedArtifact(artifact,options,onProgress){

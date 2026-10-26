@@ -1,3 +1,4 @@
+import {yieldToPage} from './page-yield.js';
 import {assemblePng} from './exporter.js';
 import {exportBands} from './image-output.js';
 import {DotScanner} from './large-dot-engine.js';
@@ -38,7 +39,7 @@ export async function finishPrintExport(artifact,{onProgress,signal,correctAlpha
     while(preview&&previewY<ph&&Math.floor(previewY*height/ph)===y){for(let px=0;px<pw;px++){const source=Math.floor(px*width/pw)*4,target=(previewY*pw+px)*4;before.set(raw.subarray(source,source+4),target);after.set(finalRow.subarray(source,source+4),target);}previewY++;}
     scanner?.band(finalRow,1,y);
     outputRows++;y++;offset=0;
-    if(outputRows===32||y===height){await writer.write(output.subarray(0,outputRows*(stride+1)));output=new Uint8Array((stride+1)*Math.min(32,height-y));outputRows=0;onProgress?.(y/height);if(y%256===0)await new Promise(requestAnimationFrame);}
+    if(outputRows===32||y===height){await writer.write(output.subarray(0,outputRows*(stride+1)));output=new Uint8Array((stride+1)*Math.min(32,height-y));outputRows=0;onProgress?.(y/height);if(y%256===0)await yieldToPage();}
    }
   }
   if(y!==height||offset)throw Error('El PNG final no contiene todas sus filas.');

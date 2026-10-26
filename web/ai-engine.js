@@ -1,9 +1,15 @@
 import {createIndexedDbCache} from './idb-cache.js';
 
-const CACHE_NAME='lz-print-lab-super-resolution-cnn-v2';
-const MODEL_URL='./models/realesr-general-x4v3-cnn/model.onnx';
+const CACHE_NAME='lz-print-lab-super-resolution-cnn-v3';
+// Same Real-ESRGAN weights; the ×4 output is averaged to ×2 inside the graph
+// (identical 8-bit result, 4× less data copied back from the GPU per block).
+const MODEL_URL='./models/realesr-general-x4v3-cnn/model-x2.onnx';
 const RUNTIME_ROOT='./vendor/onnxruntime/';
 export const CNN_TILE_SIZE=160;
+// Larger blocks waste less work on overlapping margins and per-call overhead.
+export const CNN_TILE_SIZES=Object.freeze({webgpu:384,wasm:320});
+export const CNN_TILE_PAD=12;
+export function cnnThreads(isolated=globalThis.crossOriginIsolated,cores=globalThis.navigator?.hardwareConcurrency||1){if(!isolated)return 1;return Math.max(1,Math.min(8,cores<=4?cores:cores-1));}
 const modelCache=createIndexedDbCache(CACHE_NAME);
 let ortPromise=null;
 
@@ -40,7 +46,7 @@ export async function prefetchSuperResolution(_backend,onProgress){
 async function loadOrt(){
   if(!ortPromise)ortPromise=import('./vendor/onnxruntime/ort.webgpu.bundle.min.mjs').then(ort=>{
     ort.env.wasm.wasmPaths=new URL(RUNTIME_ROOT,location.href).href;
-    ort.env.wasm.numThreads=window.crossOriginIsolated?Math.max(1,Math.min(4,navigator.hardwareConcurrency||1)):1;
+    ort.env.wasm.numThreads=cnnThreads();
     ort.env.wasm.proxy=false;
     if(ort.env.webgpu)ort.env.webgpu.powerPreference='high-performance';
     return ort;
@@ -77,20 +83,20 @@ async function outputImage(tensor,inputWidth,inputHeight){
   return {data,width,height,channels:3};
 }
 
-export async function createOnnxSuperResolution(backend,onProgress){
+export async function createOnnxSuperResolution(backend,onProgress,{tileSize=CNN_TILE_SIZES[backend]||CNN_TILE_SIZE}={}){
   const ort=await loadOrt(),bytes=await modelBytes(onProgress);
   onProgress?.(100,'optimizing');
   const session=await ort.InferenceSession.create(bytes,{executionProviders:[backend],graphOptimizationLevel:'all',enableCpuMemArena:true,enableMemPattern:true});
   const inputName=session.inputNames[0],outputName=session.outputNames[0];
-  const warmup=new ort.Tensor('float32',new Float32Array(3*CNN_TILE_SIZE*CNN_TILE_SIZE),[1,3,CNN_TILE_SIZE,CNN_TILE_SIZE]);
-  try{const outputs=await session.run({[inputName]:warmup});outputs[outputName]?.dispose?.();}finally{warmup.dispose?.();}
+  if(backend==='webgpu'){const warmup=new ort.Tensor('float32',new Float32Array(3*64*64),[1,3,64,64]);try{const outputs=await session.run({[inputName]:warmup});outputs[outputName]?.dispose?.();}finally{warmup.dispose?.();}}
   onProgress?.(100,'ready');
   const run=async canvas=>{
-    if(canvas.width!==CNN_TILE_SIZE||canvas.height!==CNN_TILE_SIZE)throw Error(`El bloque CNN debe medir ${CNN_TILE_SIZE} × ${CNN_TILE_SIZE} px.`);
+    if(!(canvas.width>0&&canvas.height>0&&canvas.width<=tileSize&&canvas.height<=tileSize))throw Error(`El bloque CNN debe medir como máximo ${tileSize} × ${tileSize} px.`);
     const input=canvasTensor(ort,canvas);
     try{const outputs=await session.run({[inputName]:input}),output=outputs[outputName];try{return await outputImage(output,canvas.width,canvas.height);}finally{output?.dispose?.();}}
     finally{input.dispose?.();}
   };
+  run.tileSize=tileSize;run.pad=CNN_TILE_PAD;run.backend=backend;run.threads=backend==='wasm'?cnnThreads():0;
   run.dispose=()=>session.release();
   return run;
 }

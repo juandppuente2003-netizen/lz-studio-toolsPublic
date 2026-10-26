@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {COLOR_DEFAULTS,COLOR_STYLES,processColorAdjustments,autoColorAdjustments,clarityRadius} from './web/color-engine.js';
-import {upscaleTiles,validateUpscaleSize,enhanceImage,upscaleWorkingSize} from './web/upscale-runner.js';
+import {tilePlan,upscaleTiles,validateUpscaleSize,enhanceImage,upscaleWorkingSize} from './web/upscale-runner.js';
 import {decodeImageFile,validateImageFile,validateImportSize} from './web/upscale-import.js';
 import {runInNewContext} from 'node:vm';
 import {readFileSync} from 'node:fs';
@@ -59,6 +59,10 @@ const testEngine=async input=>{calls++;assert.equal(input.width,160);const data=
 const out=await enhanceImage(image,testEngine,{onProgress:p=>lastProgress=p});assert.equal(out.width,282);assert.equal(out.height,22);assert.equal(calls,2);assert.equal(lastProgress.percent,100);
 for(let y=0;y<22;y++)for(let x=0;x<282;x++){const i=(y*282+x)*4;assert.equal(out.data[i+3],x<2?0:255);if(x>=2)assert.deepEqual([...out.data.slice(i,i+3)],[Math.floor(x/2),Math.floor(y/2),80])}
 const cancel=new AbortController();cancel.abort();await assert.rejects(enhanceImage(image,testEngine,{signal:cancel.signal}),{name:'AbortError'});
+// Adaptive blocks for real engines: full coverage, no overlap between cores, bounded size.
+for(const [w,h,max,pad] of [[1000,1000,320,12],[141,11,384,12],[4096,1953,384,12],[2000,1333,320,12]]){const plan=tilePlan(w,h,max,pad),hit=new Uint8Array(w*h);assert.ok(plan.width<=max&&plan.height<=max);for(const t of plan.tiles){assert.equal(t.pad,pad);for(let y=t.y;y<t.y+t.h;y++)for(let x=t.x;x<t.x+t.w;x++)hit[y*w+x]++;}assert.ok(hit.every(v=>v===1),`plan ${w}x${h}`);}
+// Larger blocks engine: same result as the 160 px engine on a flat image, fewer calls.
+{let bigCalls=0;const big=async input=>{bigCalls++;assert.ok(input.width<=320&&input.height<=320);const w=input.width*2,h=input.height*2,data=new Uint8ClampedArray(w*h*3);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const j=(Math.floor(y/2)*input.width+Math.floor(x/2))*4;data.set(input.data.subarray(j,j+3),(y*w+x)*3)}return {data,width:w,height:h,channels:3}};big.tileSize=320;big.pad=12;const out2=await enhanceImage(image,big);assert.equal(bigCalls,1);assert.deepEqual([...out2.data],[...out.data]);}
 const colorHtml=readFileSync('./web/color-enhance.html','utf8');for(const key of Object.keys(COLOR_DEFAULTS))assert.ok(colorHtml.includes(`id="color_${key}"`));
 const upscaleHtml=readFileSync('./web/upscale.html','utf8');assert.ok(!upscaleHtml.includes('id="halftoneOn"'));assert.ok(!upscaleHtml.includes('id="recolorOn"'));
 const ui=readFileSync('./web/color-app.js','utf8');assert.match(ui,/autoColorAdjustments/);assert.match(ui,/writeAdjustments\(COLOR_DEFAULTS\)/);
