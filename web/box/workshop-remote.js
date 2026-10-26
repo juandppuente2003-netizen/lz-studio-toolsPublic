@@ -1,5 +1,5 @@
 import qrcode from './vendor/qrcode.mjs';
-import {createPeer,gatherDescription,encodePairing,decodePairing,CommandGate,sendPeerMessage} from './peer-transport.js?v=1';
+import {createPeer,gatherDescription,encodePairing,decodePairing,CommandGate,sendPeerMessage} from './peer-transport.js?v=2';
 import {pairingRequest,pairingSecret} from './peer-signaling.js?v=1';
 
 export function mountRemoteHost(app,machine,mount){

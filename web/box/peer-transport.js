@@ -1,5 +1,5 @@
 // Encrypted peer-to-peer transport. No relay, signaling service or USB token.
-export const REMOTE_ACTIONS=new Set(['home','jog','frame','cut','pause','resume','cancel']);
+export const REMOTE_ACTIONS=new Set(['pulse','home','jog','frame','cut','pause','resume','cancel']);
 export async function encodePairing(value){
  const bytes=new TextEncoder().encode(JSON.stringify(value));
  const compressed=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());

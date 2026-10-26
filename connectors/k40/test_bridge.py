@@ -293,6 +293,20 @@ class RealCompilerTests(unittest.TestCase):
             self.assertEqual(b.status()['state'], 'idle'); self.assertAlmostEqual(b.position[1],5,delta=.0254)
             b.motion('jog', 0, -1, True); c._check_transfer_buffer(); c.process_queue()
             self.assertEqual(b.status()['state'], 'idle'); self.assertAlmostEqual(b.position[1],4,delta=.0254)
+            for _ in range(3):
+                prepared = b.prepare(job(), 'frame', 'current'); b.run(prepared['id'], True)
+                for i in range(100):
+                    c._check_transfer_buffer()
+                    if not c.process_queue(): break
+                self.assertEqual(b.status()['state'], 'idle')
+                self.assertIsNotNone(b.position)
+                b.motion('goto', 30, 40, True)
+                for i in range(100):
+                    c._check_transfer_buffer()
+                    if not c.process_queue(): break
+                self.assertEqual(b.status()['state'], 'idle')
+                self.assertAlmostEqual(b.position[0], 30, delta=.0254)
+                self.assertAlmostEqual(b.position[1], 40, delta=.0254)
             b.prepare(job(), 'cut'); b.state = 'sent'; b.operation = 'cut'
             self.assertEqual(b.status()['state'], 'sent')
             with self.assertRaises(ValueError): b.motion('jog', 1, 0, True)
@@ -300,6 +314,19 @@ class RealCompilerTests(unittest.TestCase):
             self.assertEqual(b.status()['state'], 'idle')
         finally:
             engine.close()
+    def test_real_driver_pulse_writes_on_and_off_and_no_movement(self):
+        engine=M2Engine(BED);sent=[]
+        engine.send=lambda data: sent.append(('on',data))
+        engine.device.controller.realtime_write=lambda data: sent.append(('off',data))
+        engine.remaining=lambda:0;engine.failed=lambda:False
+        try:
+            abort=threading.Event();abort.set()
+            engine.timed_pulse(50,abort)
+            self.assertEqual([kind for kind,_ in sent],['on','off'])
+            self.assertIn(b'D',sent[0][1]);self.assertIn(b'U',sent[1][1])
+            self.assertNotIn(b'IPP',sent[0][1]);self.assertNotIn(b'IPP',sent[1][1])
+        finally: engine.close()
+
     def test_real_m2_cut_and_laser_off_frame(self):
         raw = validate_job(job(), BED); cut = self.engine.compile(raw,'cut'); frame = self.engine.compile(raw,'frame')
         self.assertTrue(cut.startswith(b'IPP\n')); self.assertIn(b'D',cut)
@@ -466,5 +493,36 @@ class RealCompilerTests(unittest.TestCase):
             self.assertEqual(sum(p.startswith(b'IBaS1P') for p in packets), 1)
         finally:
             engine.close()
+
+class PulseTests(unittest.TestCase):
+    def test_pulse_is_bounded_exclusive_and_stop_preserves_position(self):
+        entered, released = threading.Event(), threading.Event()
+        class Engine(FakeEngine):
+            def timed_pulse(self, ms, abort):
+                self.ms = ms; entered.set(); abort.wait(1); released.set()
+        b = Bridge(BED, simulation=False, engine_factory=Engine)
+        b.connect(); b.position = [20,30]
+        for value in (0, -1, 101, float('inf')):
+            with self.assertRaises(ValueError): b.pulse(value, True)
+        with self.assertRaises(ValueError): b.pulse(50, False)
+        b.pulse(50, True); self.assertTrue(entered.wait(1))
+        with self.assertRaises(ValueError): b.pulse(50, True)
+        with self.assertRaises(ValueError): b.motion('jog',1,0,True)
+        b.pause(); self.assertTrue(released.wait(1))
+        for _ in range(100):
+            if b.status()['state'] == 'idle': break
+            time.sleep(.002)
+        self.assertEqual(b.state,'idle'); self.assertEqual(b.position,[20,30])
+        self.assertFalse(b.engine.paused)
+
+    def test_pulse_error_never_claims_ready(self):
+        class Engine(FakeEngine):
+            def timed_pulse(self, ms, abort): raise ConnectionError('lost')
+        b=Bridge(BED,simulation=False,engine_factory=Engine);b.connect();b.position=[0,0]
+        b.pulse(50,True)
+        for _ in range(100):
+            if b.state=='error': break
+            time.sleep(.002)
+        self.assertEqual(b.state,'error');self.assertIsNone(b.position)
 
 if __name__ == '__main__': unittest.main()

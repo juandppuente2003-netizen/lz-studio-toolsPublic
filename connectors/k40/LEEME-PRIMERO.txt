@@ -1,3 +1,11 @@
+ACTUALIZACION 0.6.3
+Marcos: acepta cola de movimientos rapidos sin exigir fin de corte.
+Ir a punto: destino absoluto dentro de la cama.
+Pulso movil: 50 ms temporizados por Windows y USB, potencia manual del panel.
+El tiempo real depende de USB y Windows, no es un temporizador interno de placa.
+Stop solicita apagado; ante perdida USB usa el paro fisico.
+Actualizar: maquina apagada y USB desconectado; extraer todo y ejecutar INICIAR-LZ-BOX.bat.
+
 LZ STUDIO - K40 0.6.2 - WINDOWS
 
 1. Apaga la maquina, desconecta su cable USB y cierra Sagaon.

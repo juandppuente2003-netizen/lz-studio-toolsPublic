@@ -26,6 +26,9 @@ test('actual mobile controller: pairing, owner, single jog, priority Stop, disco
   $('remoteDown').click();$('remoteDown').click();assert.equal(sent.length,1);assert.equal(sent[0].action,'jog');assert.deepEqual(sent[0].args,{dx:0,dy:5});
   channel.onmessage({data:JSON.stringify({...state,state:'sending',busy:true,canPause:true})});$('remoteStop').click();assert.equal(sent.length,2);assert.equal(sent[1].action,'pause');
   for(const message of sent)channel.onmessage({data:JSON.stringify({type:'reply',id:message.id,ok:true})});await settle();
+  channel.onmessage({data:JSON.stringify({...state,canPulse:true})});$('remotePulse').click();$('remotePulse').click();
+  assert.equal(sent.at(-1).action,'pulse');assert.equal(sent.filter(v=>v.action==='pulse').length,1);
+  channel.onmessage({data:JSON.stringify({type:'reply',id:sent.at(-1).id,ok:true})});await settle();
   channel.onmessage({data:JSON.stringify({...state,owner:'desktop',canPause:true})});assert.equal($('remoteDown').disabled,true);assert.equal($('remoteStop').disabled,false);
   const before=sent.length;channel.onclose();assert.equal($('remoteHome').disabled,true);assert.equal($('remoteStop').disabled,true);assert.equal(sent.length,before,'Disconnect must not retry commands');
  }finally{dom.window.close();for(const key of keys){if(original[key])Object.defineProperty(globalThis,key,original[key]);else delete globalThis[key];}}

@@ -49,7 +49,7 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
  dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
  let pollTick;globalThis.setInterval=fn=>{pollTick=fn;return 12345678;};globalThis.clearInterval=()=>{};
  const requests=[];let phase='idle',position=null,connected=false,operation=null,pending=null,oldBridge=false,delayRun=false,releaseRun;
- const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:false,position,connected,operation,operationAccepted:phase==='idle'&&['home','jog'].includes(operation),sessionId:'test-session',features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion','pause-resume','automatic-cancel-recovery','rigid-registration','rapid-command-acceptance']});
+ const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:false,position,connected,operation,operationAccepted:phase==='idle'&&['home','jog'].includes(operation),sessionId:'test-session',features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion','pause-resume','automatic-cancel-recovery','rigid-registration','rapid-command-acceptance','rapid-frame-acceptance','timed-pulse']});
  globalThis.fetch=async(url,options)=>{
   const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):null;requests.push({path,body});
   if(path==='/connect')connected=true;
@@ -71,6 +71,9 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
   $('k40Home').click();$('k40Home').click();await settle();await settle();
   assert.equal(requests.filter(r=>r.path==='/motion').length,1);assert.equal($('k40Right').disabled,false);assert.match($('k40Position').textContent,/0.00/);
   assert.equal($('k40State').textContent,'ORDEN ACEPTADA');assert.equal($('k40Frame').disabled,false);
+  $('k40TargetX').value='20';$('k40TargetY').value='30';$('k40Goto').click();await settle();await settle();
+  assert.deepEqual(requests.filter(r=>r.path==='/motion').at(-1).body,{action:'goto',dx:20,dy:30,confirmed:true});
+  $('k40Home').click();await settle();await settle();
   $('k40Down').click();await settle();await settle();assert.deepEqual(position,[0,5]);
   $('k40Up').click();await settle();await settle();assert.deepEqual(position,[0,0]);
   $('k40Right').click();$('k40Right').click();await settle();await settle();assert.deepEqual(position,[5,0]);

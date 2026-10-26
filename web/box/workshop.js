@@ -1,5 +1,5 @@
 import {modelInfo} from './models.js?v=3.5';
-import {mountK40} from './k40-control.js?v=11';
+import {mountK40} from './k40-control.js?v=12';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
 import {mountRemoteHost} from './workshop-remote.js?v=4';
 

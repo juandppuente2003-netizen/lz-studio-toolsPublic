@@ -270,6 +270,38 @@ class M2Engine:
             driver.move_abs(target[0] * UNITS_PER_MM, target[1] * UNITS_PER_MM)
         return output.getvalue()
 
+    def timed_pulse(self, milliseconds, abort):
+        # The pinned M2 driver implements pulse timing on the host, not the board.
+        from meerk40t.lihuiyu.driver import LihuiyuDriver
+        driver, output = LihuiyuDriver(self.device), io.BytesIO()
+        driver.out_pipe = output
+        driver.laser_on()
+        on = output.getvalue()
+        output.seek(0); output.truncate()
+        driver.laser_off()
+        off = output.getvalue()
+        def drain():
+            deadline = time.monotonic() + 2
+            while self.remaining():
+                if self.failed() or time.monotonic() > deadline:
+                    raise ConnectionError('No se confirmó USB durante el pulso. Usa el paro físico.')
+                time.sleep(0.002)
+            if self.failed():
+                raise ConnectionError('USB perdido durante el pulso. Usa el paro físico.')
+        if abort.is_set():
+            return
+        try:
+            self.send(on)
+            drain()
+            abort.wait(milliseconds / 1000)
+        finally:
+            # Off is queued even on timeout, cancellation or failed acknowledgement.
+            if self.remaining():
+                self.device.controller.abort()
+                self.device.controller.reset()
+            self.device.controller.realtime_write(off)
+            drain()
+
     def finished(self):
         return self._completion_status(allow_ready=False)
 
@@ -408,12 +440,13 @@ class Bridge:
         self.control_started = 0
         self.cleanup_thread = None
         self.session_id = None
+        self.pulse_abort = threading.Event()
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.6.2', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance'],
-                'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog') and self.position is not None,
+                'bridgeVersion': '0.6.3', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse'],
+                'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog', 'goto', 'frame') and self.position is not None,
                 'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
                 'controllerStatus': getattr(self.engine, 'last_controller_status', None),
@@ -495,6 +528,30 @@ class Bridge:
             self.position = None  # Unknown until completion/explicit acknowledgement.
         return self.status()
 
+    def pulse(self, milliseconds=50, confirmed=False):
+        with self.lock:
+            milliseconds = numeric(milliseconds, 10, 100, 'Pulso en ms')
+            if confirmed is not True or self.state != 'idle' or self.position is None:
+                raise ValueError('Pulso: conecta, referencia y espera a que no haya operación pendiente.')
+            if not self.engine or (not self.simulation and not self.engine.connected()):
+                raise ConnectionError('Conecta la máquina antes del pulso.')
+            self.state, self.operation = 'pulsing', 'pulse'
+            self.id, self.payload, self.job = None, b'', None
+            self.pulse_abort.clear()
+            self.message = 'Pulso temporizado por Windows/USB; apagado automático solicitado.'
+            def fire():
+                try:
+                    if not self.simulation:
+                        self.engine.timed_pulse(milliseconds, self.pulse_abort)
+                    with self.lock:
+                        self.state, self.message = 'idle', 'Pulso finalizado; apagado enviado y aceptado por USB. Posición estimada conservada.'
+                except Exception:
+                    with self.lock:
+                        self.state, self.position = 'error', None
+                        self.message = 'No se confirmó el apagado por USB. Usa el paro físico y restablece la conexión.'
+            threading.Thread(target=fire, daemon=True).start()
+            return {'state': self.state, 'message': self.message, **self.info()}
+
     def motion(self, action, dx=0, dy=0, confirmed=False):
         with self.lock:
             if confirmed is not True:
@@ -506,6 +563,13 @@ class Bridge:
                 raise ConnectionError('Conecta la M2 antes de moverla.')
             if action == 'home':
                 start, target = [0, 0], [0, 0]
+            elif action == 'goto':
+                if self.position is None:
+                    raise ValueError('Haz Home una vez para establecer la posición.')
+                start = list(self.position)
+                target = [numeric(dx, 0, self.bed['width'], 'Destino X'), numeric(dy, 0, self.bed['height'], 'Destino Y')]
+                target = [round(round(v / 0.0254) * 0.0254, 6) for v in target]
+                target = [min(v, size) for v, size in zip(target, (self.bed['width'], self.bed['height']))]
             elif action == 'jog':
                 if self.position is None:
                     raise ValueError('Haz Home una vez para establecer la posición.')
@@ -520,6 +584,9 @@ class Bridge:
                     numeric(target[i], 0, size, 'Posición destino')
             else:
                 raise ValueError('Movimiento no compatible.')
+            if action != 'home' and target == start:
+                self.state, self.message = 'idle', 'El cabezal ya está en el punto indicado.'
+                return {'state': self.state, 'message': self.message, **self.info()}
             payload = self.engine.compile_motion(start, target, home=action == 'home')
             if not payload or b'D' in payload:
                 raise ValueError('El movimiento no produjo instrucciones válidas sin láser.')
@@ -552,11 +619,11 @@ class Bridge:
                     self.state, self.message = 'sent', 'Datos enviados. Esperando fin de la controladora; el panel quedará listo automáticamente.'
             if self.state == 'error':
                 self.position, self.pending_position = None, None
-            if self.state == 'sent' and self.operation in ('home', 'jog', 'frame', 'cut'):
+            if self.state == 'sent' and self.operation in ('home', 'jog', 'goto', 'frame', 'cut'):
                 probe = self.engine
         if probe is not None:
             try:
-                rapid = self.operation in ('home', 'jog')
+                rapid = self.operation in ('home', 'jog', 'goto', 'frame')
                 finished = probe.rapid_ready() if rapid else probe.finished()
                 with self.lock:
                     if finished and self.engine is probe and self.state == 'sent':
@@ -598,6 +665,9 @@ class Bridge:
 
     def pause(self):
         with self.lock:
+            if self.state == 'pulsing':
+                self.pulse_abort.set()
+                return {'state': self.state, 'message': 'Apagando pulso…', **self.info()}
             if self.state in ('pausing', 'paused'):
                 return self.status()
             if self.state not in ('sending', 'sent'):
@@ -657,6 +727,9 @@ class Bridge:
 
     def cancel(self):
         with self.lock:
+            if self.state == 'pulsing':
+                self.pulse_abort.set()
+                return {'state': self.state, 'message': 'Apagando pulso…', **self.info()}
             if self.state in ('cancelling', 'recovering'):
                 return self.status()
             if self.state == 'idle':
@@ -752,7 +825,7 @@ def make_server(bridge, token, origins, port=17840):
                 return
             if self.path == '/health':
                 # Installer identity check must never wait for USB or state locks.
-                self.reply(200, {'protocol': PROTOCOL, 'bridgeVersion': '0.6.2',
+                self.reply(200, {'protocol': PROTOCOL, 'bridgeVersion': '0.6.3',
                                  'pid': os.getpid(), 'source': str(Path(__file__).resolve()),
                                  'ready': True})
             elif self.path == '/status':
@@ -778,6 +851,8 @@ def make_server(bridge, token, origins, port=17840):
                     result = bridge.disconnect()
                 elif self.path == '/prepare':
                     result = bridge.prepare(data.get('job'), data.get('mode'), data.get('origin', 'home'), data.get('registration'))
+                elif self.path == '/pulse':
+                    result = bridge.pulse(data.get('milliseconds', 50), data.get('confirmed'))
                 elif self.path == '/motion':
                     result = bridge.motion(data.get('action'), data.get('dx', 0), data.get('dy', 0), data.get('confirmed'))
                 elif self.path == '/shutdown':
