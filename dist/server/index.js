@@ -1089,7 +1089,7 @@ export function coupon(s){\r
 <dialog id="saveDialog"><div class="dialog-header"><h2>Guardar dise\xF1o</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><label class="field-title" for="designName">Nombre del dise\xF1o</label><input id="designName" maxlength="80" placeholder="Ej. Caja para regalo"><p class="hint">Se guarda en este navegador. Exporta un respaldo para conservarlo en otro dispositivo.</p><button id="confirmSave" class="btn primary wide">Guardar dise\xF1o</button><button id="saveCopy" type="button" class="btn outline wide">Guardar como copia nueva</button></dialog>
 <dialog id="projectsDialog"><div class="dialog-header"><div><span class="eyebrow">TU MESA DE TRABAJO</span><h2>Mis dise\xF1os</h2></div><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><div id="projectSearchMount" class="project-search-mount"></div><div id="projectsList"></div><div class="backup-actions"><button id="newBtn" class="btn outline">Nuevo dise\xF1o</button><button id="backupBtn" class="btn outline">Exportar respaldo JSON</button><button id="importBtn" class="btn outline">Importar dise\xF1o</button><input type="file" id="importFile" accept=".json,application/json" hidden></div><p class="hint">Guardados en este navegador, sin sincronizaci\xF3n entre dispositivos.</p></dialog>
 <dialog id="helpDialog"><div class="dialog-header"><h2>De la idea a tu primera caja</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><ol class="help-steps"><li><strong>Elige el modelo y las medidas.</strong><p>Las exteriores incluyen el MDF. Las interiores corresponden al espacio \xFAtil de la caja armada.</p></li><li><strong>Mide tu material.</strong><p>Selecciona 2, 2.5, 3, 4, 5 o 6 mm, o escribe el espesor real entre 1 y 20 mm. Los encastres se regeneran con cada cambio.</p></li><li><strong>Calibra el encaje.</strong><p>El kerf es el ancho total que elimina tu l\xE1ser. La holgura agrega espacio entre dientes. Descarga la probeta, corta y ajusta estos valores antes de producir.</p></li><li><strong>Revisa y exporta.</strong><p>Gira el modelo, separa las piezas y revisa las hojas de corte. Exporta SVG o DXF en mm a escala 1:1.</p></li></ol><div class="export-note shortcuts"><strong>Controles y atajos</strong><p>Arrastrar: girar \xB7 Bot\xF3n derecho, rueda presionada o May\xFAs + arrastrar: desplazar \xB7 Rueda: zoom \xB7 Doble clic: encuadrar.</p><p><kbd>Ctrl</kbd>+<kbd>Z</kbd> deshacer \xB7 <kbd>Ctrl</kbd>+<kbd>May\xFAs</kbd>+<kbd>Z</kbd> o <kbd>Ctrl</kbd>+<kbd>Y</kbd> rehacer \xB7 <kbd>Ctrl</kbd>+<kbd>S</kbd> guardar \xB7 <kbd>F</kbd> encuadrar \xB7 <kbd>1</kbd>\u2013<kbd>7</kbd> vistas (perspectiva, frente, posterior, izquierda, derecha, superior, inferior) \xB7 <kbd>H</kbd> ocultar pieza \xB7 <kbd>I</kbd> aislar \xB7 <kbd>May\xFAs</kbd>+<kbd>H</kbd> mostrar todas \xB7 <kbd>M</kbd> medidas \xB7 <kbd>C</kbd> compartimentos \xB7 <kbd>E</kbd> formas \xB7 <kbd>P</kbd> plano / 3D \xB7 <kbd>Esc</kbd> cerrar panel.</p><p>En el plano de corte, con \xABEditar distribuci\xF3n\xBB: arrastra piezas, <kbd>R</kbd> gira 90\xB0 y las flechas ajustan 1 mm (May\xFAs: 10 mm).</p></div><div class="export-note"><strong>Sobre esta versi\xF3n</strong><p>Diecisiete modelos, edici\xF3n directa en 3D, formas de corte y PNG. Incluye caja normal, abatible, corrediza, charola, huacal, canasta con arco, canasta con asa doble, estuche con divisiones, portador con asa ovalada y canasta de perfil curvo. Todos los modelos se dise\xF1an para ensamble sin pegamento. La abatible usa pivotes integrados y la corrediza, gu\xEDas capturadas por los laterales y tirador integral de MDF. El 3D permite revisar la forma y la apertura; realiza una prueba de corte y armado antes de producir. Las referencias muestran la forma, sin incluir sus grabados.</p></div><button class="btn primary wide" data-close>Empezar a crear</button></dialog>
-<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=5"><\/script></body></html>
+<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=5"><\/script><script type="module" src="neo-studio.js?v=60"><\/script></body></html>
 `,type:"text/html; charset=utf-8",public:!1},"/box/internal-joints.js":{body:`import {frame,rect,materialWeb} from './models.js?v=3.5';
 /* Tenons on horizontal panels and side ends; closed receivers on all walls. */
 function spans(L,s){const m=materialWeb(s),fit=+s.clearance,margin=m+fit,length=L-2*margin;if(length<m)throw Error('Aumenta la medida: las ranuras interiores necesitan margen y pesta\xF1as resistentes.');let n=Math.max(1,Math.round(length/(+s.finger)));n=Math.min(n,Math.floor(length/(m+fit)));if(n%2===0)n--;n=Math.max(n,1);return Array.from({length:(n+1)/2},(_,k)=>[margin+2*k*length/n,margin+(2*k+1)*length/n]);}
@@ -1728,6 +1728,587 @@ modelInfo.heart={name:'Canasta con asas coraz\xF3n',description:'Frentes con cor
 modelPresets.drawer={width:260,depth:240,height:110,slideGap:.4,decoration:true,pattern:'diamond',type:'closed',opening:35,name:'Cajonera con cubierta calada'};\r
 modelPresets.heart={width:280,depth:180,height:150,handleRise:120,bagTaper:10,handleStyle:'heart',decoration:false,pattern:'quatrefoil',type:'open',opening:0,name:'Canasta con asas coraz\xF3n'};\r
 modelPresets.bag={...modelPresets.bag,pattern:'quatrefoil',handleStyle:'oval'};\r
+`,type:"text/javascript; charset=utf-8",public:!1},"/box/neo-studio.js":{body:`/* LZ Box Studio \xB7 interfaz NEO (v60).
+   Reorganiza los espacios Dise\xF1ar, Preparar corte y Operar m\xE1quina, y agrega vistas
+   r\xE1pidas, panel de pieza y opciones de visualizaci\xF3n. Todo usa las funciones que ya
+   existen (c\xE1mara, ocultar/aislar, plano, posiciones, control de m\xE1quina): la
+   geometr\xEDa, los planos exportados y los comandos a la m\xE1quina no cambian. */
+import {modelInfo} from './models.js?v=3.5';
+import {sheetPresets} from './layout-plus.js?v=3.5';
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
+const store = {
+  get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
+  set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
+};
+const r1 = (n) => (Math.round(n * 10) / 10).toLocaleString('es-MX', {maximumFractionDigits: 1});
+const ICONS = {
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="m3 3 18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a9.9 9.9 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  rotate: '<path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/>',
+  target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+  isolate: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/>',
+  layers: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  cursor: '<path d="M5 3 19 12l-6 1.5L10 20z"/>',
+  move: '<path d="M12 3v18M3 12h18"/><path d="m9 6 3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/>',
+  fit: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><circle cx="12" cy="12" r="2.5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  phone: '<rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18h2"/>',
+  usb: '<path d="M12 3v14"/><path d="m9 6 3-3 3 3"/><circle cx="12" cy="19" r="2"/><path d="M12 13 7 10V7M12 11l5-3V6"/>',
+  file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  sheet: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+  material: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5M3 8v5M21 8v5"/>',
+  speed: '<path d="M4 15a8 8 0 1 1 16 0"/><path d="m12 15 4-5"/>',
+  passes: '<path d="M7 4v16M12 4v16M17 4v16"/>',
+  home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/>',
+  laser: '<path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3 3M16 16l3 3M5 19l3-3M16 8l3-3"/>',
+  grid: '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 3.5v17M14.5 3.5v17"/>',
+  ruler: '<path d="M3 16 16 3l5 5L8 21z"/><path d="m7 12 2 2M10 9l2 2M13 6l2 2"/>',
+  texture: '<path d="M4 20 20 4M4 14 14 4M10 20 20 10M4 8l4-4M16 20l4-4"/>',
+  joints: '<path d="M4 7h4v4h4V7h4v4h4"/><path d="M4 17h16"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  alert: '<path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/>',
+  reset: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/>',
+  frame: '<path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>',
+  play: '<path d="M7 4.5v15l12-7.5z"/>',
+  pause: '<path d="M8 5v14M16 5v14"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+  panel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
+};
+const icon = (name, cls = 'neo-ico') => \`<svg class="\${cls}" viewBox="0 0 24 24" aria-hidden="true">\${ICONS[name] || ''}</svg>\`;
+const withIcon = (node, name) => { if (node && !node.querySelector(':scope > .neo-ico')) node.insertAdjacentHTML('afterbegin', icon(name)); return node; };
+const textureNames = {mdf: 'MDF natural', oak: 'Madera clara', walnut: 'Nogal oscuro', birch: 'Abedul', white: 'Blanco mate', black: 'Negro mate'};
+
+function ready(fn) {
+  let tries = 0;
+  const timer = setInterval(() => {
+    const app = globalThis.lzApp;
+    if (app?.workshop || ++tries > 400) { clearInterval(timer); if (app?.workshop) fn(app); }
+  }, 25);
+}
+
+ready((app) => {
+  if (document.body.dataset.neoStudio) return;
+  document.body.dataset.neoStudio = '1';
+  const prefs = store.get('lzbox-neo-view', {grid: true, texture: true});
+  safe(() => header(app));
+  safe(() => design(app, prefs));
+  safe(() => prepare(app));
+  safe(() => operate(app));
+  document.body.classList.add('neo-ready');
+});
+
+function safe(fn) { try { fn(); } catch (error) { (globalThis.__lzNeoErrors ||= []).push(String(error?.stack || error)); console.error('[LZ Box NEO]', error); } }
+
+/* ---------------------------------------------------------------- Cabecera */
+function header(app) {
+  const topbar = document.querySelector('body.workshop .topbar');
+  const nav = document.querySelector('.workshop-nav');
+  if (topbar && nav) {
+    nav.classList.add('neo-tabs');
+    topbar.querySelector('.brand')?.after(nav);
+  }
+  // Iconos para los cuatro espacios.
+  const tabIcons = {design: 'material', prepare: 'layers', operate: 'target', library: 'file'};
+  for (const tab of document.querySelectorAll('.workshop-tab')) {
+    const name = tabIcons[tab.dataset.space];
+    if (name && !tab.querySelector('.neo-ico')) tab.querySelector('.workshop-number')?.insertAdjacentHTML('afterend', icon(name));
+  }
+  // Distribuci\xF3n del panel: bot\xF3n compacto en la barra superior.
+  const tools = document.querySelector('.workshop-layout-tools');
+  if (tools && topbar) {
+    tools.classList.add('neo-layout-tools');
+    const collapse = tools.querySelector('.btn');
+    if (collapse) { collapse.classList.add('neo-collapse'); collapse.title = 'Ocultar o mostrar el panel de propiedades'; collapse.insertAdjacentHTML('afterbegin', icon('panel')); new MutationObserver(() => { if (!collapse.querySelector('.neo-ico')) collapse.insertAdjacentHTML('afterbegin', icon('panel')); }).observe(collapse, {childList: true}); }
+    topbar.querySelector('.top-actions')?.prepend(tools);
+  }
+}
+
+/* ---------------------------------------------------------------- Dise\xF1ar */
+function design(app, prefs) {
+  const {renderer, editor} = app;
+  const config = document.querySelector('.config');
+  const viewerBody = document.querySelector('.viewer-body');
+  const stage = $('stage');
+  if (!config || !viewerBody || !stage) return;
+
+  // Tarjeta del modelo con imagen.
+  const launcher = document.querySelector('.workshop-model-button');
+  const paintLauncher = () => {
+    if (!launcher) return;
+    const id = app.state.model;
+    const card = document.querySelector(\`#modelCatalog [data-model="\${CSS.escape(id)}"]\`);
+    const src = card?.querySelector('img')?.getAttribute('src');
+    const name = modelInfo[id]?.name || card?.querySelector('strong')?.textContent || 'Caja';
+    const sub = card?.querySelector('span')?.textContent || '';
+    if (launcher.dataset.neoModel === id + '|' + name && launcher.querySelector('.neo-model-text')) return;
+    launcher.dataset.neoModel = id + '|' + name;
+    launcher.classList.add('neo-model-card');
+    launcher.replaceChildren();
+    if (src) { const img = el('img'); img.src = src; img.alt = ''; launcher.append(img); }
+    const text = el('span', 'neo-model-text');
+    text.append(el('strong', '', name), el('small', '', sub), el('em', '', 'Cambiar modelo \u2192'));
+    launcher.append(text);
+    launcher.setAttribute('aria-label', \`\${name}. Cambiar modelo\`);
+  };
+
+  // Opciones de visualizaci\xF3n (solo afectan al visor).
+  const options = el('section', 'neo-view-options');
+  options.innerHTML = '<h3>Opciones de visualizaci\xF3n</h3>';
+  const toggle = (label, iconName, checked, onChange, id) => {
+    const row = el('label', 'neo-switch');
+    row.innerHTML = icon(iconName) + \`<span>\${label}</span>\`;
+    const input = el('input'); input.type = 'checkbox'; input.checked = checked; input.setAttribute('role', 'switch'); if (id) input.id = id;
+    input.addEventListener('change', () => onChange(input.checked));
+    row.append(input, el('i', 'neo-switch-ui'));
+    options.append(row);
+    return input;
+  };
+  const dims = $('showDimensions');
+  const dimsSwitch = toggle('Mostrar medidas', 'ruler', dims ? dims.checked : true, (on) => { if (dims && dims.checked !== on) dims.click(); });
+  dims?.addEventListener('change', () => { dimsSwitch.checked = dims.checked; });
+  const applyView = () => { renderer.showGrid = prefs.grid !== false; renderer.showTexture = prefs.texture !== false; renderer.draw(); store.set('lzbox-neo-view', prefs); scheduleThumbs(); syncPiece(); };
+  toggle('Mostrar cuadr\xEDcula', 'grid', prefs.grid !== false, (on) => { prefs.grid = on; applyView(); }, 'neoShowGrid');
+  const textureSwitch = toggle('Textura de material', 'texture', prefs.texture !== false, (on) => { prefs.texture = on; applyView(); }, 'neoShowTexture');
+  const joints = $('showJoints');
+  if (joints) {
+    const jointSwitch = toggle('Resaltar uniones', 'joints', joints.checked, (on) => { if (joints.checked !== on) joints.click(); });
+    joints.addEventListener('change', () => { jointSwitch.checked = joints.checked; });
+  }
+  const preview = document.querySelector('.workshop-preview-controls');
+  (preview || config.querySelector('.panel-head'))?.after(options);
+  renderer.showGrid = prefs.grid !== false;
+  renderer.showTexture = prefs.texture !== false;
+
+  // Tira de vistas con miniaturas reales del modelo.
+  const views = [['iso', 'Vista 3D'], ['front', 'Frontal'], ['right', 'Lateral'], ['top', 'Superior'], ['iso-back', 'Isom\xE9trica']];
+  const strip = el('div', 'neo-view-strip');
+  strip.setAttribute('role', 'group');
+  strip.setAttribute('aria-label', 'Vistas del modelo');
+  const thumbs = new Map();
+  for (const [mode, label] of views) {
+    const b = el('button', 'neo-view-thumb');
+    b.type = 'button';
+    b.dataset.neoCamera = mode;
+    const canvas = el('canvas');
+    canvas.width = 168; canvas.height = 112;
+    b.append(canvas, el('span', '', label));
+    b.onclick = () => { renderer.camera(mode); markView(mode); };
+    strip.append(b);
+    thumbs.set(mode, canvas);
+  }
+  const resetView = el('button', 'neo-view-thumb neo-view-reset');
+  resetView.type = 'button';
+  resetView.innerHTML = icon('reset', 'neo-ico neo-big-ico') + '<span>Restablecer vista</span>';
+  resetView.onclick = () => { renderer.camera('iso'); markView('iso'); };
+  strip.append(resetView);
+  const more = $('moreViews');
+  if (more) { const holder = el('label', 'neo-more-views'); holder.append(el('span', '', 'M\xE1s vistas'), more); strip.append(holder); }
+  const markView = (mode) => { for (const b of strip.querySelectorAll('[data-neo-camera]')) b.classList.toggle('active', b.dataset.neoCamera === mode); };
+  markView('iso');
+  viewerBody.after(strip);
+  // El arrastre libre deja de coincidir con una vista guardada.
+  renderer.canvas.addEventListener('pointermove', () => { if (renderer.drag?.active) markView(''); });
+
+  let thumbTimer = 0;
+  function scheduleThumbs() { clearTimeout(thumbTimer); thumbTimer = setTimeout(renderThumbs, 450); }
+  function renderThumbs() {
+    if (app.view !== '3d' || document.body.dataset.workshopSpace !== 'design' || renderer.drag || !renderer.data || !renderer.canvas.clientWidth) return;
+    const keep = {yaw: renderer.yaw, pitch: renderer.pitch, zoom: renderer.zoom, panX: renderer.panX, panY: renderer.panY, cotas: renderer.cotas, capture: renderer.capture, exportRatio: renderer.exportRatio};
+    const selected = renderer.gpu?.selectedId;
+    try {
+      renderer.capture = true;
+      renderer.cotas = false;
+      if (renderer.gpu) renderer.gpu.selectedId = null;
+      renderer.exportRatio = Math.max(.2, 260 / renderer.canvas.clientWidth);
+      for (const [mode] of views) {
+        renderer.zoom = 1; renderer.panX = 0; renderer.panY = 0;
+        setCamera(renderer, mode);
+        renderer.draw();
+        const target = thumbs.get(mode), ctx = target.getContext('2d');
+        ctx.clearRect(0, 0, target.width, target.height);
+        const src = renderer.canvas, k = Math.min(target.width / src.width, target.height / src.height) * 1.18;
+        ctx.drawImage(src, (target.width - src.width * k) / 2, (target.height - src.height * k) / 2, src.width * k, src.height * k);
+      }
+    } catch (error) {
+      console.warn('[LZ Box NEO] miniaturas', error);
+    } finally {
+      Object.assign(renderer, keep);
+      if (renderer.gpu) renderer.gpu.selectedId = selected;
+      renderer.draw();
+    }
+  }
+
+  // Panel derecho: pieza seleccionada.
+  const panel = el('aside', 'neo-piece-panel');
+  panel.setAttribute('aria-label', 'Pieza seleccionada');
+  panel.innerHTML = \`
+    <div class="neo-panel-head"><h2>\${icon('material')}Pieza seleccionada</h2></div>
+    <div class="neo-piece-empty"><p>Haz clic en una pieza del modelo o el\xEDgela de la lista.</p><div class="neo-piece-chips"></div></div>
+    <div class="neo-piece-body" hidden>
+      <figure class="neo-piece-preview"></figure>
+      <div class="neo-piece-title"><strong class="neo-piece-name"></strong><button type="button" class="neo-icon-btn neo-piece-eye" aria-label="Ocultar pieza en el visor"></button></div>
+      <dl class="neo-piece-facts"><div><dt>Tipo</dt><dd class="neo-piece-type"></dd></div><div><dt>Material</dt><dd class="neo-piece-material"></dd></div><div><dt>Medidas</dt><dd class="neo-piece-size"></dd></div><div><dt>Hoja</dt><dd class="neo-piece-sheet"></dd></div></dl>
+      <h3>Posici\xF3n en la hoja de corte</h3>
+      <div class="neo-xy"><label>X<input type="number" step="0.5" class="neo-piece-x"><span>mm</span></label><label>Y<input type="number" step="0.5" class="neo-piece-y"><span>mm</span></label></div>
+      <div class="neo-piece-actions"><button type="button" class="btn outline neo-piece-apply">Aplicar posici\xF3n</button><button type="button" class="btn outline neo-piece-rotate">\${icon('rotate')}Girar 90\xB0</button></div>
+      <h3>Apariencia</h3>
+      <label class="neo-switch">\${icon('eye')}<span>Visible</span><input type="checkbox" class="neo-piece-visible" role="switch"><i class="neo-switch-ui"></i></label>
+      <label class="neo-switch">\${icon('texture')}<span>Mostrar textura</span><input type="checkbox" class="neo-piece-texture" role="switch"><i class="neo-switch-ui"></i></label>
+      <div class="neo-piece-actions"><button type="button" class="btn outline neo-piece-isolate">\${icon('isolate')}Aislar pieza</button><button type="button" class="btn quiet neo-piece-all">Mostrar todas</button></div>
+      <p class="neo-note">Girar y mover cambian solo su lugar en la hoja de corte. Ocultar y aislar afectan \xFAnicamente al visor; los planos no cambian.</p>
+    </div>\`;
+  viewerBody.append(panel);
+  viewerBody.classList.add('neo-has-piece-panel');
+  const q = (s) => panel.querySelector(s);
+
+  const hiddenIds = () => renderer.hiddenIds || new Set();
+  const selectPiece = (id) => {
+    if (app.view !== '3d') app.setView('3d');
+    editor.select?.(id);
+    app.planEdit.selected = id;
+    renderer.draw();
+    syncPiece();
+  };
+  const outline = (p) => {
+    const rings = [p.points, ...(p.holePoints || [])].filter(Boolean);
+    if (!rings.length) return '';
+    const xs = rings.flat().map((v) => v[0]), ys = rings.flat().map((v) => v[1]);
+    const x0 = Math.min(...xs), y0 = Math.min(...ys), w = Math.max(...xs) - x0 || 1, h = Math.max(...ys) - y0 || 1, pad = Math.max(w, h) * .08;
+    const d = rings.map((r) => 'M' + r.map((v) => \`\${(v[0] - x0).toFixed(1)} \${(v[1] - y0).toFixed(1)}\`).join('L') + 'Z').join('');
+    return \`<svg viewBox="\${-pad} \${-pad} \${w + pad * 2} \${h + pad * 2}" role="img" aria-label="Contorno de \${p.name}"><path d="\${d}" fill-rule="evenodd"/></svg>\`;
+  };
+  let lastPiece = null;
+  function syncPiece() {
+    const id = editor.selected;
+    const part = app.panels?.find((p) => p.id === id);
+    const placed = app.packed?.panels?.find((p) => p.id === id);
+    q('.neo-piece-body').hidden = !part;
+    q('.neo-piece-empty').hidden = !!part;
+    if (!part) {
+      const chips = q('.neo-piece-chips');
+      const key = (app.panels || []).map((p) => p.id).join('|');
+      if (chips.dataset.key !== key) {
+        chips.dataset.key = key;
+        chips.replaceChildren(...(app.panels || []).map((p) => { const b = el('button', 'neo-chip', p.name); b.type = 'button'; b.onclick = () => selectPiece(p.id); return b; }));
+      }
+      lastPiece = null;
+      return;
+    }
+    const hidden = hiddenIds().has(id);
+    q('.neo-piece-name').textContent = part.name;
+    q('.neo-piece-type').textContent = part.gridRun ? 'Divisi\xF3n interior' : 'Pieza individual';
+    q('.neo-piece-material').textContent = \`\${textureNames[app.state.texture] || 'MDF'} \${app.state.thickness} mm\`;
+    q('.neo-piece-size').textContent = placed ? \`\${r1(placed.bw)} \xD7 \${r1(placed.bh)} \xD7 \${app.state.thickness} mm\` : '\u2014';
+    q('.neo-piece-sheet').textContent = placed ? \`Hoja \${placed.sheet + 1} \xB7 giro \${placed.rotation || 0}\xB0\` : '\u2014';
+    if (placed && lastPiece !== id + ':' + placed.x + ':' + placed.y) {
+      q('.neo-piece-preview').innerHTML = outline(placed);
+      if (!panel.contains(document.activeElement)) { q('.neo-piece-x').value = placed.x; q('.neo-piece-y').value = placed.y; }
+      lastPiece = id + ':' + placed.x + ':' + placed.y;
+    }
+    q('.neo-piece-eye').innerHTML = icon(hidden ? 'eyeOff' : 'eye');
+    q('.neo-piece-eye').setAttribute('aria-label', hidden ? 'Mostrar pieza en el visor' : 'Ocultar pieza en el visor');
+    q('.neo-piece-visible').checked = !hidden;
+    q('.neo-piece-texture').checked = prefs.texture !== false;
+    const isolated = renderer.isolateId === id;
+    q('.neo-piece-isolate').lastChild.textContent = isolated ? 'Quitar aislado' : 'Aislar pieza';
+    q('.neo-piece-all').disabled = !hiddenIds().size && !renderer.isolateId;
+    for (const b of panel.querySelectorAll('.neo-piece-apply,.neo-piece-rotate,.neo-piece-x,.neo-piece-y')) b.disabled = !placed;
+  }
+  const toggleHidden = () => { $('hidePiece')?.click(); syncPiece(); };
+  q('.neo-piece-eye').onclick = toggleHidden;
+  q('.neo-piece-visible').onchange = toggleHidden;
+  q('.neo-piece-texture').onchange = () => { prefs.texture = q('.neo-piece-texture').checked; textureSwitch.checked = prefs.texture; applyView(); };
+  q('.neo-piece-isolate').onclick = () => { $('isolatePiece')?.click(); syncPiece(); };
+  q('.neo-piece-all').onclick = () => { $('showAllPieces')?.click(); syncPiece(); };
+  q('.neo-piece-rotate').onclick = () => { app.planEdit.selected = editor.selected; app.planEdit.rotate(); };
+  q('.neo-piece-apply').onclick = () => {
+    const x = Number(q('.neo-piece-x').value), y = Number(q('.neo-piece-y').value);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return app.toast('Coordenadas inv\xE1lidas.');
+    app.planEdit.setPlacement(editor.selected, (p) => ({...p, x, y}));
+  };
+  // La selecci\xF3n tambi\xE9n funciona con \xABEditar en 3D\xBB apagado.
+  let down = null;
+  renderer.canvas.addEventListener('pointerdown', (e) => { down = {x: e.clientX, y: e.clientY}; });
+  renderer.canvas.addEventListener('pointerup', (e) => {
+    if (editor.enabled || !down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 4) return;
+    const r = renderer.canvas.getBoundingClientRect(), hit = renderer.pick?.(e.clientX - r.left, e.clientY - r.top);
+    if (hit?.part) selectPiece(hit.part.id);
+  });
+  const refresh = editor.refresh.bind(editor);
+  editor.refresh = (...args) => { const out = refresh(...args); syncPiece(); return out; };
+  new MutationObserver(() => panel.classList.toggle('neo-under-inspector', !$('editInspector')?.hidden)).observe($('editInspector'), {attributes: true, attributeFilter: ['hidden']});
+
+  app.onUpdate(() => { paintLauncher(); syncPiece(); scheduleThumbs(); });
+  // workshop.js reescribe el texto del bot\xF3n en cada cambio: se vuelve a pintar la tarjeta.
+  if (launcher) new MutationObserver(() => { if (!launcher.querySelector('.neo-model-text')) paintLauncher(); }).observe(launcher, {childList: true});
+  const show = app.workshop.show;
+  app.workshop.show = (space) => { show(space); if (space === 'design') scheduleThumbs(); };
+  paintLauncher();
+  syncPiece();
+  scheduleThumbs();
+
+  // Barra del visor: iconos en las acciones.
+}
+
+function setCamera(renderer, mode) {
+  if (mode === 'front') { renderer.yaw = 0; renderer.pitch = .03; }
+  else if (mode === 'right') { renderer.yaw = -Math.PI / 2; renderer.pitch = .03; }
+  else if (mode === 'top') { renderer.yaw = 0; renderer.pitch = 1.54; }
+  else if (mode === 'iso-back') { renderer.yaw = Math.PI - .62; renderer.pitch = .64; }
+  else { renderer.yaw = -.62; renderer.pitch = .64; }
+}
+
+/* ---------------------------------------------------------------- Preparar corte */
+function prepare(app) {
+  const dock = document.querySelector('.workshop-prepare-dock');
+  const tools = $('planTools');
+  const stage = $('stage');
+  if (!dock || !tools || !stage) return;
+
+  // Barra de herramientas con iconos.
+  const toolbar = el('div', 'neo-plan-toolbar');
+  const group = el('div', 'neo-tool-group');
+  const mk = (label, name, fn, title) => { const b = el('button', 'neo-tool'); b.type = 'button'; b.innerHTML = icon(name) + \`<span>\${label}</span>\`; if (title) b.title = title; b.onclick = fn; return b; };
+  const selectBtn = mk('Seleccionar', 'cursor', () => { setEditing(false); }, 'Ver y seleccionar sin mover');
+  const moveBtn = mk('Mover', 'move', () => { setEditing(true); }, 'Arrastra piezas en la hoja \xB7 flechas ajustan 1 mm');
+  const rotateBtn = mk('Girar', 'rotate', () => app.planEdit.rotate(), 'Girar la pieza seleccionada 90\xB0 \xB7 tecla R');
+  const fitBtn = mk('Encajar', 'fit', () => app.planViewer.fit(), 'Ver todas las hojas completas');
+  group.append(selectBtn, moveBtn, rotateBtn, fitBtn);
+  const sheetTabs = el('div', 'neo-sheet-tabs');
+  sheetTabs.setAttribute('role', 'tablist');
+  sheetTabs.setAttribute('aria-label', 'Hojas de corte');
+  const addSheet = mk('Hoja', 'plus', () => $('planAddSheet')?.click(), 'Agregar una hoja vac\xEDa');
+  addSheet.classList.add('neo-add-sheet');
+  toolbar.append(group, sheetTabs, addSheet);
+  tools.prepend(toolbar);
+  function setEditing(on) { if (app.planEdit.editing !== on) $('planEditToggle')?.click(); paint(); }
+
+  // Panel izquierdo: resultado y checklist.
+  const result = el('section', 'neo-result');
+  result.innerHTML = \`<h3>Resultado del acomodo</h3><div class="neo-saving"><div class="neo-ring" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5"/><circle class="neo-ring-value" cx="18" cy="18" r="15.5" pathLength="100"/></svg>\${icon('check')}</div><div><strong class="neo-saving-text">Ahorro estimado: \u2014</strong><span>Recorrido de corte comparado con cortar cada pieza por separado.</span></div></div><div class="neo-usage"><span>Aprovechamiento</span><strong class="neo-usage-value">\u2014</strong></div>\`;
+  const checklist = el('section', 'neo-checklist');
+  checklist.innerHTML = '<h3>' + icon('check') + 'Checklist de validaci\xF3n</h3><ul></ul>';
+  dock.querySelector('.panel-head')?.after(result);
+  result.after(checklist);
+  // Datos del material en tarjeta y fusi\xF3n m\xE1s compacta.
+  $('workshopFusion')?.classList.add('neo-fusion');
+  withIcon($('workshopFuseCuts'), 'layers');
+  withIcon($('workshopRemoveDuplicates'), 'layers');
+
+  // Barra inferior: hoja, pieza y coordenadas.
+  const info = el('div', 'neo-plan-info');
+  info.innerHTML = \`<div class="neo-info-card">\${icon('sheet')}<div><span>Hoja seleccionada</span><strong class="neo-info-sheet">\u2014</strong><small class="neo-info-sheet-meta"></small></div></div><div class="neo-info-card">\${icon('material')}<div><span>Pieza seleccionada</span><strong class="neo-info-piece">Ninguna</strong><small class="neo-info-piece-meta"></small></div></div><div class="neo-info-card neo-info-coords">\${icon('target')}<div class="neo-coords-slot"><span>Coordenadas de la pieza</span></div></div>\`;
+  const props = document.querySelector('.workshop-piece-properties');
+  if (props) { props.classList.add('neo-coords'); info.querySelector('.neo-coords-slot').append(props); }
+  stage.after(info);
+
+  let focusSheet = 0;
+  function paint() {
+    if (!app.packed) return;
+    const packed = app.packed, check = app.planEdit.check, s = app.state;
+    selectBtn.classList.toggle('active', !app.planEdit.editing);
+    moveBtn.classList.toggle('active', !!app.planEdit.editing);
+    selectBtn.setAttribute('aria-pressed', String(!app.planEdit.editing));
+    moveBtn.setAttribute('aria-pressed', String(!!app.planEdit.editing));
+    rotateBtn.disabled = !app.planEdit.editing || !app.planEdit.selected;
+    const sel = packed.panels.find((p) => p.id === app.planEdit.selected);
+    if (sel) focusSheet = sel.sheet;
+    focusSheet = Math.min(focusSheet, packed.count - 1);
+    // Pesta\xF1as de hojas.
+    if (sheetTabs.childElementCount !== packed.count) {
+      sheetTabs.replaceChildren(...Array.from({length: packed.count}, (_, i) => {
+        const b = el('button', 'neo-sheet-tab', \`Hoja \${i + 1}\`); b.type = 'button'; b.setAttribute('role', 'tab');
+        b.onclick = () => { focusSheet = i; document.querySelectorAll('#plan .sheet-wrap')[i]?.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); paint(); };
+        return b;
+      }));
+    }
+    [...sheetTabs.children].forEach((b, i) => { b.classList.toggle('active', i === focusSheet); b.setAttribute('aria-selected', String(i === focusSheet)); });
+    document.querySelectorAll('#plan .sheet-wrap').forEach((w, i) => w.classList.toggle('neo-focus', i === focusSheet && packed.count > 1));
+    // Hoja y pieza.
+    const u = check?.sheets?.[focusSheet];
+    q('.neo-info-sheet').textContent = \`Hoja \${focusSheet + 1} (\${+s.sheetW} \xD7 \${+s.sheetH} mm)\`;
+    q('.neo-info-sheet-meta').textContent = u ? \`\${u.pieces} pieza\${u.pieces === 1 ? '' : 's'} \xB7 \${u.pct.toFixed(1)}% aprovechado\` : '';
+    q('.neo-info-piece').textContent = sel ? sel.name : 'Ninguna';
+    q('.neo-info-piece-meta').textContent = sel ? \`\${r1(sel.bw)} \xD7 \${r1(sel.bh)} mm \xB7 giro \${sel.rotation || 0}\xB0\` : (app.planEdit.editing ? 'Haz clic en una pieza del plano.' : 'Activa Mover para seleccionar y acomodar.');
+    // Aprovechamiento y ahorro.
+    const total = check ? check.sheets.reduce((a, x) => a + x.net, 0) : 0, used = check ? (check.sheets.filter((x) => x.pieces).length || 1) : 1;
+    q('.neo-usage-value').textContent = check ? \`\${(100 * total / (used * +s.sheetW * +s.sheetH)).toFixed(1)}%\` : '\u2014';
+    const summary = $('workshopFusionSummary')?.textContent || '';
+    const m = summary.match(/Ahorro:\\s*[\\d.,]+\\s*mm\\s*\\(([\\d.,]+)%\\)/);
+    const pct = m ? Number(m[1]) : 0;
+    q('.neo-saving-text').textContent = \`Ahorro estimado: \${m ? m[1] : '0'}%\`;
+    result.querySelector('.neo-ring-value').style.strokeDasharray = \`\${Math.max(0, Math.min(100, pct))} 100\`;
+    // Checklist.
+    const items = [];
+    if (check) {
+      items.push([!check.overlaps.length, 'Sin superposiciones', check.overlaps.length ? \`\${check.overlaps.length} par(es) de piezas encimadas.\` : 'Ninguna pieza se encima con otra.']);
+      items.push([!check.outside.length, 'Dentro del material', check.outside.length ? \`\${check.outside.length} pieza(s) salen del \xE1rea de corte.\` : 'Todas las piezas est\xE1n dentro de la hoja.']);
+      items.push([!check.tight.length, \`Separaci\xF3n m\xEDnima \${s.gap} mm\`, check.tight.length ? \`\${check.tight.length} par(es) m\xE1s juntos de lo indicado.\` : 'Las piezas respetan la separaci\xF3n.']);
+      items.push([!packed.unplaced?.length, 'Todas las piezas colocadas', packed.unplaced?.length ? \`\${packed.unplaced.length} pieza(s) no caben en la hoja.\` : \`\${packed.panels.length} piezas en \${packed.count} hoja\${packed.count > 1 ? 's' : ''}.\`]);
+    }
+    checklist.querySelector('ul').replaceChildren(...items.map(([ok, title, text]) => { const li = el('li', ok ? 'ok' : 'bad'); li.innerHTML = icon(ok ? 'check' : 'alert'); const d = el('div'); d.append(el('strong', '', title), el('span', '', text)); li.append(d); return li; }));
+  }
+  const q = (s) => info.querySelector(s) || result.querySelector(s);
+  const refreshTools = app.planEdit.refreshTools.bind(app.planEdit);
+  app.planEdit.refreshTools = (...args) => { const out = refreshTools(...args); paint(); return out; };
+  app.onUpdate(paint);
+  const show = app.workshop.show;
+  app.workshop.show = (space) => { show(space); if (space === 'prepare') { paint(); requestAnimationFrame(() => app.planViewer.fit()); } };
+  paint();
+  // Tama\xF1o de hoja visible en la barra de material.
+  const preset = $('sheetPreset');
+  if (preset && !preset.options.length) for (const p of sheetPresets) preset.append(new Option(p.label || \`\${p.w} \xD7 \${p.h} mm\`, p.id));
+}
+
+/* ---------------------------------------------------------------- Operar m\xE1quina */
+function operate(app) {
+  const dialog = $('k40Dialog');
+  const operator = $('workshopOperator');
+  if (!dialog || !operator) return;
+  dialog.classList.add('neo-operate');
+  const find = (s) => dialog.querySelector(s);
+
+  // Columna izquierda: trabajo actual, conexi\xF3n y control desde celular.
+  const left = el('div', 'neo-op-left');
+  const job = el('section', 'neo-op-card neo-job');
+  job.innerHTML = \`<div class="neo-job-head"><span class="neo-job-icon">\${icon('file')}</span><div><span>Trabajo actual</span><strong class="neo-job-name"></strong></div></div><div class="neo-job-rows"></div>\`;
+  const rows = job.querySelector('.neo-job-rows');
+  const row = (name, label, control) => { const r = el('div', 'neo-job-row'); r.innerHTML = icon(name) + \`<span>\${label}</span>\`; if (control) r.append(control); rows.append(r); return r; };
+  const sheet = $('k40Sheet');
+  if (sheet) { sheet.closest('label')?.classList.add('neo-moved'); row('sheet', 'Hoja', sheet); }
+  const material = el('output', 'neo-job-material');
+  row('material', 'Material', material);
+  const speed = $('k40Speed'), passes = $('k40Passes');
+  if (speed) row('speed', 'Velocidad', speed);
+  if (passes) row('passes', 'Pasadas', passes);
+  const origin = $('k40Origin');
+  if (origin) { const r = row('target', 'Origen', origin); r.classList.add('neo-job-origin'); const note = $('k40OriginNote'); if (note) job.append(note); }
+  find('.k40-job-settings')?.classList.add('neo-emptied');
+
+  const usb = $('k40BridgePanel');
+  const usbCard = el('section', 'neo-op-card neo-usb');
+  usbCard.innerHTML = \`<div class="neo-usb-head"><span class="neo-led" aria-hidden="true"></span><strong>Conexi\xF3n USB</strong><span class="neo-usb-state"></span></div>\`;
+  if (usb) { usb.open = false; usbCard.append(usb); usb.querySelector('summary').textContent = 'Detalles de conexi\xF3n'; }
+
+  const phone = el('section', 'neo-op-card neo-phone');
+  phone.innerHTML = \`<div class="neo-phone-head"><span class="neo-job-icon">\${icon('phone')}</span><div><strong>Control desde celular</strong><p>Accede y controla la m\xE1quina desde tu celular en la misma red.</p></div></div>\`;
+  const remoteButton = [...document.querySelectorAll('.workshop-operator-tools button')].find((b) => /celular/i.test(b.textContent));
+  const openPhone = el('button', 'btn outline neo-wide', 'Abrir control');
+  openPhone.type = 'button';
+  openPhone.onclick = () => remoteButton?.click();
+  phone.append(openPhone);
+  if (!remoteButton) phone.hidden = true;
+  left.append(job, usbCard, phone);
+  const registration = find('.k40-registration');
+  if (registration) { registration.classList.add('neo-op-card'); left.append(registration); }
+  const power = find('.k40-controls > p.k40-note');
+  if (power) { power.classList.add('neo-power-note'); left.append(power); }
+  find('.k40-controls')?.classList.add('neo-emptied');
+
+  // Columna derecha: mover cabezal.
+  const right = el('div', 'neo-op-right');
+  // Las columnas entran al documento antes de mover nodos: as\xED getElementById los sigue encontrando.
+  const layout = find('.k40-layout');
+  layout?.prepend(left);
+  layout?.append(right);
+  const jog = find('.k40-jog-panel');
+  if (jog) {
+    right.append(jog);
+    jog.classList.add('neo-op-card');
+    const heading = jog.querySelector('.k40-section-heading');
+    const position = $('k40Position');
+    const readout = el('div', 'neo-readout');
+    readout.innerHTML = '<span>Posici\xF3n estimada (mm)</span><div><b>X</b><strong class="neo-pos-x">\u2014</strong><b>Y</b><strong class="neo-pos-y">\u2014</strong></div>';
+    heading?.after(readout);
+    const syncPosition = () => {
+      const match = position?.textContent.match(/X\\s*(-?[\\d.]+)\\s*\xB7\\s*Y\\s*(-?[\\d.]+)/);
+      readout.querySelector('.neo-pos-x').textContent = match ? match[1] : '\u2014';
+      readout.querySelector('.neo-pos-y').textContent = match ? match[2] : '\u2014';
+      readout.classList.toggle('neo-unknown', !match);
+    };
+    if (position) new MutationObserver(syncPosition).observe(position, {childList: true, characterData: true, subtree: true});
+    syncPosition();
+    // Paso como botones segmentados (la lista original sigue mandando).
+    const step = $('k40Step');
+    if (step) {
+      const seg = el('div', 'neo-steps');
+      seg.setAttribute('role', 'group');
+      seg.setAttribute('aria-label', 'Paso de movimiento en mm');
+      const paintSteps = () => { for (const b of seg.children) b.setAttribute('aria-pressed', String(b.dataset.value === step.value)); };
+      for (const option of step.options) {
+        const b = el('button', 'neo-step', option.value); b.type = 'button'; b.dataset.value = option.value;
+        b.onclick = () => { step.value = option.value; step.dispatchEvent(new Event('change', {bubbles: true})); step.dispatchEvent(new Event('input', {bubbles: true})); paintSteps(); };
+        seg.append(b);
+      }
+      step.addEventListener('change', paintSteps);
+      const label = el('p', 'neo-sub', 'Paso de movimiento (mm)');
+      step.closest('div')?.prepend(label, seg);
+      step.classList.add('neo-visually-hidden');
+      jog.querySelector('label[for=k40Step]')?.classList.add('neo-visually-hidden');
+      paintSteps();
+    }
+    withIcon($('k40Home'), 'home');
+    withIcon($('k40UsePosition'), 'target');
+    withIcon($('k40Goto'), 'target');
+    withIcon($('k40Pick'), 'cursor');
+    withIcon($('k40Pulse'), 'laser');
+  }
+
+  // Centro: plano con encabezado y medidas.
+  const canvas = find('.k40-canvas-panel');
+  canvas?.classList.add('neo-op-card', 'neo-op-plan');
+  withIcon($('k40Arrange'), 'layers');
+
+  // Consola inferior: estado, tiempo estimado y acciones.
+  const consoleBar = find('.k40-console');
+  const time = $('k40Time');
+  if (consoleBar && time) {
+    const clock = el('div', 'neo-clock');
+    clock.innerHTML = '<span>Tiempo estimado</span>';
+    const value = el('strong', 'neo-clock-value', '\u2014');
+    const note = el('small', 'neo-clock-note', '');
+    clock.append(value, note);
+    consoleBar.querySelector('.k40-feedback')?.after(clock);
+    time.classList.add('neo-visually-hidden');
+    clock.append(time);
+    const summary = $('k40Summary');
+    const syncClock = () => {
+      const live = time.textContent;
+      if (/restante\\s+(\\d+)\\s*s/.test(live)) { const s = Number(live.match(/restante\\s+(\\d+)\\s*s/)[1]); value.textContent = fmtTime(s); note.textContent = 'Restante \xB7 en curso'; return; }
+      const est = (summary?.textContent || '').match(/Tiempo\\s+m[i\xED]nimo de corte:\\s*([\\d.]+)\\s*s/i);
+      value.textContent = est ? fmtTime(Number(est[1])) : '\u2014';
+      note.textContent = est ? 'Estimaci\xF3n, m\xE1s movimientos y aceleraciones.' : 'Sin trabajo preparado.';
+    };
+    for (const node of [time, summary].filter(Boolean)) new MutationObserver(syncClock).observe(node, {childList: true, characterData: true, subtree: true});
+    syncClock();
+  }
+  withIcon($('k40Frame'), 'frame');
+  withIcon($('k40Run'), 'play');
+  withIcon($('k40Resume'), 'play');
+  withIcon($('k40Cancel'), 'stop');
+
+
+  // Material y nombre del trabajo; estado de conexi\xF3n en la tarjeta USB.
+  const state = $('k40State');
+  const paintJob = () => {
+    job.querySelector('.neo-job-name').textContent = app.state.name || modelInfo[app.state.model]?.name || 'Trabajo';
+    material.textContent = \`\${textureNames[app.state.texture] || 'MDF'} \${app.state.thickness} mm\`;
+    const connected = !!app.machineControl?.machine?.connected;
+    usbCard.classList.toggle('is-connected', connected);
+    usbCard.querySelector('.neo-usb-state').textContent = connected ? 'Conectada' : (state?.textContent || 'Sin conectar').toLowerCase().replace(/^./, (c) => c.toUpperCase());
+  };
+  app.onUpdate(paintJob);
+  if (state) new MutationObserver(paintJob).observe(state, {childList: true, characterData: true, subtree: true});
+  paintJob();
+}
+
+function fmtTime(seconds) {
+  if (!Number.isFinite(seconds)) return '\u2014';
+  const m = Math.floor(seconds / 60), s = Math.round(seconds % 60);
+  return m ? \`\${m} min \${String(s).padStart(2, '0')} s\` : \`\${s} s\`;
+}
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/patterns.js":{body:`import {materialWeb} from './models.js?v=3.5';
 import {ringDistance} from './structure.js?v=3.5';
 export const patterns=['legacy','diamond','quatrefoil','petals','arches'];
@@ -2227,10 +2808,10 @@ export class BoxRenderer{
  this.editProjection={project:proj,mapping,scale,ox,oy,fitScale,fitOx,fitOy};
  /* Ground grid, all coordinate geometry shares a single camera transform. */
  ctx.save();if(this.capture)ctx.globalAlpha=0;
- ctx.save();ctx.globalAlpha=this.capture?0:this.studio?.3:1;ctx.lineWidth=.6;const gridStep=max/10,ground=-H/2-2;for(let i=-15;i<=15;i++){ctx.strokeStyle=i%5===0?palette.gridMajor:palette.gridMinor;for(const axis of[0,1]){const a=proj(axis?[i*gridStep,-max*1.5,ground]:[-max*1.5,i*gridStep,ground]),b=proj(axis?[i*gridStep,max*1.5,ground]:[max*1.5,i*gridStep,ground]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}}ctx.restore();
+ ctx.save();ctx.globalAlpha=this.capture||this.showGrid===false?0:this.studio?.3:1;ctx.lineWidth=.6;const gridStep=max/10,ground=-H/2-2;for(let i=-15;i<=15;i++){ctx.strokeStyle=i%5===0?palette.gridMajor:palette.gridMinor;for(const axis of[0,1]){const a=proj(axis?[i*gridStep,-max*1.5,ground]:[-max*1.5,i*gridStep,ground]),b=proj(axis?[i*gridStep,max*1.5,ground]:[max*1.5,i*gridStep,ground]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}}ctx.restore();
  /* Soft, grounded shadow. */const center=proj([0,0,ground]);ctx.save();ctx.translate(center[0],center[1]);ctx.scale(1,Math.max(.15,Math.abs(sp)*.5));const gradient=ctx.createRadialGradient(0,0,0,0,0,max*scale*.57);gradient.addColorStop(0,palette.shadow);gradient.addColorStop(1,palette.shadowEnd);ctx.fillStyle=gradient;ctx.beginPath();ctx.arc(0,0,max*scale*.57,0,Math.PI*2);ctx.fill();ctx.restore();
  ctx.restore();
- let gpuFrame=null;if(this.gpu&&!this.gpu.lost){try{gpuFrame=this.gpu.draw({width:w,height:h,dpr,scale,ox,oy,yaw:this.yaw,pitch:this.pitch,max,H,mapping,visible:p=>this.visiblePart(p)&&(this.assembly>=1||this.assemblyOrder.get(p.id)<=phase.index),texture:this.s.texture,showJoints:!this.capture&&this.showJoints,dark,capture:this.capture,showCells:this.assembly>=1&&!this.explode});}catch{this.gpu.lost=true;}}
+ let gpuFrame=null;if(this.gpu&&!this.gpu.lost){try{gpuFrame=this.gpu.draw({width:w,height:h,dpr,scale,ox,oy,yaw:this.yaw,pitch:this.pitch,max,H,mapping,visible:p=>this.visiblePart(p)&&(this.assembly>=1||this.assemblyOrder.get(p.id)<=phase.index),texture:this.showTexture===false?'plain-'+(this.s.texture||'mdf'):this.s.texture,showJoints:!this.capture&&this.showJoints,dark,capture:this.capture,showCells:this.assembly>=1&&!this.explode});}catch{this.gpu.lost=true;}}
  if(gpuFrame){ctx.drawImage(gpuFrame,0,0,w,h);this.engine='WebGL 2';}else{this.engine='Compatible';
  const faces=[];
  for(const p of this.data){if(!this.visiblePart(p)||(this.assembly<1&&this.assemblyOrder.get(p.id)>phase.index))continue;const rings=[p.p,...(p.holes||[])],front=p.p.map(([u,v])=>mapping(p,u,v,0)),back=p.p.map(([u,v])=>mapping(p,u,v,t)),holes0=(p.holes||[]).map(r=>r.map(([u,v])=>mapping(p,u,v,0))),holes1=(p.holes||[]).map(r=>r.map(([u,v])=>mapping(p,u,v,t))),joint0=(p.jointHoles||[]).map(i=>holes0[i]),joint1=(p.jointHoles||[]).map(i=>holes1[i]);const texture=this.s.texture||'mdf',tone=texture==='birch'?'#dfcfa6':texture==='oak'?'#c9a976':texture==='walnut'?'#79523c':texture==='white'?'#e8e7df':texture==='black'?'#414642':p.role==='locking-key'?'#9b693d':p.id.includes('guide')?'#bb9b68':p.motion?'#e0c89a':({front:'#d5b887',back:'#c3a16e',left:'#cfac78',right:'#c9a674',bottom:'#dcc393',top:'#e1cda4'}[p.id]||'#d1b383');faces.push({points:front,holes:holes0,joints:joint0,fill:tone,edge:false,part:p,layer:0},{points:back,holes:holes1,joints:joint1,fill:tone,edge:false,part:p,layer:t});for(const ring of rings){const a=ring.map(([u,v])=>mapping(p,u,v,0)),b=ring.map(([u,v])=>mapping(p,u,v,t));for(let i=0;i<a.length;i++){const j=(i+1)%a.length;faces.push({points:[a[i],a[j],b[j],b[i]],fill:'#947147',edge:true});}}}
@@ -2238,7 +2819,7 @@ export class BoxRenderer{
  const illumination=f=>{const a=f.points[0];let normal;for(let i=1;i<f.points.length-1;i++){const b=f.points[i].map((v,j)=>v-a[j]),c=f.points[i+1].map((v,j)=>v-a[j]);normal=[b[1]*c[2]-b[2]*c[1],b[2]*c[0]-b[0]*c[2],b[0]*c[1]-b[1]*c[0]];if(Math.hypot(...normal)>1e-7)break;}const length=Math.hypot(...normal)||1;return .69+.29*Math.abs((normal[0]*-.45+normal[1]*-.6+normal[2]*.8)/length);};
  const projected=faces.map(f=>({...f,light:illumination(f),screen:f.points.map(proj),holeScreens:(f.holes||[]).map(r=>r.map(proj)),jointScreens:(f.joints||[]).map(r=>r.map(proj)),uvBasis:f.part&&!f.edge?[proj(mapping(f.part,0,0,f.layer)),proj(mapping(f.part,1,0,f.layer)),proj(mapping(f.part,0,1,f.layer))]:null}));
  this.onFrame?.({faces:projected,width:w,height:h});
- const interactive=this.assembly<1||!!this.drag||this.editDragging,quality=interactive?1:Math.min(dpr,Math.sqrt(4000000/(w*h))),rw=Math.max(1,Math.round(w*quality)),rh=Math.max(1,Math.round(h*quality)),raster=depthRaster(projected,rw,rh,{scale:quality,texture:this.s.texture,grain:true,outlines:!this.studio,atlas:getMaterialAtlas(),edge:palette.edge,outline:palette.outline,showJoints:this.showJoints,joint:dark?'#abd5af':'#3b7950'});
+ const interactive=this.assembly<1||!!this.drag||this.editDragging,quality=interactive?1:Math.min(dpr,Math.sqrt(4000000/(w*h))),rw=Math.max(1,Math.round(w*quality)),rh=Math.max(1,Math.round(h*quality)),raster=depthRaster(projected,rw,rh,{scale:quality,texture:this.s.texture,grain:this.showTexture!==false,outlines:!this.studio,atlas:getMaterialAtlas(),edge:palette.edge,outline:palette.outline,showJoints:this.showJoints,joint:dark?'#abd5af':'#3b7950'});
  this.surface??=document.createElement('canvas');this.surface.width=rw;this.surface.height=rh;const surfaceContext=this.surface.getContext('2d'),frame=surfaceContext.createImageData(rw,rh);frame.data.set(raster.pixels);surfaceContext.putImageData(frame,0,0);ctx.drawImage(this.surface,0,0,w,h);
 
  }
@@ -4962,7 +5543,7 @@ export class StudioGPU{
  }
  clear(){for(const e of this.entries){this.group.remove(e.mesh);e.mesh.geometry.dispose();for(const line of e.lines){this.group.remove(line);line.geometry.dispose();}}this.entries=[];}
  setData(parts,t){this.clear();for(const part of parts){const mesh=new THREE.Mesh(panelGeometry(part,t),[this.material('mdf'),this.edgeMaterial]);mesh.castShadow=mesh.receiveShadow=true;mesh.matrixAutoUpdate=false;this.group.add(mesh);const lines=[];for(const index of part.jointHoles||[]){const hole=part.holes[index];for(const z of[0,t]){const points=[...hole,hole[0]].map(([u,v])=>new THREE.Vector3(u,v,z));const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),this.jointMaterial);line.matrixAutoUpdate=false;lines.push(line);this.group.add(line);}}this.entries.push({part,mesh,lines});}}
- material(name){if(this.materials[name])return this.materials[name];const colors={mdf:0xc9aa7c,oak:0xccad7b,walnut:0x75513c,birch:0xe4d5ae,white:0xe8e7e2,black:0x303238};const m=new THREE.MeshStandardMaterial({color:colors[name]??colors.mdf,roughness:name==='white'||name==='black'?.65:.88,metalness:0,side:THREE.DoubleSide,shadowSide:THREE.DoubleSide});this.materials[name]=m;return m;}
+ material(name){if(this.materials[name])return this.materials[name];const colors={mdf:0xc9aa7c,oak:0xccad7b,walnut:0x75513c,birch:0xe4d5ae,white:0xe8e7e2,black:0x303238};const key=String(name).replace(/^plain-/,'');const m=new THREE.MeshStandardMaterial({color:colors[key]??colors.mdf,roughness:key==='white'||key==='black'?.65:.88,metalness:0,side:THREE.DoubleSide,shadowSide:THREE.DoubleSide});this.materials[name]=m;return m;}
  setCellSelection(cells,base,t){for(const mesh of this.cellMeshes){this.cellGroup.remove(mesh);mesh.geometry.dispose();}this.cellMeshes=[];this.cellBaseId=base?.id;for(const ring of cells||[]){const shape=new THREE.Shape(ring.map(p=>new THREE.Vector2(...p))),geometry=new THREE.ShapeGeometry(shape);geometry.translate(0,0,t+.06);const mesh=new THREE.Mesh(geometry,this.cellMaterial);mesh.matrixAutoUpdate=false;this.cellGroup.add(mesh);this.cellMeshes.push(mesh);}}
  updateTextures(){const atlas=getMaterialAtlas();if(!atlas||this.atlas===atlas)return;this.atlas=atlas;const tw=Math.floor(atlas.width/2),th=Math.floor(atlas.height/2);for(const[name,[col,row]]of Object.entries(materialTiles)){const data=new Uint8Array(tw*th*4);for(let y=0;y<th;y++)data.set(atlas.data.subarray(((row*th+y)*atlas.width+col*tw)*4,((row*th+y)*atlas.width+col*tw+tw)*4),y*tw*4);const map=new THREE.DataTexture(data,tw,th,THREE.RGBAFormat);map.wrapS=map.wrapT=THREE.RepeatWrapping;map.magFilter=THREE.LinearFilter;map.minFilter=THREE.LinearMipmapLinearFilter;map.generateMipmaps=true;map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=Math.min(8,this.renderer.capabilities.getMaxAnisotropy());map.needsUpdate=true;const mat=this.material(name);mat.map=map;mat.bumpMap=map;mat.bumpScale=name==='mdf'?.035:.075;mat.color.set(0xffffff);mat.needsUpdate=true;this.textures[name]=map;}}
  draw({width,height,dpr,scale,ox,oy,yaw,pitch,max,H,mapping,visible,texture,showJoints,dark,capture,showCells}){
@@ -5462,18 +6043,45 @@ export function mountWorkshop(app){
  $('workshopApplyPosition').onclick=()=>{const x=Number($('workshopPieceX').value),y=Number($('workshopPieceY').value);if(!Number.isFinite(x)||!Number.isFinite(y))return app.toast('Coordenadas inv\xE1lidas.');app.planEdit.setPlacement(app.planEdit.selected,q=>({...q,x,y}));};$('workshopRotatePiece').onclick=()=>app.planEdit.rotate();
  function updateMachine(){if(!app.machineControl)return;const m=app.machineControl;const bed=m.machine?.connected?m.machine.bed:null;if(JSON.stringify(app.displayBed)!==JSON.stringify(bed)){app.displayBed=bed;if(app.view==='2d')app.redrawPlan();}bedLabel.textContent=bed?\`Cama de m\xE1quina: \${bed.width} \xD7 \${bed.height} mm. El rect\xE1ngulo interior es el material.\`:'Cama: se obtiene al conectar la m\xE1quina. Material: tama\xF1o de hoja configurado.';live.textContent=m.stateLabel;live.dataset.busy=String(m.busy);globalMachine.hidden=!m.busy||current==='operate';$('workshopMachineMessage').textContent=m.stateLabel+' \xB7 '+m.message;globalStop.disabled=!m.canPause;remote?.publish();}
  function allItems(){return [...app.designs().map(p=>({...p,kind:'design',name:p.state.name})),...readWorkshop(storage)].sort((a,b)=>String(b.updated).localeCompare(String(a.updated)));}
- library.innerHTML='<header class="workshop-library-head"><div><span class="eyebrow">BIBLIOTECA DEL TALLER</span><h1>Dise\xF1os y trabajos</h1><p>Guardados en este navegador. Las plantillas requieren volver a referenciar la m\xE1quina.</p></div><div id="workshopLibraryActions"></div></header><div class="workshop-library-filters"><input id="workshopSearch" type="search" placeholder="Buscar por nombre, modelo o material\u2026" aria-label="Buscar en biblioteca"><select id="workshopKind" aria-label="Tipo de elemento"><option value="all">Todos los tipos</option><option value="design">Dise\xF1os editables</option><option value="prepared">Trabajos preparados</option><option value="template">Plantillas de posicionamiento</option></select><select id="workshopModelFilter" aria-label="Filtrar por modelo"><option value="all">Todos los modelos</option></select><span id="workshopLibraryCount"></span></div><div id="workshopLibraryGrid" class="workshop-library-grid"></div><div id="workshopLibraryUndo" class="workshop-library-undo" hidden></div>';
+ library.innerHTML='<header class="workshop-library-head"><div><span class="eyebrow">BIBLIOTECA DEL TALLER</span><h1>Dise\xF1os y trabajos</h1><p>Guardados en este navegador. Las plantillas requieren volver a referenciar la m\xE1quina.</p></div><div id="workshopLibraryActions"></div></header><div class="workshop-library-body"><div class="workshop-library-main"><div class="workshop-library-filters"><label class="workshop-library-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="workshopSearch" type="search" placeholder="Buscar dise\xF1o, modelo o material\u2026" aria-label="Buscar en biblioteca"></label><div class="workshop-kind-chips" role="group" aria-label="Tipo de elemento"><button type="button" data-kind="all">Todos</button><button type="button" data-kind="design">Dise\xF1os</button><button type="button" data-kind="prepared">Preparaciones</button><button type="button" data-kind="template">Plantillas</button></div><select id="workshopKind" aria-label="Tipo de elemento" hidden><option value="all">Todos los tipos</option><option value="design">Dise\xF1os editables</option><option value="prepared">Trabajos preparados</option><option value="template">Plantillas de posicionamiento</option></select><div class="workshop-view-toggle" role="group" aria-label="Vista"><button type="button" data-view="grid" aria-label="Cuadr\xEDcula"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg></button><button type="button" data-view="list" aria-label="Lista"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></button></div></div><div class="workshop-library-filters2"><select id="workshopModelFilter" aria-label="Filtrar por modelo"><option value="all">Todos los modelos</option></select><span id="workshopLibraryCount"></span><label class="workshop-sort">Orden<select id="workshopSort" aria-label="Orden"><option value="recent">M\xE1s recientes</option><option value="old">M\xE1s antiguos</option><option value="name">Nombre</option></select></label></div><div id="workshopLibraryGrid" class="workshop-library-grid"></div><div id="workshopLibraryUndo" class="workshop-library-undo" hidden></div><section class="workshop-starters" aria-labelledby="workshopStartersTitle"><h2 id="workshopStartersTitle">Empieza con un modelo del cat\xE1logo</h2><div id="workshopStarters" class="workshop-starters-grid"></div></section></div><aside id="workshopLibraryDetail" class="workshop-library-detail" aria-label="Detalles del dise\xF1o"></aside></div>';
  for(const [id,info] of Object.entries(modelInfo)){const o=el('option','',info.name);o.value=id;$('workshopModelFilter').append(o);}
  for(const [id,key] of [['workshopSearch','query'],['workshopKind','kind'],['workshopModelFilter','model']])$(id).addEventListener('input',()=>{filter[key]=$(id).value;renderLibrary();});
- $('workshopLibraryActions').append(button('Guardar dise\xF1o actual',()=>app.quickSave(),'btn primary'),button('Respaldo de dise\xF1os',()=>{$('projectsBtn').dataset.legacy='1';app.showProjects();$('projectsDialog').showModal();}),button('Exportar biblioteca',()=>exportLibrary()));
+ let sortMode='recent',selectedItem=null,libraryView=app.readStorage('lzbox-library-view','grid')==='list'?'list':'grid';
+ $('workshopSort').addEventListener('input',()=>{sortMode=$('workshopSort').value;renderLibrary();});
+ for(const chip of library.querySelectorAll('[data-kind]'))chip.onclick=()=>{$('workshopKind').value=chip.dataset.kind;filter.kind=chip.dataset.kind;renderLibrary();};
+ for(const b of library.querySelectorAll('[data-view]'))b.onclick=()=>{libraryView=b.dataset.view;app.putStorage('lzbox-library-view',libraryView);renderLibrary();};
+ $('workshopLibraryActions').append(button('Guardar dise\xF1o actual',()=>app.quickSave(),'btn primary'),button('Importar desde archivo',()=>$('importBtn')?.click()),button('Exportar biblioteca',()=>exportLibrary()),button('Respaldo de dise\xF1os',()=>{$('projectsBtn').dataset.legacy='1';app.showProjects();$('projectsDialog').showModal();},'btn quiet'));
  $('projectsBtn').onclick=()=>show('library');
- function renderLibrary(){const list=filterWorkshop(allItems(),filter),grid=$('workshopLibraryGrid');if(!grid)return;grid.replaceChildren();$('workshopLibraryCount').textContent=\`\${list.length} elementos\`;
-  if(!list.length){grid.append(el('p','workshop-empty','No hay elementos que mostrar. Guarda un dise\xF1o o una preparaci\xF3n para volver a utilizarlo.'));return;}
-  for(const item of list){const card=el('article','workshop-library-card'),preview=el('div','workshop-library-thumb');if(typeof item.thumb==='string'&&/^data:image\\/(png|jpeg|webp);base64,/.test(item.thumb)){const img=el('img');img.src=item.thumb;img.alt='Vista de '+item.name;preview.append(img);}else preview.append(el('span','',modelInfo[item.state.model]?.name||'Dise\xF1o'));
-   const info=el('div','workshop-library-info');info.append(el('span','workshop-item-kind',({design:'Dise\xF1o editable',prepared:'Trabajo preparado',template:'Plantilla de posicionamiento'})[item.kind]),el('h2','',item.name),el('p','',\`\${modelInfo[item.state.model]?.name||item.state.model} \xB7 \${item.state.width} \xD7 \${item.state.depth} \xD7 \${item.state.height} mm\`),el('p','',\`\${item.state.thickness} mm \xB7 \${item.state.texture||'MDF'} \xB7 \${new Date(item.updated).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})}\`));
+ const kindLabel={design:'Dise\xF1o',prepared:'Preparaci\xF3n',template:'Plantilla'};
+ const modelImage=model=>document.querySelector(\`#modelCatalog [data-model="\${model}"] img\`)?.getAttribute('src')||'';
+ const ago=date=>{const t=new Date(date).getTime();if(!Number.isFinite(t))return '';const s=Math.max(0,(Date.now()-t)/1000);if(s<60)return 'hace un momento';const m=s/60,h=m/60,d=h/24;if(m<60)return \`hace \${Math.round(m)} min\`;if(h<24)return \`hace \${Math.round(h)} hora\${Math.round(h)===1?'':'s'}\`;if(d<7)return \`hace \${Math.round(d)} d\xEDa\${Math.round(d)===1?'':'s'}\`;if(d<30)return \`hace \${Math.round(d/7)} semana\${Math.round(d/7)===1?'':'s'}\`;return new Date(t).toLocaleDateString('es-MX',{dateStyle:'medium'});};
+ const itemKey=item=>item.kind+':'+item.id;
+ const thumbFor=item=>{const preview=el('div','workshop-library-thumb');const src=typeof item.thumb==='string'&&/^data:image\\/(png|jpeg|webp);base64,/.test(item.thumb)?item.thumb:modelImage(item.state.model);if(src){const img=el('img');img.src=src;img.alt='Vista de '+item.name;img.loading='lazy';preview.append(img);}else preview.append(el('span','',modelInfo[item.state.model]?.name||'Dise\xF1o'));const badge=el('span','workshop-kind-badge is-'+item.kind,kindLabel[item.kind]||'Dise\xF1o');preview.append(badge);return preview;};
+ const rename=item=>{renaming=item;$('workshopNameTitle').textContent='Renombrar';$('workshopItemName').value=item.name;$('workshopNameHint').textContent='';nameDialog.showModal();$('workshopItemName').focus();};
+ const menuFor=item=>{const menu=el('details','workshop-card-menu');const sum=el('summary','btn outline');sum.setAttribute('aria-label','M\xE1s acciones');sum.textContent='\u22EF';const list=el('div','workshop-card-menu-list');list.append(button('Duplicar',()=>{menu.open=false;duplicate(item);},'btn quiet'),button('Renombrar',()=>{menu.open=false;rename(item);},'btn quiet'),button('Eliminar',()=>{menu.open=false;remove(item);},'btn quiet workshop-danger'));menu.append(sum,list);return menu;};
+ function renderDetail(item){const box=$('workshopLibraryDetail');if(!box)return;box.replaceChildren();if(!item){box.hidden=true;return;}box.hidden=false;
+  const head=el('div','workshop-detail-head');head.append(el('h2','','Detalles del dise\xF1o'));const close=button('\xD7',()=>{selectedItem=null;renderLibrary();},'workshop-detail-close');close.setAttribute('aria-label','Cerrar detalles');head.append(close);
+  const title=el('div','workshop-detail-title');title.append(el('h3','',item.name),el('span','workshop-kind-badge is-'+item.kind,kindLabel[item.kind]||'Dise\xF1o'));
+  const facts=el('dl','workshop-detail-facts');const fact=(k,v,sub)=>{const d=el('div');d.append(el('dt','',k));const dd=el('dd','',v);if(sub)dd.append(el('small','',sub));d.append(dd);facts.append(d);};
+  fact('Descripci\xF3n',modelInfo[item.state.model]?.description||'Dise\xF1o param\xE9trico de LZ Box Studio.');fact('Dimensiones (ensamblada)',\`\${item.state.width} \xD7 \${item.state.depth} \xD7 \${item.state.height} mm\`,modelInfo[item.state.model]?.name||item.state.model);fact('Material',\`\${item.state.texture==='mdf'||!item.state.texture?'MDF':item.state.texture} \${item.state.thickness} mm\`);fact('Archivo',(item.name||'dise\xF1o').replace(/\\s+/g,'_')+(item.kind==='design'?'.lzbox':'.lzjob'),item.kind==='design'?'Dise\xF1o editable guardado en este navegador':item.kind==='template'?'Plantilla de posicionamiento':'Trabajo listo para cortar');
+  const main=el('div','workshop-detail-actions');main.append(button('Abrir',()=>openItem(item),'btn primary'),menuFor(item));
+  const minor=el('div','workshop-detail-minor');minor.append(button('Duplicar',()=>duplicate(item)),button('Renombrar',()=>rename(item)),button('Eliminar',()=>remove(item),'btn outline workshop-danger'));
+  box.append(head,thumbFor(item),title,el('p','workshop-detail-time','Modificado '+ago(item.updated)),facts);if(item.requiresReference)box.append(el('p','workshop-reference-note','Requiere establecer referencias f\xEDsicas.'));box.append(main,minor);}
+ function renderStarters(){const host=$('workshopStarters');if(!host||host.childElementCount)return;for(const card of document.querySelectorAll('#modelCatalog [data-model]')){const b=el('button','workshop-starter');b.type='button';const img=card.querySelector('img');if(img){const i=el('img');i.src=img.getAttribute('src');i.alt='';i.loading='lazy';b.append(i);}b.append(el('strong','',card.querySelector('strong')?.textContent||card.dataset.model),el('span','',card.querySelector('span')?.textContent||''));b.onclick=()=>{if(machine.busy)return app.toast('Hay una operaci\xF3n de m\xE1quina activa.');card.click();show('design');app.toast('Modelo cargado con medidas iniciales.');};host.append(b);}}
+ function renderLibrary(){let list=filterWorkshop(allItems(),filter);const grid=$('workshopLibraryGrid');if(!grid)return;grid.replaceChildren();grid.classList.toggle('is-list',libraryView==='list');
+  if(sortMode==='name')list=[...list].sort((a,b)=>String(a.name).localeCompare(String(b.name),'es'));else if(sortMode==='old')list=[...list].reverse();
+  for(const b of library.querySelectorAll('[data-kind]')){const on=b.dataset.kind===(filter.kind||'all');b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));}
+  for(const b of library.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===libraryView));
+  $('workshopLibraryCount').textContent=\`\${list.length} elemento\${list.length===1?'':'s'}\`;renderStarters();
+  if(selectedItem&&!list.some(i=>itemKey(i)===selectedItem))selectedItem=null;
+  if(!list.length){grid.append(el('p','workshop-empty','No hay elementos que mostrar. Guarda un dise\xF1o o una preparaci\xF3n para volver a utilizarlo, o empieza con un modelo del cat\xE1logo.'));renderDetail(null);return;}
+  if(!selectedItem)selectedItem=itemKey(list[0]);
+  for(const item of list){const card=el('article','workshop-library-card');card.tabIndex=0;card.classList.toggle('is-selected',itemKey(item)===selectedItem);card.onclick=e=>{if(e.target.closest('button,summary,details'))return;selectedItem=itemKey(item);renderLibrary();};card.onkeydown=e=>{if(e.key==='Enter'&&e.target===card){selectedItem=itemKey(item);renderLibrary();}};
+   const info=el('div','workshop-library-info');info.append(el('span','workshop-item-kind',({design:'Dise\xF1o editable',prepared:'Trabajo preparado',template:'Plantilla de posicionamiento'})[item.kind]),el('h2','',item.name),el('p','workshop-card-meta',\`\${item.state.width} \xD7 \${item.state.depth} \xD7 \${item.state.height} mm \xB7 \${item.state.thickness} mm \${item.state.texture==='mdf'||!item.state.texture?'MDF':item.state.texture}\`),el('p','workshop-card-time','Modificado '+ago(item.updated)));
    if(item.requiresReference)info.append(el('p','workshop-reference-note','Requiere establecer referencias f\xEDsicas.'));
-   const actions=el('div','workshop-library-card-actions');actions.append(button('Abrir',()=>openItem(item),'btn primary'),button('Duplicar',()=>duplicate(item)),button('Renombrar',()=>{renaming=item;$('workshopNameTitle').textContent='Renombrar';$('workshopItemName').value=item.name;$('workshopNameHint').textContent='';nameDialog.showModal();$('workshopItemName').focus();}),button('Eliminar',()=>remove(item),'btn quiet'));card.append(preview,info,actions);grid.append(card);
+   const actions=el('div','workshop-library-card-actions');actions.append(button('Abrir',()=>openItem(item),'btn primary'),menuFor(item));card.append(thumbFor(item),info,actions);grid.append(card);
   }
+  renderDetail(list.find(i=>itemKey(i)===selectedItem));
  }
  function openItem(item){if(machine.busy)return app.toast('Hay una operaci\xF3n de m\xE1quina activa. Espera para cargar otro trabajo.');try{app.loadDesign(item.state,item.kind==='design'?item.id:null);if(item.kind!=='design'){machine.restoreSettings(item.settings);machine.restoreReferencePoints(item.references||[]);}show(item.kind==='design'?'design':'prepare');app.toast(item.kind==='template'?'Plantilla cargada. Establece sus referencias en Operar m\xE1quina.':'Trabajo cargado.');}catch(e){app.toast(e.message);}}
  function duplicate(item){try{if(item.kind==='design'){const copy={...structuredClone(item),id:crypto.randomUUID(),updated:new Date().toISOString()};copy.state.name=(item.name+' (copia)').slice(0,80);delete copy.kind;delete copy.name;if(!app.putStorage('lzbox-projects',[copy,...app.designs()]))return;}else{const copy={...structuredClone(item),id:crypto.randomUUID(),name:(item.name+' (copia)').slice(0,80),updated:new Date().toISOString()};writeWorkshop(storage,[copy,...readWorkshop(storage)]);}renderLibrary();app.toast('Copia guardada.');}catch(e){app.toast(e.message);}}
@@ -7103,6 +7711,172 @@ doc.addEventListener('pointermove', (event) => {
   card.style.setProperty('--mx', \`\${event.clientX - rect.left}px\`);
   card.style.setProperty('--my', \`\${event.clientY - rect.top}px\`);
 }, { passive: true });
+
+// ---------------------------------------------------------------------------
+// Herramientas: comparaci\xF3n antes/despu\xE9s dentro de la vista y tarjeta del archivo.
+const byId = (id) => doc.getElementById(id);
+const isTestDom = /jsdom/i.test(doc.defaultView?.navigator?.userAgent || '') || typeof MutationObserver === 'undefined';
+
+function setupCompare() {
+  const pairs = [['premiumOriginal', 'premiumResult', 'Resultado'], ['viewOriginal', 'viewResult', 'Resultado'], ['effectOriginal', 'effectResult', 'Resultado'], ['upscaleOriginal', 'upscaleResult', 'Mejorada']];
+  const pair = pairs.find(([a, b]) => byId(a) && byId(b));
+  const wrap = doc.querySelector('.lab-canvas-wrap, .preview-wrap');
+  if (!pair || !wrap) return;
+  const [originalButton, resultButton] = [byId(pair[0]), byId(pair[1])];
+  const tabs = resultButton.closest('.tabs');
+  const toggle = doc.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'lz-compare-toggle';
+  toggle.setAttribute('aria-pressed', 'false');
+  toggle.title = 'Ver el original y el resultado en la misma vista';
+  toggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><path d="m8 8-4 4 4 4M16 8l4 4-4 4"/></svg><span>Comparar</span>';
+  tabs?.append(toggle);
+
+  if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+  const layer = doc.createElement('div');
+  layer.className = 'lz-compare';
+  layer.hidden = true;
+  layer.innerHTML = '<canvas class="lz-compare-original"></canvas><span class="lz-compare-tag lz-left">Original</span><span class="lz-compare-tag lz-right"></span><div class="lz-compare-line"><button type="button" class="lz-compare-handle" aria-label="Mover la divisi\xF3n entre original y resultado"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7-5 5 5 5M15 7l5 5-5 5"/></svg></button></div>';
+  layer.querySelector('.lz-right').textContent = pair[2];
+  wrap.append(layer);
+  const snapshot = layer.querySelector('canvas');
+  const line = layer.querySelector('.lz-compare-line');
+  let enabled = false, busy = false, split = 50, autoDone = false, timer = 0;
+
+  const visibleCanvas = () => [...wrap.querySelectorAll('canvas')].find((c) => c !== snapshot && !c.hidden && c.offsetWidth > 0);
+  const place = () => {
+    const canvas = visibleCanvas();
+    if (!enabled || !canvas) return;
+    const a = canvas.getBoundingClientRect(), b = wrap.getBoundingClientRect();
+    Object.assign(layer.style, {left: \`\${a.left - b.left + wrap.scrollLeft}px\`, top: \`\${a.top - b.top + wrap.scrollTop}px\`, width: \`\${a.width}px\`, height: \`\${a.height}px\`});
+    snapshot.style.clipPath = \`inset(0 \${100 - split}% 0 0)\`;
+    line.style.left = \`\${split}%\`;
+  };
+  const capture = () => {
+    if (!enabled || busy || originalButton.disabled || resultButton.disabled) return;
+    // Nunca interrumpir el cuentagotas ni una selecci\xF3n en curso.
+    if (doc.body.classList.contains('picking') || doc.body.classList.contains('lz-picking') || doc.querySelector('.lz-picker-notice:not([hidden])')) return;
+    busy = true;
+    try {
+      originalButton.click();
+      const canvas = visibleCanvas();
+      if (canvas) { snapshot.width = canvas.width; snapshot.height = canvas.height; const ctx = snapshot.getContext('2d'); ctx.clearRect(0, 0, snapshot.width, snapshot.height); ctx.drawImage(canvas, 0, 0); }
+      resultButton.click();
+    } finally { busy = false; }
+    place();
+  };
+  const setEnabled = (on) => {
+    on = !!on && !originalButton.disabled && !resultButton.disabled;
+    if (enabled === on) return;
+    enabled = on;
+    layer.hidden = !on;
+    toggle.setAttribute('aria-pressed', String(on));
+    wrap.classList.toggle('lz-comparing', on);
+    if (on) capture();
+  };
+  toggle.addEventListener('click', () => setEnabled(!enabled));
+  // Elegir una pesta\xF1a de vista sale de la comparaci\xF3n.
+  for (const b of [originalButton, resultButton, ...(tabs ? tabs.querySelectorAll('button:not(.lz-compare-toggle)') : [])]) b.addEventListener('click', () => { if (!busy) setEnabled(false); });
+  const refreshState = () => {
+    const ready = !originalButton.disabled && !resultButton.disabled;
+    toggle.disabled = !ready;
+    if (!ready) setEnabled(false);
+    // La primera vez que hay resultado se muestra directamente la comparaci\xF3n.
+    if (ready && !autoDone && !isTestDom && resultButton.getAttribute('aria-pressed') === 'true') { autoDone = true; setEnabled(true); }
+  };
+  for (const b of [originalButton, resultButton]) new MutationObserver(refreshState).observe(b, {attributes: true, attributeFilter: ['disabled', 'aria-pressed']});
+  refreshState();
+  doc.addEventListener('lz-work-changed', () => { if (!enabled || busy) return; clearTimeout(timer); timer = setTimeout(capture, 250); });
+  if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(place); ro.observe(wrap); new MutationObserver(() => { const c = visibleCanvas(); if (c) ro.observe(c); place(); }).observe(wrap, {subtree: true, attributes: true, attributeFilter: ['style', 'hidden', 'width', 'height']}); }
+  window.addEventListener('resize', place);
+  // Arrastrar la divisi\xF3n.
+  const handle = layer.querySelector('.lz-compare-handle');
+  const moveTo = (x) => { const r = layer.getBoundingClientRect(); if (!r.width) return; split = Math.max(0, Math.min(100, (x - r.left) / r.width * 100)); place(); };
+  handle.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    handle.setPointerCapture(e.pointerId);
+    const move = (ev) => moveTo(ev.clientX);
+    const up = () => { handle.removeEventListener('pointermove', move); handle.removeEventListener('pointerup', up); handle.removeEventListener('pointercancel', up); };
+    handle.addEventListener('pointermove', move); handle.addEventListener('pointerup', up); handle.addEventListener('pointercancel', up);
+  });
+  handle.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); split = Math.max(0, Math.min(100, split + (e.key === 'ArrowLeft' ? -5 : 5))); place(); } });
+}
+
+function setupFileCards() {
+  const pairs = [['premiumFile', 'premiumName'], ['file', 'fileName'], ['effectFile', 'effectName'], ['upscaleFile', 'upscaleName'], ['cropFile', 'cropName'], ['extractFile', 'extractName'], ['vectorFile', 'vectorName'], ['analyzerFile', 'analyzerName']];
+  const pair = pairs.find(([a, b]) => byId(a) && byId(b));
+  if (!pair) return;
+  const input = byId(pair[0]), name = byId(pair[1]);
+  const upload = doc.querySelector(\`label[for="\${pair[0]}"]\`) || input.closest('.upload') || input.parentElement;
+  const card = doc.createElement('div');
+  card.className = 'lz-file-card';
+  card.hidden = true;
+  card.innerHTML = '<div class="lz-file-thumb"><canvas width="112" height="112"></canvas></div><div class="lz-file-info"><strong class="lz-file-name"></strong><span class="lz-file-meta"></span><small class="lz-file-extra"></small></div><button type="button" class="lz-file-remove" aria-label="Quitar imagen y empezar de nuevo" title="Quitar imagen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>';
+  (upload?.parentElement ? upload : name).after(card);
+  const thumb = card.querySelector('canvas');
+  let lastFile = null;
+  input.addEventListener('change', () => { lastFile = input.files?.[0] || null; });
+  const drawThumb = (source, w, h) => { const ctx = thumb.getContext('2d'); ctx.clearRect(0, 0, 112, 112); const k = Math.max(112 / w, 112 / h); ctx.drawImage(source, (112 - w * k) / 2, (112 - h * k) / 2, w * k, h * k); };
+  const paint = () => {
+    const text = (name.textContent || '').trim();
+    const loaded = text && !/^sin imagen/i.test(text);
+    card.hidden = !loaded;
+    name.classList.toggle('lz-file-hidden', !!loaded);
+    if (!loaded) return;
+    const [first, ...rest] = text.split(' \xB7 ');
+    card.querySelector('.lz-file-name').textContent = first;
+    const sizeEl = doc.querySelector('[id$="SourceSize"]');
+    if (sizeEl) sizeEl.classList.toggle('lz-file-hidden', !!loaded);
+    const dims = text.match(/(\\d[\\d.,]*)\\s*\xD7\\s*(\\d[\\d.,]*)\\s*px/) || (sizeEl?.textContent || '').match(/(\\d[\\d.,]*)\\s*\xD7\\s*(\\d[\\d.,]*)\\s*px/);
+    const size = lastFile && lastFile.name === first ? \`\${(lastFile.size / 1048576).toFixed(lastFile.size > 10485760 ? 0 : 1)} MB\` : '';
+    card.querySelector('.lz-file-meta').textContent = [dims ? \`\${dims[1]} \xD7 \${dims[2]} px\` : '', size].filter(Boolean).join(' \xB7 ') || 'Imagen cargada';
+    card.querySelector('.lz-file-extra').textContent = rest.filter((part) => !/\xD7.*px/.test(part) || part.includes('IA')).join(' \xB7 ');
+    if (lastFile && lastFile.name === first && typeof createImageBitmap === 'function') {
+      createImageBitmap(lastFile, {resizeWidth: 224, resizeQuality: 'medium'}).then((bmp) => { drawThumb(bmp, bmp.width, bmp.height); bmp.close?.(); }).catch(() => fromCanvas());
+    } else fromCanvas();
+  };
+  const fromCanvas = () => { const c = [...doc.querySelectorAll('.lab-canvas-wrap canvas, .preview-wrap canvas, .extract-studio canvas')].find((x) => !x.hidden && x.width > 1 && !x.classList.contains('lz-compare-original')); if (c) try { drawThumb(c, c.width, c.height); } catch {} };
+  new MutationObserver(paint).observe(name, {childList: true, characterData: true, subtree: true});
+  card.querySelector('.lz-file-remove').addEventListener('click', () => {
+    if (confirm('\xBFQuitar la imagen y empezar de nuevo? Los ajustes guardados se conservan.')) location.reload();
+  });
+  paint();
+}
+
+if (!doc.body.classList.contains('lz-catalog') && !doc.body.classList.contains('lz-landing') && !isTestDom) {
+  try { setupCompare(); } catch (error) { console.warn('[LZ] comparar', error); }
+  try { setupFileCards(); } catch (error) { console.warn('[LZ] archivo', error); }
+}
+
+// Secciones de ajustes plegables (todas abiertas al inicio; se recuerda lo que el usuario pliega).
+function setupCollapsibleSections() {
+  const key = 'lz-folded:' + location.pathname.split('/').pop() + (new URLSearchParams(location.search).get('tool') || '');
+  let folded = [];
+  try { folded = JSON.parse(localStorage.getItem(key)) || []; } catch {}
+  const sections = [...doc.querySelectorAll(':is(.lab-sidebar,.tools,.text-tools,.mockup-tools) :is(.step-card,.panel)')].filter((s) => s.querySelector(':scope > h2'));
+  sections.forEach((section, index) => {
+    const title = section.querySelector(':scope > h2');
+    const id = (title.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 40) || String(index);
+    title.classList.add('lz-fold-title');
+    title.setAttribute('role', 'button');
+    title.tabIndex = 0;
+    title.insertAdjacentHTML('beforeend', '<svg class="lz-fold-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
+    const apply = (closed) => { section.classList.toggle('lz-folded', closed); title.setAttribute('aria-expanded', String(!closed)); };
+    apply(folded.includes(id));
+    const flip = (event) => {
+      if (event.target.closest('input,select,button:not(.lz-fold-title),a')) return;
+      const closed = !section.classList.contains('lz-folded');
+      apply(closed);
+      folded = closed ? [...new Set([...folded, id])] : folded.filter((x) => x !== id);
+      try { localStorage.setItem(key, JSON.stringify(folded)); } catch {}
+    };
+    title.addEventListener('click', flip);
+    title.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(event); } });
+  });
+}
+if (!doc.body.classList.contains('lz-catalog') && !doc.body.classList.contains('lz-landing') && !isTestDom) {
+  try { setupCollapsibleSections(); } catch (error) { console.warn('[LZ] secciones', error); }
+}
 `,type:"text/javascript; charset=utf-8",public:!0},"/mockup-transform.js":{body:`import {CORNERS,cornerPosition,toWorld} from './sheet-transform.js';
 export {CORNERS,cornerPosition};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -8584,4 +9358,4 @@ export function setupViewport({wrap,controls,editable=false,canPan=()=>false,isP
 }
 `,type:"text/javascript; charset=utf-8",public:!1},"/worker.js":{body:`import {processPixels} from './processor.js';
 self.onmessage=({data:m})=>{try{const pixels=new Uint8ClampedArray(m.buffer);processPixels(pixels,m.width,m.height,m.params,m.pixelsPerCm,m.offsetX||0,m.offsetY||0);self.postMessage({buffer:pixels.buffer},[pixels.buffer]);}catch(e){self.postMessage({error:e.message});}};
-`,type:"text/javascript; charset=utf-8",public:!1}};var h=Object.freeze({supabaseUrl:"https://mmqqfeywxvlwzmxsbxic.supabase.co",publishableKey:"sb_publishable_2Tp3tasLtQze6B2Ac9IQCw_zRwueNWd",googleEnabled:!1,enforceToolAccess:!0});async function y(r,{fetchUpstream:a,verify:p,token:u}){let e=(n,c=200)=>Response.json(n,{status:c,headers:{"Cache-Control":"private, no-store","Referrer-Policy":"no-referrer","X-Content-Type-Options":"nosniff"}});if(r.method!=="POST")return e({message:"Metodo no permitido."},405);if(r.headers.get("Origin")!==new URL(r.url).origin)return e({message:"Solicitud no permitida."},403);if(!r.headers.get("Content-Type")?.startsWith("application/json"))return e({message:"Solicitud invalida."},415);if(Number(r.headers.get("Content-Length")||0)>4e4)return e({message:"Solicitud demasiado grande."},413);let i=await r.text();if(i.length>4e4)return e({message:"Solicitud demasiado grande."},413);let t;try{t=JSON.parse(i)}catch{return e({message:"Solicitud invalida."},400)}if(!t||!["create","poll","remove","offer","answer"].includes(t.action)||typeof t.session!="string"||!/^[0-9a-f-]{36}$/i.test(t.session))return e({message:"Emparejamiento invalido."},400);let s=["create","poll","remove"].includes(t.action);if(s){let n=await p(u);if(!n||n.blocked)return e({message:"Inicia sesion para emparejar."},401)}if((!s||t.action==="create")&&(typeof t.secret!="string"||!/^[a-f0-9]{64}$/.test(t.secret)))return e({message:"QR invalido."},400);if(["create","answer"].includes(t.action)&&(typeof t.sdp!="string"||!t.sdp.length||new TextEncoder().encode(t.sdp).length>3e4))return e({message:"Enlace invalido."},400);if(!s&&(typeof t.claim!="string"||!/^[0-9a-f-]{36}$/i.test(t.claim)))return e({message:"Celular invalido."},400);let o=await a(h.supabaseUrl+"/rest/v1/rpc/lz_box_pair_exchange",{method:"POST",headers:{apikey:h.publishableKey,...s?{Authorization:"Bearer "+u}:{},"Content-Type":"application/json"},body:JSON.stringify({p_action:t.action,p_id:t.session,p_secret:t.secret||null,p_sdp:t.sdp||null,p_claim:t.claim||null})});if(!o.ok){let n;try{n=await o.json()}catch{}return e({message:n?.message?.match(/^(El QR|Emparejamiento|Este QR|Respuesta de enlace|Espera dos|Inicia sesion)/)?n.message:"No se pudo completar el emparejamiento. Genera otro QR."},o.status===401||o.status===403?403:409)}return e(await o.json())}var b="__Host-lz_session",m={"Cache-Control":"private, no-store","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer"},l=(r,a=200,p={})=>new Response(JSON.stringify(r),{status:a,headers:{...m,"Content-Type":"application/json",...p}});function f(r,a){return`${b}=${r||""}; Path=/; HttpOnly; Secure; SameSite=Lax; ${a===null?"":"Max-Age="+a}`}function w(r){return r.headers.get("Cookie")?.split(";").map(a=>a.trim()).find(a=>a.startsWith(b+"="))?.slice(b.length+1)||null}var x={crop:"/crop.html",editor:"/editor.html",recolor:"/editor.html?tool=recolor",opacity:"/opacity.html",thickness:"/thickness.html",texture:"/textures.html",text:"/text-creator.html",mockups:"/mockups.html",vectorize:"/vectorize.html",analyzer:"/analyzer.html",sheet:"/gang-sheet.html",color:"/color-enhance.html",upscale:"/upscale.html",extract:"/extract.html"};function _(r){return r.pathname==="/premium.html"?"editor":r.pathname==="/editor.html"?r.searchParams.get("tool")==="recolor"?"recolor":"editor":Object.keys(x).find(a=>x[a]===r.pathname)}function M(r,a){let p=new Set(a.filter(e=>e.enabled).map(e=>e.id)),u=e=>{let i=_(new URL(e,"https://local.test"));return!i||p.has(i)};return r.replace(/<article\b[^>]*class="tool-card"[^>]*>[\s\S]*?<\/article>/g,e=>{let i=e.match(/class="open-tool" href="([^"]+)"/);return i&&!u(i[1])?"":e}).replace(/<a\b[^>]*href="([^"]+)"[^>]*>[\s\S]*?<\/a>/g,(e,i)=>u(i)?e:"")}function S({assets:r,fetchUpstream:a=fetch}={}){async function p(){let e=await a(h.supabaseUrl+"/rest/v1/lz_tools?select=id,name,enabled",{headers:{apikey:h.publishableKey,Authorization:"Bearer "+h.publishableKey}});if(!e.ok)throw new Error("No se pudo consultar las herramientas.");return e.json()}async function u(e,i=!1){if(!e||e.length>8192||!/^[A-Za-z0-9_.-]+$/.test(e))return null;let t=h.supabaseUrl,s={apikey:h.publishableKey,Authorization:"Bearer "+e},o=await a(t+"/auth/v1/user",{headers:s});if(o.status===401||o.status===403)return null;if(!o.ok)throw new Error("No se pudo verificar la sesi\xF3n.");let n=await o.json();if(!n.id)return null;if(i&&!(await a(t+"/rest/v1/rpc/lz_ensure_profile",{method:"POST",headers:{...s,"Content-Type":"application/json"},body:"{}"})).ok)throw new Error("No se pudo crear tu perfil.");let c=await a(t+"/rest/v1/lz_profiles?id=eq."+encodeURIComponent(n.id)+"&select=id,blocked",{headers:s});if(!c.ok)throw new Error("No se pudo verificar tu cuenta.");let d=await c.json();return d[0]?{user:n,blocked:d[0].blocked}:null}return{async fetch(e){let i=new URL(e.url),t;try{t=decodeURIComponent(i.pathname)}catch{return l({message:"Ruta inv\xE1lida."},400)}if(t.includes("\\")||t.includes("\0")||t.split("/").some(s=>s===".."))return l({message:"Ruta inv\xE1lida."},400);t==="/"&&(t="/index.html");try{if(t==="/api/box/pair")return await y(e,{fetchUpstream:a,verify:u,token:w(e)});if(t==="/api/account/session"){if(e.method!=="POST")return l({message:"M\xE9todo no permitido."},405);if(e.headers.get("Origin")!==i.origin)return l({message:"Solicitud no permitida."},403);if(!e.headers.get("Content-Type")?.startsWith("application/json"))return l({message:"Solicitud inv\xE1lida."},415);if(Number(e.headers.get("Content-Length")||0)>1e4)return l({message:"Solicitud demasiado grande."},413);let n=await e.text();if(n.length>1e4)return l({message:"Solicitud demasiado grande."},413);let c;try{c=JSON.parse(n)}catch{return l({message:"Solicitud inv\xE1lida."},400)}if(c.access_token===null)return l({ok:!0},200,{"Set-Cookie":f(null,0)});let d=typeof c.access_token=="string"?c.access_token:null,g=await u(d,!0);return g?g.blocked?l({message:"Tu cuenta est\xE1 suspendida. Comun\xEDcate con el administrador."},403,{"Set-Cookie":f(null,0)}):l({ok:!0},200,{"Set-Cookie":f(d,c.remember===!1?null:3600)}):l({message:"Inicia sesi\xF3n para continuar."},401,{"Set-Cookie":f(null,0)})}if(t==="/box"||t==="/box/")return["GET","HEAD"].includes(e.method)?new Response(null,{status:307,headers:{...m,Location:"/box/index.html"+i.search}}):l({message:"M\xE9todo no permitido."},405);let s=r[t];if(!s)return new Response("No encontrado",{status:404,headers:m});if(!["GET","HEAD"].includes(e.method))return l({message:"M\xE9todo no permitido."},405);if(!s.public){let n=await u(w(e));if(!n||n.blocked){if(s.type.startsWith("text/html")){let c=t.slice(1)+i.search;return new Response(null,{status:303,headers:{...m,Location:"/account.html?return="+encodeURIComponent(c),"Set-Cookie":f(null,0)}})}return l({message:n?.blocked?"Cuenta suspendida.":"Inicia sesi\xF3n para usar las herramientas."},n?.blocked?403:401)}}let o=s.body;if(s.type.startsWith("text/html")&&t!=="/account.html"){let n=await p(),c=_(i);if(c&&!n.some(d=>d.id===c&&d.enabled))return new Response('<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Herramienta desactivada</title><link rel="stylesheet" href="account.css"><body class="account-body"><main class="account-main"><h1>Herramienta desactivada</h1><p>El administrador ha desactivado esta herramienta.</p><a class="account-primary" href="/index.html">Ver herramientas disponibles</a></main></body></html>',{status:403,headers:{...m,"Content-Type":"text/html; charset=utf-8"}});o=M(o,n),t==="/editor.html"&&!n.some(d=>d.id==="recolor"&&d.enabled)&&(o=o.replace("<body",'<body data-recolor-disabled="true"'))}return new Response(e.method==="HEAD"?null:o,{headers:{...m,"Content-Type":s.type}})}catch{return l({message:"No pudimos verificar el acceso. Intenta de nuevo en unos momentos."},503)}}}}var $=S({assets:v});export{$ as default};
+`,type:"text/javascript; charset=utf-8",public:!1}};var h=Object.freeze({supabaseUrl:"https://mmqqfeywxvlwzmxsbxic.supabase.co",publishableKey:"sb_publishable_2Tp3tasLtQze6B2Ac9IQCw_zRwueNWd",googleEnabled:!1,enforceToolAccess:!0});async function y(a,{fetchUpstream:r,verify:p,token:u}){let e=(n,c=200)=>Response.json(n,{status:c,headers:{"Cache-Control":"private, no-store","Referrer-Policy":"no-referrer","X-Content-Type-Options":"nosniff"}});if(a.method!=="POST")return e({message:"Metodo no permitido."},405);if(a.headers.get("Origin")!==new URL(a.url).origin)return e({message:"Solicitud no permitida."},403);if(!a.headers.get("Content-Type")?.startsWith("application/json"))return e({message:"Solicitud invalida."},415);if(Number(a.headers.get("Content-Length")||0)>4e4)return e({message:"Solicitud demasiado grande."},413);let i=await a.text();if(i.length>4e4)return e({message:"Solicitud demasiado grande."},413);let t;try{t=JSON.parse(i)}catch{return e({message:"Solicitud invalida."},400)}if(!t||!["create","poll","remove","offer","answer"].includes(t.action)||typeof t.session!="string"||!/^[0-9a-f-]{36}$/i.test(t.session))return e({message:"Emparejamiento invalido."},400);let s=["create","poll","remove"].includes(t.action);if(s){let n=await p(u);if(!n||n.blocked)return e({message:"Inicia sesion para emparejar."},401)}if((!s||t.action==="create")&&(typeof t.secret!="string"||!/^[a-f0-9]{64}$/.test(t.secret)))return e({message:"QR invalido."},400);if(["create","answer"].includes(t.action)&&(typeof t.sdp!="string"||!t.sdp.length||new TextEncoder().encode(t.sdp).length>3e4))return e({message:"Enlace invalido."},400);if(!s&&(typeof t.claim!="string"||!/^[0-9a-f-]{36}$/i.test(t.claim)))return e({message:"Celular invalido."},400);let o=await r(h.supabaseUrl+"/rest/v1/rpc/lz_box_pair_exchange",{method:"POST",headers:{apikey:h.publishableKey,...s?{Authorization:"Bearer "+u}:{},"Content-Type":"application/json"},body:JSON.stringify({p_action:t.action,p_id:t.session,p_secret:t.secret||null,p_sdp:t.sdp||null,p_claim:t.claim||null})});if(!o.ok){let n;try{n=await o.json()}catch{}return e({message:n?.message?.match(/^(El QR|Emparejamiento|Este QR|Respuesta de enlace|Espera dos|Inicia sesion)/)?n.message:"No se pudo completar el emparejamiento. Genera otro QR."},o.status===401||o.status===403?403:409)}return e(await o.json())}var b="__Host-lz_session",m={"Cache-Control":"private, no-store","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer"},l=(a,r=200,p={})=>new Response(JSON.stringify(a),{status:r,headers:{...m,"Content-Type":"application/json",...p}});function f(a,r){return`${b}=${a||""}; Path=/; HttpOnly; Secure; SameSite=Lax; ${r===null?"":"Max-Age="+r}`}function w(a){return a.headers.get("Cookie")?.split(";").map(r=>r.trim()).find(r=>r.startsWith(b+"="))?.slice(b.length+1)||null}var x={crop:"/crop.html",editor:"/editor.html",recolor:"/editor.html?tool=recolor",opacity:"/opacity.html",thickness:"/thickness.html",texture:"/textures.html",text:"/text-creator.html",mockups:"/mockups.html",vectorize:"/vectorize.html",analyzer:"/analyzer.html",sheet:"/gang-sheet.html",color:"/color-enhance.html",upscale:"/upscale.html",extract:"/extract.html"};function _(a){return a.pathname==="/premium.html"?"editor":a.pathname==="/editor.html"?a.searchParams.get("tool")==="recolor"?"recolor":"editor":Object.keys(x).find(r=>x[r]===a.pathname)}function M(a,r){let p=new Set(r.filter(e=>e.enabled).map(e=>e.id)),u=e=>{let i=_(new URL(e,"https://local.test"));return!i||p.has(i)};return a.replace(/<article\b[^>]*class="tool-card"[^>]*>[\s\S]*?<\/article>/g,e=>{let i=e.match(/class="open-tool" href="([^"]+)"/);return i&&!u(i[1])?"":e}).replace(/<a\b[^>]*href="([^"]+)"[^>]*>[\s\S]*?<\/a>/g,(e,i)=>u(i)?e:"")}function S({assets:a,fetchUpstream:r=fetch}={}){async function p(){let e=await r(h.supabaseUrl+"/rest/v1/lz_tools?select=id,name,enabled",{headers:{apikey:h.publishableKey,Authorization:"Bearer "+h.publishableKey}});if(!e.ok)throw new Error("No se pudo consultar las herramientas.");return e.json()}async function u(e,i=!1){if(!e||e.length>8192||!/^[A-Za-z0-9_.-]+$/.test(e))return null;let t=h.supabaseUrl,s={apikey:h.publishableKey,Authorization:"Bearer "+e},o=await r(t+"/auth/v1/user",{headers:s});if(o.status===401||o.status===403)return null;if(!o.ok)throw new Error("No se pudo verificar la sesi\xF3n.");let n=await o.json();if(!n.id)return null;if(i&&!(await r(t+"/rest/v1/rpc/lz_ensure_profile",{method:"POST",headers:{...s,"Content-Type":"application/json"},body:"{}"})).ok)throw new Error("No se pudo crear tu perfil.");let c=await r(t+"/rest/v1/lz_profiles?id=eq."+encodeURIComponent(n.id)+"&select=id,blocked",{headers:s});if(!c.ok)throw new Error("No se pudo verificar tu cuenta.");let d=await c.json();return d[0]?{user:n,blocked:d[0].blocked}:null}return{async fetch(e){let i=new URL(e.url),t;try{t=decodeURIComponent(i.pathname)}catch{return l({message:"Ruta inv\xE1lida."},400)}if(t.includes("\\")||t.includes("\0")||t.split("/").some(s=>s===".."))return l({message:"Ruta inv\xE1lida."},400);t==="/"&&(t="/index.html");try{if(t==="/api/box/pair")return await y(e,{fetchUpstream:r,verify:u,token:w(e)});if(t==="/api/account/session"){if(e.method!=="POST")return l({message:"M\xE9todo no permitido."},405);if(e.headers.get("Origin")!==i.origin)return l({message:"Solicitud no permitida."},403);if(!e.headers.get("Content-Type")?.startsWith("application/json"))return l({message:"Solicitud inv\xE1lida."},415);if(Number(e.headers.get("Content-Length")||0)>1e4)return l({message:"Solicitud demasiado grande."},413);let n=await e.text();if(n.length>1e4)return l({message:"Solicitud demasiado grande."},413);let c;try{c=JSON.parse(n)}catch{return l({message:"Solicitud inv\xE1lida."},400)}if(c.access_token===null)return l({ok:!0},200,{"Set-Cookie":f(null,0)});let d=typeof c.access_token=="string"?c.access_token:null,g=await u(d,!0);return g?g.blocked?l({message:"Tu cuenta est\xE1 suspendida. Comun\xEDcate con el administrador."},403,{"Set-Cookie":f(null,0)}):l({ok:!0},200,{"Set-Cookie":f(d,c.remember===!1?null:3600)}):l({message:"Inicia sesi\xF3n para continuar."},401,{"Set-Cookie":f(null,0)})}if(t==="/box"||t==="/box/")return["GET","HEAD"].includes(e.method)?new Response(null,{status:307,headers:{...m,Location:"/box/index.html"+i.search}}):l({message:"M\xE9todo no permitido."},405);let s=a[t];if(!s)return new Response("No encontrado",{status:404,headers:m});if(!["GET","HEAD"].includes(e.method))return l({message:"M\xE9todo no permitido."},405);if(!s.public){let n=await u(w(e));if(!n||n.blocked){if(s.type.startsWith("text/html")){let c=t.slice(1)+i.search;return new Response(null,{status:303,headers:{...m,Location:"/account.html?return="+encodeURIComponent(c),"Set-Cookie":f(null,0)}})}return l({message:n?.blocked?"Cuenta suspendida.":"Inicia sesi\xF3n para usar las herramientas."},n?.blocked?403:401)}}let o=s.body;if(s.type.startsWith("text/html")&&t!=="/account.html"){let n=await p(),c=_(i);if(c&&!n.some(d=>d.id===c&&d.enabled))return new Response('<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Herramienta desactivada</title><link rel="stylesheet" href="account.css"><body class="account-body"><main class="account-main"><h1>Herramienta desactivada</h1><p>El administrador ha desactivado esta herramienta.</p><a class="account-primary" href="/index.html">Ver herramientas disponibles</a></main></body></html>',{status:403,headers:{...m,"Content-Type":"text/html; charset=utf-8"}});o=M(o,n),t==="/editor.html"&&!n.some(d=>d.id==="recolor"&&d.enabled)&&(o=o.replace("<body",'<body data-recolor-disabled="true"'))}return new Response(e.method==="HEAD"?null:o,{headers:{...m,"Content-Type":s.type}})}catch{return l({message:"No pudimos verificar el acceso. Intenta de nuevo en unos momentos."},503)}}}}var $=S({assets:v});export{$ as default};

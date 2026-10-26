@@ -38,3 +38,322 @@ html body.workshop .direct-bar [aria-pressed=true]{background:#2ee6ff14}
 html body.workshop .stat-icon{background:#0b2730;color:#2ee6ff}
 html body.workshop .model-card.active:after{background:#2ee6ff;color:#02101a}
 @media (max-width:700px){html body.workshop .lz-top-nav.lz-appbar{padding:0 10px;gap:8px}}
+
+/* ===================================================================== */
+/* Interfaz NEO del estudio (neo-studio.js)                              */
+/* ===================================================================== */
+.neo-ico{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.neo-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;margin:0!important;padding:0!important;border:0!important}
+.neo-emptied,.neo-moved{display:none!important}
+html body.workshop .neo-op-card,html body.workshop .neo-result,html body.workshop .neo-checklist,html body.workshop .neo-piece-panel{background:#0a0d12;border:1px solid #1c2531;border-radius:14px}
+
+/* Cabecera: marca, cuatro espacios y acciones en una sola barra ------ */
+html body.workshop .topbar{display:flex;align-items:center;gap:14px;height:64px;min-height:64px;padding:0 18px;flex-wrap:nowrap;position:sticky;top:0;z-index:40}
+html body.workshop .topbar .brand{flex:none}
+html body.workshop .topbar .neo-tabs{position:static;display:flex;align-items:stretch;gap:2px;height:64px;min-height:0;margin:0 auto 0 8px;padding:0;background:none;border:0;flex-wrap:nowrap;box-shadow:none}
+html body.workshop .neo-tabs .workshop-tab{display:flex;align-items:center;gap:8px;height:100%;padding:0 16px;border:0;border-bottom:2px solid transparent;border-radius:0;background:none;color:#a7b3c2;font-size:14px;font-weight:550;white-space:nowrap}
+html body.workshop .neo-tabs .workshop-tab:hover{color:#fff;background:#0b1118}
+html body.workshop .neo-tabs .workshop-tab .workshop-number{font-size:11px;color:#5f6d80;font-family:ui-monospace,monospace}
+html body.workshop .neo-tabs .workshop-tab.active{color:#2ee6ff;border-bottom-color:#2ee6ff;background:linear-gradient(180deg,#071219,#0b2730);box-shadow:inset 0 -2px 0 #2ee6ff}
+html body.workshop .neo-tabs .workshop-tab.active .workshop-number{color:#2ee6ff}
+html body.workshop .neo-tabs .workshop-live{align-self:center;margin-left:10px;padding:5px 10px;border:1px solid #243041;border-radius:999px;background:#06080b;font-size:11px;letter-spacing:.06em;color:#9aa7b7;white-space:nowrap}
+html body.workshop .top-actions{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;margin-left:0}
+html body.workshop #themeBtn,html body.workshop #projectsBtn,html body.workshop .top-history{display:none!important}
+html body.workshop .neo-layout-tools{display:flex;align-items:center;gap:6px;margin:0;padding:0;border:0;background:none;position:static}
+html body.workshop .neo-layout-tools>label{display:none}
+html body.workshop .neo-layout-tools .btn{min-height:34px;padding:6px 10px;font-size:12px}
+html body.workshop .neo-layout-tools .btn:last-child{display:none}
+html body.workshop .workshop-layout-tools:not(.neo-layout-tools){display:none}
+@media (max-width:1380px){html body.workshop .neo-tabs .workshop-tab{padding:0 11px;font-size:13px}html body.workshop .neo-tabs .workshop-live,html body.workshop #saveState{display:none}}
+@media (max-width:1180px){html body.workshop .neo-tabs .workshop-tab>span:not(.workshop-number){display:none}html body.workshop .neo-tabs .workshop-tab .neo-ico{width:20px;height:20px}html body.workshop .neo-layout-tools{display:none}}
+@media (max-width:760px){html body.workshop .topbar{height:auto;min-height:56px;flex-wrap:wrap;padding:8px 10px;gap:8px}html body.workshop .topbar .neo-tabs{order:5;width:100%;height:46px;margin:0;overflow-x:auto}html body.workshop .neo-tabs .workshop-tab{flex:1;justify-content:center}html body.workshop .top-actions{margin-left:auto}html body.workshop #autosaveState{display:none}}
+
+/* Diseñar ------------------------------------------------------------ */
+html body.workshop .workshop-model-button.neo-model-card{display:flex;align-items:center;gap:14px;padding:10px;border:1px solid #1c2531;border-left:1px solid #1c2531;border-radius:14px;background:linear-gradient(135deg,#0c1720,#080b10);text-align:left}
+html body.workshop .neo-model-card img{width:84px;height:84px;object-fit:cover;border-radius:10px;background:#11161e;flex:none}
+html body.workshop .neo-model-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+html body.workshop .neo-model-text strong{font-size:16px;color:#fff;line-height:1.25}
+html body.workshop .neo-model-text small{font-size:12.5px;color:#9aa7b7}
+html body.workshop .neo-model-text em{font-style:normal;font-size:13px;font-weight:600;color:#2ee6ff;margin-top:4px}
+html body.workshop .neo-model-card:hover{border-color:#2ee6ff88;box-shadow:0 12px 30px -20px #2ee6ff}
+.neo-view-options{padding:16px 16px 6px;border-top:1px solid #18202b}
+.neo-view-options h3{margin:0 0 10px;font-size:15px}
+.neo-switch{position:relative;display:flex;align-items:center;gap:10px;min-height:42px;cursor:pointer;color:#dbe4ee;font-size:14px}
+.neo-switch>span{flex:1}
+.neo-switch>.neo-ico{color:#9aa7b7}
+.neo-switch input{position:absolute;opacity:0;width:1px;height:1px}
+.neo-switch-ui{position:relative;width:42px;height:24px;border-radius:999px;background:#1c2531;border:1px solid #2a3646;transition:background .2s,border-color .2s;flex:none}
+.neo-switch-ui:after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#7b8796;transition:transform .2s,background .2s}
+.neo-switch input:checked+.neo-switch-ui{background:#0d3a45;border-color:#2ee6ff}
+.neo-switch input:checked+.neo-switch-ui:after{transform:translateX(18px);background:#2ee6ff;box-shadow:0 0 10px #2ee6ff}
+.neo-switch input:focus-visible+.neo-switch-ui{outline:2px solid #2ee6ff;outline-offset:2px}
+
+/* Visor con panel de pieza a la derecha */
+html body.workshop[data-workshop-space=design] .viewer-body.neo-has-piece-panel{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:stretch}
+html body.workshop[data-workshop-space=design] .viewer-body.neo-has-piece-panel>#editInspector:not([hidden])~.neo-piece-panel,.neo-piece-panel.neo-under-inspector{display:none}
+html body.workshop[data-workshop-space=design] .stage{height:clamp(420px,62dvh,720px)}
+html body.workshop:not([data-workshop-space=design]) .neo-piece-panel,html body.workshop:not([data-workshop-space=design]) .neo-view-strip{display:none!important}
+.neo-piece-panel{display:flex;flex-direction:column;gap:12px;padding:16px;min-width:0;overflow:auto;max-height:clamp(420px,62dvh,720px)}
+.neo-panel-head h2{display:flex;align-items:center;gap:9px;margin:0;font-size:16px;color:#fff}
+.neo-panel-head .neo-ico{color:#2ee6ff}
+.neo-piece-empty p{margin:0 0 12px;font-size:13.5px;line-height:1.5;color:#9aa7b7}
+.neo-piece-chips{display:flex;flex-wrap:wrap;gap:6px}
+.neo-chip{min-height:32px;padding:0 11px;border-radius:999px;border:1px solid #243041;background:#06080b;color:#dbe4ee;font-size:12.5px;cursor:pointer}
+.neo-chip:hover{border-color:#2ee6ff}
+.neo-piece-preview{margin:0;height:130px;display:grid;place-items:center;border-radius:12px;background:radial-gradient(circle at 50% 40%,#111a26,#06080b);border:1px solid #18202b}
+.neo-piece-preview svg{width:86%;height:86%}
+.neo-piece-preview path{fill:#c9aa7c;stroke:#7a5a33;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.neo-piece-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.neo-piece-title strong{font-size:16px;color:#fff}
+.neo-icon-btn{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;border:1px solid #243041;background:#06080b;color:#dbe4ee;cursor:pointer}
+.neo-icon-btn:hover{border-color:#2ee6ff;color:#2ee6ff}
+.neo-piece-facts{display:grid;gap:7px;margin:0}
+.neo-piece-facts div{display:grid;grid-template-columns:78px 1fr;gap:10px;font-size:13px}
+.neo-piece-facts dt{color:#768396}
+.neo-piece-facts dd{margin:0;color:#e5edf5}
+.neo-piece-panel h3{margin:6px 0 0;padding-top:12px;border-top:1px solid #18202b;font-size:13.5px;color:#fff}
+.neo-xy{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.neo-xy label{position:relative;display:grid;gap:4px;font-size:12px;color:#9aa7b7}
+.neo-xy input{width:100%;min-height:38px;padding:6px 34px 6px 10px;box-sizing:border-box}
+.neo-xy label span{position:absolute;right:10px;bottom:11px;font-size:11px;color:#768396}
+.neo-piece-actions{display:flex;flex-wrap:wrap;gap:8px}
+.neo-piece-actions .btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;font-size:12.5px}
+.neo-note{margin:0;font-size:12px;line-height:1.5;color:#768396}
+.neo-view-strip{display:flex;gap:10px;align-items:stretch;padding:12px;margin-top:12px;border:1px solid #1c2531;border-radius:14px;background:#06080b;overflow-x:auto}
+.neo-view-thumb{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 132px;padding:6px 6px 8px;border:1px solid #1c2531;border-radius:12px;background:#0a0d12;color:#a7b3c2;font-size:12.5px;cursor:pointer}
+.neo-view-thumb canvas{width:120px;height:80px;border-radius:8px;background:radial-gradient(circle at 50% 40%,#111a26,#06080b)}
+.neo-view-thumb:hover{border-color:#37465a;color:#fff}
+.neo-view-thumb.active{border-color:#2ee6ff;color:#2ee6ff;box-shadow:0 0 0 1px #2ee6ff55,0 10px 24px -14px #2ee6ff}
+.neo-view-reset{justify-content:center;flex-basis:110px}
+.neo-big-ico{width:26px;height:26px}
+.neo-more-views{display:flex;flex-direction:column;justify-content:center;gap:6px;margin-left:auto;font-size:12px;color:#768396;min-width:150px}
+html body.workshop .viewer-footer .view-presets{display:none}
+@media (max-width:1180px){html body.workshop[data-workshop-space=design] .viewer-body.neo-has-piece-panel{grid-template-columns:minmax(0,1fr)}.neo-piece-panel{max-height:none}}
+
+/* Preparar corte ----------------------------------------------------- */
+html body.workshop:not([data-workshop-space=prepare]) .neo-plan-toolbar,html body.workshop:not([data-workshop-space=prepare]) .neo-plan-info{display:none!important}
+html body.workshop[data-workshop-space=prepare] .stage{height:calc(100dvh - 280px);min-height:520px}
+.neo-plan-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.neo-tool-group{display:flex;gap:4px;padding:4px;border:1px solid #1c2531;border-radius:12px;background:#06080b}
+.neo-tool{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 14px;border:1px solid transparent;border-radius:9px;background:none;color:#a7b3c2;font-size:13.5px;cursor:pointer}
+.neo-tool:hover:not(:disabled){color:#fff;background:#10141b}
+.neo-tool.active{color:#2ee6ff;background:#0b2730;border-color:#2ee6ff88}
+.neo-tool:disabled{opacity:.45;cursor:not-allowed}
+.neo-sheet-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.neo-sheet-tab{min-height:40px;padding:0 18px;border:1px solid #243041;border-radius:10px;background:#06080b;color:#a7b3c2;font-size:13.5px;cursor:pointer}
+.neo-sheet-tab.active{color:#2ee6ff;border-color:#2ee6ff;background:#0b2730;box-shadow:0 0 16px -8px #2ee6ff}
+.neo-add-sheet{margin-left:auto;border-color:#243041;background:#06080b}
+html body.workshop #planTools #planEditToggle,html body.workshop #planTools #planRotate,html body.workshop #planTools #planAddSheet{display:none}
+#plan .sheet-wrap.neo-focus svg{outline:2px solid #2ee6ff;outline-offset:3px;border-radius:2px}
+html body.workshop[data-workshop-space=prepare] .plan-ruler{fill:#7f93a8}
+html body.workshop[data-workshop-space=prepare] .sheet-wrap p{color:#a7b3c2;font-size:12.5px}
+.neo-plan-info{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:12px;margin-top:12px}
+.neo-info-card{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid #1c2531;border-radius:14px;background:#0a0d12}
+.neo-info-card>.neo-ico{color:#2ee6ff;margin-top:2px}
+.neo-info-card span{display:block;font-size:12px;color:#768396}
+.neo-info-card strong{display:block;font-size:15px;color:#fff;margin:2px 0}
+.neo-info-card small{font-size:12px;color:#9aa7b7}
+.neo-coords-slot{flex:1;min-width:0}
+html body.workshop .neo-coords{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:end;margin-top:6px;padding:0;border:0;background:none}
+html body.workshop .neo-coords h3,html body.workshop .neo-coords #workshopPieceName,html body.workshop .neo-coords #workshopPieceSize{display:none}
+html body.workshop .neo-coords label{display:grid;gap:4px;font-size:12px;color:#9aa7b7}
+html body.workshop .neo-coords input{min-height:38px}
+html body.workshop .neo-coords .btn{min-height:38px;font-size:12.5px;white-space:nowrap}
+@media (max-width:1100px){.neo-plan-info{grid-template-columns:1fr}html body.workshop .neo-coords{grid-template-columns:1fr 1fr}}
+.neo-result,.neo-checklist{margin:14px 16px 0;padding:14px}
+.neo-result h3,.neo-checklist h3{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:14px;color:#fff}
+.neo-checklist h3 .neo-ico{color:#2ee6ff}
+.neo-saving{display:flex;align-items:center;gap:14px}
+.neo-ring{position:relative;width:58px;height:58px;flex:none;display:grid;place-items:center}
+.neo-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.neo-ring circle{fill:none;stroke:#18202b;stroke-width:3.4}
+.neo-ring .neo-ring-value{stroke:#35e29a;stroke-linecap:round;stroke-dasharray:0 100;transition:stroke-dasharray .4s;pathLength:100}
+.neo-ring>.neo-ico{color:#35e29a;width:22px;height:22px}
+.neo-saving strong{display:block;font-size:15px;color:#fff}
+.neo-saving span{font-size:12.5px;line-height:1.45;color:#9aa7b7}
+.neo-usage{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid #18202b;font-size:13px;color:#9aa7b7}
+.neo-usage strong{color:#2ee6ff}
+.neo-checklist ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.neo-checklist li{display:flex;gap:10px;align-items:flex-start}
+.neo-checklist li>.neo-ico{width:22px;height:22px;padding:3px;border-radius:50%;box-sizing:border-box;flex:none}
+.neo-checklist li.ok>.neo-ico{background:#35e29a;color:#02130b;stroke-width:2.6}
+.neo-checklist li.bad>.neo-ico{background:#ffb84d;color:#1d1200}
+.neo-checklist strong{display:block;font-size:13.5px;color:#fff}
+.neo-checklist span{font-size:12.5px;color:#9aa7b7}
+html body.workshop .neo-fusion{margin:14px 16px 0;padding:14px;border:1px solid #1c2531;border-radius:14px;background:#0a0d12}
+html body.workshop .neo-fusion h3{font-size:14px}
+html body.workshop .neo-fusion>p:first-of-type{font-size:12.5px;line-height:1.5;color:#9aa7b7}
+html body.workshop .neo-fusion .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:8px}
+
+/* Operar máquina ----------------------------------------------------- */
+html body.workshop .workshop-operator{max-width:none;padding:14px 18px 20px}
+html body.workshop .neo-operate .k40-layout{display:grid;grid-template-columns:310px minmax(0,1fr) 330px;gap:16px;align-items:start;padding:0;background:none;border:0}
+html body.workshop .neo-operate{background:none;border:0;padding:0}
+.neo-op-left,.neo-op-right{display:flex;flex-direction:column;gap:14px;min-width:0}
+html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan{order:0;padding:16px}
+.neo-op-left{order:-1}.neo-op-right{order:1}
+html body.workshop .neo-op-card{padding:16px}
+.neo-job-head,.neo-phone-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.neo-job-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#3b2d8f,#5b3dd6);color:#fff;flex:none}
+.neo-job-icon .neo-ico{width:22px;height:22px}
+.neo-job-head span{display:block;font-size:12px;color:#9aa7b7}
+.neo-job-head strong{display:block;font-size:18px;color:#fff}
+.neo-job-rows{display:grid;gap:8px}
+.neo-job-row{display:grid;grid-template-columns:22px 92px minmax(0,1fr);align-items:center;gap:8px;font-size:13px;color:#a7b3c2}
+.neo-job-row>.neo-ico{color:#7f93a8}
+.neo-job-row select,.neo-job-row input,.neo-job-row output{width:100%;min-height:38px;box-sizing:border-box;margin:0}
+.neo-job-row output{display:flex;align-items:center;padding:0 10px;border:1px solid #243041;border-radius:9px;background:#06080b;color:#e5edf5}
+.neo-job #k40OriginNote{margin:8px 0 0;font-size:12px;color:#768396}
+.neo-usb-head{display:flex;align-items:center;gap:10px}
+.neo-usb-head strong{font-size:15px;color:#fff}
+.neo-usb-state{margin-left:auto;padding:3px 10px;border-radius:999px;font-size:12px;background:#1c2531;color:#a7b3c2}
+.neo-led{width:12px;height:12px;border-radius:50%;background:#465366;box-shadow:0 0 0 3px #46536633}
+.neo-usb.is-connected .neo-led{background:#35e29a;box-shadow:0 0 0 3px #35e29a33,0 0 10px #35e29a}
+.neo-usb.is-connected .neo-usb-state{background:#0f3b27;color:#6ff2b3}
+html body.workshop .neo-usb .k40-pairing{margin:10px 0 0;padding:0;border:0;background:none}
+html body.workshop .neo-usb .k40-pairing summary{padding:8px 10px;border:1px solid #243041;border-radius:9px;background:#06080b;font-size:13px;color:#dbe4ee;cursor:pointer}
+.neo-phone-head p{margin:2px 0 0;font-size:12.5px;line-height:1.45;color:#9aa7b7}
+.neo-phone-head strong{font-size:15px;color:#fff}
+.neo-phone .neo-job-icon{background:#0b2730;color:#2ee6ff;border:1px solid #2ee6ff55}
+.neo-wide{width:100%}
+.neo-power-note{font-size:12px;color:#768396;margin:0 4px}
+html body.workshop .neo-op-right .k40-jog-panel{margin:0}
+.neo-readout{margin:10px 0 14px;padding:12px 14px;border:1px solid #1c2531;border-radius:12px;background:#06080b}
+.neo-readout>span{font-size:12px;color:#9aa7b7}
+.neo-readout>div{display:flex;align-items:baseline;gap:10px;margin-top:4px;font-variant-numeric:tabular-nums}
+.neo-readout b{font-size:18px;color:#7f93a8;font-weight:500}
+.neo-readout strong{font-size:26px;color:#2ee6ff;margin-right:14px}
+.neo-readout.neo-unknown strong{color:#465366}
+html body.workshop .neo-op-right #k40Position{display:none}
+html body.workshop .neo-op-right .k40-motion-layout{display:grid;grid-template-columns:1fr;gap:14px}
+html body.workshop .neo-op-right .k40-jog-pad{display:grid;grid-template-columns:repeat(3,60px);grid-template-rows:repeat(3,60px);gap:8px;justify-content:center}
+html body.workshop .neo-op-right .k40-jog,html body.workshop .neo-op-right .k40-home{border-radius:12px;border:1px solid #243041;background:#10141b;color:#fff;font-size:20px}
+html body.workshop .neo-op-right .k40-home{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:#2ee6ff;border-color:#2ee6ff66}
+html body.workshop .neo-op-right .k40-jog:hover:not(:disabled),html body.workshop .neo-op-right .k40-home:hover:not(:disabled){border-color:#2ee6ff}
+.neo-sub{margin:0 0 6px;font-size:12.5px;color:#9aa7b7}
+.neo-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px}
+.neo-step{min-height:38px;border:1px solid #243041;border-radius:9px;background:#06080b;color:#dbe4ee;font-size:13px;cursor:pointer;padding:0}
+.neo-step[aria-pressed=true]{background:#2ee6ff;border-color:#2ee6ff;color:#02101a;font-weight:700}
+html body.workshop .neo-op-right .k40-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+html body.workshop .neo-op-right .k40-fields>p{grid-column:1/-1;font-size:12px;color:#768396;margin:0}
+html body.workshop .neo-op-right #k40Pulse{grid-column:1/-1;order:9;border-color:#8a5cff;color:#d7c8ff;background:#160f2b;min-height:44px}
+html body.workshop .neo-op-right #k40Pulse:hover:not(:disabled){box-shadow:0 0 18px -6px #8a5cff}
+html body.workshop .neo-op-right .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+html body.workshop .neo-op-right .k40-note{font-size:12px;color:#768396}
+html body.workshop .neo-operate .k40-console{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:16px;padding:14px 18px;border:1px solid #1c2531;border-radius:14px;background:#0a0d12}
+html body.workshop .neo-operate .k40-feedback{flex:1 1 260px;min-width:0}
+.neo-clock{display:flex;flex-direction:column;padding-left:18px;border-left:1px solid #1c2531;min-width:170px}
+.neo-clock span{font-size:12px;color:#9aa7b7}
+.neo-clock-value{font-size:22px;color:#fff;font-variant-numeric:tabular-nums}
+.neo-clock-note{font-size:11.5px;color:#768396}
+html body.workshop .neo-operate .k40-run-actions{display:flex;gap:10px;flex-wrap:wrap}
+html body.workshop .neo-operate .k40-run-actions .btn,html body.workshop .neo-operate .k40-pause-panel .btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 20px;font-size:14px}
+html body.workshop .neo-operate #k40Frame{border-color:#8a5cff;color:#d7c8ff}
+html body.workshop .neo-operate .k40-stop{background:#3a0d15;border-color:#ff4d6d;color:#ffd0d8}
+html body.workshop .neo-operate .k40-stop:not(:disabled):hover{background:#5a1220}
+html body.workshop .neo-operate .k40-stop-note{flex-basis:100%;margin:0;font-size:11.5px;color:#768396}
+html body.workshop .neo-operate .k40-pause-panel{flex-basis:100%;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px;border:1px solid #ffb84d55;border-radius:12px;background:#1b1408}
+html body.workshop .neo-operate .k40-pause-panel[hidden]{display:none}
+html body.workshop .neo-operate .k40-preview{min-height:420px;max-height:none;border-radius:12px;background:#06080b}
+html body.workshop .neo-operate .k40-section-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+html body.workshop .neo-operate .k40-section-heading>label{display:none}
+html body.workshop .neo-operate #k40Arrange{display:inline-flex;align-items:center;gap:7px;margin-left:auto}
+@media (max-width:1280px){html body.workshop .neo-operate .k40-layout{grid-template-columns:290px minmax(0,1fr)}.neo-op-right{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}}
+@media (max-width:860px){html body.workshop .neo-operate .k40-layout{grid-template-columns:minmax(0,1fr)}.neo-clock{border-left:0;padding-left:0}html body.workshop .neo-operate .k40-console{position:static}}
+
+html body.workshop .topbar{min-width:0;max-width:100vw;box-sizing:border-box}
+html body.workshop .neo-collapse{display:inline-flex;align-items:center;gap:7px;font-size:0!important;width:38px;min-height:38px;justify-content:center;padding:0!important}
+html body.workshop .neo-collapse .neo-ico{width:19px;height:19px}
+html body.workshop[data-workshop-space=operate] .neo-layout-tools,html body.workshop[data-workshop-space=library] .neo-layout-tools{display:none}
+@media (max-width:1600px){html body.workshop #saveState{display:none}}
+@media (max-width:1480px){html body.workshop .neo-tabs .workshop-live{display:none}}
+
+/* Biblioteca ------------------------------------------------------------ */
+html body.workshop .workshop-library{max-width:none;padding:22px 24px 30px}
+html body.workshop .workshop-library-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;padding:0;border:0}
+html body.workshop .workshop-library-head .eyebrow{color:#2ee6ff;letter-spacing:.24em;font-size:11px}
+html body.workshop .workshop-library-head h1{margin:6px 0 4px;font-size:36px;font-weight:800;letter-spacing:-.03em;color:#fff}
+html body.workshop .workshop-library-head p{margin:0;color:#9aa7b7;font-size:14px}
+html body.workshop #workshopLibraryActions{display:flex;gap:8px;flex-wrap:wrap}
+html body.workshop #workshopLibraryActions .btn{min-height:42px;padding:0 16px}
+.workshop-library-body{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:22px;align-items:start}
+.workshop-library-detail[hidden]{display:none}
+.workshop-library-body:has(.workshop-library-detail[hidden]){grid-template-columns:minmax(0,1fr)}
+html body.workshop .workshop-library-filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:0;border:0;background:none}
+.workshop-library-search{flex:1 1 300px;display:flex;align-items:center;gap:10px;height:46px;padding:0 14px;border:1px solid #243041;border-radius:12px;background:#0a0d12}
+.workshop-library-search svg{width:19px;height:19px;fill:none;stroke:#9aa7b7;stroke-width:1.7}
+.workshop-library-search input{flex:1;border:0!important;background:none!important;box-shadow:none!important;min-height:0;padding:0;font-size:14.5px}
+.workshop-library-search:focus-within{border-color:#2ee6ff}
+.workshop-kind-chips{display:flex;gap:6px;flex-wrap:wrap}
+.workshop-kind-chips button{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid #243041;background:transparent;color:#a7b3c2;font-size:13.5px;cursor:pointer}
+.workshop-kind-chips button.active{color:#2ee6ff;border-color:#2ee6ff;background:#0b2730;box-shadow:0 0 16px -8px #2ee6ff;font-weight:650}
+.workshop-view-toggle{display:inline-flex;gap:2px;padding:3px;border:1px solid #243041;border-radius:12px;background:#0a0d12}
+.workshop-view-toggle button{width:38px;height:34px;display:grid;place-items:center;border:0;border-radius:9px;background:none;color:#768396;cursor:pointer}
+.workshop-view-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.workshop-view-toggle button[aria-pressed=true]{background:#0b2730;color:#2ee6ff}
+.workshop-library-filters2{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.workshop-library-filters2 #workshopModelFilter{flex:1 1 280px;max-width:520px;min-height:42px}
+#workshopLibraryCount{margin-left:auto;font-size:13px;color:#9aa7b7}
+.workshop-sort{display:flex;align-items:center;gap:8px;font-size:13px;color:#9aa7b7}
+.workshop-sort select{min-height:38px}
+html body.workshop .workshop-library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+html body.workshop .workshop-library-card{position:relative;display:flex;flex-direction:column;gap:0;padding:0;overflow:visible;border:1px solid #1c2531;border-radius:16px;background:#0a0d12;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s}
+html body.workshop .workshop-library-card:hover{transform:translateY(-2px);border-color:#37465a}
+html body.workshop .workshop-library-card.is-selected{border-color:#2ee6ff;box-shadow:0 0 0 1px #2ee6ff66,0 18px 40px -26px #2ee6ff}
+html body.workshop .workshop-library-thumb{position:relative;height:170px;margin:10px 10px 0;border-radius:12px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#17202c,#06080b);display:grid;place-items:center}
+html body.workshop .workshop-library-thumb img{width:100%;height:100%;object-fit:contain}
+.workshop-kind-badge{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;background:#1d1640ee;color:#c9b8ff;border:1px solid #8a5cff66}
+.workshop-kind-badge.is-prepared{background:#082a2fee;color:#7ff0ff;border-color:#2ee6ff66}
+.workshop-kind-badge.is-template{background:#0b1a3aee;color:#9cc0ff;border-color:#3b7bff66}
+html body.workshop .workshop-library-info{padding:12px 14px 4px}
+html body.workshop .workshop-library-info .workshop-item-kind{display:none}
+html body.workshop .workshop-library-info h2{margin:0 0 6px;font-size:16px;color:#fff}
+.workshop-card-meta,.workshop-card-time{margin:2px 0;font-size:12.5px;color:#9aa7b7}
+.workshop-card-time{color:#768396}
+html body.workshop .workshop-library-card-actions{display:flex;gap:8px;padding:10px 14px 14px;margin-top:auto}
+html body.workshop .workshop-library-card-actions>.btn.primary{flex:1;min-height:40px}
+.workshop-card-menu{position:relative}
+.workshop-card-menu>summary{list-style:none;display:grid;place-items:center;width:44px;min-height:40px;padding:0;font-size:18px;cursor:pointer}
+.workshop-card-menu>summary::-webkit-details-marker{display:none}
+.workshop-card-menu-list{position:absolute;right:0;bottom:calc(100% + 6px);z-index:20;display:grid;min-width:160px;padding:6px;border:1px solid #243041;border-radius:12px;background:#0a0d12;box-shadow:0 20px 40px #000c}
+.workshop-card-menu-list .btn{justify-content:flex-start;text-align:left;min-height:36px;border:0}
+html body.workshop .workshop-danger{color:#ff8a9a!important;border-color:#ff4d6d66!important}
+html body.workshop .workshop-library-grid.is-list{grid-template-columns:1fr}
+html body.workshop .workshop-library-grid.is-list .workshop-library-card{flex-direction:row;align-items:center}
+html body.workshop .workshop-library-grid.is-list .workshop-library-thumb{width:150px;height:96px;margin:10px;flex:none}
+html body.workshop .workshop-library-grid.is-list .workshop-library-info{flex:1;padding:10px 0}
+html body.workshop .workshop-library-grid.is-list .workshop-library-card-actions{margin:0;min-width:190px}
+.workshop-library-detail{position:sticky;top:80px;display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid #1c2531;border-radius:18px;background:#0a0d12}
+.workshop-detail-head{display:flex;align-items:center;justify-content:space-between}
+.workshop-detail-head h2{margin:0;font-size:18px;color:#fff}
+.workshop-detail-close{width:36px;height:36px;border:0;border-radius:10px;background:none;color:#9aa7b7;font-size:22px;cursor:pointer}
+.workshop-detail-close:hover{background:#10141b;color:#fff}
+.workshop-library-detail .workshop-library-thumb{margin:0;height:220px}
+.workshop-detail-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.workshop-detail-title h3{margin:0;font-size:22px;color:#fff}
+.workshop-detail-title .workshop-kind-badge{position:static}
+.workshop-detail-time{margin:-4px 0 0;font-size:13px;color:#9aa7b7}
+.workshop-detail-facts{display:grid;gap:0;margin:0;border-top:1px solid #18202b}
+.workshop-detail-facts div{padding:12px 0;border-bottom:1px solid #18202b}
+.workshop-detail-facts dt{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px}
+.workshop-detail-facts dd{margin:0;font-size:13.5px;color:#a7b3c2;line-height:1.5}
+.workshop-detail-facts dd small{display:block;font-size:12px;color:#768396}
+.workshop-detail-actions{display:flex;gap:8px}
+.workshop-detail-actions>.btn.primary{flex:1;min-height:46px;font-size:15px}
+.workshop-detail-actions .workshop-card-menu>summary{min-height:46px}
+.workshop-detail-minor{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.workshop-detail-minor .btn{min-height:40px;font-size:12.5px}
+.workshop-starters{margin-top:28px}
+.workshop-starters h2{margin:0 0 12px;font-size:17px;color:#fff}
+.workshop-starters-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.workshop-starter{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px;border:1px solid #1c2531;border-radius:14px;background:#0a0d12;color:#fff;text-align:left;cursor:pointer}
+.workshop-starter img{width:100%;height:100px;object-fit:contain;border-radius:10px;background:radial-gradient(circle at 50% 35%,#17202c,#06080b);margin-bottom:6px}
+.workshop-starter strong{font-size:13.5px}
+.workshop-starter span{font-size:12px;color:#9aa7b7}
+.workshop-starter:hover{border-color:#2ee6ff88}
+@media (max-width:1100px){.workshop-library-body{grid-template-columns:minmax(0,1fr)}.workshop-library-detail{position:static}}
+/* Operar: ajustes finos */
+.neo-job-row{grid-template-columns:22px 78px minmax(0,1fr)}
+html body.workshop .neo-operate #k40State{background:#1c2531;color:#dbe4ee;border:0;border-radius:8px;padding:4px 10px;font-size:11.5px;letter-spacing:.08em}
+html body.workshop .workshop-library-card-actions>.btn.primary{font-size:14px}
+@media (max-width:760px){.neo-tool-group{max-width:100%;overflow-x:auto}.neo-tool span{display:none}.neo-tool{padding:0 12px}}
