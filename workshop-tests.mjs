@@ -63,7 +63,7 @@ test('actual Box boot: all models, four spaces, selection, saved preparations an
  const media=()=>({matches:true,addEventListener(){},removeEventListener(){}});dom.window.matchMedia=media;
  Object.assign(globalThis,{window:dom.window,document:dom.window.document,localStorage:dom.window.localStorage,ResizeObserver:class{observe(){}disconnect(){}},MutationObserver:dom.window.MutationObserver,requestAnimationFrame:()=>0,cancelAnimationFrame(){},Image,ImageData,Path2D,matchMedia:media});
  const requests=[];let connected=false,phase='idle',position=null;
- const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},connected,position,sessionId:'workshop-session',state:phase,percent:100,message:'Estado '+phase,features:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion','pause-resume','automatic-cancel-recovery','rigid-registration','rapid-command-acceptance']});
+ const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},connected,position,sessionId:'workshop-session',state:phase,percent:100,message:'Estado '+phase,features:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion','pause-resume','automatic-cancel-recovery','rigid-registration','rapid-command-acceptance','rapid-frame-acceptance','timed-pulse','cancel-keeps-usb']});
  globalThis.fetch=async(url,options={})=>{const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):{};requests.push({path,body});if(path==='/connect')connected=true;if(path==='/motion'){position=body.action==='home'?[0,0]:[position[0]+body.dx,position[1]+body.dy];}if(path==='/prepare')return {ok:true,json:async()=>({id:'frozen-job',...info()})};if(path==='/run'){phase='sent';position=null;}if(path==='/pause')phase='paused';if(path==='/resume')phase='sending';return {ok:true,json:async()=>info()};};
  const settle=()=>new Promise(r=>setImmediate(r));
  try{
@@ -71,6 +71,9 @@ test('actual Box boot: all models, four spaces, selection, saved preparations an
   const {mountWorkshop}=await import('./web/box/workshop.js?workshop-test');const workshop=mountWorkshop(app),$=id=>dom.window.document.getElementById(id);
   assert.equal(dom.window.document.querySelectorAll('#modelCatalog [data-model]').length,17);
   assert.equal(workshop.space,'design');assert.equal($('k40Dialog').tagName,'SECTION');
+  assert.ok($('workshopFuseCuts').closest('.workshop-prepare-dock'));
+  $('workshopFuseCuts').click();assert.equal(app.state.layoutMode,'shared');assert.equal(app.state.placements,null);
+  assert.match($('workshopFusionSummary').textContent,/Ahorro:/);assert.ok($('workshopFusionPreview').querySelector('svg'));
   const before=JSON.stringify(app.state);workshop.show('prepare');assert.equal(app.view,'2d');assert.equal(JSON.stringify(app.state),before);assert.ok($('plan').querySelector('svg'));
   app.planEdit.selected=app.packed.panels[0].id;app.planEdit.refreshTools();assert.equal($('workshopPieceX').disabled,false);
   const old=app.packed.panels[0].x;$('workshopPieceX').value=old+1;$('workshopPieceY').value=app.packed.panels[0].y;$('workshopApplyPosition').click();assert.equal(app.state.placements[app.planEdit.selected].x,old+1);

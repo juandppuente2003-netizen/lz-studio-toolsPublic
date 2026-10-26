@@ -1,3 +1,5 @@
+import {optimizeSheet} from './cut-optimizer.js?v=3.5';
+import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
 import {mountK40} from './k40-control.js?v=13';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
@@ -61,14 +63,23 @@ export function mountWorkshop(app){
  function show(space){if(!tabs.has(space))return;current=space;document.body.dataset.workshopSpace=space;root.hidden=!['design','prepare'].includes(space);operator.hidden=space!=='operate';library.hidden=space!=='library';config.hidden=space!=='design';dock.hidden=space!=='prepare';tools.hidden=!['design','prepare'].includes(space);for(const [id,b] of tabs){b.classList.toggle('active',id===space);b.setAttribute('aria-current',id===space?'page':'false');}
   if(space==='design')baseSetView('3d');if(space==='prepare'){app.planEdit.editing=true;baseSetView('2d');app.planViewer.fit();}if(space==='operate')machine.open();if(space==='library')renderLibrary();updateMachine();preferences.space=space;saveLayout();
  }
- const shared=button('Acomodar con cortes compartidos',()=>{if(machine.busy)return app.toast('Espera a que termine la operación.');const error=app.commit({...app.state,layoutMode:'shared',placements:null});if(error)app.toast(error);else app.toast('Acomodo compartido aplicado: las líneas coincidentes se cortan una sola vez.');},'btn outline');document.querySelector('.workshop-layout-tools')?.append(shared);
+ const fusion=el('section','workshop-fusion');fusion.id='workshopFusion';fusion.innerHTML='<h3>Fusionar líneas de corte</h3><p>Junta bordes compatibles y corta cada tramo coincidente una sola vez por pasada. No modifica los encastres ni el kerf.</p><p id="workshopFusionSummary" role="status"></p><details id="workshopFusionDetails"><summary>Ver trayectorias únicas · hoja 1</summary><div id="workshopFusionPreview"></div></details>';
+ const shared=button('Juntar piezas y fusionar cortes',()=>{if(machine.busy)return app.toast('Espera a que termine la operación.');const error=app.commit({...app.state,layoutMode:'shared',placements:null});if(error)app.toast(error);else{$('workshopFusionDetails').open=true;updateFusion();app.toast('Acomodo compartido aplicado. Revisa los tramos ahorrados antes de cortar.');}},'btn primary');shared.id='workshopFuseCuts';fusion.querySelector('p').after(shared);$('workshopCutSettings').after(fusion);
+ function updateFusion(){shared.disabled=machine.busy;try{
+  if(!app.valid||!app.packed)throw Error('Completa un diseño válido para preparar las trayectorias.');
+  let before=0,after=0,first=null;
+  for(let sheet=0;sheet<app.packed.count;sheet++){const items=app.packed.panels.filter(p=>p.sheet===sheet);if(!items.length)continue;const result=optimizeSheet(items,.01);before+=result.stats.before;after+=result.stats.after;if(sheet===0)first=result;}
+  const saved=Math.max(0,before-after);$('workshopFusionSummary').textContent=`${app.state.layoutMode==='shared'?'Acomodo compartido activo. ':''}Recorrido: ${before.toFixed(1)} → ${after.toFixed(1)} mm por pasada. Ahorro: ${saved.toFixed(1)} mm (${before?(saved/before*100).toFixed(1):0}%). `+(saved>.01?'Los tramos coincidentes se envían una sola vez a la máquina.':'No hay tramos coincidentes en este acomodo; no se eliminarán líneas distintas.');
+  $('workshopFusionPreview').innerHTML=first?k40Preview({bed:{width:app.state.sheetW,height:app.state.sheetH},paths:first.paths}):'';
+ }catch(e){$('workshopFusionSummary').textContent=e.message;$('workshopFusionPreview').replaceChildren();}}
+
  const baseSetView=app.setView.bind(app);app.setView=v=>{if(current!==(v==='2d'?'prepare':'design'))show(v==='2d'?'prepare':'design');else baseSetView(v);};
  $('view3d').addEventListener('click',()=>show('design'));$('view2d').addEventListener('click',()=>show('prepare'));
  const modelTitle=()=>modelInfo[app.state.model]?.name||'Caja';
  function update(){variantSection.hidden=$('boxVariant').hidden;modelLauncher.textContent=modelTitle()+' · Cambiar modelo';const selected=app.packed?.panels.find(p=>p.id===app.planEdit.selected);if(selected){$('workshopPieceName').textContent=selected.name;$('workshopPieceSize').textContent=`${selected.bw.toFixed(2)} × ${selected.bh.toFixed(2)} mm · giro ${selected.rotation||0}°`;}else{$('workshopPieceName').textContent='Selecciona una pieza en el plano.';$('workshopPieceSize').textContent='';}
   if(selected?.id!==lastSelected||document.activeElement!==$('workshopPieceX')&&document.activeElement!==$('workshopPieceY')){if(selected){$('workshopPieceX').value=selected.x;$('workshopPieceY').value=selected.y;}lastSelected=selected?.id;}
   for(const id of ['workshopPieceX','workshopPieceY','workshopApplyPosition','workshopRotatePiece'])$(id).disabled=!selected;
-  if(current==='library')renderLibrary();updateMachine();
+  updateFusion();if(current==='library')renderLibrary();updateMachine();
  }
  const refreshPlanTools=app.planEdit.refreshTools.bind(app.planEdit);app.planEdit.refreshTools=(...args)=>{refreshPlanTools(...args);update();};
  $('workshopApplyPosition').onclick=()=>{const x=Number($('workshopPieceX').value),y=Number($('workshopPieceY').value);if(!Number.isFinite(x)||!Number.isFinite(y))return app.toast('Coordenadas inválidas.');app.planEdit.setPlacement(app.planEdit.selected,q=>({...q,x,y}));};$('workshopRotatePiece').onclick=()=>app.planEdit.rotate();
