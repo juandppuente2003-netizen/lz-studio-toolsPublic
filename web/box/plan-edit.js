@@ -1,3 +1,4 @@
+import {optimizeSheet} from './cut-optimizer.js?v=3.5';
 /* LZ Studio · plano de corte editable (v3.4).
    Dibuja cada hoja con las mismas coordenadas que exportan SVG/DXF
    (packed.panels: contornos ya compensados por kerf) y permite mover,
@@ -8,18 +9,20 @@ import {arrange,checkPacked,freeze,place,sheetPresets} from './layout-plus.js?v=
 const esc=s=>String(s).replace(/[<&>"]/g,c=>({'<':'&lt;','&':'&amp;','>':'&gt;','"':'&quot;'}[c]));
 const r2=n=>Math.round(n*100)/100;
 
-export function sheetSVG(packed,s,sheet,{selected=null,status={},bed=null}={}){
+export function sheetSVG(packed,s,sheet,{selected=null,status={},bed=null,uniqueCuts=false}={}){
  const items=packed.panels.filter(p=>p.sheet===sheet),fs=Math.max(4,+s.sheetW/70),g=+s.gap;
  const body=items.map(p=>{const d=[p.points,...(p.holePoints||[])].map(r=>'M'+r.map(v=>v.map(r2).join(' ')).join('L')+'Z').join('');const cls=['plan-piece',p.id===selected?'is-selected':'',status[p.id]||''].join(' ');const size=Math.min(fs,p.bw/Math.max(4,p.name.length)*1.6,p.bh*.3);
-  return `<g class="${cls}" data-piece="${esc(p.id)}"><rect class="plan-hit" x="${r2(p.x)}" y="${r2(p.y)}" width="${r2(p.bw)}" height="${r2(p.bh)}"/><path d="${d}" fill-rule="evenodd"/><text x="${r2(p.x+p.bw/2)}" y="${r2(p.y+p.bh/2+size*.35)}" font-size="${r2(size)}" text-anchor="middle">${esc(p.name)}</text></g>`;}).join('');
+  return `<g class="${cls}" data-piece="${esc(p.id)}"><rect class="plan-hit" x="${r2(p.x)}" y="${r2(p.y)}" width="${r2(p.bw)}" height="${r2(p.bh)}"/><path d="${d}" fill-rule="evenodd" ${uniqueCuts?'style="stroke:none"':''}/><text x="${r2(p.x+p.bw/2)}" y="${r2(p.y+p.bh/2+size*.35)}" font-size="${r2(size)}" text-anchor="middle">${esc(p.name)}</text></g>`;}).join('');
+ const optimized=uniqueCuts?optimizeSheet(items,.01):null;
+ const toolpaths=optimized?'<g class="plan-unique-cuts" style="pointer-events:none">'+optimized.paths.map(p=>`<path d="M${p.points.map(q=>q.join(' ')).join('L')}${p.closed?'Z':''}" fill="none" stroke="#86ccaa" stroke-width=".7"/>`).join('')+'</g>':'';
  const W=bed?Math.max(+s.sheetW,bed.width):+s.sheetW,H=bed?Math.max(+s.sheetH,bed.height):+s.sheetH,step=Math.max(10,Math.ceil(Math.max(W,H)/10/10)*10);
  let ruler='';for(let x=0;x<=W;x+=step)ruler+=`<text class="plan-ruler" x="${x+1}" y="${fs}" font-size="${fs*.7}">${x}</text>`;for(let y=step;y<=H;y+=step)ruler+=`<text class="plan-ruler" x="1" y="${y}" font-size="${fs*.7}">${y}</text>`;
- return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Hoja ${sheet+1}: ${items.length} piezas"><rect class="plan-bed" width="${W}" height="${H}"/><rect class="plan-stock" width="${+s.sheetW}" height="${+s.sheetH}"/><rect class="plan-margin" x="${g/2}" y="${g/2}" width="${+s.sheetW-g}" height="${+s.sheetH-g}"/>${ruler}${body}</svg>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Hoja ${sheet+1}: ${items.length} piezas"><rect class="plan-bed" width="${W}" height="${H}"/><rect class="plan-stock" width="${+s.sheetW}" height="${+s.sheetH}"/><rect class="plan-margin" x="${g/2}" y="${g/2}" width="${+s.sheetW-g}" height="${+s.sheetH-g}"/>${ruler}${body}${toolpaths}</svg>`;
 }
 
 export class PlanEdit{
  constructor(api){
-  this.api=api;this.editing=false;this.selected=null;this.$=id=>document.getElementById(id);const $=this.$;
+  this.api=api;this.editing=false;this.uniqueCuts=false;this.selected=null;this.$=id=>document.getElementById(id);const $=this.$;
   $('planEditToggle')&&($('planEditToggle').onclick=()=>{this.editing=!this.editing;this.refreshTools();this.api.redraw();});
   $('planLayoutMode')&&($('planLayoutMode').onchange=()=>{const s=this.api.state();this.api.commit({...s,layoutMode:$('planLayoutMode').value,placements:null,extraSheets:0});const m=$('planLayoutMode').value;this.api.toast(m==='compact'?'Distribución compacta aplicada.':m==='shared'?'Cortes compartidos: las piezas rectas se juntan y cada borde común se cortará una sola vez.':'Distribución por filas (original) aplicada.');});
   $('planRotate')&&($('planRotate').onclick=()=>this.rotate());
@@ -33,14 +36,14 @@ export class PlanEdit{
  render(packed,s,panels){
   this.check=checkPacked(packed,s,panels);const status={};for(const id of this.check.outside)status[id]='is-outside';for(const [a,b] of this.check.tight){status[a]||='is-tight';status[b]||='is-tight';}for(const [a,b] of this.check.overlaps){status[a]='is-overlap';status[b]='is-overlap';}
   if(this.selected&&!packed.panels.some(p=>p.id===this.selected))this.selected=null;
-  const sheets=[];for(let i=0;i<packed.count;i++){const wrap=document.createElement('div');wrap.className='sheet-wrap';wrap.innerHTML=sheetSVG(packed,s,i,{selected:this.selected,status,bed:this.api.bed?.()});const u=this.check.sheets[i];const label=document.createElement('p');label.textContent=`Hoja ${i+1} · ${+s.sheetW} × ${+s.sheetH} mm · ${u?u.pieces:0} piezas · ${u?u.pct.toFixed(1):'0.0'}% aprovechado`;wrap.append(label);if(this.editing)this.bind(wrap,i,packed,s);sheets.push(wrap);}
+  const sheets=[];for(let i=0;i<packed.count;i++){const wrap=document.createElement('div');wrap.className='sheet-wrap';wrap.innerHTML=sheetSVG(packed,s,i,{selected:this.selected,status,bed:this.api.bed?.(),uniqueCuts:this.uniqueCuts||s.layoutMode==='shared'});const u=this.check.sheets[i];const label=document.createElement('p');label.textContent=`Hoja ${i+1} · ${+s.sheetW} × ${+s.sheetH} mm · ${u?u.pieces:0} piezas · ${u?u.pct.toFixed(1):'0.0'}% aprovechado`;wrap.append(label);if(this.editing)this.bind(wrap,i,packed,s);sheets.push(wrap);}
   this.refreshTools(packed,s);return sheets;
  }
  bind(wrap,sheet,packed,s){const svg=wrap.querySelector('svg');if(!svg)return;
   svg.querySelectorAll('[data-piece]').forEach(g=>{g.addEventListener('pointerdown',e=>{if(e.button!==undefined&&e.button!==0)return;e.stopPropagation();e.preventDefault();const id=g.dataset.piece,p=packed.panels.find(q=>q.id===id);if(!p)return;this.selected=id;svg.querySelectorAll('.is-selected').forEach(n=>n.classList.remove('is-selected'));g.classList.add('is-selected');this.refreshTools();
    const m=svg.getScreenCTM?.();if(!m)return;const inv=m.inverse(),pt=svg.createSVGPoint(),toMM=ev=>{pt.x=ev.clientX;pt.y=ev.clientY;const q=pt.matrixTransform(inv);return[q.x,q.y];};const start=toMM(e);let delta=[0,0];
    const move=ev=>{const now=toMM(ev);delta=[Math.round((now[0]-start[0])*2)/2,Math.round((now[1]-start[1])*2)/2];g.setAttribute('transform',`translate(${delta[0]} ${delta[1]})`);this.$('planInfo')&&(this.$('planInfo').textContent=`${p.name} · X ${r2(p.x+delta[0])} · Y ${r2(p.y+delta[1])} mm`);};
-   const up=()=>{svg.removeEventListener('pointermove',move);svg.removeEventListener('pointerup',up);svg.removeEventListener('pointercancel',up);if(Math.abs(delta[0])+Math.abs(delta[1])<.5){this.api.redraw();return;}this.setPlacement(id,q=>({...q,x:r2(q.x+delta[0]),y:r2(q.y+delta[1])}));};
+   const up=()=>{svg.removeEventListener('pointermove',move);svg.removeEventListener('pointerup',up);svg.removeEventListener('pointercancel',up);if(Math.abs(delta[0])+Math.abs(delta[1])<.5){this.api.redraw();return;}const proposed={...p,x:r2(p.x+delta[0]),y:r2(p.y+delta[1])};const snapped=(s.layoutMode==='shared'||this.uniqueCuts)?snapSharedEdges(proposed,packed.panels,s):proposed;this.setPlacement(id,q=>({...q,x:snapped.x,y:snapped.y}));};
    try{svg.setPointerCapture(e.pointerId);}catch{}svg.addEventListener('pointermove',move);svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);});});
  }
  setPlacement(id,fn){const s=this.api.state(),packed=this.api.packed(),all=s.placements?{...s.placements}:freeze(packed);const cur=all[id]||(()=>{const p=packed.panels.find(q=>q.id===id);return p?{sheet:p.sheet,x:p.x,y:p.y,rot:p.rotation??0}:null;})();if(!cur)return;all[id]=fn(cur);this.api.commit({...s,placements:all});}
@@ -64,3 +67,20 @@ export class PlanEdit{
  }
 }
 export {arrange};
+
+/** Snap adjacent envelope edges without overlap, rotation or dimension changes. */
+export function snapSharedEdges(piece,others,state,tolerance=3){
+ const candidates=[{x:piece.x,y:piece.y,score:Infinity}];
+ for(const other of others){if(other.id===piece.id||other.sheet!==piece.sheet)continue;
+  const vertical=Math.min(piece.y+piece.bh,other.y+other.bh)-Math.max(piece.y,other.y);
+  const horizontal=Math.min(piece.x+piece.bw,other.x+other.bw)-Math.max(piece.x,other.x);
+  if(vertical>0)for(const x of [other.x+other.bw,other.x-piece.bw])if(Math.abs(x-piece.x)<=tolerance)candidates.push({x,y:piece.y,score:Math.abs(x-piece.x)});
+  if(horizontal>0)for(const y of [other.y+other.bh,other.y-piece.bh])if(Math.abs(y-piece.y)<=tolerance)candidates.push({x:piece.x,y,score:Math.abs(y-piece.y)});
+ }
+ for(const q of candidates.sort((a,b)=>a.score-b.score)){
+  if(q.x<0||q.y<0||q.x+piece.bw>state.sheetW||q.y+piece.bh>state.sheetH)continue;
+  if(others.some(o=>o.id!==piece.id&&o.sheet===piece.sheet&&Math.min(q.x+piece.bw,o.x+o.bw)-Math.max(q.x,o.x)>1e-6&&Math.min(q.y+piece.bh,o.y+o.bh)-Math.max(q.y,o.y)>1e-6))continue;
+  return {x:q.x,y:q.y};
+ }
+ return {x:piece.x,y:piece.y};
+}

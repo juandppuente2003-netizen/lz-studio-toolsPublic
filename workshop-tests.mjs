@@ -74,6 +74,9 @@ test('actual Box boot: all models, four spaces, selection, saved preparations an
   assert.ok($('workshopFuseCuts').closest('.workshop-prepare-dock'));
   $('workshopFuseCuts').click();assert.equal(app.state.layoutMode,'shared');assert.equal(app.state.placements,null);
   assert.match($('workshopFusionSummary').textContent,/Ahorro:/);assert.ok($('workshopFusionPreview').querySelector('svg'));
+  const placementBefore=app.packed.panels.map(p=>[p.id,p.x,p.y,p.rotation]);$('workshopRemoveDuplicates').click();
+  assert.deepEqual(app.packed.panels.map(p=>[p.id,p.x,p.y,p.rotation]),placementBefore);
+  assert.ok($('plan').querySelector('.plan-unique-cuts'));
   const before=JSON.stringify(app.state);workshop.show('prepare');assert.equal(app.view,'2d');assert.equal(JSON.stringify(app.state),before);assert.ok($('plan').querySelector('svg'));
   app.planEdit.selected=app.packed.panels[0].id;app.planEdit.refreshTools();assert.equal($('workshopPieceX').disabled,false);
   const old=app.packed.panels[0].x;$('workshopPieceX').value=old+1;$('workshopPieceY').value=app.packed.panels[0].y;$('workshopApplyPosition').click();assert.equal(app.state.placements[app.planEdit.selected].x,old+1);
