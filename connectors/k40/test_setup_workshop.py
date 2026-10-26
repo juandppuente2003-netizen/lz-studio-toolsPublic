@@ -29,6 +29,13 @@ class InstallerTests(unittest.TestCase):
 
     def test_identity_checks_pid_version_and_source(self):
         folder=Path('/local/connector'); good={'protocol':'lz-k40-m2/v1','bridgeVersion':setup.VERSION,'pid':123,'source':str(folder/'bridge.py'),'ready':True}
-        self.assertTrue(setup.verify_identity(good,folder,123))
-        for changes in [{'pid':124},{'bridgeVersion':'0.6.0'},{'source':'/old/bridge.py'},{'ready':False}]:
-            self.assertFalse(setup.verify_identity(dict(good,**changes),folder,123))
+        process={'ProcessId':123,'CommandLine':'real-background'}
+        with patch.object(setup,'split_command',return_value=['background']),patch.object(setup,'lz_script',return_value=folder/'background.pyw'):
+            # Launcher PID may be 122; real server/listener PID is 123.
+            self.assertTrue(setup.verify_identity(good,folder,{123},[process]))
+            self.assertFalse(setup.verify_identity(good,folder,{122},[process]))
+            self.assertFalse(setup.verify_identity(good,folder,{123},[]))
+            for changes in [{'pid':124},{'bridgeVersion':'0.6.0'},{'source':'/old/bridge.py'},{'ready':False}]:
+                self.assertFalse(setup.verify_identity(dict(good,**changes),folder,{123},[process]))
+        with patch.object(setup,'split_command',return_value=['other']),patch.object(setup,'lz_script',return_value=Path('/other/background.pyw')):
+            self.assertFalse(setup.verify_identity(good,folder,{123},[process]))
