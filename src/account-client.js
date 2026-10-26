@@ -1,3 +1,4 @@
+import {safeNavigationTarget} from './navigation-target.js';
 import {createClient} from '@supabase/supabase-js';
 import {AUTH_CONFIG} from '../web/auth-config.js';
 export const configured = Boolean(AUTH_CONFIG.supabaseUrl && AUTH_CONFIG.publishableKey);
@@ -19,7 +20,7 @@ export const client = configured ? createClient(AUTH_CONFIG.supabaseUrl,AUTH_CON
 export const routes={premium:"premium.html",crop:'crop.html',editor:'editor.html',remove:'editor.html?tool=remove',recolor:'editor.html?tool=recolor',opacity:'opacity.html',thickness:'thickness.html',texture:'textures.html',text:'text-creator.html',mockups:'mockups.html',vectorize:'vectorize.html',analyzer:'analyzer.html',sheet:'gang-sheet.html',color:'color-enhance.html',upscale:'upscale.html',extract:'extract.html'};
 export async function rpc(name,args={}) {const {data,error}=await client.rpc(name,args);if(error)throw error;return data;}
 export async function rows(table) {let result=[];for(let offset=0;;offset+=1000){const {data,error}=await client.from(table).select('*').order('id').range(offset,offset+999);if(error)throw error;result.push(...data);if(data.length<1000)return result;}}
-export function safeReturn(value){return Object.values(routes).includes(value)?value:'index.html';}
+export function safeReturn(value){return safeNavigationTarget(value,routes);}
 export async function identity(){if(!client)return null;const {data,error}=await client.auth.getUser();if(error||!data.user)return null;await rpc('lz_ensure_profile');const [profiles,isAdmin,tools]=await Promise.all([rows('lz_profiles'),rpc('lz_is_admin'),rows('lz_tools')]);return {user:data.user,profile:profiles.find(p=>p.id===data.user.id),profiles,isAdmin,tools};}
 export function allowed(state,id){return Boolean(state&&state.profile&&!state.profile.blocked&&routes[id]&&state.tools.some(t=>t.id===(['remove','premium'].includes(id)?'editor':id)&&t.enabled!==false));}
 export async function syncServerSession(session){const response=await fetch('/api/account/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session?.access_token||null,remember:rememberSession()}),credentials:'same-origin'});if(!response.ok){const data=await response.json();throw new Error(data.message||'No pudimos verificar tu sesión.');}}

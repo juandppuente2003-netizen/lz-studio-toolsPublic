@@ -35,6 +35,7 @@ export function mountWorkshop(app){
  catalog.querySelector('.dialog-header').append(button('Cerrar',()=>catalog.close(),'btn quiet'));
  const catalogSection=$('modelCatalog').closest('.form-section');catalogSection.classList.remove('catalog-collapsed','is-collapsed');catalog.append(catalogSection);document.body.append(catalog);
  const modelLauncher=button('',()=>{catalogSection.classList.remove('catalog-collapsed');$('catalogToggle').setAttribute('aria-expanded','true');catalog.showModal();$('catalogSearch').focus();},'workshop-model-button');config.querySelector('.panel-head').after(modelLauncher);
+ const previewControls=el('section','workshop-preview-controls');previewControls.innerHTML='<h3>Vista y apertura</h3><p id="workshopOpeningHint" class="hint">La apertura aparece en modelos con tapa móvil o cajón.</p>';const opening=$('openingRow');if(opening)previewControls.append(opening);const explosion=document.querySelector('.assembly-control');if(explosion)previewControls.append(explosion);modelLauncher.after(previewControls);
  catalog.querySelectorAll('[data-model]').forEach(b=>b.addEventListener('click',()=>{catalog.close();update();}));
  const variantSection=el('section','form-section');variantSection.append(el('h3','','Tapa y variante'),$('boxVariant'));$('configForm').prepend(variantSection);
  const assemblyDetails=el('details','workshop-assembly-details');assemblyDetails.append(el('summary','','Armado, instrucciones y lista de piezas'));for(const node of [document.querySelector('.assembly-note'),document.querySelector('.notes-line'),$('pieceList')])if(node)assemblyDetails.append(node);main.append(assemblyDetails);
@@ -78,7 +79,7 @@ export function mountWorkshop(app){
  const baseSetView=app.setView.bind(app);app.setView=v=>{if(current!==(v==='2d'?'prepare':'design'))show(v==='2d'?'prepare':'design');else baseSetView(v);};
  $('view3d').addEventListener('click',()=>show('design'));$('view2d').addEventListener('click',()=>show('prepare'));
  const modelTitle=()=>modelInfo[app.state.model]?.name||'Caja';
- function update(){variantSection.hidden=$('boxVariant').hidden;modelLauncher.textContent=modelTitle()+' · Cambiar modelo';const selected=app.packed?.panels.find(p=>p.id===app.planEdit.selected);if(selected){$('workshopPieceName').textContent=selected.name;$('workshopPieceSize').textContent=`${selected.bw.toFixed(2)} × ${selected.bh.toFixed(2)} mm · giro ${selected.rotation||0}°`;}else{$('workshopPieceName').textContent='Selecciona una pieza en el plano.';$('workshopPieceSize').textContent='';}
+ function update(){if($('workshopOpeningHint'))$('workshopOpeningHint').hidden=!$('openingRow').hidden;variantSection.hidden=$('boxVariant').hidden;modelLauncher.textContent=modelTitle()+' · Cambiar modelo';const selected=app.packed?.panels.find(p=>p.id===app.planEdit.selected);if(selected){$('workshopPieceName').textContent=selected.name;$('workshopPieceSize').textContent=`${selected.bw.toFixed(2)} × ${selected.bh.toFixed(2)} mm · giro ${selected.rotation||0}°`;}else{$('workshopPieceName').textContent='Selecciona una pieza en el plano.';$('workshopPieceSize').textContent='';}
   if(selected?.id!==lastSelected||document.activeElement!==$('workshopPieceX')&&document.activeElement!==$('workshopPieceY')){if(selected){$('workshopPieceX').value=selected.x;$('workshopPieceY').value=selected.y;}lastSelected=selected?.id;}
   for(const id of ['workshopPieceX','workshopPieceY','workshopApplyPosition','workshopRotatePiece'])$(id).disabled=!selected;
   updateFusion();if(current==='library')renderLibrary();updateMachine();
@@ -107,7 +108,7 @@ export function mountWorkshop(app){
  app.onUpdate(update);document.addEventListener('storage',()=>{if(current==='library')renderLibrary();});
  // Saved designs can change without a geometry update (save and rename).
  for(const id of ['confirmSave','saveCopy'])$(id)?.addEventListener('click',()=>{if(current==='library')renderLibrary();});
- app.workshop={show,get space(){return current;},savePreparation};applyLayout();show(spaces.some(s=>s[0]===preferences.space)?preferences.space:'design');update();if(new URLSearchParams(document.location.search).get('celular')==='1'){show('operate');remote.open();}return app.workshop;
+ document.body.classList.remove('box-booting');document.querySelector('.box-loading')?.remove();app.workshop={show,get space(){return current;},savePreparation};applyLayout();show(spaces.some(s=>s[0]===preferences.space)?preferences.space:'design');update();if(new URLSearchParams(document.location.search).get('celular')==='1'){show('operate');remote.open();}return app.workshop;
 }
 if(typeof document!=='undefined'){
  if(globalThis.lzApp)mountWorkshop(globalThis.lzApp);else{let count=0;const timer=setInterval(()=>{if(globalThis.lzApp||++count>200){clearInterval(timer);if(globalThis.lzApp)mountWorkshop(globalThis.lzApp);}},25);}

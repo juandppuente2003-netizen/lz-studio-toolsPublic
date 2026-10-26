@@ -1,11 +1,11 @@
-import {client,configured,syncServerSession} from './account-client.js';
+import {client,configured,syncServerSession,safeReturn} from './account-client.js';
 import {mountAuth} from './auth-ui.js';
 if(!document.querySelector('link[href="account.css"]')){const css=document.createElement('link');css.rel='stylesheet';css.href='account.css';document.head.append(css);}
 const nav=document.querySelector('.topbar');
 if(nav){
  const button=document.createElement('button');button.type='button';button.className='account-link';button.textContent='Iniciar sesión';button.setAttribute('aria-haspopup','dialog');nav.append(button);
  const dialog=document.createElement('dialog');dialog.className='auth-dialog';dialog.setAttribute('aria-label','Acceso a LZ Studio Tools');dialog.innerHTML='<button class="auth-close" type="button" aria-label="Cerrar">×</button><div class="auth-content"></div>';document.body.append(dialog);dialog.querySelector('.auth-close').onclick=()=>dialog.close();dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}});
- let signedIn=false;mountAuth(dialog.querySelector('.auth-content'),{onSuccess:async()=>{const pending=sessionStorage.getItem('lz-account-return');dialog.close();if(pending){sessionStorage.removeItem('lz-account-return');location.href='account.html?return='+encodeURIComponent(pending);}else location.reload();}});
+ let signedIn=false;mountAuth(dialog.querySelector('.auth-content'),{onSuccess:async()=>{const pending=sessionStorage.getItem('lz-account-return');dialog.close();if(pending){sessionStorage.removeItem('lz-account-return');const {data}=await client.auth.getSession();await syncServerSession(data.session);location.href=safeReturn(pending);}else location.reload();}});
  button.onclick=()=>{if(signedIn)location.href='account.html';else dialog.showModal();};
  const toolPages=['premium.html','crop.html','editor.html','opacity.html','thickness.html','textures.html','text-creator.html','mockups.html','vectorize.html','analyzer.html','gang-sheet.html','color-enhance.html','upscale.html','extract.html'];
  const current=location.pathname.split('/').pop();
