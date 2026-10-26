@@ -49,7 +49,7 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
  dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
  let pollTick;globalThis.setInterval=fn=>{pollTick=fn;return 12345678;};globalThis.clearInterval=()=>{};
  const requests=[];let phase='idle',position=null,connected=false,operation=null,pending=null,oldBridge=false,delayRun=false,releaseRun;
- const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:false,position,connected,operation,operationAccepted:phase==='idle'&&['home','jog'].includes(operation),sessionId:'test-session',features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion','pause-resume','automatic-cancel-recovery','rigid-registration','rapid-command-acceptance','rapid-frame-acceptance','timed-pulse']});
+ const info=()=>({protocol:'lz-k40-m2/v1',board:'M2',bed:{width:400,height:400},simulation:false,position,connected,operation,operationAccepted:phase==='idle'&&['home','jog'].includes(operation),sessionId:'test-session',features:oldBridge?[]:['persistent-pairing','disconnect','priority-stop','jog','current-origin','automatic-completion','pause-resume','automatic-cancel-recovery','rigid-registration','rapid-command-acceptance','rapid-frame-acceptance','timed-pulse','cancel-keeps-usb']});
  globalThis.fetch=async(url,options)=>{
   const path=new URL(url).pathname,body=options.body?JSON.parse(options.body):null;requests.push({path,body});
   if(path==='/connect')connected=true;

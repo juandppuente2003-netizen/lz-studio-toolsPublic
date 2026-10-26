@@ -1,3 +1,7 @@
+ACTUALIZACION 0.6.4
+Cancelar conserva USB y descarta el trabajo anterior. Haz Home para referenciar de nuevo.
+Pulso disponible tambien en PC; parametros editables desde el celular.
+
 ACTUALIZACION 0.6.3
 Marcos: acepta cola de movimientos rapidos sin exigir fin de corte.
 Ir a punto: destino absoluto dentro de la cama.

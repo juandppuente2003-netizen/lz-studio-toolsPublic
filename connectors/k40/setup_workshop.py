@@ -9,7 +9,7 @@ import sys
 import time
 from urllib.request import Request, urlopen
 
-VERSION = '0.6.3'
+VERSION = '0.6.4'
 SITE = 'https://lz-studio-tools-d-git-a183ed-juandppuente2003-netizens-projects.vercel.app/box/index.html?celular=1'
 
 

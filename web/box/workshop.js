@@ -1,5 +1,5 @@
 import {modelInfo} from './models.js?v=3.5';
-import {mountK40} from './k40-control.js?v=12';
+import {mountK40} from './k40-control.js?v=13';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
 import {mountRemoteHost} from './workshop-remote.js?v=4';
 
@@ -61,6 +61,7 @@ export function mountWorkshop(app){
  function show(space){if(!tabs.has(space))return;current=space;document.body.dataset.workshopSpace=space;root.hidden=!['design','prepare'].includes(space);operator.hidden=space!=='operate';library.hidden=space!=='library';config.hidden=space!=='design';dock.hidden=space!=='prepare';tools.hidden=!['design','prepare'].includes(space);for(const [id,b] of tabs){b.classList.toggle('active',id===space);b.setAttribute('aria-current',id===space?'page':'false');}
   if(space==='design')baseSetView('3d');if(space==='prepare'){app.planEdit.editing=true;baseSetView('2d');app.planViewer.fit();}if(space==='operate')machine.open();if(space==='library')renderLibrary();updateMachine();preferences.space=space;saveLayout();
  }
+ const shared=button('Acomodar con cortes compartidos',()=>{if(machine.busy)return app.toast('Espera a que termine la operación.');const error=app.commit({...app.state,layoutMode:'shared',placements:null});if(error)app.toast(error);else app.toast('Acomodo compartido aplicado: las líneas coincidentes se cortan una sola vez.');},'btn outline');document.querySelector('.workshop-layout-tools')?.append(shared);
  const baseSetView=app.setView.bind(app);app.setView=v=>{if(current!==(v==='2d'?'prepare':'design'))show(v==='2d'?'prepare':'design');else baseSetView(v);};
  $('view3d').addEventListener('click',()=>show('design'));$('view2d').addEventListener('click',()=>show('prepare'));
  const modelTitle=()=>modelInfo[app.state.model]?.name||'Caja';

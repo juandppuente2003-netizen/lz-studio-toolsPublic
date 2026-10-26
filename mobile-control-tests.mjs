@@ -29,6 +29,9 @@ test('actual mobile controller: pairing, owner, single jog, priority Stop, disco
   channel.onmessage({data:JSON.stringify({...state,canPulse:true})});$('remotePulse').click();$('remotePulse').click();
   assert.equal(sent.at(-1).action,'pulse');assert.equal(sent.filter(v=>v.action==='pulse').length,1);
   channel.onmessage({data:JSON.stringify({type:'reply',id:sent.at(-1).id,ok:true})});await settle();
+  channel.onmessage({data:JSON.stringify(state)});$('remoteSpeed').value='15';$('remotePasses').value='3';$('remoteSettings').click();
+  assert.equal(sent.at(-1).action,'settings');assert.deepEqual(sent.at(-1).args,{speed:15,passes:3});
+  channel.onmessage({data:JSON.stringify({type:'reply',id:sent.at(-1).id,ok:true})});await settle();
   channel.onmessage({data:JSON.stringify({...state,owner:'desktop',canPause:true})});assert.equal($('remoteDown').disabled,true);assert.equal($('remoteStop').disabled,false);
   const before=sent.length;channel.onclose();assert.equal($('remoteHome').disabled,true);assert.equal($('remoteStop').disabled,true);assert.equal(sent.length,before,'Disconnect must not retry commands');
  }finally{dom.window.close();for(const key of keys){if(original[key])Object.defineProperty(globalThis,key,original[key]);else delete globalThis[key];}}

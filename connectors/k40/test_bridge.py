@@ -35,6 +35,7 @@ class FakeEngine:
     def pause_complete(self): return self.paused
     def resume_complete(self): return self.resumed
     def cancel_complete(self): return self.reset_done
+    def rearm(self): self.reset_done = False; self.paused = False; self.resumed = False
     def cancel(self): self.left = 0
     def close(self): self.closed = True
 
@@ -125,8 +126,8 @@ class JobTests(unittest.TestCase):
         b.pause(); b.cancel(); self.assertEqual(b.state, 'cancelling')
         with self.assertRaises(ValueError): b.resume()
         self.assertIsNone(b.position); self.assertIsNone(b.id)
-        engine.reset_done = True; b.status(); b.cleanup_thread.join(1)
-        self.assertEqual(b.status()['state'], 'idle'); self.assertIsNone(b.engine)
+        engine.reset_done = True; b.status()
+        self.assertEqual(b.status()['state'], 'idle'); self.assertIs(b.engine,engine); self.assertFalse(engine.closed)
         b.connect(); self.assertTrue(b.prepare(job(), 'frame')['id'])
 
     def test_stop_is_not_blocked_by_usb_status_query(self):
@@ -196,7 +197,7 @@ class MotionTests(unittest.TestCase):
         b.acknowledge(True); self.assertEqual(b.position, position)
         b.position = [399, 399]
         with self.assertRaises(ValueError): b.prepare(job(), 'cut', 'current')
-        b.state = 'prepared'; b.cancel(); b.cleanup_thread.join(1); self.assertIsNone(b.position)
+        b.state = 'prepared'; b.cancel(); self.assertIsNone(b.position)
         b.connect(); b.motion('home', confirmed=True); b.disconnect()
         self.assertIsNone(b.position)
 
@@ -260,7 +261,7 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(self.request('/cancel', {'confirmed':True})[1]['state'], 'cancelling')
         self.assertEqual(self.request('/resume', {})[0], 400)
         engine.reset_done = True
-        self.request('/status'); self.b.cleanup_thread.join(1)
+        self.request('/status')
         self.assertEqual(self.request('/status')[1]['state'], 'idle')
         self.assertEqual(self.request('/connect', {})[0], 200)
 
@@ -320,7 +321,7 @@ class RealCompilerTests(unittest.TestCase):
         engine.device.controller.realtime_write=lambda data: sent.append(('off',data))
         engine.remaining=lambda:0;engine.failed=lambda:False
         try:
-            abort=threading.Event();abort.set()
+            abort=threading.Event()
             engine.timed_pulse(50,abort)
             self.assertEqual([kind for kind,_ in sent],['on','off'])
             self.assertIn(b'D',sent[0][1]);self.assertIn(b'U',sent[1][1])
@@ -353,6 +354,7 @@ class RealCompilerTests(unittest.TestCase):
             c.process_queue()
             self.assertEqual(packets, [b'I' + b'F' * 29])
             self.assertEqual(c.state, 'terminate')
+            engine.rearm(); self.assertEqual(c.state,'init'); self.assertFalse(engine.stop_requested.is_set())
             self.assertEqual(len(c), 0)
             self.assertIsNone(c.connection)
         finally:

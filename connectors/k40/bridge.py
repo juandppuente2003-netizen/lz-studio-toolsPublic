@@ -394,6 +394,17 @@ class M2Engine:
     def cancel_complete(self):
         return self.reset_confirmed.is_set() and self.device.controller.state in ('terminate', 'end')
 
+    def rearm(self):
+        # Called only after the priority reset is acknowledged and its worker ends.
+        with self.transport_lock:
+            self.stop_requested.clear()
+            self.pause_requested.clear()
+            self.pause_confirmed.clear()
+            self.resume_confirmed.clear()
+            self.reset_confirmed.clear()
+            self.pending_control = None
+            self.device.controller.reset()
+
     def cancel(self):
         controller = self.device.controller
         self.stop_requested.set()
@@ -445,7 +456,7 @@ class Bridge:
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.6.3', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse'],
+                'bridgeVersion': '0.6.4', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb'],
                 'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog', 'goto', 'frame') and self.position is not None,
                 'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
@@ -654,7 +665,10 @@ class Bridge:
                         pass
             if self.state == 'cancelling':
                 if self.simulation or self.engine.cancel_complete():
-                    self._begin_cleanup('Cancelado. Cola eliminada y reset aceptado. Reconecta y establece Home para el siguiente trabajo.')
+                    if not self.simulation:
+                        self.engine.rearm()
+                    self.state, self.id, self.payload, self.job = 'idle', None, b'', None
+                    self.message = 'Cancelado. USB conservado; haz Home para volver a referenciar. El trabajo anterior no se puede reanudar.'
                 elif self.engine.usb_failed or not self.engine.connected() or time.monotonic() - self.control_started > 15:
                     self.state, self.message = 'error', 'No llegó confirmación del reset. Usa el paro físico si sigue activa; restablece USB después.'
             if self.state == 'idle' and self.engine and not self.simulation and not self.engine.connected():
@@ -825,7 +839,7 @@ def make_server(bridge, token, origins, port=17840):
                 return
             if self.path == '/health':
                 # Installer identity check must never wait for USB or state locks.
-                self.reply(200, {'protocol': PROTOCOL, 'bridgeVersion': '0.6.3',
+                self.reply(200, {'protocol': PROTOCOL, 'bridgeVersion': '0.6.4',
                                  'pid': os.getpid(), 'source': str(Path(__file__).resolve()),
                                  'ready': True})
             elif self.path == '/status':

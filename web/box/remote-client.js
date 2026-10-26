@@ -1,8 +1,8 @@
 import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader} from './peer-transport.js?v=2';
 import {pairingRequest,parsePairingLink} from './peer-signaling.js?v=1';
-const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false;const pending=new Map();
+const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false;const pending=new Map();let parametersDirty=false;
 const status=message=>{$('remoteStatus').textContent=message;};
-function controls(){const owner=state?.owner==='phone',idle=owner&&!state?.busy&&!awaiting&&channel?.readyState==='open';for(const id of ['remoteUp','remoteLeft','remoteRight','remoteDown'])$(id).disabled=!idle||!state?.hasPosition;$('remoteHome').disabled=!idle;$('remotePulse').disabled=!idle||!state?.canPulse;$('remoteFrame').disabled=!idle||!state?.canRun;$('remoteCut').disabled=!idle||!state?.canRun;$('remoteStop').disabled=!state?.canPause||channel?.readyState!=='open';$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||channel?.readyState!=='open';$('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);}
+function controls(){const owner=state?.owner==='phone',idle=owner&&!state?.busy&&!awaiting&&channel?.readyState==='open';for(const id of ['remoteUp','remoteLeft','remoteRight','remoteDown'])$(id).disabled=!idle||!state?.hasPosition;for(const id of ['remoteSettings','remoteSpeed','remotePasses'])$(id).disabled=!idle;$('remoteHome').disabled=!idle;$('remotePulse').disabled=!idle||!state?.canPulse;$('remoteFrame').disabled=!idle||!state?.canRun;$('remoteCut').disabled=!idle||!state?.canRun;$('remoteStop').disabled=!state?.canPause||channel?.readyState!=='open';$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||channel?.readyState!=='open';$('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);}
 function disconnected(){state=null;awaiting=false;$('remoteLinkState').textContent='Enlace perdido';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado.'));}pending.clear();controls();status('Vuelve a enlazar desde la computadora. No se repetirá ninguna orden.');}
 function receive(message){
  if(message.type==='reply'){const p=pending.get(message.id);if(p){clearTimeout(p.timer);pending.delete(message.id);message.ok?p.resolve():p.reject(Error(message.error));}return;}
@@ -12,6 +12,7 @@ function receive(message){
  const svg=message.preview===undefined?null:new DOMParser().parseFromString(message.preview||'','image/svg+xml').documentElement;
  const tags=new Set(['svg','rect','path','circle']);const attributes=new Set(['xmlns','viewBox','role','aria-label','width','height','fill','stroke','stroke-width','d','cx','cy','r']);
  if(svg?.localName==='svg'&&[svg,...svg.querySelectorAll('*')].every(n=>tags.has(n.localName)&&[...n.attributes].every(a=>attributes.has(a.name)&&!/[<>]/.test(a.value))))$('remotePreview').replaceChildren(document.importNode(svg,true));
+ if(!parametersDirty&&document.activeElement!==$('remoteSpeed'))$('remoteSpeed').value=message.settings?.speed||10;if(!parametersDirty&&document.activeElement!==$('remotePasses'))$('remotePasses').value=message.settings?.passes||1;$('remoteTime').textContent=message.estimatedSeconds?`Estimación · ${message.elapsedSeconds||0} s transcurridos · ${Math.max(0,Math.ceil(message.estimatedSeconds-(message.elapsedSeconds||0)))} s restantes`:'';
  status(message.message);controls();
 }
 async function command(action,args={}){
@@ -23,6 +24,8 @@ async function command(action,args={}){
 }
 for(const [id,x,y] of [['remoteUp',0,-1],['remoteLeft',-1,0],['remoteRight',1,0],['remoteDown',0,1]])$(id).onclick=()=>command('jog',{dx:x*Number($('remoteStep').value),dy:y*Number($('remoteStep').value)});
 for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
+$('remoteSpeed').oninput=$('remotePasses').oninput=()=>{parametersDirty=true;};
+$('remoteSettings').onclick=()=>command('settings',{speed:Number($('remoteSpeed').value),passes:Number($('remotePasses').value)});
 $('remotePair').onclick=async()=>{try{
  $('remotePair').disabled=true;const params=new URLSearchParams(location.hash.slice(1)),automatic=params.has('link');const reference=automatic?parsePairingLink(params.get('link')):null,claim=automatic?crypto.randomUUID():null;
  const offer=automatic?await pairingRequest('offer',{...reference,claim}):await decodePairing(params.get('pair'),'offer');
