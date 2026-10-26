@@ -1,7 +1,7 @@
 import {readFile,readdir,mkdir,rm,copyFile,writeFile} from 'node:fs/promises';
 import {build} from 'esbuild';
 import './build-accounts.mjs';
-const publicScripts=new Set(['/home.js','/account/account-nav.js','/account/account-page.js',
+const publicScripts=new Set(['/home.js','/lz-neo.js','/account/account-nav.js','/account/account-page.js',
  // Pairing-only client: no USB credentials, machine API or geometry generator.
  '/box/remote.html','/box/remote-client.js','/box/peer-transport.js','/box/peer-signaling.js']);
 // Auth bundles use shared chunks; the app modules themselves remain protected.

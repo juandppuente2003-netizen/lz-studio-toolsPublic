@@ -1,0 +1,40 @@
+/* LZ Box Studio · tema NEO (v60): mismo negro, cian y blanco que el resto de LZ Studio Tools.
+   Solo colores y tipografía; la geometría, el 3D y el control de la máquina no cambian. */
+@font-face{font-family:'Inter LZ';src:url('../assets/fonts/inter-latin.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+html:root body.workshop,html:root[data-theme=dark] body.workshop{
+ --ink:#f3f7fc;--muted:#9aa7b7;--line:#1c2531;--paper:#0a0d12;--bg:#030405;--pale:#0d1e27;--green:#2ee6ff;
+ --accent:#2ee6ff;--accent-ink:#02101a;--focus:#2ee6ff;--ok:#35e29a;--edit-accent:#2ee6ff;--wood:#d2b48a;
+ font-family:'Inter LZ',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:#030405}
+html,body.workshop{background:#030405}
+/* En el estudio solo las pestañas quedan fijas al desplazarse (diseño original del flujo). */
+html body.workshop .lz-top-nav.lz-appbar{position:relative;top:auto;height:var(--lz-appbar-h);min-height:0;flex-wrap:nowrap;gap:12px;padding:0 20px;z-index:61}
+html body.workshop .topbar{background:#05070a;border-bottom:1px solid #18202b;box-shadow:none}
+html body.workshop .workshop-nav{background:#05070af2;border-bottom:1px solid #18202b}
+/* Botones */
+body.workshop .btn.primary,body.workshop .workshop .btn.primary,.workshop .btn.primary{background:#2ee6ff;border-color:#2ee6ff;color:#02101a;font-weight:650;box-shadow:0 8px 24px -12px #2ee6ffcc}
+.workshop .btn.primary:hover:not(:disabled){background:#74f1ff;border-color:#74f1ff;box-shadow:0 0 0 1px #2ee6ff55,0 8px 28px -6px #2ee6ff88}
+body.workshop .btn,body.workshop .icon-btn{border-radius:10px}
+body.workshop .btn:not(.primary):hover:not(:disabled){border-color:#2ee6ff88}
+/* Selección y estados activos */
+body.workshop [aria-pressed=true],body.workshop [aria-selected=true],body.workshop .active,body.workshop .is-active{--green:#2ee6ff}
+.workshop .plan .plan-piece path{fill:#2ee6ff0a;stroke:#5c7a93}
+.workshop .plan .plan-piece.is-selected path{fill:#2ee6ff1f;stroke:#2ee6ff}
+body.workshop :is(input,select,textarea){background:#06080b;border-color:#243041}
+body.workshop :is(input,select,textarea):focus{border-color:#2ee6ff;box-shadow:0 0 0 3px #2ee6ff1f}
+body.workshop input[type=range],body.workshop input[type=checkbox],body.workshop input[type=radio]{accent-color:#2ee6ff}
+body.workshop ::selection{background:#2ee6ff44}
+body.workshop :is(button,a,summary,input,select,textarea,[tabindex]):focus-visible{outline:2px solid #2ee6ff;outline-offset:2px}
+/* Superficies y acentos propios del estudio */
+html body.workshop #stage{background:radial-gradient(at 50% 30%,#111a26 0%,#070a0f 58%,#030405 100%)}
+html body.workshop .workshop-model-button{background:#0a1820;border-left-color:#2ee6ff}
+html body.workshop .workshop-model-button:hover{border-color:#2ee6ff88;border-left-color:#2ee6ff}
+html body.workshop .shape-grid button.active,html[data-theme=dark] body.workshop .shape-grid button.active{background:#2ee6ff14;border-color:#2ee6ff;color:#e3fbff}
+html body.workshop .view-tabs button.active,html[data-theme=dark] body.workshop .view-tabs button.active{color:#2ee6ff;border-color:#2ee6ff}
+html body.workshop .model-card.active,html[data-theme=dark] body.workshop .model-card.active{background:#0a1820;border-color:#2ee6ff}
+html body.workshop .workshop-tab.active{color:#2ee6ff;border-bottom-color:#2ee6ff;background:linear-gradient(180deg,#0b2730,#071219);box-shadow:inset 0 -2px 0 #2ee6ff,0 10px 24px -16px #2ee6ff}
+html[data-theme=dark] body.workshop .plan .plan-piece.is-selected path{fill:#0e2a33;stroke:#2ee6ff}
+html body.workshop .divider-move-handle{background:#2ee6ff;color:#02101a;border-color:#8ef3ff}
+html body.workshop .direct-bar [aria-pressed=true]{background:#2ee6ff14}
+html body.workshop .stat-icon{background:#0b2730;color:#2ee6ff}
+html body.workshop .model-card.active:after{background:#2ee6ff;color:#02101a}
+@media (max-width:700px){html body.workshop .lz-top-nav.lz-appbar{padding:0 10px;gap:8px}}

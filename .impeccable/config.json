@@ -8,6 +8,15 @@
         "value": "inter",
         "createdAt": "2026-10-20T03:45:16.537Z",
         "reason": "Claude decided: Operate-mode tool UI favors a familiar, highly legible sans for dense controls and tabular measurements; brand voice stays in the LZ Display wordmark"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "web/lz-neo.css"
+        ],
+        "createdAt": "2026-10-26T05:24:15.752Z",
+        "reason": "user requested RGB/futuristic colour effects on the brand headings (chat, 25 oct 2026); mock shows cyan headline"
       }
     ]
   }

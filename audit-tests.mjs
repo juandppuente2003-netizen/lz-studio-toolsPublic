@@ -109,5 +109,5 @@ for(let y=0;y<h;y++)assert.deepEqual(raw.slice(y*(w*4+1)+1,(y+1)*(w*4+1)),new Ui
 for(const page of ['dtf','editor','opacity','textures','mockups','text-creator','vectorize','analyzer','gang-sheet','color-enhance','upscale','thickness']){
   const html=readFileSync(`./web/${page}.html`,'utf8');assert.ok(!html.includes('PREPRENSA TEXTIL'));assert.match(html,/class="brand-name"/);assert.match(html,/assets\/lz-studio-green\.svg/);assert.ok(!html.includes('class="brandmark"'));
 }
-assert.ok(existsSync('./web/assets/fonts/lz-display.woff'));assert.match(auditHtml,/href="preflight\.css"/);
+assert.ok(existsSync('./web/assets/fonts/lz-display.woff'));assert.match(auditHtml,/href="preflight\.css(?:\?v=\d+)?"/);
 console.log('PASS: independent alpha/thickness audits, physical minimum, selective reinforcement, seam-free PNG export, rotated mockup touch resize and movement, export without handles, and all twelve branded headers.');

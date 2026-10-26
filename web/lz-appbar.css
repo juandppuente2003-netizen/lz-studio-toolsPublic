@@ -1,0 +1,100 @@
+/* LZ Studio Tools · barra superior común (v60). Compartida por Inicio, Herramientas DTF, cada herramienta, Mi cuenta y LZ Box Studio. */
+@font-face{font-family:'Inter LZ';src:url('assets/fonts/inter-latin.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+:root{
+ --lz-font:'Inter LZ',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+ --lz-ease:cubic-bezier(.22,1,.36,1);
+
+ color-scheme:dark;
+ --lz-bg:#030405;--lz-canvas:#06080b;--lz-surface:#0a0d12;--lz-surface-2:#10141b;--lz-surface-3:#171d27;
+ --lz-line:#18202b;--lz-line-strong:#243041;--lz-line-hover:#37465a;
+ --lz-text:#f3f7fc;--lz-text-2:#a7b3c2;--lz-text-3:#768396;--lz-text-on-light:#02101a;
+ --lz-cyan:#2ee6ff;--lz-blue:#3b7bff;--lz-violet:#8a5cff;--lz-magenta:#ff3fa9;--lz-green:#35e29a;
+ --lz-accent:var(--lz-cyan);--lz-accent-soft:#2ee6ff14;--lz-accent-line:#2ee6ffb8;
+ --lz-rgb:linear-gradient(90deg,#2ee6ff 0%,#3b7bff 36%,#8a5cff 68%,#ff3fa9 100%);
+ --lz-rgb-soft:linear-gradient(90deg,#2ee6ff55,#3b7bff55 36%,#8a5cff55 68%,#ff3fa955);
+ --lz-glow:0 0 0 1px #2ee6ff40,0 8px 28px -6px #2ee6ff66;
+ --lz-radius-s:8px;--lz-radius:10px;--lz-radius-l:16px;
+ --lz-appbar-h:60px;--lz-header-height:60px;
+ --muted:var(--lz-text-3);--ink:var(--lz-text);--line:var(--lz-line);--accent:var(--lz-accent);
+ --lab-green:var(--lz-cyan);--lab-line:var(--lz-line);--lab-muted:var(--lz-text-3);--lab-white:var(--lz-text);--lab-panel:var(--lz-surface);
+}
+/* ===================================================================== */
+/* Barra superior común (todas las páginas)                              */
+/* ===================================================================== */
+.lz-appbar,body .topbar.lz-appbar,.home .topbar.lz-appbar{
+ position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:12px;
+ height:var(--lz-appbar-h);padding:0 20px;background:#030405f2;
+ -webkit-backdrop-filter:saturate(140%) blur(10px);backdrop-filter:saturate(140%) blur(10px);
+ border-bottom:1px solid var(--lz-line);box-shadow:none;color:var(--lz-text)}
+.lz-appbar:after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--lz-rgb);opacity:.55;pointer-events:none}
+.lz-appbar .brand,.lz-appbar .lz-logo{display:inline-flex;align-items:center;gap:0;text-decoration:none;color:var(--lz-text);flex:none;min-width:0}
+.lz-appbar .brand-name,.lz-logo-word{font-family:var(--lz-font);font-size:19px!important;font-weight:800;font-style:italic;letter-spacing:-.01em;line-height:1;color:var(--lz-text);white-space:nowrap}
+.lz-appbar .brand-name .lz-z,.lz-appbar .brand-name>b{font-weight:900;background:var(--lz-rgb);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lz-appbar .brand-name .brand-studio{color:var(--lz-text)!important}
+.lz-mainnav{position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);display:flex;align-items:stretch;gap:6px}
+.lz-mainnav a{position:relative;display:inline-flex;align-items:center;gap:8px;padding:0 16px;font-size:14px;font-weight:500;color:var(--lz-text-2);text-decoration:none;white-space:nowrap;transition:color .15s}
+.lz-mainnav a svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.lz-mainnav a:hover{color:var(--lz-text)}
+.lz-mainnav a.active,.lz-mainnav a[aria-current=page]{color:var(--lz-cyan);font-weight:600}
+.lz-mainnav a.active:after,.lz-mainnav a[aria-current=page]:after{content:'';position:absolute;left:10px;right:10px;bottom:0;height:2px;border-radius:2px;background:var(--lz-cyan);box-shadow:0 0 12px var(--lz-cyan),0 0 2px var(--lz-cyan)}
+.lz-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+.lz-help{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px;border-radius:var(--lz-radius);font-size:13.5px;font-weight:500;color:var(--lz-text-2);text-decoration:none;background:none;border:0;cursor:pointer}
+.lz-help svg,.account-link svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.lz-help:hover{color:var(--lz-text);background:var(--lz-surface-2)}
+html .lz-appbar .account-link{order:9;display:inline-flex;align-items:center;gap:8px;height:36px;min-height:36px;padding:0 12px;border-radius:var(--lz-radius);background:transparent;border:1px solid var(--lz-line-strong);color:var(--lz-text);font-size:13.5px;font-weight:500;margin:0;white-space:nowrap}
+html .lz-appbar .account-link:hover{border-color:var(--lz-cyan);background:var(--lz-accent-soft)}
+.lz-appbar>.menu-button,.topbar.lz-appbar>.menu-button{order:-1;display:inline-flex;align-items:center;gap:8px;min-height:36px;height:36px;padding:0 12px;background:var(--lz-surface-2);border:1px solid var(--lz-line-strong);border-radius:var(--lz-radius);color:var(--lz-text);font-size:13px;font-weight:500}
+.lz-appbar>.menu-button:hover{border-color:var(--lz-cyan)}
+.lz-appbar .primary{order:8}
+/* Contexto de la herramienta como ruta: Herramientas DTF › Nombre */
+.lz-appbar .lz-tool-context{border-left:1px solid var(--lz-line-strong);padding-left:14px;margin-right:0}
+.lz-appbar .lz-tool-context strong{font-size:13.5px;font-weight:600;color:var(--lz-text)}
+.lz-appbar .lz-tool-context strong:before{content:'Herramientas DTF';color:var(--lz-text-3);font-weight:500;margin-right:8px}
+.lz-appbar .lz-tool-context strong:after{content:none}
+.lz-appbar .lz-tool-context strong{display:inline-flex;gap:0}
+.lz-appbar .lz-tool-context strong:before{content:'Herramientas DTF  ›';white-space:pre}
+/* En las herramientas la navegación va junto a las acciones para dejar sitio a la ruta y al botón de descarga. */
+.topbar.lz-appbar:has(.lz-tool-context) .lz-mainnav{position:static;transform:none;margin-left:auto;height:100%;gap:2px}
+.topbar.lz-appbar:has(.lz-tool-context) .lz-mainnav a{padding:0 11px;font-size:13.5px}
+.topbar.lz-appbar:has(.lz-tool-context)>.lz-help{margin-left:0}
+@media (max-width:1380px){.topbar.lz-appbar:has(.lz-tool-context) .lz-mainnav a span{display:none}.topbar.lz-appbar:has(.lz-tool-context) .lz-mainnav a{padding:0 10px}.topbar.lz-appbar:has(.lz-tool-context) .lz-mainnav a svg{width:19px;height:19px}}
+@media (max-width:1100px){.topbar.lz-appbar:has(.lz-tool-context) .lz-help span{display:none}}
+@media (max-width:1000px){.lz-mainnav{display:none}.lz-help span{display:none}}
+@media (max-width:700px){
+ :root{--lz-appbar-h:54px;--lz-header-height:54px}
+ .lz-appbar,body .topbar.lz-appbar{padding:0 10px;gap:8px}
+ .lz-appbar .brand-name,.lz-logo-word{font-size:15px!important}
+ .lz-help{display:none}
+ html .lz-appbar .account-link{padding:0 10px;font-size:12.5px}
+ .lz-appbar>.menu-button{padding:0 10px}
+ .lz-appbar .lz-tool-context{display:none}
+}
+@media (max-width:420px){html .lz-appbar .account-link .lz-acc-label{display:none}}
+
+/* Ayuda ---------------------------------------------------------------- */
+.lz-appbar .version,.lz-appbar .home-nav{display:none!important}
+.topbar.lz-appbar>.lz-help{margin-left:auto}
+.lz-help-dialog{width:min(520px,calc(100vw - 24px));padding:28px 26px 24px;box-sizing:border-box}
+.lz-help-dialog h2{margin:0 0 18px;font-size:21px}
+.lz-help-close{position:absolute;top:12px;right:12px;width:36px;min-height:36px;padding:0;font-size:20px;background:transparent;border-color:transparent}
+.lz-help-steps{list-style:none;counter-reset:s;margin:0;padding:0;display:grid;gap:14px}
+.lz-help-steps li{counter-increment:s;display:grid;grid-template-columns:32px 1fr;column-gap:12px}
+.lz-help-steps li:before{content:counter(s);grid-row:1/3;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#0e2a33;border:1px solid #2ee6ff66;color:var(--lz-cyan);font-weight:700;font-size:13px}
+.lz-help-steps strong{font-size:14.5px;color:#fff}
+.lz-help-steps span{font-size:13.5px;line-height:1.5;color:var(--lz-text-2)}
+.lz-help-foot{margin:18px 0 0;font-size:13px;color:var(--lz-text-3)}
+@keyframes lz-flash{0%{box-shadow:0 0 0 0 #2ee6ffaa}100%{box-shadow:0 0 0 14px #2ee6ff00}}
+.lz-quick-guide.lz-flash{border-color:var(--lz-cyan);animation:lz-flash .9s ease-out 2}
+@media (max-width:1000px){.topbar.lz-appbar>.brand{margin-right:auto}.topbar.lz-appbar>.lz-help{margin-left:0}}
+
+.topbar.lz-appbar{flex-wrap:nowrap}
+@media (max-width:700px){
+ .topbar.lz-appbar:has(.menu-button) .brand-name{font-size:0!important;letter-spacing:0}
+ .topbar.lz-appbar:has(.menu-button) .brand-name b{font-size:20px}
+ .topbar.lz-appbar>.menu-button{font-size:0;padding:0 10px;min-width:40px}
+ .topbar.lz-appbar>.menu-button span{font-size:18px}
+ .topbar.lz-appbar .primary{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ html .topbar.lz-appbar .account-link .lz-acc-label{display:none}
+ html .lz-appbar .account-link{width:40px;padding:0;justify-content:center}
+}@media (max-width:700px){.lz-mobile-switch{top:var(--lz-appbar-h)!important}}
+.module-menu{z-index:90!important}.menu-backdrop{z-index:89!important}

@@ -1,0 +1,42 @@
+LZ STUDIO TOOLS — v60 · Rediseño NEO
+
+Base: la versión publicada en producción (rama codex/box-k40-m2, commit 948e2f4).
+Las herramientas, rutas, IDs y motores de imagen no cambian.
+
+Identidad
+- Fondo negro (#030405), cian eléctrico (#2ee6ff) como acción principal, azul y blanco.
+- Hilo RGB (cian → azul → violeta → magenta) solo como acento: línea bajo la barra superior,
+  títulos de portada y borde de las tarjetas al pasar el cursor.
+
+Barra superior común
+- La misma barra en Inicio, Herramientas DTF, cada herramienta, Mi cuenta y LZ Box Studio:
+  logo, Inicio · Herramientas DTF · LZ Box Studio, Ayuda y Mi cuenta.
+- Se dibuja en el HTML (no con JavaScript), así no salta ni aparece tarde al cargar.
+- En las herramientas muestra la ruta "Herramientas DTF › Nombre" y conserva Módulos y Descargar.
+- Ayuda abre la guía rápida de la herramienta; en el catálogo y en Inicio abre una guía breve del sitio.
+
+Sin parpadeos del diseño anterior
+- Cada página pinta negro desde el primer instante (estilo crítico en <head>).
+- Todas las hojas CSS llevan ?v=60: el navegador no puede mezclar CSS viejo con HTML nuevo.
+- account.css se carga en el HTML y no después por JavaScript.
+- La pantalla "Preparando tu espacio de trabajo" de Box Studio usa la misma identidad y deja visible la barra superior.
+
+Catálogo Herramientas DTF (dtf.html)
+- Barra lateral de categorías, portada con trama RGB, buscador, filtros, vista cuadrícula/lista.
+- Cada herramienta tiene su imagen de referencia (web/assets/tools/*.webp), etiquetas, Abrir y Cómo usar.
+- Las imágenes son generadas por código (scripts no incluidos), sin fotos de terceros.
+
+Archivos nuevos
+- web/lz-neo.css      sistema visual NEO (herramientas, catálogo, inicio, cuenta)
+- web/lz-appbar.css   barra superior común
+- web/lz-neo.js       Ayuda, vista lista/cuadrícula, barra lateral del catálogo (público)
+- web/box/neo-box.css tema NEO para Box Studio
+- web/assets/tools/   imágenes de referencia
+
+Cambios de código mínimos
+- src/account-nav.js reutiliza el botón "Mi cuenta" ya dibujado en la barra.
+- interface-polish.js reutiliza la ruta de la herramienta ya dibujada.
+- build-site.mjs marca lz-neo.js como público.
+- audit-tests.mjs admite la versión ?v= en la hoja preflight.css.
+
+Verificación: npm test en verde, más workshop, pairing, móvil, navegación y K40.
