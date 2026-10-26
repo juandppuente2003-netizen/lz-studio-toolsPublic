@@ -65,7 +65,7 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
  };
  const settle=()=>new Promise(resolve=>setImmediate(resolve));
  try{
-  const {dialog}=mountK40({...example(),onUpdate(){},setView(){}}),$=id=>dialog.querySelector('#'+id),open=()=>dom.window.document.querySelector('#k40Open').click();
+  const app={...example(),onUpdate(){},setView(){}};const {dialog}=mountK40(app),$=id=>dialog.querySelector('#'+id),open=()=>dom.window.document.querySelector('#k40Open').click();
   open();$('k40Remember').checked=false;$('k40Token').value='test-code';$('k40Connect').click();await settle();
   assert.equal($('k40Confirm'),null);assert.equal($('k40Home').disabled,false);assert.equal($('k40Right').disabled,true);
   $('k40Home').click();$('k40Home').click();await settle();await settle();
@@ -84,6 +84,14 @@ test('UI: home, one jog per click, current origin, priority cancellation and rem
   $('k40Resume').click();$('k40Resume').click();await settle();assert.equal(requests.filter(r=>r.path==='/resume').length,1);assert.equal(requests.filter(r=>r.path==='/run').length,1);
   phase='sent';await pollTick();await settle();assert.equal($('k40Stop').disabled,false);
   phase='idle';position=pending;await pollTick();await settle();assert.equal($('k40Right').disabled,false);assert.equal(requests.filter(r=>r.path==='/acknowledge').length,0);assert.equal($('k40Connect').disabled,true);assert.match($('k40Position').textContent,/5.00/);
+  $('k40Origin').value='home';app.machineControl.setRemoteOwner(true);
+  await app.machineControl.remoteCommand('jog',{dx:5,dy:5});
+  await app.machineControl.remoteCommand('frame');
+  assert.equal(requests.filter(r=>r.path==='/prepare').at(-1).body.origin,'current');
+  phase='idle';position=pending;await pollTick();await settle();
+  await app.machineControl.remoteCommand('cut');
+  assert.equal(requests.filter(r=>r.path==='/prepare').at(-1).body.origin,'current');
+  phase='idle';position=pending;await pollTick();await settle();app.machineControl.setRemoteOwner(false);
   delayRun=true;$('k40Run').click();await settle();
   assert.equal(typeof releaseRun,'function');assert.equal($('k40Stop').disabled,false);$('k40Stop').click();await settle();$('k40Cancel').click();await settle();assert.equal(phase,'cancelling');
   releaseRun();await settle();await settle();assert.equal($('k40Acknowledge'),null);assert.match($('k40Status').textContent,/cancelling/);
