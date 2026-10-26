@@ -69,7 +69,7 @@ body:not(.home) :is(.tools,.lab-sidebar,.text-tools,.mockup-tools){background:li
 .upload svg{stroke:var(--lz-cyan)}
 .lz-quick-guide{background:var(--lz-surface);border:1px solid var(--lz-line);border-radius:var(--lz-radius)}
 .lz-quick-guide li:before{background:#0e2a33;color:var(--lz-cyan)}
-.inline-note,.strong-hint,.extract-color-help{background:#0b1118;border:1px solid var(--lz-line);border-left:2px solid #2ee6ff88}
+.inline-note,.strong-hint,.extract-color-help{background:#0b1118;border:1px solid #1f3442}
 .ai-card,.editor-quick-upload{background:var(--lz-surface-2);border-color:var(--lz-line-strong)}
 .new-badge{background:#0e2a33;color:var(--lz-cyan);border-color:#2ee6ff55}
 
