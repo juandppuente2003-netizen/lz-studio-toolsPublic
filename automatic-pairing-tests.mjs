@@ -17,7 +17,7 @@ test('phone automatically exchanges QR offer and answer without clipboard or mac
   const channel={label:'lz-box-'+session,readyState:'open',send:v=>sent.push(v),close(){}};peer.ondatachannel({channel});channel.onopen();assert.equal(sent.length,0);
  }finally{restore();}
 });
-test('desktop QR uses automatic answer and keeps movement control until explicitly granted',async()=>{
+test('desktop QR uses automatic answer and automatically transfers control on connection',async()=>{
  const dom=new JSDOM('<body><div id="mount"></div></body>',{url:'https://www.lzstudiotools.com/box/index.html'});dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
  const calls=[];let peer,owner=false,host;
  class Peer{constructor(){peer=this;this.iceGatheringState='complete';}createDataChannel(label){return this.channel={label,bufferedAmount:0,readyState:'open',send(){},close(){}};}async createOffer(){return {type:'offer',sdp:'automatic-offer'};}async setLocalDescription(v){this.localDescription=v;}async setRemoteDescription(v){this.remote=v;}close(){}}
@@ -27,7 +27,7 @@ test('desktop QR uses automatic answer and keeps movement control until explicit
   host=mountRemoteHost({}, {busy:false,setRemoteOwner:value=>{owner=value;},snapshot:()=>({preview:'',owner:owner?'phone':'desktop'})},dom.window.document.getElementById('mount'));
   await dom.window.document.getElementById('peerGenerate').onclick();await settle();await settle();assert.equal(peer.remote.sdp,'automatic-answer');
   const link=dom.window.document.getElementById('peerLink').value;assert.match(link,/#link=[0-9a-f-]{36}\.[a-f0-9]{64}$/);assert.equal(dom.window.document.getElementById('peerAccept').hidden,true);
-  peer.channel.onopen();assert.equal(owner,false);dom.window.document.getElementById('peerGrant').click();assert.equal(owner,true);
+  peer.channel.onopen();assert.equal(owner,true);assert.equal(dom.window.document.getElementById('peerGrant').hidden,true);
   host.revoke();await settle();assert.equal(owner,false);assert.ok(calls.some(c=>c.action==='remove'));
  }finally{host?.revoke();await settle();restore();}
 });
