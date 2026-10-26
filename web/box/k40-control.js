@@ -123,7 +123,8 @@ export function mountK40(app,options={}){
   let generation;requesting=true;buttons();status('Preparando instrucciones M2…');
   try{
    activePreview=k40Preview(currentView||job);activeName=app.state.name;
-   const prepared=await api('/prepare',{job,mode,origin:$('k40Origin').value,...($('k40Origin').value==='aligned'?{registration:{pairs,mode:$('k40RegistrationMode').value,session:registrationSession}}:{})});if(!prepared.id)throw Error('El conector no preparó un trabajo válido.');
+   const origin=fromRemote?'current':$('k40Origin').value;
+   const prepared=await api('/prepare',{job,mode,origin,...(origin==='aligned'?{registration:{pairs,mode:$('k40RegistrationMode').value,session:registrationSession}}:{})});if(!prepared.id)throw Error('El conector no preparó un trabajo válido.');
    active=true;lastState=null;generation=++epoch;buttons();let result=await api('/run',{id:prepared.id,confirmed:true});if(generation!==epoch)return;
    if(result.state==='simulated'){result=await api('/acknowledge',{confirmed:true});if(generation!==epoch)return;}
    consume(result);if(result.state==='sending'||result.state==='sent')startPolling();await poll();
