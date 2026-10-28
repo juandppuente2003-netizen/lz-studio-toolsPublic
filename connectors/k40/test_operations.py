@@ -202,3 +202,25 @@ class BridgeFlowTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class InstallerIdentityTests(unittest.TestCase):
+    def test_health_reports_the_same_version_the_installer_expects(self):
+        # Regresión 0.7.0: /health decía 0.6.4 y el instalador rechazaba el conector nuevo.
+        import http.client, json, threading
+        from bridge import Bridge, make_server, BRIDGE_VERSION
+        import setup_workshop
+        self.assertEqual(setup_workshop.VERSION, BRIDGE_VERSION)
+        self.assertIn('www.lzstudiotools.com', setup_workshop.SITE)
+        server = make_server(Bridge(BED, simulation=True, engine_factory=FakeEngine), 'token', {'https://www.lzstudiotools.com'}, port=0)
+        server.pairing_token = 'token'
+        thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
+        try:
+            port = server.server_port
+            c = http.client.HTTPConnection('127.0.0.1', port, timeout=3)
+            c.request('GET', '/health', headers={'Origin': 'https://www.lzstudiotools.com', 'Authorization': 'Bearer token', 'Host': f'127.0.0.1:{port}'})
+            value = json.loads(c.getresponse().read())
+            self.assertEqual(value['bridgeVersion'], BRIDGE_VERSION)
+            self.assertTrue(value['ready'])
+        finally:
+            server.shutdown(); server.server_close()

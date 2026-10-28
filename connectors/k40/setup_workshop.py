@@ -10,7 +10,7 @@ import time
 from urllib.request import Request, urlopen
 
 VERSION = '0.7.0'
-SITE = 'https://lz-studio-tools-d-git-a183ed-juandppuente2003-netizens-projects.vercel.app/box/index.html?celular=1'
+SITE = 'https://www.lzstudiotools.com/box/index.html?celular=1'
 
 
 def split_command(command):

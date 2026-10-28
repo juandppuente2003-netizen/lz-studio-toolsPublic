@@ -900,7 +900,7 @@ def make_server(bridge, token, origins, port=17840):
                 return
             if self.path == '/health':
                 # Installer identity check must never wait for USB or state locks.
-                self.reply(200, {'protocol': PROTOCOL, 'bridgeVersion': '0.6.4',
+                self.reply(200, {'protocol': PROTOCOL, 'bridgeVersion': BRIDGE_VERSION,
                                  'pid': os.getpid(), 'source': str(Path(__file__).resolve()),
                                  'ready': True})
             elif self.path == '/status':

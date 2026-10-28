@@ -26,7 +26,10 @@ def build():
     with ZipFile(archive) as package:
         assert package.testzip() is None
         assert len(package.namelist()) == len(FILES)
-        assert b"BRIDGE_VERSION = '0.7.0'" in package.read('LZ-K40-Windows/bridge.py')
+        bridge = package.read('LZ-K40-Windows/bridge.py')
+        assert b"BRIDGE_VERSION = '0.7.0'" in bridge
+        assert b"'bridgeVersion': '0.6" not in bridge, 'Versiones mezcladas en bridge.py'
+        assert b"VERSION = '0.7.0'" in package.read('LZ-K40-Windows/setup_workshop.py')
     checksum = hashlib.sha256(archive.read_bytes()).hexdigest()
     (folder / 'LZ-K40-Windows.sha256').write_text(checksum + '  ' + archive.name + '\n', encoding='utf-8')
     print(f'{archive.name}: {archive.stat().st_size} bytes, 0.7.0, CRC and SHA-256 OK')
