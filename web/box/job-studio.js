@@ -186,6 +186,14 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       state.placement = {x: 0, y: 0, scale: fit < 1 ? Math.floor(fit * 1000) / 1000 : 1, rotation: 0};
       if (fit < 1) design.issues.push({level: 'warn', code: 'fit', message: `El diseño (${fmt(b.width)} × ${fmt(b.height)} mm) no cabía en la cama: se redujo al ${fmt(state.placement.scale * 100)} %. Revisa la escala.`, count: 1});
     }
+    if (placement) {
+      // Una colocación guardada que ya no cabe (otra cama o un arrastre antiguo) se regresa a la cama y se avisa.
+      const b = placedBounds(design, state.placement);
+      if (b.width <= bed.width && b.height <= bed.height && (b.x < 0 || b.y < 0 || b.x + b.width > bed.width || b.y + b.height > bed.height)) {
+        state.placement = {...state.placement, x: Math.min(Math.max(b.x, 0), bed.width - b.width), y: Math.min(Math.max(b.y, 0), bed.height - b.height)};
+        design.issues.push({level: 'warn', code: 'moved', message: 'La colocación guardada quedaba fuera de la cama; se movió dentro. Revisa la posición.', count: 1});
+      }
+    }
     if (fresh) { state.libraryId = null; state.libraryCloud = null; state.created = null; state.savedWhere = null; state.savedAt = null; state.review = false; state.dirty = true; }
     renders = new Map(); previews = new Map(); analysisKey = '';
     renderStructure(); update(); scheduleDraft();
@@ -228,7 +236,16 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     if (p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height) return;
     drag = {start: p, origin: {...state.placement}, svg}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-dragging'); e.preventDefault();
   });
-  previewEl.addEventListener('pointermove', (e) => { if (!drag) return; const p = toBed(drag.svg, e); setPlacement({x: drag.origin.x + p.x - drag.start.x, y: drag.origin.y + p.y - drag.start.y}, {silent: true}); updateLight(); });
+  // La vista se redibuja en cada movimiento: se usa siempre el SVG actual (el anterior ya no está en pantalla).
+  previewEl.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
+    const p = toBed(svg, e), bed = currentBed(), b = placedBounds(state.design, drag.origin);
+    // Se mantiene dentro de la cama mientras se arrastra (si el diseño cabe).
+    const clamp = (v, size, max) => size <= max ? Math.min(Math.max(v, 0), max - size) : v;
+    const x = clamp(b.x + p.x - drag.start.x, b.width, bed.width), y = clamp(b.y + p.y - drag.start.y, b.height, bed.height);
+    setPlacement({x: drag.origin.x + x - b.x, y: drag.origin.y + y - b.y}, {silent: true}); updateLight();
+  });
   const endDrag = () => { if (!drag) return; drag = null; previewEl.classList.remove('is-dragging'); update(); scheduleDraft(); };
   previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
   function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
