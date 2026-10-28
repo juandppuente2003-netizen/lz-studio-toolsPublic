@@ -25,7 +25,9 @@ BRIDGE_VERSION = '0.7.0'
 ENGINE_VERSION = '0.9.9100'
 MAX_BODY = 6_000_000
 DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com',
-                   'https://lz-studio-tools-d-git-a183ed-juandppuente2003-netizens-projects.vercel.app'}
+                   'https://lz-studio-tools-d-git-a183ed-juandppuente2003-netizens-projects.vercel.app',
+                   # Versión de revisión v62 (rama operar-maquina-v62).
+                   'https://lz-studio-tools-d-git-c3a816-juandppuente2003-netizens-projects.vercel.app'}
 
 
 def pairing_path():

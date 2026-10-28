@@ -101,3 +101,5 @@ button:disabled,.rm-import.is-disabled{opacity:.42;cursor:not-allowed}
 .rm-dialog::backdrop{background:#000a}
 .rm-check{display:flex;align-items:center;gap:8px;color:var(--text)}.rm-check input{width:20px;min-height:0}
 @media (max-width:380px){.rm-grid2{grid-template-columns:1fr}.rm-lib-card{grid-template-columns:72px 1fr}.rm-thumb{width:72px;height:64px}}
+[hidden]{display:none!important}
+.rm-steps{flex-wrap:nowrap}.rm-steps button{min-width:0;padding:6px 2px;font-size:13px}

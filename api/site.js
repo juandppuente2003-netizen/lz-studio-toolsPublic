@@ -4181,7 +4181,7 @@ if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidd
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#06090d">
 <title>LZ Box \xB7 Control de taller</title>
-<link rel="stylesheet" href="remote.css?v=3">
+<link rel="stylesheet" href="remote.css?v=4">
 </head>
 <body>
 <main class="remote-shell">
