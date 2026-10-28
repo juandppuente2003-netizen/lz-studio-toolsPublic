@@ -1,3 +1,14 @@
+ACTUALIZACION 0.7.0 (version de revision)
+Nuevo: trabajos con varias operaciones (lz-k40-m2/v2): grabado de imagen,
+grabado vectorial y corte en un mismo envio, cada uno con su velocidad y
+pasadas. Los trabajos 0.6.x (v1) siguen funcionando igual, sin cambios.
+Grabado de imagen: barridos horizontales de 1 bit generados por MeerK40t.
+La M2 no tiene control de potencia por USB: ajustala en el panel para cada
+operacion. Si cada operacion necesita otra potencia, en Box elige
+"Enviar: solo esta operacion" y cambia la perilla entre envios.
+Nada se ejecuta al importar o abrir un trabajo: solo al pulsar en Box.
+Actualizar: maquina apagada y USB desconectado; extraer todo y ejecutar INICIAR-LZ-BOX.bat.
+
 ACTUALIZACION 0.6.4
 Cancelar conserva USB y descarta el trabajo anterior. Haz Home para referenciar de nuevo.
 Pulso disponible tambien en PC; parametros editables desde el celular.

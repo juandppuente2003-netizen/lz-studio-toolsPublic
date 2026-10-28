@@ -1,1 +1,107 @@
-<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>LZ Box · Control de taller</title><link rel="stylesheet" href="remote.css?v=2"></head><body><main class="remote-shell"><header><span class="remote-brand">LZ <small>BOX STUDIO</small></span><span id="remoteLinkState">Sin enlace</span></header><section id="remotePairing"><h1>Conecta con tu computadora</h1><p>Escanea el QR desde Box Studio. La computadora mantiene la conexión USB.</p><button id="remotePair" type="button">Aceptar emparejamiento</button><label hidden>Respuesta para pegar en la computadora<textarea id="remoteAnswer" rows="3" readonly></textarea></label><button id="remoteCopy" type="button" disabled hidden>Copiar respuesta</button></section><section id="remoteMachine" hidden><div class="remote-job-head"><h1 id="remoteJobName">Trabajo</h1><span id="remoteMachineState"></span></div><div id="remotePreview"></div><p id="remotePosition">Sin referencia</p><p id="remoteOwner">La computadora tiene el control.</p><section class="remote-motion"><label>Paso · mm<select id="remoteStep"><option>0.1</option><option>0.5</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select></label><div class="remote-pad"><button id="remoteUp" aria-label="Mover hacia arriba">↑</button><button id="remoteLeft" aria-label="Mover hacia la izquierda">←</button><button id="remoteHome">Home</button><button id="remoteRight" aria-label="Mover hacia la derecha">→</button><button id="remoteDown" aria-label="Mover hacia abajo">↓</button></div></section><label>Velocidad · mm/s<input id="remoteSpeed" type="number" min="1" max="100" value="10"></label><label>Pasadas<input id="remotePasses" type="number" min="1" max="10" value="1"></label><button id="remoteSettings">Aplicar parámetros</button><p id="remoteTime"></p><div class="remote-run"><button id="remotePulse" disabled>Pulso láser · 50 ms</button><p>Potencia del panel de la máquina. Temporizado por Windows/USB; no por la placa.</p><button id="remoteFrame">Recorrer marco</button><button id="remoteCut">Iniciar corte</button></div><div id="remotePaused" hidden><button id="remoteResume">Reanudar trabajo</button><button id="remoteCancel">Cancelar trabajo</button></div></section><p id="remoteStatus" role="status" aria-live="polite">El enlace funciona entre dispositivos en la misma red. No inicia movimientos al conectar.</p><footer><button id="remoteStop" disabled>Ⅱ STOP / PAUSA</button><p>La pausa es una orden USB. Si la máquina sigue activa, usa su paro físico.</p></footer></main><script type="module" src="remote-client.js?v=4"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#06090d">
+<title>LZ Box · Control de taller</title>
+<link rel="stylesheet" href="remote.css?v=3">
+</head>
+<body>
+<main class="remote-shell">
+ <header class="rm-top">
+  <span class="remote-brand"><b>LZ</b> Box Studio</span>
+  <span id="remoteLinkState" class="rm-link">Sin enlace</span>
+ </header>
+
+ <section id="remotePairing" class="rm-pair">
+  <h1>Conecta con tu computadora</h1>
+  <p>Escanea el QR desde <strong>Box Studio › Operar máquina › Control desde celular</strong>. La computadora conserva la conexión USB con la máquina; este celular la controla por la red local.</p>
+  <button id="remotePair" type="button" class="rm-primary">Aceptar emparejamiento</button>
+  <label hidden>Respuesta para pegar en la computadora<textarea id="remoteAnswer" rows="3" readonly></textarea></label>
+  <button id="remoteCopy" type="button" disabled hidden>Copiar respuesta</button>
+  <p class="rm-note">Sin la computadora encendida y con Box abierto, el celular no puede operar la máquina: un iPhone no puede conectarse por USB a la controladora.</p>
+ </section>
+
+ <section id="remoteMachine" hidden>
+  <button type="button" id="remoteBridge" class="rm-bridge" aria-live="polite"><i id="remoteLed"></i><span id="remoteMachineState">—</span><small id="remoteOwner">La computadora tiene el control.</small></button>
+
+  <!-- ============ CONTROL ============ -->
+  <section id="tabControl" class="rm-tab" aria-labelledby="navControl">
+   <button type="button" class="rm-file" id="remoteFileCard"><span class="rm-file-icon" aria-hidden="true"></span><span><strong id="remoteJobName">Trabajo</strong><small id="remoteJobMeta"></small></span><b aria-hidden="true">›</b></button>
+   <div id="remotePreview" class="rm-preview" aria-label="Vista de la cama"></div>
+   <div class="rm-status" id="remoteReady"><span class="rm-status-icon" aria-hidden="true"></span><div><strong id="remoteReadyTitle">—</strong><small id="remoteReadyText"></small></div></div>
+   <p id="remoteTime" class="rm-time"></p>
+   <div class="rm-grid2">
+    <div class="rm-card rm-pos"><span>Posición estimada (mm)</span><p id="remotePosition">Sin referencia</p><small>Calculada por las órdenes enviadas; si mueves el cabezal a mano, haz Home.</small></div>
+    <div class="rm-card rm-move"><span>Mover cabezal</span>
+     <div class="remote-pad"><button id="remoteUp" aria-label="Mover hacia arriba">↑</button><button id="remoteLeft" aria-label="Mover hacia la izquierda">←</button><button id="remoteHome" class="rm-home">Home</button><button id="remoteRight" aria-label="Mover hacia la derecha">→</button><button id="remoteDown" aria-label="Mover hacia abajo">↓</button></div>
+    </div>
+   </div>
+   <div class="rm-card"><span>Paso de movimiento (mm)</span><div class="rm-steps" id="remoteSteps" role="group" aria-label="Paso de movimiento"></div>
+    <select id="remoteStep" class="rm-hidden" aria-hidden="true" tabindex="-1"><option>0.1</option><option>0.5</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select></div>
+   <div class="rm-card"><span>Origen del trabajo</span>
+    <div class="rm-seg" role="group" aria-label="Origen"><button type="button" data-origin="home">Desde Home</button><button type="button" data-origin="current">Posición actual</button></div>
+    <small id="remoteOriginNote"></small></div>
+   <button id="remotePulse" class="rm-pulse" disabled>Pulso láser · 50 ms</button>
+   <p class="rm-note">Potencia: la del panel de la máquina. El pulso lo temporiza la computadora por USB.</p>
+   <div class="remote-run"><button id="remoteFrame">Recorrer marco</button><button id="remoteCut" class="rm-primary">Iniciar trabajo</button></div>
+   <div id="remotePaused" class="rm-paused" hidden><p>Trabajo en pausa o sin confirmar.</p><button id="remoteResume" class="rm-primary">Reanudar</button><button id="remoteCancel" class="rm-danger-outline">Cancelar trabajo</button></div>
+  </section>
+
+  <!-- ============ TRABAJOS ============ -->
+  <section id="tabJobs" class="rm-tab" hidden aria-labelledby="navJobs">
+   <div class="rm-head"><h1>Preparar trabajo</h1><label class="rm-import rm-primary" id="remoteImportLabel">+ Importar SVG<input type="file" id="remoteImport" accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label></div>
+   <div class="rm-seg rm-source" role="group" aria-label="Fuente del trabajo"><button type="button" data-source="box">Diseño Box</button><button type="button" data-source="import">Archivo importado</button></div>
+   <p id="remoteUpload" class="rm-note" role="status"></p>
+   <div id="remoteImportBlock">
+    <div class="rm-file rm-static"><span class="rm-file-icon" aria-hidden="true"></span><span><strong id="remoteFileName">Sin archivo</strong><small id="remoteFileMeta">Importa un SVG desde este celular o desde la computadora.</small></span></div>
+    <div id="remoteJobPreview" class="rm-preview rm-preview-small"></div>
+    <ul id="remoteIssues" class="rm-issues"></ul>
+    <details class="rm-card rm-place"><summary>Colocación en la cama</summary>
+     <div class="rm-fields"><label>X · mm<input id="remotePlaceX" type="number" step="0.5" inputmode="decimal"></label><label>Y · mm<input id="remotePlaceY" type="number" step="0.5" inputmode="decimal"></label><label>Escala · %<input id="remotePlaceScale" type="number" step="1" min="1" inputmode="decimal"></label><label>Giro · °<input id="remotePlaceRot" type="number" step="90" inputmode="decimal"></label></div>
+     <div class="rm-row"><button type="button" id="remotePlaceApply">Aplicar colocación</button><button type="button" id="remotePlaceCenter">Centrar</button></div>
+    </details>
+    <h2 class="rm-h2">Operaciones <span id="remoteOpCount"></span></h2>
+    <div id="remoteOps" class="rm-ops"></div>
+    <label>Enviar a la máquina<select id="remoteScope"></select></label>
+    <p class="rm-note">La potencia es la del panel. Si cada operación necesita otra, envíalas por separado y cambia la perilla entre envíos.</p>
+    <p id="remoteJobWarn" class="rm-warn" hidden></p>
+   </div>
+   <div id="remoteBoxBlock" class="rm-card">
+    <span>Diseño Box · corte</span>
+    <div class="rm-fields"><label>Velocidad · mm/s<input id="remoteSpeed" type="number" min="1" max="100" value="10" inputmode="decimal"></label><label>Pasadas<input id="remotePasses" type="number" min="1" max="10" value="1" inputmode="numeric"></label></div>
+    <button id="remoteSettings">Aplicar parámetros</button>
+   </div>
+   <div class="rm-card"><span>Origen</span><div class="rm-seg" role="group" aria-label="Origen"><button type="button" data-origin="home">Desde Home</button><button type="button" data-origin="current">Posición actual</button></div></div>
+   <div class="rm-row rm-sticky"><button type="button" id="remoteSave">Guardar en biblioteca</button><button type="button" id="remoteReviewOpen" class="rm-primary">Revisar trabajo</button></div>
+   <section id="remoteReview" class="rm-card rm-review" hidden aria-labelledby="remoteReviewTitle">
+    <h2 id="remoteReviewTitle">Revisión antes de enviar</h2>
+    <dl id="remoteReviewList"></dl>
+    <p class="rm-note">Revisa que el material esté en la cama, que la colocación y el origen correspondan, y la potencia en el panel. Recorre el marco antes de iniciar.</p>
+    <div class="rm-row"><button type="button" id="remoteReviewOk" class="rm-primary">Revisado · ir a Control</button></div>
+   </section>
+  </section>
+
+  <!-- ============ BIBLIOTECA ============ -->
+  <section id="tabLibrary" class="rm-tab" hidden aria-labelledby="navLibrary">
+   <div class="rm-head"><h1>Mis trabajos</h1><button type="button" id="remoteLibRefresh" class="rm-ghost">Actualizar</button></div>
+   <label class="rm-search"><span class="rm-hidden">Buscar</span><input id="remoteLibSearch" type="search" placeholder="Buscar archivo o trabajo…"></label>
+   <div class="rm-chips" role="group" aria-label="Filtro"><button type="button" data-lib="all">Todos</button><button type="button" data-lib="file">Placas y archivos</button><button type="button" data-lib="box">Cajas</button><button type="button" data-lib="trash">Papelera</button></div>
+   <p id="remoteLibWhere" class="rm-note"></p>
+   <div id="remoteLibList" class="rm-lib"></div>
+   <p class="rm-info">Abrir un trabajo no lo envía: revisa origen y colocación antes de cada envío.</p>
+  </section>
+ </section>
+
+ <p id="remoteStatus" role="status" aria-live="polite">El enlace funciona entre dispositivos en la misma red. No inicia movimientos al conectar.</p>
+ <footer class="rm-footer">
+  <button id="remoteStop" class="rm-stop" disabled>■ STOP</button>
+  <nav class="rm-nav" aria-label="Secciones"><button type="button" id="navControl" data-tab="tabControl" class="active">Control</button><button type="button" id="navJobs" data-tab="tabJobs">Trabajos</button><button type="button" id="navLibrary" data-tab="tabLibrary">Biblioteca</button></nav>
+ </footer>
+</main>
+<dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> También en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
+<script type="module" src="remote-client.js?v=5"></script>
+</body>
+</html>

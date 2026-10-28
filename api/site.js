@@ -1,4 +1,4 @@
-var S={"/account/account-nav.js":{body:`import{b as f}from"./shared-2ZCXHAWV.js";import{b as r,e as l,h as d,k as u}from"./shared-77LC5TXT.js";import"./shared-Q63R373C.js";if(!document.querySelector('link[href^="account.css"]')){let e=document.createElement("link");e.rel="stylesheet",e.href="account.css",document.head.append(e)}var h=document.querySelector(".lz-appbar")||document.querySelector(".topbar");if(h){let e=h.querySelector(".account-link");e||(e=document.createElement("button"),e.type="button",e.className="account-link",e.setAttribute("aria-haspopup","dialog"),e.textContent="Iniciar sesi\\xF3n",h.append(e));let m=e.querySelector(".lz-acc-label")||e,o=document.createElement("dialog");o.className="auth-dialog",o.setAttribute("aria-label","Acceso a LZ Studio Tools"),o.innerHTML='<button class="auth-close" type="button" aria-label="Cerrar">\\xD7</button><div class="auth-content"></div>',document.body.append(o),o.querySelector(".auth-close").onclick=()=>o.close(),o.addEventListener("click",t=>{if(t.target===o){let a=o.getBoundingClientRect();(t.clientX<a.left||t.clientX>a.right||t.clientY<a.top||t.clientY>a.bottom)&&o.close()}});let n=!1;f(o.querySelector(".auth-content"),{onSuccess:async()=>{let t=sessionStorage.getItem("lz-account-return");if(o.close(),t){sessionStorage.removeItem("lz-account-return");let{data:a}=await l.auth.getSession();await u(a.session),location.href=d(t)}else location.reload()}}),e.onclick=()=>{n?location.href="account.html":o.showModal()};let p=["premium.html","crop.html","editor.html","opacity.html","thickness.html","textures.html","text-creator.html","mockups.html","vectorize.html","analyzer.html","gang-sheet.html","color-enhance.html","upscale.html","extract.html"],s=location.pathname.split("/").pop(),i=async t=>{if(n=!!t,m.textContent=n?"Mi cuenta":"Iniciar sesi\\xF3n",r)try{await u(t)}catch{n=!1,m.textContent="Iniciar sesi\\xF3n"}!n&&p.includes(s)&&location.replace("account.html?return="+encodeURIComponent(s+location.search))};if(r){let{data:t}=await l.auth.getSession();await i(t.session),l.auth.onAuthStateChange((a,c)=>{setTimeout(()=>i(c),0)}),p.includes(s)&&setInterval(async()=>{let{data:a}=await l.auth.getSession();await i(a.session)},6e4)}document.addEventListener("click",t=>{let a=t.target.closest("a");if(!a||n||t.ctrlKey||t.metaKey||t.shiftKey||t.altKey)return;let c=new URL(a.href,location.href),g=["premium.html","crop.html","editor.html","opacity.html","thickness.html","textures.html","text-creator.html","mockups.html","vectorize.html","analyzer.html","gang-sheet.html","color-enhance.html","upscale.html","extract.html"];c.origin===location.origin&&g.includes(c.pathname.split("/").pop())&&(t.preventDefault(),sessionStorage.setItem("lz-account-return",c.pathname.split("/").pop()+c.search),o.showModal())})}
+var E={"/account/account-nav.js":{body:`import{b as f}from"./shared-2ZCXHAWV.js";import{b as r,e as l,h as d,k as u}from"./shared-77LC5TXT.js";import"./shared-Q63R373C.js";if(!document.querySelector('link[href^="account.css"]')){let e=document.createElement("link");e.rel="stylesheet",e.href="account.css",document.head.append(e)}var h=document.querySelector(".lz-appbar")||document.querySelector(".topbar");if(h){let e=h.querySelector(".account-link");e||(e=document.createElement("button"),e.type="button",e.className="account-link",e.setAttribute("aria-haspopup","dialog"),e.textContent="Iniciar sesi\\xF3n",h.append(e));let m=e.querySelector(".lz-acc-label")||e,o=document.createElement("dialog");o.className="auth-dialog",o.setAttribute("aria-label","Acceso a LZ Studio Tools"),o.innerHTML='<button class="auth-close" type="button" aria-label="Cerrar">\\xD7</button><div class="auth-content"></div>',document.body.append(o),o.querySelector(".auth-close").onclick=()=>o.close(),o.addEventListener("click",t=>{if(t.target===o){let a=o.getBoundingClientRect();(t.clientX<a.left||t.clientX>a.right||t.clientY<a.top||t.clientY>a.bottom)&&o.close()}});let n=!1;f(o.querySelector(".auth-content"),{onSuccess:async()=>{let t=sessionStorage.getItem("lz-account-return");if(o.close(),t){sessionStorage.removeItem("lz-account-return");let{data:a}=await l.auth.getSession();await u(a.session),location.href=d(t)}else location.reload()}}),e.onclick=()=>{n?location.href="account.html":o.showModal()};let p=["premium.html","crop.html","editor.html","opacity.html","thickness.html","textures.html","text-creator.html","mockups.html","vectorize.html","analyzer.html","gang-sheet.html","color-enhance.html","upscale.html","extract.html"],s=location.pathname.split("/").pop(),i=async t=>{if(n=!!t,m.textContent=n?"Mi cuenta":"Iniciar sesi\\xF3n",r)try{await u(t)}catch{n=!1,m.textContent="Iniciar sesi\\xF3n"}!n&&p.includes(s)&&location.replace("account.html?return="+encodeURIComponent(s+location.search))};if(r){let{data:t}=await l.auth.getSession();await i(t.session),l.auth.onAuthStateChange((a,c)=>{setTimeout(()=>i(c),0)}),p.includes(s)&&setInterval(async()=>{let{data:a}=await l.auth.getSession();await i(a.session)},6e4)}document.addEventListener("click",t=>{let a=t.target.closest("a");if(!a||n||t.ctrlKey||t.metaKey||t.shiftKey||t.altKey)return;let c=new URL(a.href,location.href),g=["premium.html","crop.html","editor.html","opacity.html","thickness.html","textures.html","text-creator.html","mockups.html","vectorize.html","analyzer.html","gang-sheet.html","color-enhance.html","upscale.html","extract.html"];c.origin===location.origin&&g.includes(c.pathname.split("/").pop())&&(t.preventDefault(),sessionStorage.setItem("lz-account-return",c.pathname.split("/").pop()+c.search),o.showModal())})}
 `,type:"text/javascript; charset=utf-8",public:!0},"/account/account-page.js":{body:`import{a as b,b as _}from"./shared-2ZCXHAWV.js";import{a as A,b as x,e as g,f,g as y,h as v,i as z,j as P,k as h,l as R}from"./shared-77LC5TXT.js";import"./shared-Q63R373C.js";var t=e=>document.getElementById(e),o=null,p=!1,w=!0,d=new URLSearchParams(location.search).has("recovery"),u=e=>{t("accountMessage").textContent=e};function r(e,n,i){let c=document.createElement(e);return n!==void 0&&(c.textContent=n),i&&(c.className=i),c}var D=_(t("authContainer"),{onSuccess:async()=>{d=!1,sessionStorage.getItem("lz-account-return")||sessionStorage.setItem("lz-account-return","dtf.html"),history.replaceState(null,"","account.html"),await C(),await k()},mode:d?"update":"login"}),E=new URLSearchParams(location.search);E.has("return")&&sessionStorage.setItem("lz-account-return",v(E.get("return")));async function k(){let e=sessionStorage.getItem("lz-account-return");!d&&e&&A(e,o,f)&&(sessionStorage.removeItem("lz-account-return"),location.replace(v(e)))}async function C(){if(o=await z(),t("loginPanel").hidden=!!o&&!d,t("memberPanel").hidden=!o||d,t("adminPanel").hidden=!o?.isAdmin||d,!o){u("Inicia sesi\\xF3n o crea una cuenta gratuita.");return}if(d){u("Confirma tu nueva contrase\\xF1a.");return}t("memberEmail").textContent=o.user.email,t("memberName").textContent=o.profile?.display_name||"Mi cuenta",t("memberRole").textContent=o.profile?.blocked?"Cuenta suspendida":o.isAdmin?"Administrador":"Cuenta gratuita";let e=t("myTools");e.replaceChildren();for(let n of o.tools){if(!f[n.id]||n.enabled===!1)continue;let i=r("article",void 0,"account-tool");if(i.append(r("strong",n.id==="editor"?"Semitonos / Quitar fondo color":n.id==="recolor"?"Reemplazar color":n.name),r("p",o.profile?.blocked?"Cuenta suspendida":"Gratis \\xB7 Sin vencimiento")),P(o,n.id)){let c=r("a","Abrir herramienta","account-primary");c.href=f[n.id],i.append(c)}e.append(i)}t("accessSummary").textContent=o.profile?.blocked?"Acceso suspendido":"Todas las herramientas incluidas",o.isAdmin&&(I(),await M()),u(o.profile?.blocked?"Tu cuenta est\\xE1 suspendida. Comun\\xEDcate con el administrador.":"Tu cuenta tiene acceso gratuito a todas las herramientas.")}function I(){let e=t("toolSettings");e.replaceChildren();for(let a of o.tools){if(!f[a.id])continue;let l=r("div",void 0,"permission-row"),s=r("div");s.append(r("strong",a.id==="editor"?"Semitonos / Quitar fondo color":a.id==="recolor"?"Reemplazar color":a.name),r("small",a.enabled===!1?"Desactivada":"Activa"));let m=r("button",a.enabled===!1?"Activar":"Desactivar");m.type="button",m.disabled=p,m.setAttribute("aria-label",(a.enabled===!1?"Activar ":"Desactivar ")+(a.id==="editor"?"Semitonos / Quitar fondo color":a.id==="recolor"?"Reemplazar color":a.name)),m.onclick=()=>S(()=>R(a.id,a.enabled===!1)),l.append(s,m),e.append(l)}let n=o.profiles,i=t("users"),c=i.value;i.replaceChildren();for(let a of[...n].sort((l,s)=>l.email.localeCompare(s.email))){let l=r("option",(a.display_name?a.display_name+" \\xB7 ":"")+a.email+(a.blocked?" \\xB7 Suspendido":""));l.value=a.id,i.append(l)}n.some(a=>a.id===c)&&(i.value=c),t("userCount").textContent=String(n.length),t("activeCount").textContent=String(n.filter(a=>!a.blocked).length),t("blockedCount").textContent=String(n.filter(a=>a.blocked).length),i.onchange=T,T()}function T(){let e=o.profiles.find(n=>n.id===t("users").value);e&&(t("selectedEmail").textContent=e.email,t("selectedName").textContent=e.display_name||"Sin nombre",t("selectedDate").textContent=e.created_at?new Date(e.created_at).toLocaleDateString("es-MX"):"\\u2014",t("blockUser").textContent=e.blocked?"Reactivar cuenta":"Suspender cuenta",t("blockUser").disabled=e.id===o.user.id||p,t("blockUser").onclick=()=>S(()=>y("lz_set_blocked",{target:e.id,value:!e.blocked})))}async function S(e){if(!p){p=!0,u("Procesando\\u2026");try{await e(),await C()}catch(n){u(b(n))}finally{p=!1,o?.isAdmin&&I()}}}t("signOut").onclick=()=>S(async()=>{let{error:e}=await g.auth.signOut();if(e)throw e;await h(null)});t("refreshAccount").onclick=()=>S(async()=>{});t("changePassword").onclick=()=>{d=!0,D.setMode("update"),t("loginPanel").hidden=!1,t("memberPanel").hidden=!0,t("adminPanel").hidden=!0,u("Elige tu nueva contrase\\xF1a.")};if(x){g.auth.onAuthStateChange((e,n)=>{e==="PASSWORD_RECOVERY"&&(d=!0,D.setMode("update")),setTimeout(async()=>{try{await h(n),!p&&!w&&(await C(),n&&await k())}catch(i){u(b(i))}},0)});try{let{data:e}=await g.auth.getSession();await h(e.session),await C(),await k()}catch(e){u(b(e))}finally{w=!1}}else u("Las cuentas no est\\xE1n disponibles en este momento."),t("loginPanel").hidden=!1,w=!1;async function M(){let e=t("usageStats");e.textContent="Cargando estad\\xEDsticas\\u2026";try{let n=await y("lz_usage_stats");e.replaceChildren(),e.append(r("p",(n?.users||0)+" usuarios con actividad \\xB7 \\xFAltimos 30 d\\xEDas"));let i=r("table"),c=r("tr");for(let s of["Herramienta","Aperturas","Usuarios","Descargas solicitadas","Errores"])c.append(r("th",s));let a=r("thead");a.append(c),i.append(a);let l=r("tbody");for(let s of n?.tools||[]){let m=r("tr");for(let U of[s.id==="editor"?"Semitonos / Quitar fondo color":s.id==="recolor"?"Reemplazar color":s.name,s.opens,s.users,s.export_requests,s.errors])m.append(r("td",String(U??0)));l.append(m)}i.append(l),e.append(i)}catch{e.textContent="No se pudieron cargar las estad\\xEDsticas. Pulsa Actualizar para intentar de nuevo."}}
 `,type:"text/javascript; charset=utf-8",public:!0},"/account/shared-2ZCXHAWV.js":{body:'import{b as w,c as y,d as S,e as d,k}from"./shared-77LC5TXT.js";function R(n){let o=(n?.message||"")+" "+(n?.code||"");return/invalid login credentials/i.test(o)?"El correo o la contrase\\xF1a son incorrectos.":/email not confirmed/i.test(o)?"Tu cuenta est\\xE1 pendiente de confirmar el correo. Revisa tu bandeja y Spam.":/not authorized|email address not authorized|email_address_not_authorized/i.test(o)?"El env\\xEDo de correos a\\xFAn est\\xE1 limitado a las cuentas de prueba. El administrador debe revisar la configuraci\\xF3n del correo.":/rate limit|too many|over_email_send_rate_limit/i.test(o)?"Se alcanz\\xF3 el l\\xEDmite temporal de correos. Espera unos minutos antes de solicitar otro.":/already registered|user_already_exists/i.test(o)?"Ese correo ya tiene una cuenta. Inicia sesi\\xF3n o pulsa \\xABOlvid\\xE9 mi contrase\\xF1a\\xBB.":/password/i.test(o)?"La contrase\\xF1a debe tener al menos 8 caracteres y cumplir los requisitos de seguridad.":/failed to fetch|network|timeout|timed out/i.test(o)?"No pudimos confirmar la respuesta del servidor. Revisa tu conexi\\xF3n e intenta iniciar sesi\\xF3n antes de volver a registrarte.":n?.message||"No pudimos completar la solicitud. Intenta de nuevo."}function q(n,{onSuccess:o=()=>{},mode:C="login"}={}){n.innerHTML=\'<div class="auth-tabs" role="tablist" aria-label="Acceso"><button type="button" role="tab" data-mode="login">Iniciar sesi\\xF3n</button><button type="button" role="tab" data-mode="register">Registrarse</button></div><h2 class="auth-title"></h2><p class="auth-intro"></p><form class="auth-form"><div class="auth-name"><label>Nombre<input name="full_name" autocomplete="name" maxlength="120"></label></div><label class="auth-email">Correo electr\\xF3nico<input name="email" type="email" autocomplete="email" required maxlength="254" placeholder="tu@correo.com"></label><label class="auth-password">Contrase\\xF1a<input name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label><label class="auth-confirm">Confirmar contrase\\xF1a<input name="confirm" type="password" autocomplete="new-password" minlength="8" maxlength="128"></label><label class="auth-remember"><input name="remember" type="checkbox" checked> Mantener sesi\\xF3n iniciada</label><p class="account-hint auth-password-hint">Usa al menos 8 caracteres.</p><button class="account-primary auth-submit" type="submit">Iniciar sesi\\xF3n</button></form><button type="button" class="auth-forgot">Olvid\\xE9 mi contrase\\xF1a</button><button type="button" class="auth-back" hidden>Volver a iniciar sesi\\xF3n</button><p class="auth-message" role="status" aria-live="polite" tabindex="-1"></p><div class="auth-delivery" hidden><p class="account-hint">La cuenta necesita confirmar su correo antes de entrar. Si no llega el mensaje, revisa Spam. Reenviar una confirmaci\\xF3n no crea otra cuenta.</p><button type="button" class="auth-resend">Reenviar confirmaci\\xF3n</button><button type="button" class="auth-check-login">Ya confirm\\xE9 mi correo</button></div><p class="account-hint auth-free">Cuenta gratuita. Todas las herramientas est\\xE1n incluidas.</p>\';let a=e=>n.querySelector(e),m=a(".auth-form"),r=m.elements,p,g=!1,h="",b=0,i=e=>{a(".auth-message").textContent=e,a(".auth-message").focus()},f=e=>{g=e;for(let t of n.querySelectorAll("button"))t.disabled=e};function l(e){p=e,h="",a(".auth-message").textContent="",a(".auth-delivery").hidden=!0,m.hidden=!1,m.reset(),a(".auth-remember").hidden=!["login","register"].includes(e),r.remember.checked=y(),a(".auth-tabs").hidden=e==="update",a(".auth-name").hidden=e!=="register",r.full_name.required=e==="register",a(".auth-email").hidden=e==="update",r.email.required=e!=="update",a(".auth-password").hidden=e==="reset",r.password.required=e!=="reset",r.password.autocomplete=e==="login"?"current-password":"new-password",r.password.minLength=e==="login"?1:8,a(".auth-confirm").hidden=!["register","update"].includes(e),r.confirm.required=["register","update"].includes(e),a(".auth-password-hint").hidden=!["register","update"].includes(e),a(".auth-forgot").hidden=e!=="login",a(".auth-back").hidden=!["reset","update"].includes(e),a(".auth-free").hidden=e==="update",a(".auth-title").textContent={login:"Iniciar sesi\\xF3n",register:"Crea tu cuenta gratis",reset:"Recuperar contrase\\xF1a",update:"Elige una nueva contrase\\xF1a"}[e],a(".auth-intro").textContent={login:"Entra con tu correo y contrase\\xF1a.",register:"Reg\\xEDstrate para usar todas las herramientas.",reset:"Te enviaremos un enlace para elegir una nueva contrase\\xF1a.",update:"Guarda tu contrase\\xF1a para volver a entrar a tu cuenta."}[e],a(".auth-submit").textContent={login:"Iniciar sesi\\xF3n",register:"Crear cuenta gratis",reset:"Enviar enlace",update:"Guardar contrase\\xF1a"}[e];for(let t of n.querySelectorAll("[data-mode]"))t.setAttribute("aria-selected",String(t.dataset.mode===e)),t.tabIndex=t.dataset.mode===e?0:-1}for(let e of n.querySelectorAll("[data-mode]"))e.onclick=()=>l(e.dataset.mode),e.onkeydown=t=>{if(["ArrowLeft","ArrowRight"].includes(t.key)){t.preventDefault();let u=p==="login"?"register":"login";l(u),a(`[data-mode="${u}"]`).focus()}};return a(".auth-forgot").onclick=()=>l("reset"),a(".auth-back").onclick=()=>l("login"),a(".auth-check-login").onclick=()=>{let e=h;l("login"),r.email.value=e,r.password.focus()},m.addEventListener("invalid",e=>{let t=e.target;i(t.name==="password"&&t.validity.tooShort?"La contrase\\xF1a debe tener al menos 8 caracteres.":t.validationMessage||"Revisa los campos antes de continuar.")},!0),a(".auth-resend").onclick=async()=>{if(g||!h)return;let e=Math.ceil((6e4-(Date.now()-b))/1e3);if(e>0){i(`Espera ${e} segundos antes de reenviar la confirmaci\\xF3n.`);return}f(!0),i("Solicitando otro correo\\u2026");try{let{error:t}=await d.auth.resend({type:"signup",email:h,options:{emailRedirectTo:new URL("account.html",location.href).href}});if(t)throw t;b=Date.now(),i("Solicitamos otro correo de confirmaci\\xF3n para "+h+". Si tampoco llega, el administrador debe revisar el servicio de correo.")}catch(t){i(R(t))}finally{f(!1)}},m.onsubmit=async e=>{if(e.preventDefault(),g)return;let t=r.email.value.trim(),u=r.password.value;if(["register","update"].includes(p)&&u!==r.confirm.value){i("Las contrase\\xF1as no coinciden.");return}if(!w){i("Las cuentas no est\\xE1n disponibles en este momento.");return}f(!0);let c=p;i("Procesando\\u2026");try{let s,v=new URL("account.html",location.href);if(["login","register"].includes(c)&&S(r.remember.checked),c==="login"?s=await d.auth.signInWithPassword({email:t,password:u}):c==="register"?s=await d.auth.signUp({email:t,password:u,options:{data:{full_name:r.full_name.value.trim()},emailRedirectTo:v.href}}):c==="reset"?s=await d.auth.resetPasswordForEmail(t,{redirectTo:v.href}):s=await d.auth.updateUser({password:u}),s.error)throw s.error;if(r.password.value="",r.confirm.value="",c==="reset")i("Si ese correo tiene una cuenta, solicitamos un enlace para recuperar la contrase\\xF1a. Revisa tambi\\xE9n Spam.");else if(c==="register"&&!s.data.session)Array.isArray(s.data.user?.identities)&&s.data.user.identities.length===0?(l("login"),r.email.value=t,i("Ese correo ya tiene una cuenta. Inicia sesi\\xF3n o pulsa \\xABOlvid\\xE9 mi contrase\\xF1a\\xBB para establecer tu contrase\\xF1a.")):(h=t,b=Date.now(),m.hidden=!0,a(".auth-title").textContent="Confirma tu correo",a(".auth-intro").textContent=t,a(".auth-delivery").hidden=!1,i("Solicitud de registro recibida. Falta confirmar tu correo para activar el acceso."));else{let{data:E}=await d.auth.getSession();await k(E.session),i(c==="update"?"Contrase\\xF1a guardada.":"Sesi\\xF3n iniciada."),await o()}}catch(s){i(R(s))}finally{f(!1)}},l(C),{setMode:l}}export{R as a,q as b};\n',type:"text/javascript; charset=utf-8",public:!0},"/account/shared-77LC5TXT.js":{body:'import{a as M,b as os,c as as,e as Mt,f as Wt,i as ls,j as Ht}from"./shared-Q63R373C.js";var vt=M(mt=>{"use strict";Object.defineProperty(mt,"__esModule",{value:!0});var _t=class extends Error{constructor(e){super(e.message),this.name="PostgrestError",this.details=e.details,this.hint=e.hint,this.code=e.code}};mt.default=_t});var yt=M(ke=>{"use strict";var Jt=ke&&ke.__importDefault||function(i){return i&&i.__esModule?i:{default:i}};Object.defineProperty(ke,"__esModule",{value:!0});var hs=Jt((Ht(),as(ls))),us=Jt(vt()),wt=class{constructor(e){var t,r;this.shouldThrowOnError=!1,this.method=e.method,this.url=e.url,this.headers=new Headers(e.headers),this.schema=e.schema,this.body=e.body,this.shouldThrowOnError=(t=e.shouldThrowOnError)!==null&&t!==void 0?t:!1,this.signal=e.signal,this.isMaybeSingle=(r=e.isMaybeSingle)!==null&&r!==void 0?r:!1,e.fetch?this.fetch=e.fetch:typeof fetch>"u"?this.fetch=hs.default:this.fetch=fetch}throwOnError(){return this.shouldThrowOnError=!0,this}setHeader(e,t){return this.headers=new Headers(this.headers),this.headers.set(e,t),this}then(e,t){this.schema===void 0||(["GET","HEAD"].includes(this.method)?this.headers.set("Accept-Profile",this.schema):this.headers.set("Content-Profile",this.schema)),this.method!=="GET"&&this.method!=="HEAD"&&this.headers.set("Content-Type","application/json");let r=this.fetch,s=r(this.url.toString(),{method:this.method,headers:this.headers,body:JSON.stringify(this.body),signal:this.signal}).then(async n=>{var o,a,l,h;let c=null,u=null,d=null,f=n.status,p=n.statusText;if(n.ok){if(this.method!=="HEAD"){let T=await n.text();T===""||(this.headers.get("Accept")==="text/csv"||this.headers.get("Accept")&&(!((o=this.headers.get("Accept"))===null||o===void 0)&&o.includes("application/vnd.pgrst.plan+text"))?u=T:u=JSON.parse(T))}let m=(a=this.headers.get("Prefer"))===null||a===void 0?void 0:a.match(/count=(exact|planned|estimated)/),S=(l=n.headers.get("content-range"))===null||l===void 0?void 0:l.split("/");m&&S&&S.length>1&&(d=parseInt(S[1])),this.isMaybeSingle&&this.method==="GET"&&Array.isArray(u)&&(u.length>1?(c={code:"PGRST116",details:`Results contain ${u.length} rows, application/vnd.pgrst.object+json requires 1 row`,hint:null,message:"JSON object requested, multiple (or no) rows returned"},u=null,d=null,f=406,p="Not Acceptable"):u.length===1?u=u[0]:u=null)}else{let m=await n.text();try{c=JSON.parse(m),Array.isArray(c)&&n.status===404&&(u=[],c=null,f=200,p="OK")}catch{n.status===404&&m===""?(f=204,p="No Content"):c={message:m}}if(c&&this.isMaybeSingle&&(!((h=c?.details)===null||h===void 0)&&h.includes("0 rows"))&&(c=null,f=200,p="OK"),c&&this.shouldThrowOnError)throw new us.default(c)}return{error:c,data:u,count:d,status:f,statusText:p}});return this.shouldThrowOnError||(s=s.catch(n=>{var o,a,l;return{error:{message:`${(o=n?.name)!==null&&o!==void 0?o:"FetchError"}: ${n?.message}`,details:`${(a=n?.stack)!==null&&a!==void 0?a:""}`,hint:"",code:`${(l=n?.code)!==null&&l!==void 0?l:""}`},data:null,count:null,status:0,statusText:""}})),s.then(e,t)}returns(){return this}overrideTypes(){return this}};ke.default=wt});var St=M(Te=>{"use strict";var ds=Te&&Te.__importDefault||function(i){return i&&i.__esModule?i:{default:i}};Object.defineProperty(Te,"__esModule",{value:!0});var fs=ds(yt()),bt=class extends fs.default{select(e){let t=!1,r=(e??"*").split("").map(s=>/\\s/.test(s)&&!t?"":(s===\'"\'&&(t=!t),s)).join("");return this.url.searchParams.set("select",r),this.headers.append("Prefer","return=representation"),this}order(e,{ascending:t=!0,nullsFirst:r,foreignTable:s,referencedTable:n=s}={}){let o=n?`${n}.order`:"order",a=this.url.searchParams.get(o);return this.url.searchParams.set(o,`${a?`${a},`:""}${e}.${t?"asc":"desc"}${r===void 0?"":r?".nullsfirst":".nullslast"}`),this}limit(e,{foreignTable:t,referencedTable:r=t}={}){let s=typeof r>"u"?"limit":`${r}.limit`;return this.url.searchParams.set(s,`${e}`),this}range(e,t,{foreignTable:r,referencedTable:s=r}={}){let n=typeof s>"u"?"offset":`${s}.offset`,o=typeof s>"u"?"limit":`${s}.limit`;return this.url.searchParams.set(n,`${e}`),this.url.searchParams.set(o,`${t-e+1}`),this}abortSignal(e){return this.signal=e,this}single(){return this.headers.set("Accept","application/vnd.pgrst.object+json"),this}maybeSingle(){return this.method==="GET"?this.headers.set("Accept","application/json"):this.headers.set("Accept","application/vnd.pgrst.object+json"),this.isMaybeSingle=!0,this}csv(){return this.headers.set("Accept","text/csv"),this}geojson(){return this.headers.set("Accept","application/geo+json"),this}explain({analyze:e=!1,verbose:t=!1,settings:r=!1,buffers:s=!1,wal:n=!1,format:o="text"}={}){var a;let l=[e?"analyze":null,t?"verbose":null,r?"settings":null,s?"buffers":null,n?"wal":null].filter(Boolean).join("|"),h=(a=this.headers.get("Accept"))!==null&&a!==void 0?a:"application/json";return this.headers.set("Accept",`application/vnd.pgrst.plan+${o}; for="${h}"; options=${l};`),o==="json"?this:this}rollback(){return this.headers.append("Prefer","tx=rollback"),this}returns(){return this}maxAffected(e){return this.headers.append("Prefer","handling=strict"),this.headers.append("Prefer",`max-affected=${e}`),this}};Te.default=bt});var Ve=M(Ee=>{"use strict";var ps=Ee&&Ee.__importDefault||function(i){return i&&i.__esModule?i:{default:i}};Object.defineProperty(Ee,"__esModule",{value:!0});var gs=ps(St()),kt=class extends gs.default{eq(e,t){return this.url.searchParams.append(e,`eq.${t}`),this}neq(e,t){return this.url.searchParams.append(e,`neq.${t}`),this}gt(e,t){return this.url.searchParams.append(e,`gt.${t}`),this}gte(e,t){return this.url.searchParams.append(e,`gte.${t}`),this}lt(e,t){return this.url.searchParams.append(e,`lt.${t}`),this}lte(e,t){return this.url.searchParams.append(e,`lte.${t}`),this}like(e,t){return this.url.searchParams.append(e,`like.${t}`),this}likeAllOf(e,t){return this.url.searchParams.append(e,`like(all).{${t.join(",")}}`),this}likeAnyOf(e,t){return this.url.searchParams.append(e,`like(any).{${t.join(",")}}`),this}ilike(e,t){return this.url.searchParams.append(e,`ilike.${t}`),this}ilikeAllOf(e,t){return this.url.searchParams.append(e,`ilike(all).{${t.join(",")}}`),this}ilikeAnyOf(e,t){return this.url.searchParams.append(e,`ilike(any).{${t.join(",")}}`),this}is(e,t){return this.url.searchParams.append(e,`is.${t}`),this}in(e,t){let r=Array.from(new Set(t)).map(s=>typeof s=="string"&&new RegExp("[,()]").test(s)?`"${s}"`:`${s}`).join(",");return this.url.searchParams.append(e,`in.(${r})`),this}contains(e,t){return typeof t=="string"?this.url.searchParams.append(e,`cs.${t}`):Array.isArray(t)?this.url.searchParams.append(e,`cs.{${t.join(",")}}`):this.url.searchParams.append(e,`cs.${JSON.stringify(t)}`),this}containedBy(e,t){return typeof t=="string"?this.url.searchParams.append(e,`cd.${t}`):Array.isArray(t)?this.url.searchParams.append(e,`cd.{${t.join(",")}}`):this.url.searchParams.append(e,`cd.${JSON.stringify(t)}`),this}rangeGt(e,t){return this.url.searchParams.append(e,`sr.${t}`),this}rangeGte(e,t){return this.url.searchParams.append(e,`nxl.${t}`),this}rangeLt(e,t){return this.url.searchParams.append(e,`sl.${t}`),this}rangeLte(e,t){return this.url.searchParams.append(e,`nxr.${t}`),this}rangeAdjacent(e,t){return this.url.searchParams.append(e,`adj.${t}`),this}overlaps(e,t){return typeof t=="string"?this.url.searchParams.append(e,`ov.${t}`):this.url.searchParams.append(e,`ov.{${t.join(",")}}`),this}textSearch(e,t,{config:r,type:s}={}){let n="";s==="plain"?n="pl":s==="phrase"?n="ph":s==="websearch"&&(n="w");let o=r===void 0?"":`(${r})`;return this.url.searchParams.append(e,`${n}fts${o}.${t}`),this}match(e){return Object.entries(e).forEach(([t,r])=>{this.url.searchParams.append(t,`eq.${r}`)}),this}not(e,t,r){return this.url.searchParams.append(e,`not.${t}.${r}`),this}or(e,{foreignTable:t,referencedTable:r=t}={}){let s=r?`${r}.or`:"or";return this.url.searchParams.append(s,`(${e})`),this}filter(e,t,r){return this.url.searchParams.append(e,`${t}.${r}`),this}};Ee.default=kt});var Et=M(Ae=>{"use strict";var _s=Ae&&Ae.__importDefault||function(i){return i&&i.__esModule?i:{default:i}};Object.defineProperty(Ae,"__esModule",{value:!0});var xe=_s(Ve()),Tt=class{constructor(e,{headers:t={},schema:r,fetch:s}){this.url=e,this.headers=new Headers(t),this.schema=r,this.fetch=s}select(e,{head:t=!1,count:r}={}){let s=t?"HEAD":"GET",n=!1,o=(e??"*").split("").map(a=>/\\s/.test(a)&&!n?"":(a===\'"\'&&(n=!n),a)).join("");return this.url.searchParams.set("select",o),r&&this.headers.append("Prefer",`count=${r}`),new xe.default({method:s,url:this.url,headers:this.headers,schema:this.schema,fetch:this.fetch})}insert(e,{count:t,defaultToNull:r=!0}={}){var s;let n="POST";if(t&&this.headers.append("Prefer",`count=${t}`),r||this.headers.append("Prefer","missing=default"),Array.isArray(e)){let o=e.reduce((a,l)=>a.concat(Object.keys(l)),[]);if(o.length>0){let a=[...new Set(o)].map(l=>`"${l}"`);this.url.searchParams.set("columns",a.join(","))}}return new xe.default({method:n,url:this.url,headers:this.headers,schema:this.schema,body:e,fetch:(s=this.fetch)!==null&&s!==void 0?s:fetch})}upsert(e,{onConflict:t,ignoreDuplicates:r=!1,count:s,defaultToNull:n=!0}={}){var o;let a="POST";if(this.headers.append("Prefer",`resolution=${r?"ignore":"merge"}-duplicates`),t!==void 0&&this.url.searchParams.set("on_conflict",t),s&&this.headers.append("Prefer",`count=${s}`),n||this.headers.append("Prefer","missing=default"),Array.isArray(e)){let l=e.reduce((h,c)=>h.concat(Object.keys(c)),[]);if(l.length>0){let h=[...new Set(l)].map(c=>`"${c}"`);this.url.searchParams.set("columns",h.join(","))}}return new xe.default({method:a,url:this.url,headers:this.headers,schema:this.schema,body:e,fetch:(o=this.fetch)!==null&&o!==void 0?o:fetch})}update(e,{count:t}={}){var r;let s="PATCH";return t&&this.headers.append("Prefer",`count=${t}`),new xe.default({method:s,url:this.url,headers:this.headers,schema:this.schema,body:e,fetch:(r=this.fetch)!==null&&r!==void 0?r:fetch})}delete({count:e}={}){var t;let r="DELETE";return e&&this.headers.append("Prefer",`count=${e}`),new xe.default({method:r,url:this.url,headers:this.headers,schema:this.schema,fetch:(t=this.fetch)!==null&&t!==void 0?t:fetch})}};Ae.default=Tt});var Qt=M(Oe=>{"use strict";var Vt=Oe&&Oe.__importDefault||function(i){return i&&i.__esModule?i:{default:i}};Object.defineProperty(Oe,"__esModule",{value:!0});var ms=Vt(Et()),vs=Vt(Ve()),xt=class i{constructor(e,{headers:t={},schema:r,fetch:s}={}){this.url=e,this.headers=new Headers(t),this.schemaName=r,this.fetch=s}from(e){let t=new URL(`${this.url}/${e}`);return new ms.default(t,{headers:new Headers(this.headers),schema:this.schemaName,fetch:this.fetch})}schema(e){return new i(this.url,{headers:this.headers,schema:e,fetch:this.fetch})}rpc(e,t={},{head:r=!1,get:s=!1,count:n}={}){var o;let a,l=new URL(`${this.url}/rpc/${e}`),h;r||s?(a=r?"HEAD":"GET",Object.entries(t).filter(([u,d])=>d!==void 0).map(([u,d])=>[u,Array.isArray(d)?`{${d.join(",")}}`:`${d}`]).forEach(([u,d])=>{l.searchParams.append(u,d)})):(a="POST",h=t);let c=new Headers(this.headers);return n&&c.set("Prefer",`count=${n}`),new vs.default({method:a,url:l,headers:c,schema:this.schemaName,body:h,fetch:(o=this.fetch)!==null&&o!==void 0?o:fetch})}};Oe.default=xt});var sr=M(A=>{"use strict";var ae=A&&A.__importDefault||function(i){return i&&i.__esModule?i:{default:i}};Object.defineProperty(A,"__esModule",{value:!0});A.PostgrestError=A.PostgrestBuilder=A.PostgrestTransformBuilder=A.PostgrestFilterBuilder=A.PostgrestQueryBuilder=A.PostgrestClient=void 0;var Yt=ae(Qt());A.PostgrestClient=Yt.default;var Xt=ae(Et());A.PostgrestQueryBuilder=Xt.default;var Zt=ae(Ve());A.PostgrestFilterBuilder=Zt.default;var er=ae(St());A.PostgrestTransformBuilder=er.default;var tr=ae(yt());A.PostgrestBuilder=tr.default;var rr=ae(vt());A.PostgrestError=rr.default;A.default={PostgrestClient:Yt.default,PostgrestQueryBuilder:Xt.default,PostgrestFilterBuilder:Zt.default,PostgrestTransformBuilder:er.default,PostgrestBuilder:tr.default,PostgrestError:rr.default}});var Kt=["index.html","dtf.html","box/index.html","box/index.html?celular=1"];function zt(i,e){return Kt.includes(i)||Object.values(e).includes(i)?i:"dtf.html"}function li(i,e,t){return!e||e.profile?.blocked?!1:Kt.includes(i)?!0:e.tools.some(r=>r.enabled!==!1&&(t[r.id]===i||r.id==="editor"&&["editor.html?tool=remove","premium.html"].includes(i)))}var Gt=i=>{let e;return i?e=i:typeof fetch>"u"?e=(...t)=>import("./shared-DDMDY4E6.js").then(({default:r})=>r(...t)):e=fetch,(...t)=>e(...t)};var we=class extends Error{constructor(e,t="FunctionsError",r){super(e),this.name=t,this.context=r}},Ge=class extends we{constructor(e){super("Failed to send a request to the Edge Function","FunctionsFetchError",e)}},ye=class extends we{constructor(e){super("Relay Error invoking the Edge Function","FunctionsRelayError",e)}},be=class extends we{constructor(e){super("Edge Function returned a non-2xx status code","FunctionsHttpError",e)}},Je;(function(i){i.Any="any",i.ApNortheast1="ap-northeast-1",i.ApNortheast2="ap-northeast-2",i.ApSouth1="ap-south-1",i.ApSoutheast1="ap-southeast-1",i.ApSoutheast2="ap-southeast-2",i.CaCentral1="ca-central-1",i.EuCentral1="eu-central-1",i.EuWest1="eu-west-1",i.EuWest2="eu-west-2",i.EuWest3="eu-west-3",i.SaEast1="sa-east-1",i.UsEast1="us-east-1",i.UsWest1="us-west-1",i.UsWest2="us-west-2"})(Je||(Je={}));var cs=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})},Se=class{constructor(e,{headers:t={},customFetch:r,region:s=Je.Any}={}){this.url=e,this.headers=t,this.region=s,this.fetch=Gt(r)}setAuth(e){this.headers.Authorization=`Bearer ${e}`}invoke(e,t={}){var r;return cs(this,void 0,void 0,function*(){try{let{headers:s,method:n,body:o}=t,a={},{region:l}=t;l||(l=this.region);let h=new URL(`${this.url}/${e}`);l&&l!=="any"&&(a["x-region"]=l,h.searchParams.set("forceFunctionRegion",l));let c;o&&(s&&!Object.prototype.hasOwnProperty.call(s,"Content-Type")||!s)&&(typeof Blob<"u"&&o instanceof Blob||o instanceof ArrayBuffer?(a["Content-Type"]="application/octet-stream",c=o):typeof o=="string"?(a["Content-Type"]="text/plain",c=o):typeof FormData<"u"&&o instanceof FormData?c=o:(a["Content-Type"]="application/json",c=JSON.stringify(o)));let u=yield this.fetch(h.toString(),{method:n||"POST",headers:Object.assign(Object.assign(Object.assign({},a),this.headers),s),body:c}).catch(w=>{throw new Ge(w)}),d=u.headers.get("x-relay-error");if(d&&d==="true")throw new ye(u);if(!u.ok)throw new be(u);let f=((r=u.headers.get("Content-Type"))!==null&&r!==void 0?r:"text/plain").split(";")[0].trim(),p;return f==="application/json"?p=yield u.json():f==="application/octet-stream"?p=yield u.blob():f==="text/event-stream"?p=u:f==="multipart/form-data"?p=yield u.formData():p=yield u.text(),{data:p,error:null,response:u}}catch(s){return{data:null,error:s,response:s instanceof be||s instanceof ye?s.context:void 0}}})}};var ir=os(sr(),1),{PostgrestClient:nr,PostgrestQueryBuilder:Ti,PostgrestFilterBuilder:Ei,PostgrestTransformBuilder:xi,PostgrestBuilder:Ai,PostgrestError:ws}=ir.default;var At=class{static detectEnvironment(){var e;if(typeof WebSocket<"u")return{type:"native",constructor:WebSocket};if(typeof globalThis<"u"&&typeof globalThis.WebSocket<"u")return{type:"native",constructor:globalThis.WebSocket};if(typeof global<"u"&&typeof global.WebSocket<"u")return{type:"native",constructor:global.WebSocket};if(typeof globalThis<"u"&&typeof globalThis.WebSocketPair<"u"&&typeof globalThis.WebSocket>"u")return{type:"cloudflare",error:"Cloudflare Workers detected. WebSocket clients are not supported in Cloudflare Workers.",workaround:"Use Cloudflare Workers WebSocket API for server-side WebSocket handling, or deploy to a different runtime."};if(typeof globalThis<"u"&&globalThis.EdgeRuntime||typeof navigator<"u"&&(!((e=navigator.userAgent)===null||e===void 0)&&e.includes("Vercel-Edge")))return{type:"unsupported",error:"Edge runtime detected (Vercel Edge/Netlify Edge). WebSockets are not supported in edge functions.",workaround:"Use serverless functions or a different deployment target for WebSocket functionality."};if(typeof process<"u"){let t=process.versions;if(t&&t.node){let r=t.node,s=parseInt(r.replace(/^v/,"").split(".")[0]);return s>=22?typeof globalThis.WebSocket<"u"?{type:"native",constructor:globalThis.WebSocket}:{type:"unsupported",error:`Node.js ${s} detected but native WebSocket not found.`,workaround:"Provide a WebSocket implementation via the transport option."}:{type:"unsupported",error:`Node.js ${s} detected without native WebSocket support.`,workaround:`For Node.js < 22, install "ws" package and provide it via the transport option:\nimport ws from "ws"\nnew RealtimeClient(url, { transport: ws })`}}}return{type:"unsupported",error:"Unknown JavaScript runtime without WebSocket support.",workaround:"Ensure you\'re running in a supported environment (browser, Node.js, Deno) or provide a custom WebSocket implementation."}}static getWebSocketConstructor(){let e=this.detectEnvironment();if(e.constructor)return e.constructor;let t=e.error||"WebSocket not supported in this environment.";throw e.workaround&&(t+=`\n\nSuggested solution: ${e.workaround}`),new Error(t)}static createWebSocket(e,t){let r=this.getWebSocketConstructor();return new r(e,t)}static isWebSocketSupported(){try{let e=this.detectEnvironment();return e.type==="native"||e.type==="ws"}catch{return!1}}},Ot=At;var or="2.15.5";var ar=`realtime-js/${or}`,lr="1.0.0";var je=1e4,cr=1e3,hr=100,le;(function(i){i[i.connecting=0]="connecting",i[i.open=1]="open",i[i.closing=2]="closing",i[i.closed=3]="closed"})(le||(le={}));var x;(function(i){i.closed="closed",i.errored="errored",i.joined="joined",i.joining="joining",i.leaving="leaving"})(x||(x={}));var R;(function(i){i.close="phx_close",i.error="phx_error",i.join="phx_join",i.reply="phx_reply",i.leave="phx_leave",i.access_token="access_token"})(R||(R={}));var Qe;(function(i){i.websocket="websocket"})(Qe||(Qe={}));var q;(function(i){i.Connecting="connecting",i.Open="open",i.Closing="closing",i.Closed="closed"})(q||(q={}));var Re=class{constructor(){this.HEADER_LENGTH=1}decode(e,t){return e.constructor===ArrayBuffer?t(this._binaryDecode(e)):t(typeof e=="string"?JSON.parse(e):{})}_binaryDecode(e){let t=new DataView(e),r=new TextDecoder;return this._decodeBroadcast(e,t,r)}_decodeBroadcast(e,t,r){let s=t.getUint8(1),n=t.getUint8(2),o=this.HEADER_LENGTH+2,a=r.decode(e.slice(o,o+s));o=o+s;let l=r.decode(e.slice(o,o+n));o=o+n;let h=JSON.parse(r.decode(e.slice(o,e.byteLength)));return{ref:null,topic:a,event:l,payload:h}}};var W=class{constructor(e,t){this.callback=e,this.timerCalc=t,this.timer=void 0,this.tries=0,this.callback=e,this.timerCalc=t}reset(){this.tries=0,clearTimeout(this.timer),this.timer=void 0}scheduleTimeout(){clearTimeout(this.timer),this.timer=setTimeout(()=>{this.tries=this.tries+1,this.callback()},this.timerCalc(this.tries+1))}};var b;(function(i){i.abstime="abstime",i.bool="bool",i.date="date",i.daterange="daterange",i.float4="float4",i.float8="float8",i.int2="int2",i.int4="int4",i.int4range="int4range",i.int8="int8",i.int8range="int8range",i.json="json",i.jsonb="jsonb",i.money="money",i.numeric="numeric",i.oid="oid",i.reltime="reltime",i.text="text",i.time="time",i.timestamp="timestamp",i.timestamptz="timestamptz",i.timetz="timetz",i.tsrange="tsrange",i.tstzrange="tstzrange"})(b||(b={}));var Rt=(i,e,t={})=>{var r;let s=(r=t.skipTypes)!==null&&r!==void 0?r:[];return Object.keys(e).reduce((n,o)=>(n[o]=ys(o,i,e,s),n),{})},ys=(i,e,t,r)=>{let s=e.find(a=>a.name===i),n=s?.type,o=t[i];return n&&!r.includes(n)?ur(n,o):jt(o)},ur=(i,e)=>{if(i.charAt(0)==="_"){let t=i.slice(1,i.length);return Ts(e,t)}switch(i){case b.bool:return bs(e);case b.float4:case b.float8:case b.int2:case b.int4:case b.int8:case b.numeric:case b.oid:return Ss(e);case b.json:case b.jsonb:return ks(e);case b.timestamp:return Es(e);case b.abstime:case b.date:case b.daterange:case b.int4range:case b.int8range:case b.money:case b.reltime:case b.text:case b.time:case b.timestamptz:case b.timetz:case b.tsrange:case b.tstzrange:return jt(e);default:return jt(e)}},jt=i=>i,bs=i=>{switch(i){case"t":return!0;case"f":return!1;default:return i}},Ss=i=>{if(typeof i=="string"){let e=parseFloat(i);if(!Number.isNaN(e))return e}return i},ks=i=>{if(typeof i=="string")try{return JSON.parse(i)}catch(e){return console.log(`JSON parse error: ${e}`),i}return i},Ts=(i,e)=>{if(typeof i!="string")return i;let t=i.length-1,r=i[t];if(i[0]==="{"&&r==="}"){let n,o=i.slice(1,t);try{n=JSON.parse("["+o+"]")}catch{n=o?o.split(","):[]}return n.map(a=>ur(e,a))}return i},Es=i=>typeof i=="string"?i.replace(" ","T"):i,Ye=i=>{let e=i;return e=e.replace(/^ws/i,"http"),e=e.replace(/(\\/socket\\/websocket|\\/socket|\\/websocket)\\/?$/i,""),e.replace(/\\/+$/,"")+"/api/broadcast"};var H=class{constructor(e,t,r={},s=je){this.channel=e,this.event=t,this.payload=r,this.timeout=s,this.sent=!1,this.timeoutTimer=void 0,this.ref="",this.receivedResp=null,this.recHooks=[],this.refEvent=null}resend(e){this.timeout=e,this._cancelRefEvent(),this.ref="",this.refEvent=null,this.receivedResp=null,this.sent=!1,this.send()}send(){this._hasReceived("timeout")||(this.startTimeout(),this.sent=!0,this.channel.socket.push({topic:this.channel.topic,event:this.event,payload:this.payload,ref:this.ref,join_ref:this.channel._joinRef()}))}updatePayload(e){this.payload=Object.assign(Object.assign({},this.payload),e)}receive(e,t){var r;return this._hasReceived(e)&&t((r=this.receivedResp)===null||r===void 0?void 0:r.response),this.recHooks.push({status:e,callback:t}),this}startTimeout(){if(this.timeoutTimer)return;this.ref=this.channel.socket._makeRef(),this.refEvent=this.channel._replyEventName(this.ref);let e=t=>{this._cancelRefEvent(),this._cancelTimeout(),this.receivedResp=t,this._matchReceive(t)};this.channel._on(this.refEvent,{},e),this.timeoutTimer=setTimeout(()=>{this.trigger("timeout",{})},this.timeout)}trigger(e,t){this.refEvent&&this.channel._trigger(this.refEvent,{status:e,response:t})}destroy(){this._cancelRefEvent(),this._cancelTimeout()}_cancelRefEvent(){this.refEvent&&this.channel._off(this.refEvent,{})}_cancelTimeout(){clearTimeout(this.timeoutTimer),this.timeoutTimer=void 0}_matchReceive({status:e,response:t}){this.recHooks.filter(r=>r.status===e).forEach(r=>r.callback(t))}_hasReceived(e){return this.receivedResp&&this.receivedResp.status===e}};var Pt;(function(i){i.SYNC="sync",i.JOIN="join",i.LEAVE="leave"})(Pt||(Pt={}));var ce=class i{constructor(e,t){this.channel=e,this.state={},this.pendingDiffs=[],this.joinRef=null,this.enabled=!1,this.caller={onJoin:()=>{},onLeave:()=>{},onSync:()=>{}};let r=t?.events||{state:"presence_state",diff:"presence_diff"};this.channel._on(r.state,{},s=>{let{onJoin:n,onLeave:o,onSync:a}=this.caller;this.joinRef=this.channel._joinRef(),this.state=i.syncState(this.state,s,n,o),this.pendingDiffs.forEach(l=>{this.state=i.syncDiff(this.state,l,n,o)}),this.pendingDiffs=[],a()}),this.channel._on(r.diff,{},s=>{let{onJoin:n,onLeave:o,onSync:a}=this.caller;this.inPendingSyncState()?this.pendingDiffs.push(s):(this.state=i.syncDiff(this.state,s,n,o),a())}),this.onJoin((s,n,o)=>{this.channel._trigger("presence",{event:"join",key:s,currentPresences:n,newPresences:o})}),this.onLeave((s,n,o)=>{this.channel._trigger("presence",{event:"leave",key:s,currentPresences:n,leftPresences:o})}),this.onSync(()=>{this.channel._trigger("presence",{event:"sync"})})}static syncState(e,t,r,s){let n=this.cloneDeep(e),o=this.transformState(t),a={},l={};return this.map(n,(h,c)=>{o[h]||(l[h]=c)}),this.map(o,(h,c)=>{let u=n[h];if(u){let d=c.map(m=>m.presence_ref),f=u.map(m=>m.presence_ref),p=c.filter(m=>f.indexOf(m.presence_ref)<0),w=u.filter(m=>d.indexOf(m.presence_ref)<0);p.length>0&&(a[h]=p),w.length>0&&(l[h]=w)}else a[h]=c}),this.syncDiff(n,{joins:a,leaves:l},r,s)}static syncDiff(e,t,r,s){let{joins:n,leaves:o}={joins:this.transformState(t.joins),leaves:this.transformState(t.leaves)};return r||(r=()=>{}),s||(s=()=>{}),this.map(n,(a,l)=>{var h;let c=(h=e[a])!==null&&h!==void 0?h:[];if(e[a]=this.cloneDeep(l),c.length>0){let u=e[a].map(f=>f.presence_ref),d=c.filter(f=>u.indexOf(f.presence_ref)<0);e[a].unshift(...d)}r(a,c,l)}),this.map(o,(a,l)=>{let h=e[a];if(!h)return;let c=l.map(u=>u.presence_ref);h=h.filter(u=>c.indexOf(u.presence_ref)<0),e[a]=h,s(a,h,l),h.length===0&&delete e[a]}),e}static map(e,t){return Object.getOwnPropertyNames(e).map(r=>t(r,e[r]))}static transformState(e){return e=this.cloneDeep(e),Object.getOwnPropertyNames(e).reduce((t,r)=>{let s=e[r];return"metas"in s?t[r]=s.metas.map(n=>(n.presence_ref=n.phx_ref,delete n.phx_ref,delete n.phx_ref_prev,n)):t[r]=s,t},{})}static cloneDeep(e){return JSON.parse(JSON.stringify(e))}onJoin(e){this.caller.onJoin=e}onLeave(e){this.caller.onLeave=e}onSync(e){this.caller.onSync=e}inPendingSyncState(){return!this.joinRef||this.joinRef!==this.channel._joinRef()}};var Ct;(function(i){i.ALL="*",i.INSERT="INSERT",i.UPDATE="UPDATE",i.DELETE="DELETE"})(Ct||(Ct={}));var he;(function(i){i.BROADCAST="broadcast",i.PRESENCE="presence",i.POSTGRES_CHANGES="postgres_changes",i.SYSTEM="system"})(he||(he={}));var U;(function(i){i.SUBSCRIBED="SUBSCRIBED",i.TIMED_OUT="TIMED_OUT",i.CLOSED="CLOSED",i.CHANNEL_ERROR="CHANNEL_ERROR"})(U||(U={}));var ue=class i{constructor(e,t={config:{}},r){this.topic=e,this.params=t,this.socket=r,this.bindings={},this.state=x.closed,this.joinedOnce=!1,this.pushBuffer=[],this.subTopic=e.replace(/^realtime:/i,""),this.params.config=Object.assign({broadcast:{ack:!1,self:!1},presence:{key:"",enabled:!1},private:!1},t.config),this.timeout=this.socket.timeout,this.joinPush=new H(this,R.join,this.params,this.timeout),this.rejoinTimer=new W(()=>this._rejoinUntilConnected(),this.socket.reconnectAfterMs),this.joinPush.receive("ok",()=>{this.state=x.joined,this.rejoinTimer.reset(),this.pushBuffer.forEach(s=>s.send()),this.pushBuffer=[]}),this._onClose(()=>{this.rejoinTimer.reset(),this.socket.log("channel",`close ${this.topic} ${this._joinRef()}`),this.state=x.closed,this.socket._remove(this)}),this._onError(s=>{this._isLeaving()||this._isClosed()||(this.socket.log("channel",`error ${this.topic}`,s),this.state=x.errored,this.rejoinTimer.scheduleTimeout())}),this.joinPush.receive("timeout",()=>{this._isJoining()&&(this.socket.log("channel",`timeout ${this.topic}`,this.joinPush.timeout),this.state=x.errored,this.rejoinTimer.scheduleTimeout())}),this.joinPush.receive("error",s=>{this._isLeaving()||this._isClosed()||(this.socket.log("channel",`error ${this.topic}`,s),this.state=x.errored,this.rejoinTimer.scheduleTimeout())}),this._on(R.reply,{},(s,n)=>{this._trigger(this._replyEventName(n),s)}),this.presence=new ce(this),this.broadcastEndpointURL=Ye(this.socket.endPoint),this.private=this.params.config.private||!1}subscribe(e,t=this.timeout){var r,s,n;if(this.socket.isConnected()||this.socket.connect(),this.state==x.closed){let{config:{broadcast:o,presence:a,private:l}}=this.params,h=(s=(r=this.bindings.postgres_changes)===null||r===void 0?void 0:r.map(f=>f.filter))!==null&&s!==void 0?s:[],c=!!this.bindings[he.PRESENCE]&&this.bindings[he.PRESENCE].length>0||((n=this.params.config.presence)===null||n===void 0?void 0:n.enabled)===!0,u={},d={broadcast:o,presence:Object.assign(Object.assign({},a),{enabled:c}),postgres_changes:h,private:l};this.socket.accessTokenValue&&(u.access_token=this.socket.accessTokenValue),this._onError(f=>e?.(U.CHANNEL_ERROR,f)),this._onClose(()=>e?.(U.CLOSED)),this.updateJoinPayload(Object.assign({config:d},u)),this.joinedOnce=!0,this._rejoin(t),this.joinPush.receive("ok",async({postgres_changes:f})=>{var p;if(this.socket.setAuth(),f===void 0){e?.(U.SUBSCRIBED);return}else{let w=this.bindings.postgres_changes,m=(p=w?.length)!==null&&p!==void 0?p:0,S=[];for(let T=0;T<m;T++){let g=w[T],{filter:{event:y,schema:$,table:k,filter:O}}=g,oe=f&&f[T];if(oe&&oe.event===y&&oe.schema===$&&oe.table===k&&oe.filter===O)S.push(Object.assign(Object.assign({},g),{id:oe.id}));else{this.unsubscribe(),this.state=x.errored,e?.(U.CHANNEL_ERROR,new Error("mismatch between server and client bindings for postgres changes"));return}}this.bindings.postgres_changes=S,e&&e(U.SUBSCRIBED);return}}).receive("error",f=>{this.state=x.errored,e?.(U.CHANNEL_ERROR,new Error(JSON.stringify(Object.values(f).join(", ")||"error")))}).receive("timeout",()=>{e?.(U.TIMED_OUT)})}return this}presenceState(){return this.presence.state}async track(e,t={}){return await this.send({type:"presence",event:"track",payload:e},t.timeout||this.timeout)}async untrack(e={}){return await this.send({type:"presence",event:"untrack"},e)}on(e,t,r){return this.state===x.joined&&e===he.PRESENCE&&(this.socket.log("channel",`resubscribe to ${this.topic} due to change in presence callbacks on joined channel`),this.unsubscribe().then(()=>this.subscribe())),this._on(e,t,r)}async send(e,t={}){var r,s;if(!this._canPush()&&e.type==="broadcast"){let{event:n,payload:o}=e,l={method:"POST",headers:{Authorization:this.socket.accessTokenValue?`Bearer ${this.socket.accessTokenValue}`:"",apikey:this.socket.apiKey?this.socket.apiKey:"","Content-Type":"application/json"},body:JSON.stringify({messages:[{topic:this.subTopic,event:n,payload:o,private:this.private}]})};try{let h=await this._fetchWithTimeout(this.broadcastEndpointURL,l,(r=t.timeout)!==null&&r!==void 0?r:this.timeout);return await((s=h.body)===null||s===void 0?void 0:s.cancel()),h.ok?"ok":"error"}catch(h){return h.name==="AbortError"?"timed out":"error"}}else return new Promise(n=>{var o,a,l;let h=this._push(e.type,e,t.timeout||this.timeout);e.type==="broadcast"&&!(!((l=(a=(o=this.params)===null||o===void 0?void 0:o.config)===null||a===void 0?void 0:a.broadcast)===null||l===void 0)&&l.ack)&&n("ok"),h.receive("ok",()=>n("ok")),h.receive("error",()=>n("error")),h.receive("timeout",()=>n("timed out"))})}updateJoinPayload(e){this.joinPush.updatePayload(e)}unsubscribe(e=this.timeout){this.state=x.leaving;let t=()=>{this.socket.log("channel",`leave ${this.topic}`),this._trigger(R.close,"leave",this._joinRef())};this.joinPush.destroy();let r=null;return new Promise(s=>{r=new H(this,R.leave,{},e),r.receive("ok",()=>{t(),s("ok")}).receive("timeout",()=>{t(),s("timed out")}).receive("error",()=>{s("error")}),r.send(),this._canPush()||r.trigger("ok",{})}).finally(()=>{r?.destroy()})}teardown(){this.pushBuffer.forEach(e=>e.destroy()),this.pushBuffer=[],this.rejoinTimer.reset(),this.joinPush.destroy(),this.state=x.closed,this.bindings={}}async _fetchWithTimeout(e,t,r){let s=new AbortController,n=setTimeout(()=>s.abort(),r),o=await this.socket.fetch(e,Object.assign(Object.assign({},t),{signal:s.signal}));return clearTimeout(n),o}_push(e,t,r=this.timeout){if(!this.joinedOnce)throw`tried to push \'${e}\' to \'${this.topic}\' before joining. Use channel.subscribe() before pushing events`;let s=new H(this,e,t,r);return this._canPush()?s.send():this._addToPushBuffer(s),s}_addToPushBuffer(e){if(e.startTimeout(),this.pushBuffer.push(e),this.pushBuffer.length>hr){let t=this.pushBuffer.shift();t&&(t.destroy(),this.socket.log("channel",`discarded push due to buffer overflow: ${t.event}`,t.payload))}}_onMessage(e,t,r){return t}_isMember(e){return this.topic===e}_joinRef(){return this.joinPush.ref}_trigger(e,t,r){var s,n;let o=e.toLocaleLowerCase(),{close:a,error:l,leave:h,join:c}=R;if(r&&[a,l,h,c].indexOf(o)>=0&&r!==this._joinRef())return;let d=this._onMessage(o,t,r);if(t&&!d)throw"channel onMessage callbacks must return the payload, modified or unmodified";["insert","update","delete"].includes(o)?(s=this.bindings.postgres_changes)===null||s===void 0||s.filter(f=>{var p,w,m;return((p=f.filter)===null||p===void 0?void 0:p.event)==="*"||((m=(w=f.filter)===null||w===void 0?void 0:w.event)===null||m===void 0?void 0:m.toLocaleLowerCase())===o}).map(f=>f.callback(d,r)):(n=this.bindings[o])===null||n===void 0||n.filter(f=>{var p,w,m,S,T,g;if(["broadcast","presence","postgres_changes"].includes(o))if("id"in f){let y=f.id,$=(p=f.filter)===null||p===void 0?void 0:p.event;return y&&((w=t.ids)===null||w===void 0?void 0:w.includes(y))&&($==="*"||$?.toLocaleLowerCase()===((m=t.data)===null||m===void 0?void 0:m.type.toLocaleLowerCase()))}else{let y=(T=(S=f?.filter)===null||S===void 0?void 0:S.event)===null||T===void 0?void 0:T.toLocaleLowerCase();return y==="*"||y===((g=t?.event)===null||g===void 0?void 0:g.toLocaleLowerCase())}else return f.type.toLocaleLowerCase()===o}).map(f=>{if(typeof d=="object"&&"ids"in d){let p=d.data,{schema:w,table:m,commit_timestamp:S,type:T,errors:g}=p;d=Object.assign(Object.assign({},{schema:w,table:m,commit_timestamp:S,eventType:T,new:{},old:{},errors:g}),this._getPayloadRecords(p))}f.callback(d,r)})}_isClosed(){return this.state===x.closed}_isJoined(){return this.state===x.joined}_isJoining(){return this.state===x.joining}_isLeaving(){return this.state===x.leaving}_replyEventName(e){return`chan_reply_${e}`}_on(e,t,r){let s=e.toLocaleLowerCase(),n={type:s,filter:t,callback:r};return this.bindings[s]?this.bindings[s].push(n):this.bindings[s]=[n],this}_off(e,t){let r=e.toLocaleLowerCase();return this.bindings[r]&&(this.bindings[r]=this.bindings[r].filter(s=>{var n;return!(((n=s.type)===null||n===void 0?void 0:n.toLocaleLowerCase())===r&&i.isEqual(s.filter,t))})),this}static isEqual(e,t){if(Object.keys(e).length!==Object.keys(t).length)return!1;for(let r in e)if(e[r]!==t[r])return!1;return!0}_rejoinUntilConnected(){this.rejoinTimer.scheduleTimeout(),this.socket.isConnected()&&this._rejoin()}_onClose(e){this._on(R.close,{},e)}_onError(e){this._on(R.error,{},t=>e(t))}_canPush(){return this.socket.isConnected()&&this._isJoined()}_rejoin(e=this.timeout){this._isLeaving()||(this.socket._leaveOpenTopic(this.topic),this.state=x.joining,this.joinPush.resend(e))}_getPayloadRecords(e){let t={new:{},old:{}};return(e.type==="INSERT"||e.type==="UPDATE")&&(t.new=Rt(e.columns,e.record)),(e.type==="UPDATE"||e.type==="DELETE")&&(t.old=Rt(e.columns,e.old_record)),t}};var It=()=>{},Xe={HEARTBEAT_INTERVAL:25e3,RECONNECT_DELAY:10,HEARTBEAT_TIMEOUT_FALLBACK:100},As=[1e3,2e3,5e3,1e4],Os=1e4,js=`\n  addEventListener("message", (e) => {\n    if (e.data.event === "start") {\n      setInterval(() => postMessage({ event: "keepAlive" }), e.data.interval);\n    }\n  });`,de=class{constructor(e,t){var r;if(this.accessTokenValue=null,this.apiKey=null,this.channels=new Array,this.endPoint="",this.httpEndpoint="",this.headers={},this.params={},this.timeout=je,this.transport=null,this.heartbeatIntervalMs=Xe.HEARTBEAT_INTERVAL,this.heartbeatTimer=void 0,this.pendingHeartbeatRef=null,this.heartbeatCallback=It,this.ref=0,this.reconnectTimer=null,this.logger=It,this.conn=null,this.sendBuffer=[],this.serializer=new Re,this.stateChangeCallbacks={open:[],close:[],error:[],message:[]},this.accessToken=null,this._connectionState="disconnected",this._wasManualDisconnect=!1,this._authPromise=null,this._resolveFetch=s=>{let n;return s?n=s:typeof fetch>"u"?n=(...o)=>import("./shared-DDMDY4E6.js").then(({default:a})=>a(...o)).catch(a=>{throw new Error(`Failed to load @supabase/node-fetch: ${a.message}. This is required for HTTP requests in Node.js environments without native fetch.`)}):n=fetch,(...o)=>n(...o)},!(!((r=t?.params)===null||r===void 0)&&r.apikey))throw new Error("API key is required to connect to Realtime");this.apiKey=t.params.apikey,this.endPoint=`${e}/${Qe.websocket}`,this.httpEndpoint=Ye(e),this._initializeOptions(t),this._setupReconnectionTimer(),this.fetch=this._resolveFetch(t?.fetch)}connect(){if(!(this.isConnecting()||this.isDisconnecting()||this.conn!==null&&this.isConnected())){if(this._setConnectionState("connecting"),this._setAuthSafely("connect"),this.transport)this.conn=new this.transport(this.endpointURL());else try{this.conn=Ot.createWebSocket(this.endpointURL())}catch(e){this._setConnectionState("disconnected");let t=e.message;throw t.includes("Node.js")?new Error(`${t}\n\nTo use Realtime in Node.js, you need to provide a WebSocket implementation:\n\nOption 1: Use Node.js 22+ which has native WebSocket support\nOption 2: Install and provide the "ws" package:\n\n  npm install ws\n\n  import ws from "ws"\n  const client = new RealtimeClient(url, {\n    ...options,\n    transport: ws\n  })`):new Error(`WebSocket not available: ${t}`)}this._setupConnectionHandlers()}}endpointURL(){return this._appendParams(this.endPoint,Object.assign({},this.params,{vsn:lr}))}disconnect(e,t){if(!this.isDisconnecting())if(this._setConnectionState("disconnecting",!0),this.conn){let r=setTimeout(()=>{this._setConnectionState("disconnected")},100);this.conn.onclose=()=>{clearTimeout(r),this._setConnectionState("disconnected")},e?this.conn.close(e,t??""):this.conn.close(),this._teardownConnection()}else this._setConnectionState("disconnected")}getChannels(){return this.channels}async removeChannel(e){let t=await e.unsubscribe();return this.channels.length===0&&this.disconnect(),t}async removeAllChannels(){let e=await Promise.all(this.channels.map(t=>t.unsubscribe()));return this.channels=[],this.disconnect(),e}log(e,t,r){this.logger(e,t,r)}connectionState(){switch(this.conn&&this.conn.readyState){case le.connecting:return q.Connecting;case le.open:return q.Open;case le.closing:return q.Closing;default:return q.Closed}}isConnected(){return this.connectionState()===q.Open}isConnecting(){return this._connectionState==="connecting"}isDisconnecting(){return this._connectionState==="disconnecting"}channel(e,t={config:{}}){let r=`realtime:${e}`,s=this.getChannels().find(n=>n.topic===r);if(s)return s;{let n=new ue(`realtime:${e}`,t,this);return this.channels.push(n),n}}push(e){let{topic:t,event:r,payload:s,ref:n}=e,o=()=>{this.encode(e,a=>{var l;(l=this.conn)===null||l===void 0||l.send(a)})};this.log("push",`${t} ${r} (${n})`,s),this.isConnected()?o():this.sendBuffer.push(o)}async setAuth(e=null){this._authPromise=this._performAuth(e);try{await this._authPromise}finally{this._authPromise=null}}async sendHeartbeat(){var e;if(!this.isConnected()){try{this.heartbeatCallback("disconnected")}catch(t){this.log("error","error in heartbeat callback",t)}return}if(this.pendingHeartbeatRef){this.pendingHeartbeatRef=null,this.log("transport","heartbeat timeout. Attempting to re-establish connection");try{this.heartbeatCallback("timeout")}catch(t){this.log("error","error in heartbeat callback",t)}this._wasManualDisconnect=!1,(e=this.conn)===null||e===void 0||e.close(cr,"heartbeat timeout"),setTimeout(()=>{var t;this.isConnected()||(t=this.reconnectTimer)===null||t===void 0||t.scheduleTimeout()},Xe.HEARTBEAT_TIMEOUT_FALLBACK);return}this.pendingHeartbeatRef=this._makeRef(),this.push({topic:"phoenix",event:"heartbeat",payload:{},ref:this.pendingHeartbeatRef});try{this.heartbeatCallback("sent")}catch(t){this.log("error","error in heartbeat callback",t)}this._setAuthSafely("heartbeat")}onHeartbeat(e){this.heartbeatCallback=e}flushSendBuffer(){this.isConnected()&&this.sendBuffer.length>0&&(this.sendBuffer.forEach(e=>e()),this.sendBuffer=[])}_makeRef(){let e=this.ref+1;return e===this.ref?this.ref=0:this.ref=e,this.ref.toString()}_leaveOpenTopic(e){let t=this.channels.find(r=>r.topic===e&&(r._isJoined()||r._isJoining()));t&&(this.log("transport",`leaving duplicate topic "${e}"`),t.unsubscribe())}_remove(e){this.channels=this.channels.filter(t=>t.topic!==e.topic)}_onConnMessage(e){this.decode(e.data,t=>{if(t.topic==="phoenix"&&t.event==="phx_reply")try{this.heartbeatCallback(t.payload.status==="ok"?"ok":"error")}catch(h){this.log("error","error in heartbeat callback",h)}t.ref&&t.ref===this.pendingHeartbeatRef&&(this.pendingHeartbeatRef=null);let{topic:r,event:s,payload:n,ref:o}=t,a=o?`(${o})`:"",l=n.status||"";this.log("receive",`${l} ${r} ${s} ${a}`.trim(),n),this.channels.filter(h=>h._isMember(r)).forEach(h=>h._trigger(s,n,o)),this._triggerStateCallbacks("message",t)})}_clearTimer(e){var t;e==="heartbeat"&&this.heartbeatTimer?(clearInterval(this.heartbeatTimer),this.heartbeatTimer=void 0):e==="reconnect"&&((t=this.reconnectTimer)===null||t===void 0||t.reset())}_clearAllTimers(){this._clearTimer("heartbeat"),this._clearTimer("reconnect")}_setupConnectionHandlers(){this.conn&&("binaryType"in this.conn&&(this.conn.binaryType="arraybuffer"),this.conn.onopen=()=>this._onConnOpen(),this.conn.onerror=e=>this._onConnError(e),this.conn.onmessage=e=>this._onConnMessage(e),this.conn.onclose=e=>this._onConnClose(e))}_teardownConnection(){this.conn&&(this.conn.onopen=null,this.conn.onerror=null,this.conn.onmessage=null,this.conn.onclose=null,this.conn=null),this._clearAllTimers(),this.channels.forEach(e=>e.teardown())}_onConnOpen(){this._setConnectionState("connected"),this.log("transport",`connected to ${this.endpointURL()}`),this.flushSendBuffer(),this._clearTimer("reconnect"),this.worker?this.workerRef||this._startWorkerHeartbeat():this._startHeartbeat(),this._triggerStateCallbacks("open")}_startHeartbeat(){this.heartbeatTimer&&clearInterval(this.heartbeatTimer),this.heartbeatTimer=setInterval(()=>this.sendHeartbeat(),this.heartbeatIntervalMs)}_startWorkerHeartbeat(){this.workerUrl?this.log("worker",`starting worker for from ${this.workerUrl}`):this.log("worker","starting default worker");let e=this._workerObjectUrl(this.workerUrl);this.workerRef=new Worker(e),this.workerRef.onerror=t=>{this.log("worker","worker error",t.message),this.workerRef.terminate()},this.workerRef.onmessage=t=>{t.data.event==="keepAlive"&&this.sendHeartbeat()},this.workerRef.postMessage({event:"start",interval:this.heartbeatIntervalMs})}_onConnClose(e){var t;this._setConnectionState("disconnected"),this.log("transport","close",e),this._triggerChanError(),this._clearTimer("heartbeat"),this._wasManualDisconnect||(t=this.reconnectTimer)===null||t===void 0||t.scheduleTimeout(),this._triggerStateCallbacks("close",e)}_onConnError(e){this._setConnectionState("disconnected"),this.log("transport",`${e}`),this._triggerChanError(),this._triggerStateCallbacks("error",e)}_triggerChanError(){this.channels.forEach(e=>e._trigger(R.error))}_appendParams(e,t){if(Object.keys(t).length===0)return e;let r=e.match(/\\?/)?"&":"?",s=new URLSearchParams(t);return`${e}${r}${s}`}_workerObjectUrl(e){let t;if(e)t=e;else{let r=new Blob([js],{type:"application/javascript"});t=URL.createObjectURL(r)}return t}_setConnectionState(e,t=!1){this._connectionState=e,e==="connecting"?this._wasManualDisconnect=!1:e==="disconnecting"&&(this._wasManualDisconnect=t)}async _performAuth(e=null){let t;e?t=e:this.accessToken?t=await this.accessToken():t=this.accessTokenValue,this.accessTokenValue!=t&&(this.accessTokenValue=t,this.channels.forEach(r=>{let s={access_token:t,version:ar};t&&r.updateJoinPayload(s),r.joinedOnce&&r._isJoined()&&r._push(R.access_token,{access_token:t})}))}async _waitForAuthIfNeeded(){this._authPromise&&await this._authPromise}_setAuthSafely(e="general"){this.setAuth().catch(t=>{this.log("error",`error setting auth in ${e}`,t)})}_triggerStateCallbacks(e,t){try{this.stateChangeCallbacks[e].forEach(r=>{try{r(t)}catch(s){this.log("error",`error in ${e} callback`,s)}})}catch(r){this.log("error",`error triggering ${e} callbacks`,r)}}_setupReconnectionTimer(){this.reconnectTimer=new W(async()=>{setTimeout(async()=>{await this._waitForAuthIfNeeded(),this.isConnected()||this.connect()},Xe.RECONNECT_DELAY)},this.reconnectAfterMs)}_initializeOptions(e){var t,r,s,n,o,a,l,h,c;if(this.transport=(t=e?.transport)!==null&&t!==void 0?t:null,this.timeout=(r=e?.timeout)!==null&&r!==void 0?r:je,this.heartbeatIntervalMs=(s=e?.heartbeatIntervalMs)!==null&&s!==void 0?s:Xe.HEARTBEAT_INTERVAL,this.worker=(n=e?.worker)!==null&&n!==void 0?n:!1,this.accessToken=(o=e?.accessToken)!==null&&o!==void 0?o:null,this.heartbeatCallback=(a=e?.heartbeatCallback)!==null&&a!==void 0?a:It,e?.params&&(this.params=e.params),e?.logger&&(this.logger=e.logger),(e?.logLevel||e?.log_level)&&(this.logLevel=e.logLevel||e.log_level,this.params=Object.assign(Object.assign({},this.params),{log_level:this.logLevel})),this.reconnectAfterMs=(l=e?.reconnectAfterMs)!==null&&l!==void 0?l:(u=>As[u-1]||Os),this.encode=(h=e?.encode)!==null&&h!==void 0?h:((u,d)=>d(JSON.stringify(u))),this.decode=(c=e?.decode)!==null&&c!==void 0?c:this.serializer.decode.bind(this.serializer),this.worker){if(typeof window<"u"&&!window.Worker)throw new Error("Web Worker is not supported");this.workerUrl=e?.workerUrl}}};var fe=class extends Error{constructor(e){super(e),this.__isStorageError=!0,this.name="StorageError"}};function E(i){return typeof i=="object"&&i!==null&&"__isStorageError"in i}var Ze=class extends fe{constructor(e,t,r){super(e),this.name="StorageApiError",this.status=t,this.statusCode=r}toJSON(){return{name:this.name,message:this.message,status:this.status,statusCode:this.statusCode}}},K=class extends fe{constructor(e,t){super(e),this.name="StorageUnknownError",this.originalError=t}};var Rs=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})},tt=i=>{let e;return i?e=i:typeof fetch>"u"?e=(...t)=>import("./shared-DDMDY4E6.js").then(({default:r})=>r(...t)):e=fetch,(...t)=>e(...t)},dr=()=>Rs(void 0,void 0,void 0,function*(){return typeof Response>"u"?(yield import("./shared-DDMDY4E6.js")).Response:Response}),et=i=>{if(Array.isArray(i))return i.map(t=>et(t));if(typeof i=="function"||i!==Object(i))return i;let e={};return Object.entries(i).forEach(([t,r])=>{let s=t.replace(/([-_][a-z])/gi,n=>n.toUpperCase().replace(/[-_]/g,""));e[s]=et(r)}),e},fr=i=>{if(typeof i!="object"||i===null)return!1;let e=Object.getPrototypeOf(i);return(e===null||e===Object.prototype||Object.getPrototypeOf(e)===null)&&!(Symbol.toStringTag in i)&&!(Symbol.iterator in i)};var z=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})},$t=i=>i.msg||i.message||i.error_description||i.error||JSON.stringify(i),Ps=(i,e,t)=>z(void 0,void 0,void 0,function*(){let r=yield dr();i instanceof r&&!t?.noResolveJson?i.json().then(s=>{let n=i.status||500,o=s?.statusCode||n+"";e(new Ze($t(s),n,o))}).catch(s=>{e(new K($t(s),s))}):e(new K($t(i),i))}),Cs=(i,e,t,r)=>{let s={method:i,headers:e?.headers||{}};return i==="GET"||!r?s:(fr(r)?(s.headers=Object.assign({"Content-Type":"application/json"},e?.headers),s.body=JSON.stringify(r)):s.body=r,e?.duplex&&(s.duplex=e.duplex),Object.assign(Object.assign({},s),t))};function Pe(i,e,t,r,s,n){return z(this,void 0,void 0,function*(){return new Promise((o,a)=>{i(t,Cs(e,r,s,n)).then(l=>{if(!l.ok)throw l;return r?.noResolveJson?l:l.json()}).then(l=>o(l)).catch(l=>Ps(l,a,r))})})}function pe(i,e,t,r){return z(this,void 0,void 0,function*(){return Pe(i,"GET",e,t,r)})}function P(i,e,t,r,s){return z(this,void 0,void 0,function*(){return Pe(i,"POST",e,r,s,t)})}function Ce(i,e,t,r,s){return z(this,void 0,void 0,function*(){return Pe(i,"PUT",e,r,s,t)})}function pr(i,e,t,r){return z(this,void 0,void 0,function*(){return Pe(i,"HEAD",e,Object.assign(Object.assign({},t),{noResolveJson:!0}),r)})}function rt(i,e,t,r,s){return z(this,void 0,void 0,function*(){return Pe(i,"DELETE",e,r,s,t)})}var j=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})},Is={limit:100,offset:0,sortBy:{column:"name",order:"asc"}},gr={cacheControl:"3600",contentType:"text/plain;charset=UTF-8",upsert:!1},Ie=class{constructor(e,t={},r,s){this.shouldThrowOnError=!1,this.url=e,this.headers=t,this.bucketId=r,this.fetch=tt(s)}throwOnError(){return this.shouldThrowOnError=!0,this}uploadOrUpdate(e,t,r,s){return j(this,void 0,void 0,function*(){try{let n,o=Object.assign(Object.assign({},gr),s),a=Object.assign(Object.assign({},this.headers),e==="POST"&&{"x-upsert":String(o.upsert)}),l=o.metadata;typeof Blob<"u"&&r instanceof Blob?(n=new FormData,n.append("cacheControl",o.cacheControl),l&&n.append("metadata",this.encodeMetadata(l)),n.append("",r)):typeof FormData<"u"&&r instanceof FormData?(n=r,n.append("cacheControl",o.cacheControl),l&&n.append("metadata",this.encodeMetadata(l))):(n=r,a["cache-control"]=`max-age=${o.cacheControl}`,a["content-type"]=o.contentType,l&&(a["x-metadata"]=this.toBase64(this.encodeMetadata(l)))),s?.headers&&(a=Object.assign(Object.assign({},a),s.headers));let h=this._removeEmptyFolders(t),c=this._getFinalPath(h),u=yield(e=="PUT"?Ce:P)(this.fetch,`${this.url}/object/${c}`,n,Object.assign({headers:a},o?.duplex?{duplex:o.duplex}:{}));return{data:{path:h,id:u.Id,fullPath:u.Key},error:null}}catch(n){if(this.shouldThrowOnError)throw n;if(E(n))return{data:null,error:n};throw n}})}upload(e,t,r){return j(this,void 0,void 0,function*(){return this.uploadOrUpdate("POST",e,t,r)})}uploadToSignedUrl(e,t,r,s){return j(this,void 0,void 0,function*(){let n=this._removeEmptyFolders(e),o=this._getFinalPath(n),a=new URL(this.url+`/object/upload/sign/${o}`);a.searchParams.set("token",t);try{let l,h=Object.assign({upsert:gr.upsert},s),c=Object.assign(Object.assign({},this.headers),{"x-upsert":String(h.upsert)});typeof Blob<"u"&&r instanceof Blob?(l=new FormData,l.append("cacheControl",h.cacheControl),l.append("",r)):typeof FormData<"u"&&r instanceof FormData?(l=r,l.append("cacheControl",h.cacheControl)):(l=r,c["cache-control"]=`max-age=${h.cacheControl}`,c["content-type"]=h.contentType);let u=yield Ce(this.fetch,a.toString(),l,{headers:c});return{data:{path:n,fullPath:u.Key},error:null}}catch(l){if(this.shouldThrowOnError)throw l;if(E(l))return{data:null,error:l};throw l}})}createSignedUploadUrl(e,t){return j(this,void 0,void 0,function*(){try{let r=this._getFinalPath(e),s=Object.assign({},this.headers);t?.upsert&&(s["x-upsert"]="true");let n=yield P(this.fetch,`${this.url}/object/upload/sign/${r}`,{},{headers:s}),o=new URL(this.url+n.url),a=o.searchParams.get("token");if(!a)throw new fe("No token returned by API");return{data:{signedUrl:o.toString(),path:e,token:a},error:null}}catch(r){if(this.shouldThrowOnError)throw r;if(E(r))return{data:null,error:r};throw r}})}update(e,t,r){return j(this,void 0,void 0,function*(){return this.uploadOrUpdate("PUT",e,t,r)})}move(e,t,r){return j(this,void 0,void 0,function*(){try{return{data:yield P(this.fetch,`${this.url}/object/move`,{bucketId:this.bucketId,sourceKey:e,destinationKey:t,destinationBucket:r?.destinationBucket},{headers:this.headers}),error:null}}catch(s){if(this.shouldThrowOnError)throw s;if(E(s))return{data:null,error:s};throw s}})}copy(e,t,r){return j(this,void 0,void 0,function*(){try{return{data:{path:(yield P(this.fetch,`${this.url}/object/copy`,{bucketId:this.bucketId,sourceKey:e,destinationKey:t,destinationBucket:r?.destinationBucket},{headers:this.headers})).Key},error:null}}catch(s){if(this.shouldThrowOnError)throw s;if(E(s))return{data:null,error:s};throw s}})}createSignedUrl(e,t,r){return j(this,void 0,void 0,function*(){try{let s=this._getFinalPath(e),n=yield P(this.fetch,`${this.url}/object/sign/${s}`,Object.assign({expiresIn:t},r?.transform?{transform:r.transform}:{}),{headers:this.headers}),o=r?.download?`&download=${r.download===!0?"":r.download}`:"";return n={signedUrl:encodeURI(`${this.url}${n.signedURL}${o}`)},{data:n,error:null}}catch(s){if(this.shouldThrowOnError)throw s;if(E(s))return{data:null,error:s};throw s}})}createSignedUrls(e,t,r){return j(this,void 0,void 0,function*(){try{let s=yield P(this.fetch,`${this.url}/object/sign/${this.bucketId}`,{expiresIn:t,paths:e},{headers:this.headers}),n=r?.download?`&download=${r.download===!0?"":r.download}`:"";return{data:s.map(o=>Object.assign(Object.assign({},o),{signedUrl:o.signedURL?encodeURI(`${this.url}${o.signedURL}${n}`):null})),error:null}}catch(s){if(this.shouldThrowOnError)throw s;if(E(s))return{data:null,error:s};throw s}})}download(e,t){return j(this,void 0,void 0,function*(){let s=typeof t?.transform<"u"?"render/image/authenticated":"object",n=this.transformOptsToQueryString(t?.transform||{}),o=n?`?${n}`:"";try{let a=this._getFinalPath(e);return{data:yield(yield pe(this.fetch,`${this.url}/${s}/${a}${o}`,{headers:this.headers,noResolveJson:!0})).blob(),error:null}}catch(a){if(this.shouldThrowOnError)throw a;if(E(a))return{data:null,error:a};throw a}})}info(e){return j(this,void 0,void 0,function*(){let t=this._getFinalPath(e);try{let r=yield pe(this.fetch,`${this.url}/object/info/${t}`,{headers:this.headers});return{data:et(r),error:null}}catch(r){if(this.shouldThrowOnError)throw r;if(E(r))return{data:null,error:r};throw r}})}exists(e){return j(this,void 0,void 0,function*(){let t=this._getFinalPath(e);try{return yield pr(this.fetch,`${this.url}/object/${t}`,{headers:this.headers}),{data:!0,error:null}}catch(r){if(this.shouldThrowOnError)throw r;if(E(r)&&r instanceof K){let s=r.originalError;if([400,404].includes(s?.status))return{data:!1,error:r}}throw r}})}getPublicUrl(e,t){let r=this._getFinalPath(e),s=[],n=t?.download?`download=${t.download===!0?"":t.download}`:"";n!==""&&s.push(n);let a=typeof t?.transform<"u"?"render/image":"object",l=this.transformOptsToQueryString(t?.transform||{});l!==""&&s.push(l);let h=s.join("&");return h!==""&&(h=`?${h}`),{data:{publicUrl:encodeURI(`${this.url}/${a}/public/${r}${h}`)}}}remove(e){return j(this,void 0,void 0,function*(){try{return{data:yield rt(this.fetch,`${this.url}/object/${this.bucketId}`,{prefixes:e},{headers:this.headers}),error:null}}catch(t){if(this.shouldThrowOnError)throw t;if(E(t))return{data:null,error:t};throw t}})}list(e,t,r){return j(this,void 0,void 0,function*(){try{let s=Object.assign(Object.assign(Object.assign({},Is),t),{prefix:e||""});return{data:yield P(this.fetch,`${this.url}/object/list/${this.bucketId}`,s,{headers:this.headers},r),error:null}}catch(s){if(this.shouldThrowOnError)throw s;if(E(s))return{data:null,error:s};throw s}})}listV2(e,t){return j(this,void 0,void 0,function*(){try{let r=Object.assign({},e);return{data:yield P(this.fetch,`${this.url}/object/list-v2/${this.bucketId}`,r,{headers:this.headers},t),error:null}}catch(r){if(this.shouldThrowOnError)throw r;if(E(r))return{data:null,error:r};throw r}})}encodeMetadata(e){return JSON.stringify(e)}toBase64(e){return typeof Buffer<"u"?Buffer.from(e).toString("base64"):btoa(e)}_getFinalPath(e){return`${this.bucketId}/${e.replace(/^\\/+/,"")}`}_removeEmptyFolders(e){return e.replace(/^\\/|\\/$/g,"").replace(/\\/+/g,"/")}transformOptsToQueryString(e){let t=[];return e.width&&t.push(`width=${e.width}`),e.height&&t.push(`height=${e.height}`),e.resize&&t.push(`resize=${e.resize}`),e.format&&t.push(`format=${e.format}`),e.quality&&t.push(`quality=${e.quality}`),t.join("&")}};var _r="2.12.1";var mr={"X-Client-Info":`storage-js/${_r}`};var ge=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})},$e=class{constructor(e,t={},r,s){this.shouldThrowOnError=!1;let n=new URL(e);s?.useNewHostname&&/supabase\\.(co|in|red)$/.test(n.hostname)&&!n.hostname.includes("storage.supabase.")&&(n.hostname=n.hostname.replace("supabase.","storage.supabase.")),this.url=n.href,this.headers=Object.assign(Object.assign({},mr),t),this.fetch=tt(r)}throwOnError(){return this.shouldThrowOnError=!0,this}listBuckets(){return ge(this,void 0,void 0,function*(){try{return{data:yield pe(this.fetch,`${this.url}/bucket`,{headers:this.headers}),error:null}}catch(e){if(this.shouldThrowOnError)throw e;if(E(e))return{data:null,error:e};throw e}})}getBucket(e){return ge(this,void 0,void 0,function*(){try{return{data:yield pe(this.fetch,`${this.url}/bucket/${e}`,{headers:this.headers}),error:null}}catch(t){if(this.shouldThrowOnError)throw t;if(E(t))return{data:null,error:t};throw t}})}createBucket(e,t={public:!1}){return ge(this,void 0,void 0,function*(){try{return{data:yield P(this.fetch,`${this.url}/bucket`,{id:e,name:e,type:t.type,public:t.public,file_size_limit:t.fileSizeLimit,allowed_mime_types:t.allowedMimeTypes},{headers:this.headers}),error:null}}catch(r){if(this.shouldThrowOnError)throw r;if(E(r))return{data:null,error:r};throw r}})}updateBucket(e,t){return ge(this,void 0,void 0,function*(){try{return{data:yield Ce(this.fetch,`${this.url}/bucket/${e}`,{id:e,name:e,public:t.public,file_size_limit:t.fileSizeLimit,allowed_mime_types:t.allowedMimeTypes},{headers:this.headers}),error:null}}catch(r){if(this.shouldThrowOnError)throw r;if(E(r))return{data:null,error:r};throw r}})}emptyBucket(e){return ge(this,void 0,void 0,function*(){try{return{data:yield P(this.fetch,`${this.url}/bucket/${e}/empty`,{},{headers:this.headers}),error:null}}catch(t){if(this.shouldThrowOnError)throw t;if(E(t))return{data:null,error:t};throw t}})}deleteBucket(e){return ge(this,void 0,void 0,function*(){try{return{data:yield rt(this.fetch,`${this.url}/bucket/${e}`,{},{headers:this.headers}),error:null}}catch(t){if(this.shouldThrowOnError)throw t;if(E(t))return{data:null,error:t};throw t}})}};var Ue=class extends $e{constructor(e,t={},r,s){super(e,t,r,s)}from(e){return new Ie(this.url,this.headers,e,this.fetch)}};var vr="2.57.4";var Le="";typeof Deno<"u"?Le="deno":typeof document<"u"?Le="web":typeof navigator<"u"&&navigator.product==="ReactNative"?Le="react-native":Le="node";var $s={"X-Client-Info":`supabase-js-${Le}/${vr}`},wr={headers:$s},yr={schema:"public"},br={autoRefreshToken:!0,persistSession:!0,detectSessionInUrl:!0,flowType:"implicit"},Sr={};Ht();var Us=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})},Ls=i=>{let e;return i?e=i:typeof fetch>"u"?e=Mt:e=fetch,(...t)=>e(...t)},Ns=()=>typeof Headers>"u"?Wt:Headers,kr=(i,e,t)=>{let r=Ls(t),s=Ns();return(n,o)=>Us(void 0,void 0,void 0,function*(){var a;let l=(a=yield e())!==null&&a!==void 0?a:i,h=new s(o?.headers);return h.has("apikey")||h.set("apikey",i),h.has("Authorization")||h.set("Authorization",`Bearer ${l}`),r(n,Object.assign(Object.assign({},o),{headers:h}))})};var Ds=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})};function Bs(i){return i.endsWith("/")?i:i+"/"}function Tr(i,e){var t,r;let{db:s,auth:n,realtime:o,global:a}=i,{db:l,auth:h,realtime:c,global:u}=e,d={db:Object.assign(Object.assign({},l),s),auth:Object.assign(Object.assign({},h),n),realtime:Object.assign(Object.assign({},c),o),storage:{},global:Object.assign(Object.assign(Object.assign({},u),a),{headers:Object.assign(Object.assign({},(t=u?.headers)!==null&&t!==void 0?t:{}),(r=a?.headers)!==null&&r!==void 0?r:{})}),accessToken:()=>Ds(this,void 0,void 0,function*(){return""})};return i.accessToken?d.accessToken=i.accessToken:delete d.accessToken,d}function Er(i){let e=i?.trim();if(!e)throw new Error("supabaseUrl is required.");if(!e.match(/^https?:\\/\\//i))throw new Error("Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.");try{return new URL(Bs(e))}catch{throw Error("Invalid supabaseUrl: Provided URL is malformed.")}}var st="2.71.1";var G=30*1e3,it=3,nt=it*G,xr="http://localhost:9999",Ar="supabase.auth.token";var Or={"X-Client-Info":`gotrue-js/${st}`};var Ne="X-Supabase-Api-Version",Ut={"2024-01-01":{timestamp:Date.parse("2024-01-01T00:00:00.0Z"),name:"2024-01-01"}},jr=/^([a-z0-9_-]{4})*($|[a-z0-9_-]{3}$|[a-z0-9_-]{2}$)$/i,Rr=600*1e3;var De=class extends Error{constructor(e,t,r){super(e),this.__isAuthError=!0,this.name="AuthError",this.status=t,this.code=r}};function _(i){return typeof i=="object"&&i!==null&&"__isAuthError"in i}var ot=class extends De{constructor(e,t,r){super(e,t,r),this.name="AuthApiError",this.status=t,this.code=r}};function Pr(i){return _(i)&&i.name==="AuthApiError"}var _e=class extends De{constructor(e,t){super(e),this.name="AuthUnknownError",this.originalError=t}},L=class extends De{constructor(e,t,r,s){super(e,r,s),this.name=t,this.status=r}},C=class extends L{constructor(){super("Auth session missing!","AuthSessionMissingError",400,void 0)}};function Cr(i){return _(i)&&i.name==="AuthSessionMissingError"}var J=class extends L{constructor(){super("Auth session or user missing","AuthInvalidTokenResponseError",500,void 0)}},V=class extends L{constructor(e){super(e,"AuthInvalidCredentialsError",400,void 0)}},Q=class extends L{constructor(e,t=null){super(e,"AuthImplicitGrantRedirectError",500,void 0),this.details=null,this.details=t}toJSON(){return{name:this.name,message:this.message,status:this.status,details:this.details}}};function Ir(i){return _(i)&&i.name==="AuthImplicitGrantRedirectError"}var Be=class extends L{constructor(e,t=null){super(e,"AuthPKCEGrantCodeExchangeError",500,void 0),this.details=null,this.details=t}toJSON(){return{name:this.name,message:this.message,status:this.status,details:this.details}}},me=class extends L{constructor(e,t){super(e,"AuthRetryableFetchError",t,void 0)}};function at(i){return _(i)&&i.name==="AuthRetryableFetchError"}var qe=class extends L{constructor(e,t,r){super(e,"AuthWeakPasswordError",t,"weak_password"),this.reasons=r}};var Y=class extends L{constructor(e){super(e,"AuthInvalidJwtError",400,"invalid_jwt")}};var lt="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".split(""),$r=` 	\n\\r=`.split(""),qs=(()=>{let i=new Array(128);for(let e=0;e<i.length;e+=1)i[e]=-1;for(let e=0;e<$r.length;e+=1)i[$r[e].charCodeAt(0)]=-2;for(let e=0;e<lt.length;e+=1)i[lt[e].charCodeAt(0)]=e;return i})();function Ur(i,e,t){if(i!==null)for(e.queue=e.queue<<8|i,e.queuedBits+=8;e.queuedBits>=6;){let r=e.queue>>e.queuedBits-6&63;t(lt[r]),e.queuedBits-=6}else if(e.queuedBits>0)for(e.queue=e.queue<<6-e.queuedBits,e.queuedBits=6;e.queuedBits>=6;){let r=e.queue>>e.queuedBits-6&63;t(lt[r]),e.queuedBits-=6}}function Lr(i,e,t){let r=qs[i];if(r>-1)for(e.queue=e.queue<<6|r,e.queuedBits+=6;e.queuedBits>=8;)t(e.queue>>e.queuedBits-8&255),e.queuedBits-=8;else{if(r===-2)return;throw new Error(`Invalid Base64-URL character "${String.fromCharCode(i)}"`)}}function Lt(i){let e=[],t=o=>{e.push(String.fromCodePoint(o))},r={utf8seq:0,codepoint:0},s={queue:0,queuedBits:0},n=o=>{Ws(o,r,t)};for(let o=0;o<i.length;o+=1)Lr(i.charCodeAt(o),s,n);return e.join("")}function Fs(i,e){if(i<=127){e(i);return}else if(i<=2047){e(192|i>>6),e(128|i&63);return}else if(i<=65535){e(224|i>>12),e(128|i>>6&63),e(128|i&63);return}else if(i<=1114111){e(240|i>>18),e(128|i>>12&63),e(128|i>>6&63),e(128|i&63);return}throw new Error(`Unrecognized Unicode codepoint: ${i.toString(16)}`)}function Ms(i,e){for(let t=0;t<i.length;t+=1){let r=i.charCodeAt(t);if(r>55295&&r<=56319){let s=(r-55296)*1024&65535;r=(i.charCodeAt(t+1)-56320&65535|s)+65536,t+=1}Fs(r,e)}}function Ws(i,e,t){if(e.utf8seq===0){if(i<=127){t(i);return}for(let r=1;r<6;r+=1)if((i>>7-r&1)===0){e.utf8seq=r;break}if(e.utf8seq===2)e.codepoint=i&31;else if(e.utf8seq===3)e.codepoint=i&15;else if(e.utf8seq===4)e.codepoint=i&7;else throw new Error("Invalid UTF-8 sequence");e.utf8seq-=1}else if(e.utf8seq>0){if(i<=127)throw new Error("Invalid UTF-8 sequence");e.codepoint=e.codepoint<<6|i&63,e.utf8seq-=1,e.utf8seq===0&&t(e.codepoint)}}function Nr(i){let e=[],t={queue:0,queuedBits:0},r=s=>{e.push(s)};for(let s=0;s<i.length;s+=1)Lr(i.charCodeAt(s),t,r);return new Uint8Array(e)}function Dr(i){let e=[];return Ms(i,t=>e.push(t)),new Uint8Array(e)}function Br(i){let e=[],t={queue:0,queuedBits:0},r=s=>{e.push(s)};return i.forEach(s=>Ur(s,t,r)),Ur(null,t,r),e.join("")}function qr(i){return Math.round(Date.now()/1e3)+i}function Fr(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(i){let e=Math.random()*16|0;return(i=="x"?e:e&3|8).toString(16)})}var I=()=>typeof window<"u"&&typeof document<"u",X={tested:!1,writable:!1},ct=()=>{if(!I())return!1;try{if(typeof globalThis.localStorage!="object")return!1}catch{return!1}if(X.tested)return X.writable;let i=`lswt-${Math.random()}${Math.random()}`;try{globalThis.localStorage.setItem(i,i),globalThis.localStorage.removeItem(i),X.tested=!0,X.writable=!0}catch{X.tested=!0,X.writable=!1}return X.writable};function Mr(i){let e={},t=new URL(i);if(t.hash&&t.hash[0]==="#")try{new URLSearchParams(t.hash.substring(1)).forEach((s,n)=>{e[n]=s})}catch{}return t.searchParams.forEach((r,s)=>{e[s]=r}),e}var ht=i=>{let e;return i?e=i:typeof fetch>"u"?e=(...t)=>import("./shared-DDMDY4E6.js").then(({default:r})=>r(...t)):e=fetch,(...t)=>e(...t)},Wr=i=>typeof i=="object"&&i!==null&&"status"in i&&"ok"in i&&"json"in i&&typeof i.json=="function",Z=async(i,e,t)=>{await i.setItem(e,JSON.stringify(t))},F=async(i,e)=>{let t=await i.getItem(e);if(!t)return null;try{return JSON.parse(t)}catch{return t}},B=async(i,e)=>{await i.removeItem(e)},Fe=class i{constructor(){this.promise=new i.promiseConstructor((e,t)=>{this.resolve=e,this.reject=t})}};Fe.promiseConstructor=Promise;function ut(i){let e=i.split(".");if(e.length!==3)throw new Y("Invalid JWT structure");for(let r=0;r<e.length;r++)if(!jr.test(e[r]))throw new Y("JWT not in base64url format");return{header:JSON.parse(Lt(e[0])),payload:JSON.parse(Lt(e[1])),signature:Nr(e[2]),raw:{header:e[0],payload:e[1]}}}async function Hr(i){return await new Promise(e=>{setTimeout(()=>e(null),i)})}function Kr(i,e){return new Promise((r,s)=>{(async()=>{for(let n=0;n<1/0;n++)try{let o=await i(n);if(!e(n,null,o)){r(o);return}}catch(o){if(!e(n,o)){s(o);return}}})()})}function Hs(i){return("0"+i.toString(16)).substr(-2)}function Ks(){let e=new Uint32Array(56);if(typeof crypto>"u"){let t="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~",r=t.length,s="";for(let n=0;n<56;n++)s+=t.charAt(Math.floor(Math.random()*r));return s}return crypto.getRandomValues(e),Array.from(e,Hs).join("")}async function zs(i){let t=new TextEncoder().encode(i),r=await crypto.subtle.digest("SHA-256",t),s=new Uint8Array(r);return Array.from(s).map(n=>String.fromCharCode(n)).join("")}async function Gs(i){if(!(typeof crypto<"u"&&typeof crypto.subtle<"u"&&typeof TextEncoder<"u"))return console.warn("WebCrypto API is not supported. Code challenge method will default to use plain instead of sha256."),i;let t=await zs(i);return btoa(t).replace(/\\+/g,"-").replace(/\\//g,"_").replace(/=+$/,"")}async function ee(i,e,t=!1){let r=Ks(),s=r;t&&(s+="/PASSWORD_RECOVERY"),await Z(i,`${e}-code-verifier`,s);let n=await Gs(r);return[n,r===n?"plain":"s256"]}var Js=/^2[0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$/i;function zr(i){let e=i.headers.get(Ne);if(!e||!e.match(Js))return null;try{return new Date(`${e}T00:00:00.0Z`)}catch{return null}}function Gr(i){if(!i)throw new Error("Missing exp claim");let e=Math.floor(Date.now()/1e3);if(i<=e)throw new Error("JWT has expired")}function Jr(i){switch(i){case"RS256":return{name:"RSASSA-PKCS1-v1_5",hash:{name:"SHA-256"}};case"ES256":return{name:"ECDSA",namedCurve:"P-256",hash:{name:"SHA-256"}};default:throw new Error("Invalid alg claim")}}var Vs=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;function te(i){if(!Vs.test(i))throw new Error("@supabase/auth-js: Expected parameter to be UUID but is not")}function dt(){let i={};return new Proxy(i,{get:(e,t)=>{if(t==="__isUserNotAvailableProxy")return!0;if(typeof t=="symbol"){let r=t.toString();if(r==="Symbol(Symbol.toPrimitive)"||r==="Symbol(Symbol.toStringTag)"||r==="Symbol(util.inspect.custom)")return}throw new Error(`@supabase/auth-js: client was created with userStorage option and there was no user stored in the user storage. Accessing the "${t}" property of the session object is not supported. Please use getUser() instead.`)},set:(e,t)=>{throw new Error(`@supabase/auth-js: client was created with userStorage option and there was no user stored in the user storage. Setting the "${t}" property of the session object is not supported. Please use getUser() to fetch a user object you can manipulate.`)},deleteProperty:(e,t)=>{throw new Error(`@supabase/auth-js: client was created with userStorage option and there was no user stored in the user storage. Deleting the "${t}" property of the session object is not supported. Please use getUser() to fetch a user object you can manipulate.`)}})}function Nt(i){return JSON.parse(JSON.stringify(i))}var Qs=function(i,e){var t={};for(var r in i)Object.prototype.hasOwnProperty.call(i,r)&&e.indexOf(r)<0&&(t[r]=i[r]);if(i!=null&&typeof Object.getOwnPropertySymbols=="function")for(var s=0,r=Object.getOwnPropertySymbols(i);s<r.length;s++)e.indexOf(r[s])<0&&Object.prototype.propertyIsEnumerable.call(i,r[s])&&(t[r[s]]=i[r[s]]);return t},re=i=>i.msg||i.message||i.error_description||i.error||JSON.stringify(i),Ys=[502,503,504];async function Vr(i){var e;if(!Wr(i))throw new me(re(i),0);if(Ys.includes(i.status))throw new me(re(i),i.status);let t;try{t=await i.json()}catch(n){throw new _e(re(n),n)}let r,s=zr(i);if(s&&s.getTime()>=Ut["2024-01-01"].timestamp&&typeof t=="object"&&t&&typeof t.code=="string"?r=t.code:typeof t=="object"&&t&&typeof t.error_code=="string"&&(r=t.error_code),r){if(r==="weak_password")throw new qe(re(t),i.status,((e=t.weak_password)===null||e===void 0?void 0:e.reasons)||[]);if(r==="session_not_found")throw new C}else if(typeof t=="object"&&t&&typeof t.weak_password=="object"&&t.weak_password&&Array.isArray(t.weak_password.reasons)&&t.weak_password.reasons.length&&t.weak_password.reasons.reduce((n,o)=>n&&typeof o=="string",!0))throw new qe(re(t),i.status,t.weak_password.reasons);throw new ot(re(t),i.status||500,r)}var Xs=(i,e,t,r)=>{let s={method:i,headers:e?.headers||{}};return i==="GET"?s:(s.headers=Object.assign({"Content-Type":"application/json;charset=UTF-8"},e?.headers),s.body=JSON.stringify(r),Object.assign(Object.assign({},s),t))};async function v(i,e,t,r){var s;let n=Object.assign({},r?.headers);n[Ne]||(n[Ne]=Ut["2024-01-01"].name),r?.jwt&&(n.Authorization=`Bearer ${r.jwt}`);let o=(s=r?.query)!==null&&s!==void 0?s:{};r?.redirectTo&&(o.redirect_to=r.redirectTo);let a=Object.keys(o).length?"?"+new URLSearchParams(o).toString():"",l=await Zs(i,e,t+a,{headers:n,noResolveJson:r?.noResolveJson},{},r?.body);return r?.xform?r?.xform(l):{data:Object.assign({},l),error:null}}async function Zs(i,e,t,r,s,n){let o=Xs(e,r,s,n),a;try{a=await i(t,Object.assign({},o))}catch(l){throw console.error(l),new me(re(l),0)}if(a.ok||await Vr(a),r?.noResolveJson)return a;try{return await a.json()}catch(l){await Vr(l)}}function N(i){var e;let t=null;ei(i)&&(t=Object.assign({},i),i.expires_at||(t.expires_at=qr(i.expires_in)));let r=(e=i.user)!==null&&e!==void 0?e:i;return{data:{session:t,user:r},error:null}}function Dt(i){let e=N(i);return!e.error&&i.weak_password&&typeof i.weak_password=="object"&&Array.isArray(i.weak_password.reasons)&&i.weak_password.reasons.length&&i.weak_password.message&&typeof i.weak_password.message=="string"&&i.weak_password.reasons.reduce((t,r)=>t&&typeof r=="string",!0)&&(e.data.weak_password=i.weak_password),e}function D(i){var e;return{data:{user:(e=i.user)!==null&&e!==void 0?e:i},error:null}}function Qr(i){return{data:i,error:null}}function Yr(i){let{action_link:e,email_otp:t,hashed_token:r,redirect_to:s,verification_type:n}=i,o=Qs(i,["action_link","email_otp","hashed_token","redirect_to","verification_type"]),a={action_link:e,email_otp:t,hashed_token:r,redirect_to:s,verification_type:n},l=Object.assign({},o);return{data:{properties:a,user:l},error:null}}function Xr(i){return i}function ei(i){return i.access_token&&i.refresh_token&&i.expires_in}var ft=["global","local","others"];var ti=function(i,e){var t={};for(var r in i)Object.prototype.hasOwnProperty.call(i,r)&&e.indexOf(r)<0&&(t[r]=i[r]);if(i!=null&&typeof Object.getOwnPropertySymbols=="function")for(var s=0,r=Object.getOwnPropertySymbols(i);s<r.length;s++)e.indexOf(r[s])<0&&Object.prototype.propertyIsEnumerable.call(i,r[s])&&(t[r[s]]=i[r[s]]);return t},se=class{constructor({url:e="",headers:t={},fetch:r}){this.url=e,this.headers=t,this.fetch=ht(r),this.mfa={listFactors:this._listFactors.bind(this),deleteFactor:this._deleteFactor.bind(this)}}async signOut(e,t=ft[0]){if(ft.indexOf(t)<0)throw new Error(`@supabase/auth-js: Parameter scope must be one of ${ft.join(", ")}`);try{return await v(this.fetch,"POST",`${this.url}/logout?scope=${t}`,{headers:this.headers,jwt:e,noResolveJson:!0}),{data:null,error:null}}catch(r){if(_(r))return{data:null,error:r};throw r}}async inviteUserByEmail(e,t={}){try{return await v(this.fetch,"POST",`${this.url}/invite`,{body:{email:e,data:t.data},headers:this.headers,redirectTo:t.redirectTo,xform:D})}catch(r){if(_(r))return{data:{user:null},error:r};throw r}}async generateLink(e){try{let{options:t}=e,r=ti(e,["options"]),s=Object.assign(Object.assign({},r),t);return"newEmail"in r&&(s.new_email=r?.newEmail,delete s.newEmail),await v(this.fetch,"POST",`${this.url}/admin/generate_link`,{body:s,headers:this.headers,xform:Yr,redirectTo:t?.redirectTo})}catch(t){if(_(t))return{data:{properties:null,user:null},error:t};throw t}}async createUser(e){try{return await v(this.fetch,"POST",`${this.url}/admin/users`,{body:e,headers:this.headers,xform:D})}catch(t){if(_(t))return{data:{user:null},error:t};throw t}}async listUsers(e){var t,r,s,n,o,a,l;try{let h={nextPage:null,lastPage:0,total:0},c=await v(this.fetch,"GET",`${this.url}/admin/users`,{headers:this.headers,noResolveJson:!0,query:{page:(r=(t=e?.page)===null||t===void 0?void 0:t.toString())!==null&&r!==void 0?r:"",per_page:(n=(s=e?.perPage)===null||s===void 0?void 0:s.toString())!==null&&n!==void 0?n:""},xform:Xr});if(c.error)throw c.error;let u=await c.json(),d=(o=c.headers.get("x-total-count"))!==null&&o!==void 0?o:0,f=(l=(a=c.headers.get("link"))===null||a===void 0?void 0:a.split(","))!==null&&l!==void 0?l:[];return f.length>0&&(f.forEach(p=>{let w=parseInt(p.split(";")[0].split("=")[1].substring(0,1)),m=JSON.parse(p.split(";")[1].split("=")[1]);h[`${m}Page`]=w}),h.total=parseInt(d)),{data:Object.assign(Object.assign({},u),h),error:null}}catch(h){if(_(h))return{data:{users:[]},error:h};throw h}}async getUserById(e){te(e);try{return await v(this.fetch,"GET",`${this.url}/admin/users/${e}`,{headers:this.headers,xform:D})}catch(t){if(_(t))return{data:{user:null},error:t};throw t}}async updateUserById(e,t){te(e);try{return await v(this.fetch,"PUT",`${this.url}/admin/users/${e}`,{body:t,headers:this.headers,xform:D})}catch(r){if(_(r))return{data:{user:null},error:r};throw r}}async deleteUser(e,t=!1){te(e);try{return await v(this.fetch,"DELETE",`${this.url}/admin/users/${e}`,{headers:this.headers,body:{should_soft_delete:t},xform:D})}catch(r){if(_(r))return{data:{user:null},error:r};throw r}}async _listFactors(e){te(e.userId);try{let{data:t,error:r}=await v(this.fetch,"GET",`${this.url}/admin/users/${e.userId}/factors`,{headers:this.headers,xform:s=>({data:{factors:s},error:null})});return{data:t,error:r}}catch(t){if(_(t))return{data:null,error:t};throw t}}async _deleteFactor(e){te(e.userId),te(e.id);try{return{data:await v(this.fetch,"DELETE",`${this.url}/admin/users/${e.userId}/factors/${e.id}`,{headers:this.headers}),error:null}}catch(t){if(_(t))return{data:null,error:t};throw t}}};function Bt(i={}){return{getItem:e=>i[e]||null,setItem:(e,t)=>{i[e]=t},removeItem:e=>{delete i[e]}}}function Zr(){if(typeof globalThis!="object")try{Object.defineProperty(Object.prototype,"__magic__",{get:function(){return this},configurable:!0}),__magic__.globalThis=__magic__,delete Object.prototype.__magic__}catch{typeof self<"u"&&(self.globalThis=self)}}var ie={debug:!!(globalThis&&ct()&&globalThis.localStorage&&globalThis.localStorage.getItem("supabase.gotrue-js.locks.debug")==="true")},Me=class extends Error{constructor(e){super(e),this.isAcquireTimeout=!0}},pt=class extends Me{};async function qt(i,e,t){ie.debug&&console.log("@supabase/gotrue-js: navigatorLock: acquire lock",i,e);let r=new globalThis.AbortController;return e>0&&setTimeout(()=>{r.abort(),ie.debug&&console.log("@supabase/gotrue-js: navigatorLock acquire timed out",i)},e),await Promise.resolve().then(()=>globalThis.navigator.locks.request(i,e===0?{mode:"exclusive",ifAvailable:!0}:{mode:"exclusive",signal:r.signal},async s=>{if(s){ie.debug&&console.log("@supabase/gotrue-js: navigatorLock: acquired",i,s.name);try{return await t()}finally{ie.debug&&console.log("@supabase/gotrue-js: navigatorLock: released",i,s.name)}}else{if(e===0)throw ie.debug&&console.log("@supabase/gotrue-js: navigatorLock: not immediately available",i),new pt(`Acquiring an exclusive Navigator LockManager lock "${i}" immediately failed`);if(ie.debug)try{let n=await globalThis.navigator.locks.query();console.log("@supabase/gotrue-js: Navigator LockManager state",JSON.stringify(n,null,"  "))}catch(n){console.warn("@supabase/gotrue-js: Error when querying Navigator LockManager state",n)}return console.warn("@supabase/gotrue-js: Navigator LockManager returned a null lock when using #request without ifAvailable set to true, it appears this browser is not following the LockManager spec https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request"),await t()}}))}Zr();var ri={url:xr,storageKey:Ar,autoRefreshToken:!0,persistSession:!0,detectSessionInUrl:!0,headers:Or,flowType:"implicit",debug:!1,hasCustomAuthorizationHeader:!1};async function es(i,e,t){return await t()}var ve={},ne=class i{constructor(e){var t,r;this.userStorage=null,this.memoryStorage=null,this.stateChangeEmitters=new Map,this.autoRefreshTicker=null,this.visibilityChangedCallback=null,this.refreshingDeferred=null,this.initializePromise=null,this.detectSessionInUrl=!0,this.hasCustomAuthorizationHeader=!1,this.suppressGetSessionWarning=!1,this.lockAcquired=!1,this.pendingInLock=[],this.broadcastChannel=null,this.logger=console.log,this.instanceID=i.nextInstanceID,i.nextInstanceID+=1,this.instanceID>0&&I()&&console.warn("Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.");let s=Object.assign(Object.assign({},ri),e);if(this.logDebugMessages=!!s.debug,typeof s.debug=="function"&&(this.logger=s.debug),this.persistSession=s.persistSession,this.storageKey=s.storageKey,this.autoRefreshToken=s.autoRefreshToken,this.admin=new se({url:s.url,headers:s.headers,fetch:s.fetch}),this.url=s.url,this.headers=s.headers,this.fetch=ht(s.fetch),this.lock=s.lock||es,this.detectSessionInUrl=s.detectSessionInUrl,this.flowType=s.flowType,this.hasCustomAuthorizationHeader=s.hasCustomAuthorizationHeader,s.lock?this.lock=s.lock:I()&&(!((t=globalThis?.navigator)===null||t===void 0)&&t.locks)?this.lock=qt:this.lock=es,this.jwks||(this.jwks={keys:[]},this.jwks_cached_at=Number.MIN_SAFE_INTEGER),this.mfa={verify:this._verify.bind(this),enroll:this._enroll.bind(this),unenroll:this._unenroll.bind(this),challenge:this._challenge.bind(this),listFactors:this._listFactors.bind(this),challengeAndVerify:this._challengeAndVerify.bind(this),getAuthenticatorAssuranceLevel:this._getAuthenticatorAssuranceLevel.bind(this)},this.persistSession?(s.storage?this.storage=s.storage:ct()?this.storage=globalThis.localStorage:(this.memoryStorage={},this.storage=Bt(this.memoryStorage)),s.userStorage&&(this.userStorage=s.userStorage)):(this.memoryStorage={},this.storage=Bt(this.memoryStorage)),I()&&globalThis.BroadcastChannel&&this.persistSession&&this.storageKey){try{this.broadcastChannel=new globalThis.BroadcastChannel(this.storageKey)}catch(n){console.error("Failed to create a new BroadcastChannel, multi-tab state changes will not be available",n)}(r=this.broadcastChannel)===null||r===void 0||r.addEventListener("message",async n=>{this._debug("received broadcast notification from other tab or client",n),await this._notifyAllSubscribers(n.data.event,n.data.session,!1)})}this.initialize()}get jwks(){var e,t;return(t=(e=ve[this.storageKey])===null||e===void 0?void 0:e.jwks)!==null&&t!==void 0?t:{keys:[]}}set jwks(e){ve[this.storageKey]=Object.assign(Object.assign({},ve[this.storageKey]),{jwks:e})}get jwks_cached_at(){var e,t;return(t=(e=ve[this.storageKey])===null||e===void 0?void 0:e.cachedAt)!==null&&t!==void 0?t:Number.MIN_SAFE_INTEGER}set jwks_cached_at(e){ve[this.storageKey]=Object.assign(Object.assign({},ve[this.storageKey]),{cachedAt:e})}_debug(...e){return this.logDebugMessages&&this.logger(`GoTrueClient@${this.instanceID} (${st}) ${new Date().toISOString()}`,...e),this}async initialize(){return this.initializePromise?await this.initializePromise:(this.initializePromise=(async()=>await this._acquireLock(-1,async()=>await this._initialize()))(),await this.initializePromise)}async _initialize(){var e;try{let t=Mr(window.location.href),r="none";if(this._isImplicitGrantCallback(t)?r="implicit":await this._isPKCECallback(t)&&(r="pkce"),I()&&this.detectSessionInUrl&&r!=="none"){let{data:s,error:n}=await this._getSessionFromURL(t,r);if(n){if(this._debug("#_initialize()","error detecting session from URL",n),Ir(n)){let l=(e=n.details)===null||e===void 0?void 0:e.code;if(l==="identity_already_exists"||l==="identity_not_found"||l==="single_identity_not_deletable")return{error:n}}return await this._removeSession(),{error:n}}let{session:o,redirectType:a}=s;return this._debug("#_initialize()","detected session in URL",o,"redirect type",a),await this._saveSession(o),setTimeout(async()=>{a==="recovery"?await this._notifyAllSubscribers("PASSWORD_RECOVERY",o):await this._notifyAllSubscribers("SIGNED_IN",o)},0),{error:null}}return await this._recoverAndRefresh(),{error:null}}catch(t){return _(t)?{error:t}:{error:new _e("Unexpected error during initialization",t)}}finally{await this._handleVisibilityChange(),this._debug("#_initialize()","end")}}async signInAnonymously(e){var t,r,s;try{let n=await v(this.fetch,"POST",`${this.url}/signup`,{headers:this.headers,body:{data:(r=(t=e?.options)===null||t===void 0?void 0:t.data)!==null&&r!==void 0?r:{},gotrue_meta_security:{captcha_token:(s=e?.options)===null||s===void 0?void 0:s.captchaToken}},xform:N}),{data:o,error:a}=n;if(a||!o)return{data:{user:null,session:null},error:a};let l=o.session,h=o.user;return o.session&&(await this._saveSession(o.session),await this._notifyAllSubscribers("SIGNED_IN",l)),{data:{user:h,session:l},error:null}}catch(n){if(_(n))return{data:{user:null,session:null},error:n};throw n}}async signUp(e){var t,r,s;try{let n;if("email"in e){let{email:c,password:u,options:d}=e,f=null,p=null;this.flowType==="pkce"&&([f,p]=await ee(this.storage,this.storageKey)),n=await v(this.fetch,"POST",`${this.url}/signup`,{headers:this.headers,redirectTo:d?.emailRedirectTo,body:{email:c,password:u,data:(t=d?.data)!==null&&t!==void 0?t:{},gotrue_meta_security:{captcha_token:d?.captchaToken},code_challenge:f,code_challenge_method:p},xform:N})}else if("phone"in e){let{phone:c,password:u,options:d}=e;n=await v(this.fetch,"POST",`${this.url}/signup`,{headers:this.headers,body:{phone:c,password:u,data:(r=d?.data)!==null&&r!==void 0?r:{},channel:(s=d?.channel)!==null&&s!==void 0?s:"sms",gotrue_meta_security:{captcha_token:d?.captchaToken}},xform:N})}else throw new V("You must provide either an email or phone number and a password");let{data:o,error:a}=n;if(a||!o)return{data:{user:null,session:null},error:a};let l=o.session,h=o.user;return o.session&&(await this._saveSession(o.session),await this._notifyAllSubscribers("SIGNED_IN",l)),{data:{user:h,session:l},error:null}}catch(n){if(_(n))return{data:{user:null,session:null},error:n};throw n}}async signInWithPassword(e){try{let t;if("email"in e){let{email:n,password:o,options:a}=e;t=await v(this.fetch,"POST",`${this.url}/token?grant_type=password`,{headers:this.headers,body:{email:n,password:o,gotrue_meta_security:{captcha_token:a?.captchaToken}},xform:Dt})}else if("phone"in e){let{phone:n,password:o,options:a}=e;t=await v(this.fetch,"POST",`${this.url}/token?grant_type=password`,{headers:this.headers,body:{phone:n,password:o,gotrue_meta_security:{captcha_token:a?.captchaToken}},xform:Dt})}else throw new V("You must provide either an email or phone number and a password");let{data:r,error:s}=t;return s?{data:{user:null,session:null},error:s}:!r||!r.session||!r.user?{data:{user:null,session:null},error:new J}:(r.session&&(await this._saveSession(r.session),await this._notifyAllSubscribers("SIGNED_IN",r.session)),{data:Object.assign({user:r.user,session:r.session},r.weak_password?{weakPassword:r.weak_password}:null),error:s})}catch(t){if(_(t))return{data:{user:null,session:null},error:t};throw t}}async signInWithOAuth(e){var t,r,s,n;return await this._handleProviderSignIn(e.provider,{redirectTo:(t=e.options)===null||t===void 0?void 0:t.redirectTo,scopes:(r=e.options)===null||r===void 0?void 0:r.scopes,queryParams:(s=e.options)===null||s===void 0?void 0:s.queryParams,skipBrowserRedirect:(n=e.options)===null||n===void 0?void 0:n.skipBrowserRedirect})}async exchangeCodeForSession(e){return await this.initializePromise,this._acquireLock(-1,async()=>this._exchangeCodeForSession(e))}async signInWithWeb3(e){let{chain:t}=e;if(t==="solana")return await this.signInWithSolana(e);throw new Error(`@supabase/auth-js: Unsupported chain "${t}"`)}async signInWithSolana(e){var t,r,s,n,o,a,l,h,c,u,d,f;let p,w;if("message"in e)p=e.message,w=e.signature;else{let{chain:m,wallet:S,statement:T,options:g}=e,y;if(I())if(typeof S=="object")y=S;else{let k=window;if("solana"in k&&typeof k.solana=="object"&&("signIn"in k.solana&&typeof k.solana.signIn=="function"||"signMessage"in k.solana&&typeof k.solana.signMessage=="function"))y=k.solana;else throw new Error("@supabase/auth-js: No compatible Solana wallet interface on the window object (window.solana) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: \'solana\', wallet: resolvedUserWallet }) instead.")}else{if(typeof S!="object"||!g?.url)throw new Error("@supabase/auth-js: Both wallet and url must be specified in non-browser environments.");y=S}let $=new URL((t=g?.url)!==null&&t!==void 0?t:window.location.href);if("signIn"in y&&y.signIn){let k=await y.signIn(Object.assign(Object.assign(Object.assign({issuedAt:new Date().toISOString()},g?.signInWithSolana),{version:"1",domain:$.host,uri:$.href}),T?{statement:T}:null)),O;if(Array.isArray(k)&&k[0]&&typeof k[0]=="object")O=k[0];else if(k&&typeof k=="object"&&"signedMessage"in k&&"signature"in k)O=k;else throw new Error("@supabase/auth-js: Wallet method signIn() returned unrecognized value");if("signedMessage"in O&&"signature"in O&&(typeof O.signedMessage=="string"||O.signedMessage instanceof Uint8Array)&&O.signature instanceof Uint8Array)p=typeof O.signedMessage=="string"?O.signedMessage:new TextDecoder().decode(O.signedMessage),w=O.signature;else throw new Error("@supabase/auth-js: Wallet method signIn() API returned object without signedMessage and signature fields")}else{if(!("signMessage"in y)||typeof y.signMessage!="function"||!("publicKey"in y)||typeof y!="object"||!y.publicKey||!("toBase58"in y.publicKey)||typeof y.publicKey.toBase58!="function")throw new Error("@supabase/auth-js: Wallet does not have a compatible signMessage() and publicKey.toBase58() API");p=[`${$.host} wants you to sign in with your Solana account:`,y.publicKey.toBase58(),...T?["",T,""]:[""],"Version: 1",`URI: ${$.href}`,`Issued At: ${(s=(r=g?.signInWithSolana)===null||r===void 0?void 0:r.issuedAt)!==null&&s!==void 0?s:new Date().toISOString()}`,...!((n=g?.signInWithSolana)===null||n===void 0)&&n.notBefore?[`Not Before: ${g.signInWithSolana.notBefore}`]:[],...!((o=g?.signInWithSolana)===null||o===void 0)&&o.expirationTime?[`Expiration Time: ${g.signInWithSolana.expirationTime}`]:[],...!((a=g?.signInWithSolana)===null||a===void 0)&&a.chainId?[`Chain ID: ${g.signInWithSolana.chainId}`]:[],...!((l=g?.signInWithSolana)===null||l===void 0)&&l.nonce?[`Nonce: ${g.signInWithSolana.nonce}`]:[],...!((h=g?.signInWithSolana)===null||h===void 0)&&h.requestId?[`Request ID: ${g.signInWithSolana.requestId}`]:[],...!((u=(c=g?.signInWithSolana)===null||c===void 0?void 0:c.resources)===null||u===void 0)&&u.length?["Resources",...g.signInWithSolana.resources.map(O=>`- ${O}`)]:[]].join(`\n`);let k=await y.signMessage(new TextEncoder().encode(p),"utf8");if(!k||!(k instanceof Uint8Array))throw new Error("@supabase/auth-js: Wallet signMessage() API returned an recognized value");w=k}}try{let{data:m,error:S}=await v(this.fetch,"POST",`${this.url}/token?grant_type=web3`,{headers:this.headers,body:Object.assign({chain:"solana",message:p,signature:Br(w)},!((d=e.options)===null||d===void 0)&&d.captchaToken?{gotrue_meta_security:{captcha_token:(f=e.options)===null||f===void 0?void 0:f.captchaToken}}:null),xform:N});if(S)throw S;return!m||!m.session||!m.user?{data:{user:null,session:null},error:new J}:(m.session&&(await this._saveSession(m.session),await this._notifyAllSubscribers("SIGNED_IN",m.session)),{data:Object.assign({},m),error:S})}catch(m){if(_(m))return{data:{user:null,session:null},error:m};throw m}}async _exchangeCodeForSession(e){let t=await F(this.storage,`${this.storageKey}-code-verifier`),[r,s]=(t??"").split("/");try{let{data:n,error:o}=await v(this.fetch,"POST",`${this.url}/token?grant_type=pkce`,{headers:this.headers,body:{auth_code:e,code_verifier:r},xform:N});if(await B(this.storage,`${this.storageKey}-code-verifier`),o)throw o;return!n||!n.session||!n.user?{data:{user:null,session:null,redirectType:null},error:new J}:(n.session&&(await this._saveSession(n.session),await this._notifyAllSubscribers("SIGNED_IN",n.session)),{data:Object.assign(Object.assign({},n),{redirectType:s??null}),error:o})}catch(n){if(_(n))return{data:{user:null,session:null,redirectType:null},error:n};throw n}}async signInWithIdToken(e){try{let{options:t,provider:r,token:s,access_token:n,nonce:o}=e,a=await v(this.fetch,"POST",`${this.url}/token?grant_type=id_token`,{headers:this.headers,body:{provider:r,id_token:s,access_token:n,nonce:o,gotrue_meta_security:{captcha_token:t?.captchaToken}},xform:N}),{data:l,error:h}=a;return h?{data:{user:null,session:null},error:h}:!l||!l.session||!l.user?{data:{user:null,session:null},error:new J}:(l.session&&(await this._saveSession(l.session),await this._notifyAllSubscribers("SIGNED_IN",l.session)),{data:l,error:h})}catch(t){if(_(t))return{data:{user:null,session:null},error:t};throw t}}async signInWithOtp(e){var t,r,s,n,o;try{if("email"in e){let{email:a,options:l}=e,h=null,c=null;this.flowType==="pkce"&&([h,c]=await ee(this.storage,this.storageKey));let{error:u}=await v(this.fetch,"POST",`${this.url}/otp`,{headers:this.headers,body:{email:a,data:(t=l?.data)!==null&&t!==void 0?t:{},create_user:(r=l?.shouldCreateUser)!==null&&r!==void 0?r:!0,gotrue_meta_security:{captcha_token:l?.captchaToken},code_challenge:h,code_challenge_method:c},redirectTo:l?.emailRedirectTo});return{data:{user:null,session:null},error:u}}if("phone"in e){let{phone:a,options:l}=e,{data:h,error:c}=await v(this.fetch,"POST",`${this.url}/otp`,{headers:this.headers,body:{phone:a,data:(s=l?.data)!==null&&s!==void 0?s:{},create_user:(n=l?.shouldCreateUser)!==null&&n!==void 0?n:!0,gotrue_meta_security:{captcha_token:l?.captchaToken},channel:(o=l?.channel)!==null&&o!==void 0?o:"sms"}});return{data:{user:null,session:null,messageId:h?.message_id},error:c}}throw new V("You must provide either an email or phone number.")}catch(a){if(_(a))return{data:{user:null,session:null},error:a};throw a}}async verifyOtp(e){var t,r;try{let s,n;"options"in e&&(s=(t=e.options)===null||t===void 0?void 0:t.redirectTo,n=(r=e.options)===null||r===void 0?void 0:r.captchaToken);let{data:o,error:a}=await v(this.fetch,"POST",`${this.url}/verify`,{headers:this.headers,body:Object.assign(Object.assign({},e),{gotrue_meta_security:{captcha_token:n}}),redirectTo:s,xform:N});if(a)throw a;if(!o)throw new Error("An error occurred on token verification.");let l=o.session,h=o.user;return l?.access_token&&(await this._saveSession(l),await this._notifyAllSubscribers(e.type=="recovery"?"PASSWORD_RECOVERY":"SIGNED_IN",l)),{data:{user:h,session:l},error:null}}catch(s){if(_(s))return{data:{user:null,session:null},error:s};throw s}}async signInWithSSO(e){var t,r,s;try{let n=null,o=null;return this.flowType==="pkce"&&([n,o]=await ee(this.storage,this.storageKey)),await v(this.fetch,"POST",`${this.url}/sso`,{body:Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({},"providerId"in e?{provider_id:e.providerId}:null),"domain"in e?{domain:e.domain}:null),{redirect_to:(r=(t=e.options)===null||t===void 0?void 0:t.redirectTo)!==null&&r!==void 0?r:void 0}),!((s=e?.options)===null||s===void 0)&&s.captchaToken?{gotrue_meta_security:{captcha_token:e.options.captchaToken}}:null),{skip_http_redirect:!0,code_challenge:n,code_challenge_method:o}),headers:this.headers,xform:Qr})}catch(n){if(_(n))return{data:null,error:n};throw n}}async reauthenticate(){return await this.initializePromise,await this._acquireLock(-1,async()=>await this._reauthenticate())}async _reauthenticate(){try{return await this._useSession(async e=>{let{data:{session:t},error:r}=e;if(r)throw r;if(!t)throw new C;let{error:s}=await v(this.fetch,"GET",`${this.url}/reauthenticate`,{headers:this.headers,jwt:t.access_token});return{data:{user:null,session:null},error:s}})}catch(e){if(_(e))return{data:{user:null,session:null},error:e};throw e}}async resend(e){try{let t=`${this.url}/resend`;if("email"in e){let{email:r,type:s,options:n}=e,{error:o}=await v(this.fetch,"POST",t,{headers:this.headers,body:{email:r,type:s,gotrue_meta_security:{captcha_token:n?.captchaToken}},redirectTo:n?.emailRedirectTo});return{data:{user:null,session:null},error:o}}else if("phone"in e){let{phone:r,type:s,options:n}=e,{data:o,error:a}=await v(this.fetch,"POST",t,{headers:this.headers,body:{phone:r,type:s,gotrue_meta_security:{captcha_token:n?.captchaToken}}});return{data:{user:null,session:null,messageId:o?.message_id},error:a}}throw new V("You must provide either an email or phone number and a type")}catch(t){if(_(t))return{data:{user:null,session:null},error:t};throw t}}async getSession(){return await this.initializePromise,await this._acquireLock(-1,async()=>this._useSession(async t=>t))}async _acquireLock(e,t){this._debug("#_acquireLock","begin",e);try{if(this.lockAcquired){let r=this.pendingInLock.length?this.pendingInLock[this.pendingInLock.length-1]:Promise.resolve(),s=(async()=>(await r,await t()))();return this.pendingInLock.push((async()=>{try{await s}catch{}})()),s}return await this.lock(`lock:${this.storageKey}`,e,async()=>{this._debug("#_acquireLock","lock acquired for storage key",this.storageKey);try{this.lockAcquired=!0;let r=t();for(this.pendingInLock.push((async()=>{try{await r}catch{}})()),await r;this.pendingInLock.length;){let s=[...this.pendingInLock];await Promise.all(s),this.pendingInLock.splice(0,s.length)}return await r}finally{this._debug("#_acquireLock","lock released for storage key",this.storageKey),this.lockAcquired=!1}})}finally{this._debug("#_acquireLock","end")}}async _useSession(e){this._debug("#_useSession","begin");try{let t=await this.__loadSession();return await e(t)}finally{this._debug("#_useSession","end")}}async __loadSession(){this._debug("#__loadSession()","begin"),this.lockAcquired||this._debug("#__loadSession()","used outside of an acquired lock!",new Error().stack);try{let e=null,t=await F(this.storage,this.storageKey);if(this._debug("#getSession()","session from storage",t),t!==null&&(this._isValidSession(t)?e=t:(this._debug("#getSession()","session from storage is not valid"),await this._removeSession())),!e)return{data:{session:null},error:null};let r=e.expires_at?e.expires_at*1e3-Date.now()<nt:!1;if(this._debug("#__loadSession()",`session has${r?"":" not"} expired`,"expires_at",e.expires_at),!r){if(this.userStorage){let o=await F(this.userStorage,this.storageKey+"-user");o?.user?e.user=o.user:e.user=dt()}if(this.storage.isServer&&e.user){let o=this.suppressGetSessionWarning;e=new Proxy(e,{get:(l,h,c)=>(!o&&h==="user"&&(console.warn("Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server."),o=!0,this.suppressGetSessionWarning=!0),Reflect.get(l,h,c))})}return{data:{session:e},error:null}}let{session:s,error:n}=await this._callRefreshToken(e.refresh_token);return n?{data:{session:null},error:n}:{data:{session:s},error:null}}finally{this._debug("#__loadSession()","end")}}async getUser(e){return e?await this._getUser(e):(await this.initializePromise,await this._acquireLock(-1,async()=>await this._getUser()))}async _getUser(e){try{return e?await v(this.fetch,"GET",`${this.url}/user`,{headers:this.headers,jwt:e,xform:D}):await this._useSession(async t=>{var r,s,n;let{data:o,error:a}=t;if(a)throw a;return!(!((r=o.session)===null||r===void 0)&&r.access_token)&&!this.hasCustomAuthorizationHeader?{data:{user:null},error:new C}:await v(this.fetch,"GET",`${this.url}/user`,{headers:this.headers,jwt:(n=(s=o.session)===null||s===void 0?void 0:s.access_token)!==null&&n!==void 0?n:void 0,xform:D})})}catch(t){if(_(t))return Cr(t)&&(await this._removeSession(),await B(this.storage,`${this.storageKey}-code-verifier`)),{data:{user:null},error:t};throw t}}async updateUser(e,t={}){return await this.initializePromise,await this._acquireLock(-1,async()=>await this._updateUser(e,t))}async _updateUser(e,t={}){try{return await this._useSession(async r=>{let{data:s,error:n}=r;if(n)throw n;if(!s.session)throw new C;let o=s.session,a=null,l=null;this.flowType==="pkce"&&e.email!=null&&([a,l]=await ee(this.storage,this.storageKey));let{data:h,error:c}=await v(this.fetch,"PUT",`${this.url}/user`,{headers:this.headers,redirectTo:t?.emailRedirectTo,body:Object.assign(Object.assign({},e),{code_challenge:a,code_challenge_method:l}),jwt:o.access_token,xform:D});if(c)throw c;return o.user=h.user,await this._saveSession(o),await this._notifyAllSubscribers("USER_UPDATED",o),{data:{user:o.user},error:null}})}catch(r){if(_(r))return{data:{user:null},error:r};throw r}}async setSession(e){return await this.initializePromise,await this._acquireLock(-1,async()=>await this._setSession(e))}async _setSession(e){try{if(!e.access_token||!e.refresh_token)throw new C;let t=Date.now()/1e3,r=t,s=!0,n=null,{payload:o}=ut(e.access_token);if(o.exp&&(r=o.exp,s=r<=t),s){let{session:a,error:l}=await this._callRefreshToken(e.refresh_token);if(l)return{data:{user:null,session:null},error:l};if(!a)return{data:{user:null,session:null},error:null};n=a}else{let{data:a,error:l}=await this._getUser(e.access_token);if(l)throw l;n={access_token:e.access_token,refresh_token:e.refresh_token,user:a.user,token_type:"bearer",expires_in:r-t,expires_at:r},await this._saveSession(n),await this._notifyAllSubscribers("SIGNED_IN",n)}return{data:{user:n.user,session:n},error:null}}catch(t){if(_(t))return{data:{session:null,user:null},error:t};throw t}}async refreshSession(e){return await this.initializePromise,await this._acquireLock(-1,async()=>await this._refreshSession(e))}async _refreshSession(e){try{return await this._useSession(async t=>{var r;if(!e){let{data:o,error:a}=t;if(a)throw a;e=(r=o.session)!==null&&r!==void 0?r:void 0}if(!e?.refresh_token)throw new C;let{session:s,error:n}=await this._callRefreshToken(e.refresh_token);return n?{data:{user:null,session:null},error:n}:s?{data:{user:s.user,session:s},error:null}:{data:{user:null,session:null},error:null}})}catch(t){if(_(t))return{data:{user:null,session:null},error:t};throw t}}async _getSessionFromURL(e,t){try{if(!I())throw new Q("No browser detected.");if(e.error||e.error_description||e.error_code)throw new Q(e.error_description||"Error in URL with unspecified error_description",{error:e.error||"unspecified_error",code:e.error_code||"unspecified_code"});switch(t){case"implicit":if(this.flowType==="pkce")throw new Be("Not a valid PKCE flow url.");break;case"pkce":if(this.flowType==="implicit")throw new Q("Not a valid implicit grant flow url.");break;default:}if(t==="pkce"){if(this._debug("#_initialize()","begin","is PKCE flow",!0),!e.code)throw new Be("No code detected.");let{data:T,error:g}=await this._exchangeCodeForSession(e.code);if(g)throw g;let y=new URL(window.location.href);return y.searchParams.delete("code"),window.history.replaceState(window.history.state,"",y.toString()),{data:{session:T.session,redirectType:null},error:null}}let{provider_token:r,provider_refresh_token:s,access_token:n,refresh_token:o,expires_in:a,expires_at:l,token_type:h}=e;if(!n||!a||!o||!h)throw new Q("No session defined in URL");let c=Math.round(Date.now()/1e3),u=parseInt(a),d=c+u;l&&(d=parseInt(l));let f=d-c;f*1e3<=G&&console.warn(`@supabase/gotrue-js: Session as retrieved from URL expires in ${f}s, should have been closer to ${u}s`);let p=d-u;c-p>=120?console.warn("@supabase/gotrue-js: Session as retrieved from URL was issued over 120s ago, URL could be stale",p,d,c):c-p<0&&console.warn("@supabase/gotrue-js: Session as retrieved from URL was issued in the future? Check the device clock for skew",p,d,c);let{data:w,error:m}=await this._getUser(n);if(m)throw m;let S={provider_token:r,provider_refresh_token:s,access_token:n,expires_in:u,expires_at:d,refresh_token:o,token_type:h,user:w.user};return window.location.hash="",this._debug("#_getSessionFromURL()","clearing window.location.hash"),{data:{session:S,redirectType:e.type},error:null}}catch(r){if(_(r))return{data:{session:null,redirectType:null},error:r};throw r}}_isImplicitGrantCallback(e){return!!(e.access_token||e.error_description)}async _isPKCECallback(e){let t=await F(this.storage,`${this.storageKey}-code-verifier`);return!!(e.code&&t)}async signOut(e={scope:"global"}){return await this.initializePromise,await this._acquireLock(-1,async()=>await this._signOut(e))}async _signOut({scope:e}={scope:"global"}){return await this._useSession(async t=>{var r;let{data:s,error:n}=t;if(n)return{error:n};let o=(r=s.session)===null||r===void 0?void 0:r.access_token;if(o){let{error:a}=await this.admin.signOut(o,e);if(a&&!(Pr(a)&&(a.status===404||a.status===401||a.status===403)))return{error:a}}return e!=="others"&&(await this._removeSession(),await B(this.storage,`${this.storageKey}-code-verifier`)),{error:null}})}onAuthStateChange(e){let t=Fr(),r={id:t,callback:e,unsubscribe:()=>{this._debug("#unsubscribe()","state change callback with id removed",t),this.stateChangeEmitters.delete(t)}};return this._debug("#onAuthStateChange()","registered callback with id",t),this.stateChangeEmitters.set(t,r),(async()=>(await this.initializePromise,await this._acquireLock(-1,async()=>{this._emitInitialSession(t)})))(),{data:{subscription:r}}}async _emitInitialSession(e){return await this._useSession(async t=>{var r,s;try{let{data:{session:n},error:o}=t;if(o)throw o;await((r=this.stateChangeEmitters.get(e))===null||r===void 0?void 0:r.callback("INITIAL_SESSION",n)),this._debug("INITIAL_SESSION","callback id",e,"session",n)}catch(n){await((s=this.stateChangeEmitters.get(e))===null||s===void 0?void 0:s.callback("INITIAL_SESSION",null)),this._debug("INITIAL_SESSION","callback id",e,"error",n),console.error(n)}})}async resetPasswordForEmail(e,t={}){let r=null,s=null;this.flowType==="pkce"&&([r,s]=await ee(this.storage,this.storageKey,!0));try{return await v(this.fetch,"POST",`${this.url}/recover`,{body:{email:e,code_challenge:r,code_challenge_method:s,gotrue_meta_security:{captcha_token:t.captchaToken}},headers:this.headers,redirectTo:t.redirectTo})}catch(n){if(_(n))return{data:null,error:n};throw n}}async getUserIdentities(){var e;try{let{data:t,error:r}=await this.getUser();if(r)throw r;return{data:{identities:(e=t.user.identities)!==null&&e!==void 0?e:[]},error:null}}catch(t){if(_(t))return{data:null,error:t};throw t}}async linkIdentity(e){var t;try{let{data:r,error:s}=await this._useSession(async n=>{var o,a,l,h,c;let{data:u,error:d}=n;if(d)throw d;let f=await this._getUrlForProvider(`${this.url}/user/identities/authorize`,e.provider,{redirectTo:(o=e.options)===null||o===void 0?void 0:o.redirectTo,scopes:(a=e.options)===null||a===void 0?void 0:a.scopes,queryParams:(l=e.options)===null||l===void 0?void 0:l.queryParams,skipBrowserRedirect:!0});return await v(this.fetch,"GET",f,{headers:this.headers,jwt:(c=(h=u.session)===null||h===void 0?void 0:h.access_token)!==null&&c!==void 0?c:void 0})});if(s)throw s;return I()&&!(!((t=e.options)===null||t===void 0)&&t.skipBrowserRedirect)&&window.location.assign(r?.url),{data:{provider:e.provider,url:r?.url},error:null}}catch(r){if(_(r))return{data:{provider:e.provider,url:null},error:r};throw r}}async unlinkIdentity(e){try{return await this._useSession(async t=>{var r,s;let{data:n,error:o}=t;if(o)throw o;return await v(this.fetch,"DELETE",`${this.url}/user/identities/${e.identity_id}`,{headers:this.headers,jwt:(s=(r=n.session)===null||r===void 0?void 0:r.access_token)!==null&&s!==void 0?s:void 0})})}catch(t){if(_(t))return{data:null,error:t};throw t}}async _refreshAccessToken(e){let t=`#_refreshAccessToken(${e.substring(0,5)}...)`;this._debug(t,"begin");try{let r=Date.now();return await Kr(async s=>(s>0&&await Hr(200*Math.pow(2,s-1)),this._debug(t,"refreshing attempt",s),await v(this.fetch,"POST",`${this.url}/token?grant_type=refresh_token`,{body:{refresh_token:e},headers:this.headers,xform:N})),(s,n)=>{let o=200*Math.pow(2,s);return n&&at(n)&&Date.now()+o-r<G})}catch(r){if(this._debug(t,"error",r),_(r))return{data:{session:null,user:null},error:r};throw r}finally{this._debug(t,"end")}}_isValidSession(e){return typeof e=="object"&&e!==null&&"access_token"in e&&"refresh_token"in e&&"expires_at"in e}async _handleProviderSignIn(e,t){let r=await this._getUrlForProvider(`${this.url}/authorize`,e,{redirectTo:t.redirectTo,scopes:t.scopes,queryParams:t.queryParams});return this._debug("#_handleProviderSignIn()","provider",e,"options",t,"url",r),I()&&!t.skipBrowserRedirect&&window.location.assign(r),{data:{provider:e,url:r},error:null}}async _recoverAndRefresh(){var e,t;let r="#_recoverAndRefresh()";this._debug(r,"begin");try{let s=await F(this.storage,this.storageKey);if(s&&this.userStorage){let o=await F(this.userStorage,this.storageKey+"-user");!this.storage.isServer&&Object.is(this.storage,this.userStorage)&&!o&&(o={user:s.user},await Z(this.userStorage,this.storageKey+"-user",o)),s.user=(e=o?.user)!==null&&e!==void 0?e:dt()}else if(s&&!s.user&&!s.user){let o=await F(this.storage,this.storageKey+"-user");o&&o?.user?(s.user=o.user,await B(this.storage,this.storageKey+"-user"),await Z(this.storage,this.storageKey,s)):s.user=dt()}if(this._debug(r,"session from storage",s),!this._isValidSession(s)){this._debug(r,"session is not valid"),s!==null&&await this._removeSession();return}let n=((t=s.expires_at)!==null&&t!==void 0?t:1/0)*1e3-Date.now()<nt;if(this._debug(r,`session has${n?"":" not"} expired with margin of ${nt}s`),n){if(this.autoRefreshToken&&s.refresh_token){let{error:o}=await this._callRefreshToken(s.refresh_token);o&&(console.error(o),at(o)||(this._debug(r,"refresh failed with a non-retryable error, removing the session",o),await this._removeSession()))}}else if(s.user&&s.user.__isUserNotAvailableProxy===!0)try{let{data:o,error:a}=await this._getUser(s.access_token);!a&&o?.user?(s.user=o.user,await this._saveSession(s),await this._notifyAllSubscribers("SIGNED_IN",s)):this._debug(r,"could not get user data, skipping SIGNED_IN notification")}catch(o){console.error("Error getting user data:",o),this._debug(r,"error getting user data, skipping SIGNED_IN notification",o)}else await this._notifyAllSubscribers("SIGNED_IN",s)}catch(s){this._debug(r,"error",s),console.error(s);return}finally{this._debug(r,"end")}}async _callRefreshToken(e){var t,r;if(!e)throw new C;if(this.refreshingDeferred)return this.refreshingDeferred.promise;let s=`#_callRefreshToken(${e.substring(0,5)}...)`;this._debug(s,"begin");try{this.refreshingDeferred=new Fe;let{data:n,error:o}=await this._refreshAccessToken(e);if(o)throw o;if(!n.session)throw new C;await this._saveSession(n.session),await this._notifyAllSubscribers("TOKEN_REFRESHED",n.session);let a={session:n.session,error:null};return this.refreshingDeferred.resolve(a),a}catch(n){if(this._debug(s,"error",n),_(n)){let o={session:null,error:n};return at(n)||await this._removeSession(),(t=this.refreshingDeferred)===null||t===void 0||t.resolve(o),o}throw(r=this.refreshingDeferred)===null||r===void 0||r.reject(n),n}finally{this.refreshingDeferred=null,this._debug(s,"end")}}async _notifyAllSubscribers(e,t,r=!0){let s=`#_notifyAllSubscribers(${e})`;this._debug(s,"begin",t,`broadcast = ${r}`);try{this.broadcastChannel&&r&&this.broadcastChannel.postMessage({event:e,session:t});let n=[],o=Array.from(this.stateChangeEmitters.values()).map(async a=>{try{await a.callback(e,t)}catch(l){n.push(l)}});if(await Promise.all(o),n.length>0){for(let a=0;a<n.length;a+=1)console.error(n[a]);throw n[0]}}finally{this._debug(s,"end")}}async _saveSession(e){this._debug("#_saveSession()",e),this.suppressGetSessionWarning=!0;let t=Object.assign({},e),r=t.user&&t.user.__isUserNotAvailableProxy===!0;if(this.userStorage){!r&&t.user&&await Z(this.userStorage,this.storageKey+"-user",{user:t.user});let s=Object.assign({},t);delete s.user;let n=Nt(s);await Z(this.storage,this.storageKey,n)}else{let s=Nt(t);await Z(this.storage,this.storageKey,s)}}async _removeSession(){this._debug("#_removeSession()"),await B(this.storage,this.storageKey),await B(this.storage,this.storageKey+"-code-verifier"),await B(this.storage,this.storageKey+"-user"),this.userStorage&&await B(this.userStorage,this.storageKey+"-user"),await this._notifyAllSubscribers("SIGNED_OUT",null)}_removeVisibilityChangedCallback(){this._debug("#_removeVisibilityChangedCallback()");let e=this.visibilityChangedCallback;this.visibilityChangedCallback=null;try{e&&I()&&window?.removeEventListener&&window.removeEventListener("visibilitychange",e)}catch(t){console.error("removing visibilitychange callback failed",t)}}async _startAutoRefresh(){await this._stopAutoRefresh(),this._debug("#_startAutoRefresh()");let e=setInterval(()=>this._autoRefreshTokenTick(),G);this.autoRefreshTicker=e,e&&typeof e=="object"&&typeof e.unref=="function"?e.unref():typeof Deno<"u"&&typeof Deno.unrefTimer=="function"&&Deno.unrefTimer(e),setTimeout(async()=>{await this.initializePromise,await this._autoRefreshTokenTick()},0)}async _stopAutoRefresh(){this._debug("#_stopAutoRefresh()");let e=this.autoRefreshTicker;this.autoRefreshTicker=null,e&&clearInterval(e)}async startAutoRefresh(){this._removeVisibilityChangedCallback(),await this._startAutoRefresh()}async stopAutoRefresh(){this._removeVisibilityChangedCallback(),await this._stopAutoRefresh()}async _autoRefreshTokenTick(){this._debug("#_autoRefreshTokenTick()","begin");try{await this._acquireLock(0,async()=>{try{let e=Date.now();try{return await this._useSession(async t=>{let{data:{session:r}}=t;if(!r||!r.refresh_token||!r.expires_at){this._debug("#_autoRefreshTokenTick()","no session");return}let s=Math.floor((r.expires_at*1e3-e)/G);this._debug("#_autoRefreshTokenTick()",`access token expires in ${s} ticks, a tick lasts ${G}ms, refresh threshold is ${it} ticks`),s<=it&&await this._callRefreshToken(r.refresh_token)})}catch(t){console.error("Auto refresh tick failed with error. This is likely a transient error.",t)}}finally{this._debug("#_autoRefreshTokenTick()","end")}})}catch(e){if(e.isAcquireTimeout||e instanceof Me)this._debug("auto refresh token tick lock not available");else throw e}}async _handleVisibilityChange(){if(this._debug("#_handleVisibilityChange()"),!I()||!window?.addEventListener)return this.autoRefreshToken&&this.startAutoRefresh(),!1;try{this.visibilityChangedCallback=async()=>await this._onVisibilityChanged(!1),window?.addEventListener("visibilitychange",this.visibilityChangedCallback),await this._onVisibilityChanged(!0)}catch(e){console.error("_handleVisibilityChange",e)}}async _onVisibilityChanged(e){let t=`#_onVisibilityChanged(${e})`;this._debug(t,"visibilityState",document.visibilityState),document.visibilityState==="visible"?(this.autoRefreshToken&&this._startAutoRefresh(),e||(await this.initializePromise,await this._acquireLock(-1,async()=>{if(document.visibilityState!=="visible"){this._debug(t,"acquired the lock to recover the session, but the browser visibilityState is no longer visible, aborting");return}await this._recoverAndRefresh()}))):document.visibilityState==="hidden"&&this.autoRefreshToken&&this._stopAutoRefresh()}async _getUrlForProvider(e,t,r){let s=[`provider=${encodeURIComponent(t)}`];if(r?.redirectTo&&s.push(`redirect_to=${encodeURIComponent(r.redirectTo)}`),r?.scopes&&s.push(`scopes=${encodeURIComponent(r.scopes)}`),this.flowType==="pkce"){let[n,o]=await ee(this.storage,this.storageKey),a=new URLSearchParams({code_challenge:`${encodeURIComponent(n)}`,code_challenge_method:`${encodeURIComponent(o)}`});s.push(a.toString())}if(r?.queryParams){let n=new URLSearchParams(r.queryParams);s.push(n.toString())}return r?.skipBrowserRedirect&&s.push(`skip_http_redirect=${r.skipBrowserRedirect}`),`${e}?${s.join("&")}`}async _unenroll(e){try{return await this._useSession(async t=>{var r;let{data:s,error:n}=t;return n?{data:null,error:n}:await v(this.fetch,"DELETE",`${this.url}/factors/${e.factorId}`,{headers:this.headers,jwt:(r=s?.session)===null||r===void 0?void 0:r.access_token})})}catch(t){if(_(t))return{data:null,error:t};throw t}}async _enroll(e){try{return await this._useSession(async t=>{var r,s;let{data:n,error:o}=t;if(o)return{data:null,error:o};let a=Object.assign({friendly_name:e.friendlyName,factor_type:e.factorType},e.factorType==="phone"?{phone:e.phone}:{issuer:e.issuer}),{data:l,error:h}=await v(this.fetch,"POST",`${this.url}/factors`,{body:a,headers:this.headers,jwt:(r=n?.session)===null||r===void 0?void 0:r.access_token});return h?{data:null,error:h}:(e.factorType==="totp"&&(!((s=l?.totp)===null||s===void 0)&&s.qr_code)&&(l.totp.qr_code=`data:image/svg+xml;utf-8,${l.totp.qr_code}`),{data:l,error:null})})}catch(t){if(_(t))return{data:null,error:t};throw t}}async _verify(e){return this._acquireLock(-1,async()=>{try{return await this._useSession(async t=>{var r;let{data:s,error:n}=t;if(n)return{data:null,error:n};let{data:o,error:a}=await v(this.fetch,"POST",`${this.url}/factors/${e.factorId}/verify`,{body:{code:e.code,challenge_id:e.challengeId},headers:this.headers,jwt:(r=s?.session)===null||r===void 0?void 0:r.access_token});return a?{data:null,error:a}:(await this._saveSession(Object.assign({expires_at:Math.round(Date.now()/1e3)+o.expires_in},o)),await this._notifyAllSubscribers("MFA_CHALLENGE_VERIFIED",o),{data:o,error:a})})}catch(t){if(_(t))return{data:null,error:t};throw t}})}async _challenge(e){return this._acquireLock(-1,async()=>{try{return await this._useSession(async t=>{var r;let{data:s,error:n}=t;return n?{data:null,error:n}:await v(this.fetch,"POST",`${this.url}/factors/${e.factorId}/challenge`,{body:{channel:e.channel},headers:this.headers,jwt:(r=s?.session)===null||r===void 0?void 0:r.access_token})})}catch(t){if(_(t))return{data:null,error:t};throw t}})}async _challengeAndVerify(e){let{data:t,error:r}=await this._challenge({factorId:e.factorId});return r?{data:null,error:r}:await this._verify({factorId:e.factorId,challengeId:t.id,code:e.code})}async _listFactors(){let{data:{user:e},error:t}=await this.getUser();if(t)return{data:null,error:t};let r=e?.factors||[],s=r.filter(o=>o.factor_type==="totp"&&o.status==="verified"),n=r.filter(o=>o.factor_type==="phone"&&o.status==="verified");return{data:{all:r,totp:s,phone:n},error:null}}async _getAuthenticatorAssuranceLevel(){return this._acquireLock(-1,async()=>await this._useSession(async e=>{var t,r;let{data:{session:s},error:n}=e;if(n)return{data:null,error:n};if(!s)return{data:{currentLevel:null,nextLevel:null,currentAuthenticationMethods:[]},error:null};let{payload:o}=ut(s.access_token),a=null;o.aal&&(a=o.aal);let l=a;((r=(t=s.user.factors)===null||t===void 0?void 0:t.filter(u=>u.status==="verified"))!==null&&r!==void 0?r:[]).length>0&&(l="aal2");let c=o.amr||[];return{data:{currentLevel:a,nextLevel:l,currentAuthenticationMethods:c},error:null}}))}async fetchJwk(e,t={keys:[]}){let r=t.keys.find(a=>a.kid===e);if(r)return r;let s=Date.now();if(r=this.jwks.keys.find(a=>a.kid===e),r&&this.jwks_cached_at+Rr>s)return r;let{data:n,error:o}=await v(this.fetch,"GET",`${this.url}/.well-known/jwks.json`,{headers:this.headers});if(o)throw o;return!n.keys||n.keys.length===0||(this.jwks=n,this.jwks_cached_at=s,r=n.keys.find(a=>a.kid===e),!r)?null:r}async getClaims(e,t={}){try{let r=e;if(!r){let{data:f,error:p}=await this.getSession();if(p||!f.session)return{data:null,error:p};r=f.session.access_token}let{header:s,payload:n,signature:o,raw:{header:a,payload:l}}=ut(r);t?.allowExpired||Gr(n.exp);let h=!s.alg||s.alg.startsWith("HS")||!s.kid||!("crypto"in globalThis&&"subtle"in globalThis.crypto)?null:await this.fetchJwk(s.kid,t?.keys?{keys:t.keys}:t?.jwks);if(!h){let{error:f}=await this.getUser(r);if(f)throw f;return{data:{claims:n,header:s,signature:o},error:null}}let c=Jr(s.alg),u=await crypto.subtle.importKey("jwk",h,c,!0,["verify"]);if(!await crypto.subtle.verify(c,u,o,Dr(`${a}.${l}`)))throw new Y("Invalid JWT signature");return{data:{claims:n,header:s,signature:o},error:null}}catch(r){if(_(r))return{data:null,error:r};throw r}}};ne.nextInstanceID=0;var si=ne,Ft=si;var gt=class extends Ft{constructor(e){super(e)}};var ii=function(i,e,t,r){function s(n){return n instanceof t?n:new t(function(o){o(n)})}return new(t||(t=Promise))(function(n,o){function a(c){try{h(r.next(c))}catch(u){o(u)}}function l(c){try{h(r.throw(c))}catch(u){o(u)}}function h(c){c.done?n(c.value):s(c.value).then(a,l)}h((r=r.apply(i,e||[])).next())})},We=class{constructor(e,t,r){var s,n,o;this.supabaseUrl=e,this.supabaseKey=t;let a=Er(e);if(!t)throw new Error("supabaseKey is required.");this.realtimeUrl=new URL("realtime/v1",a),this.realtimeUrl.protocol=this.realtimeUrl.protocol.replace("http","ws"),this.authUrl=new URL("auth/v1",a),this.storageUrl=new URL("storage/v1",a),this.functionsUrl=new URL("functions/v1",a);let l=`sb-${a.hostname.split(".")[0]}-auth-token`,h={db:yr,realtime:Sr,auth:Object.assign(Object.assign({},br),{storageKey:l}),global:wr},c=Tr(r??{},h);this.storageKey=(s=c.auth.storageKey)!==null&&s!==void 0?s:"",this.headers=(n=c.global.headers)!==null&&n!==void 0?n:{},c.accessToken?(this.accessToken=c.accessToken,this.auth=new Proxy({},{get:(u,d)=>{throw new Error(`@supabase/supabase-js: Supabase Client is configured with the accessToken option, accessing supabase.auth.${String(d)} is not possible`)}})):this.auth=this._initSupabaseAuthClient((o=c.auth)!==null&&o!==void 0?o:{},this.headers,c.global.fetch),this.fetch=kr(t,this._getAccessToken.bind(this),c.global.fetch),this.realtime=this._initRealtimeClient(Object.assign({headers:this.headers,accessToken:this._getAccessToken.bind(this)},c.realtime)),this.rest=new nr(new URL("rest/v1",a).href,{headers:this.headers,schema:c.db.schema,fetch:this.fetch}),this.storage=new Ue(this.storageUrl.href,this.headers,this.fetch,r?.storage),c.accessToken||this._listenForAuthEvents()}get functions(){return new Se(this.functionsUrl.href,{headers:this.headers,customFetch:this.fetch})}from(e){return this.rest.from(e)}schema(e){return this.rest.schema(e)}rpc(e,t={},r={}){return this.rest.rpc(e,t,r)}channel(e,t={config:{}}){return this.realtime.channel(e,t)}getChannels(){return this.realtime.getChannels()}removeChannel(e){return this.realtime.removeChannel(e)}removeAllChannels(){return this.realtime.removeAllChannels()}_getAccessToken(){var e,t;return ii(this,void 0,void 0,function*(){if(this.accessToken)return yield this.accessToken();let{data:r}=yield this.auth.getSession();return(t=(e=r.session)===null||e===void 0?void 0:e.access_token)!==null&&t!==void 0?t:this.supabaseKey})}_initSupabaseAuthClient({autoRefreshToken:e,persistSession:t,detectSessionInUrl:r,storage:s,userStorage:n,storageKey:o,flowType:a,lock:l,debug:h},c,u){let d={Authorization:`Bearer ${this.supabaseKey}`,apikey:`${this.supabaseKey}`};return new gt({url:this.authUrl.href,headers:Object.assign(Object.assign({},d),c),storageKey:o,autoRefreshToken:e,persistSession:t,detectSessionInUrl:r,storage:s,userStorage:n,flowType:a,lock:l,debug:h,fetch:u,hasCustomAuthorizationHeader:Object.keys(this.headers).some(f=>f.toLowerCase()==="authorization")})}_initRealtimeClient(e){return new de(this.realtimeUrl.href,Object.assign(Object.assign({},e),{params:Object.assign({apikey:this.supabaseKey},e?.params)}))}_listenForAuthEvents(){return this.auth.onAuthStateChange((t,r)=>{this._handleTokenChanged(t,"CLIENT",r?.access_token)})}_handleTokenChanged(e,t,r){(e==="TOKEN_REFRESHED"||e==="SIGNED_IN")&&this.changedAccessToken!==r?this.changedAccessToken=r:e==="SIGNED_OUT"&&(this.realtime.setAuth(),t=="STORAGE"&&this.auth.signOut(),this.changedAccessToken=void 0)}};var ts=(i,e,t)=>new We(i,e,t);function ni(){if(typeof window<"u"||typeof process>"u")return!1;let i=process.version;if(i==null)return!1;let e=i.match(/^v(\\d+)\\./);return e?parseInt(e[1],10)<=18:!1}ni()&&console.warn("\\u26A0\\uFE0F  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217");var He=Object.freeze({supabaseUrl:"https://mmqqfeywxvlwzmxsbxic.supabase.co",publishableKey:"sb_publishable_2Tp3tasLtQze6B2Ac9IQCw_zRwueNWd",googleEnabled:!1,enforceToolAccess:!0});var oi=!!(He.supabaseUrl&&He.publishableKey),is="lz-remember-session";function Ke(){return localStorage.getItem(is)!=="false"}var ai={getItem:i=>Ke()?localStorage.getItem(i):sessionStorage.getItem(i),setItem:(i,e)=>{let t=Ke()?localStorage:sessionStorage,r=Ke()?sessionStorage:localStorage;t.setItem(i,e),r.removeItem(i)},removeItem:i=>{localStorage.removeItem(i),sessionStorage.removeItem(i)}};function Qo(i){let e=Ke();if(e===i)return;let t=e?localStorage:sessionStorage,r=i?localStorage:sessionStorage,s=[];for(let n=0;n<t.length;n++){let o=t.key(n);/^sb-.*-auth-token/.test(o)&&s.push(o)}for(let n of s)r.setItem(n,t.getItem(n)),t.removeItem(n);localStorage.setItem(is,String(i))}var ze=oi?ts(He.supabaseUrl,He.publishableKey,{auth:{storage:ai,flowType:"pkce",autoRefreshToken:!0,persistSession:!0,detectSessionInUrl:!0}}):null,ns={premium:"premium.html",crop:"crop.html",editor:"editor.html",remove:"editor.html?tool=remove",recolor:"editor.html?tool=recolor",opacity:"opacity.html",thickness:"thickness.html",texture:"textures.html",text:"text-creator.html",mockups:"mockups.html",vectorize:"vectorize.html",analyzer:"analyzer.html",sheet:"gang-sheet.html",color:"color-enhance.html",upscale:"upscale.html",extract:"extract.html"};async function rs(i,e={}){let{data:t,error:r}=await ze.rpc(i,e);if(r)throw r;return t}async function ss(i){let e=[];for(let t=0;;t+=1e3){let{data:r,error:s}=await ze.from(i).select("*").order("id").range(t,t+999);if(s)throw s;if(e.push(...r),r.length<1e3)return e}}function Yo(i){return zt(i,ns)}async function Xo(){if(!ze)return null;let{data:i,error:e}=await ze.auth.getUser();if(e||!i.user)return null;await rs("lz_ensure_profile");let[t,r,s]=await Promise.all([ss("lz_profiles"),rs("lz_is_admin"),ss("lz_tools")]);return{user:i.user,profile:t.find(n=>n.id===i.user.id),profiles:t,isAdmin:r,tools:s}}function Zo(i,e){return!!(i&&i.profile&&!i.profile.blocked&&ns[e]&&i.tools.some(t=>t.id===(["remove","premium"].includes(e)?"editor":e)&&t.enabled!==!1))}async function ea(i){let e=await fetch("/api/account/session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({access_token:i?.access_token||null,remember:Ke()}),credentials:"same-origin"});if(!e.ok){let t=await e.json();throw new Error(t.message||"No pudimos verificar tu sesi\\xF3n.")}}async function ta(i,e){let{data:t,error:r}=await ze.from("lz_tools").update({enabled:e}).eq("id",i).select("id,enabled");if(r)throw r;if(!t?.length)throw new Error("No tienes permiso para cambiar esta herramienta.")}export{li as a,oi as b,Ke as c,Qo as d,ze as e,ns as f,rs as g,Yo as h,Xo as i,Zo as j,ea as k,ta as l};\n',type:"text/javascript; charset=utf-8",public:!0},"/account/shared-DDMDY4E6.js":{body:`import{d as a,e as b,f as c,g as d,h as e,j as f}from"./shared-Q63R373C.js";f();export{c as Headers,d as Request,e as Response,b as default,a as fetch};
 `,type:"text/javascript; charset=utf-8",public:!0},"/account/shared-Q63R373C.js":{body:`var a=Object.create;var f=Object.defineProperty;var c=Object.getOwnPropertyDescriptor;var d=Object.getOwnPropertyNames;var u=Object.getPrototypeOf,i=Object.prototype.hasOwnProperty;var p=(e,t)=>()=>(e&&(t=e(e=0)),t);var v=(e,t)=>()=>(t||e((t={exports:{}}).exports,t),t.exports),b=(e,t)=>{for(var o in t)f(e,o,{get:t[o],enumerable:!0})},l=(e,t,o,s)=>{if(t&&typeof t=="object"||typeof t=="function")for(let r of d(t))!i.call(e,r)&&r!==o&&f(e,r,{get:()=>t[r],enumerable:!(s=c(t,r))||s.enumerable});return e};var H=(e,t,o)=>(o=e!=null?a(u(e)):{},l(t||!e||!e.__esModule?f(o,"default",{value:e,enumerable:!0}):o,e)),E=e=>l(f({},"__esModule",{value:!0}),e);var j={};b(j,{Headers:()=>h,Request:()=>R,Response:()=>y,default:()=>x,fetch:()=>g});var w,n,g,x,h,R,y,q=p(()=>{w=function(){if(typeof self<"u")return self;if(typeof window<"u")return window;if(typeof global<"u")return global;throw new Error("unable to locate global object")},n=w(),g=n.fetch,x=n.fetch.bind(n),h=n.Headers,R=n.Request,y=n.Response});export{v as a,H as b,E as c,g as d,x as e,h as f,R as g,y as h,j as i,q as j};
@@ -1050,7 +1050,7 @@ export function coupon(s){\r
 <link rel="stylesheet" href="k40-control.css?v=5">
 <link rel="stylesheet" href="workshop.css?v=5">
 <link rel="stylesheet" href="../lz-appbar.css?v=60">
-<link rel="stylesheet" href="neo-box.css?v=60">
+<link rel="stylesheet" href="neo-box.css?v=62">
 <style>body.box-booting{visibility:hidden}body.box-booting .lz-appbar{visibility:visible}body.box-booting .box-loading{visibility:visible;position:fixed;inset:60px 0 0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#030405;color:#f3f7fc;font:15px system-ui,sans-serif}.box-loading strong{font-size:20px}.box-loading a{color:#2ee6ff}.box-loading:before{content:"";width:38px;height:38px;border-radius:50%;border:3px solid #18202b;border-top-color:#2ee6ff;animation:lzspin .8s linear infinite}@keyframes lzspin{to{transform:rotate(360deg)}}</style></head>
 <body class="box-booting"><div class="box-loading" role="status"><strong>LZ Box Studio</strong><span>Preparando tu espacio de trabajo\u2026</span><a href="index.html">Volver a cargar</a></div>
 <header class="lz-appbar lz-top-nav" aria-label="LZ Studio Tools navegaci\xF3n"><a class="lz-logo" href="../index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name"><b>LZ</b> STUDIO TOOLS</span></a><nav class="lz-mainnav" aria-label="Secciones de LZ Studio Tools"><a class="lz-nav-link" href="../index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg><span>Inicio</span></a><a class="lz-nav-link" href="../dtf.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Herramientas DTF</span></a><a class="lz-nav-link active" aria-current="page" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg><span>LZ Box Studio</span></a></nav><div class="lz-appbar-actions"><a class="lz-help" href="#ayuda" onclick="document.getElementById('helpBtn')?.click();return false;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg><span>Ayuda</span></a><a class="account-link" href="../account.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="lz-acc-label">Mi cuenta</span></a></div></header>
@@ -1097,7 +1097,7 @@ export function coupon(s){\r
 <dialog id="saveDialog"><div class="dialog-header"><h2>Guardar dise\xF1o</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><label class="field-title" for="designName">Nombre del dise\xF1o</label><input id="designName" maxlength="80" placeholder="Ej. Caja para regalo"><p class="hint">Se guarda en este navegador. Exporta un respaldo para conservarlo en otro dispositivo.</p><button id="confirmSave" class="btn primary wide">Guardar dise\xF1o</button><button id="saveCopy" type="button" class="btn outline wide">Guardar como copia nueva</button></dialog>
 <dialog id="projectsDialog"><div class="dialog-header"><div><span class="eyebrow">TU MESA DE TRABAJO</span><h2>Mis dise\xF1os</h2></div><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><div id="projectSearchMount" class="project-search-mount"></div><div id="projectsList"></div><div class="backup-actions"><button id="newBtn" class="btn outline">Nuevo dise\xF1o</button><button id="backupBtn" class="btn outline">Exportar respaldo JSON</button><button id="importBtn" class="btn outline">Importar dise\xF1o</button><input type="file" id="importFile" accept=".json,application/json" hidden></div><p class="hint">Guardados en este navegador, sin sincronizaci\xF3n entre dispositivos.</p></dialog>
 <dialog id="helpDialog"><div class="dialog-header"><h2>De la idea a tu primera caja</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><ol class="help-steps"><li><strong>Elige el modelo y las medidas.</strong><p>Las exteriores incluyen el MDF. Las interiores corresponden al espacio \xFAtil de la caja armada.</p></li><li><strong>Mide tu material.</strong><p>Selecciona 2, 2.5, 3, 4, 5 o 6 mm, o escribe el espesor real entre 1 y 20 mm. Los encastres se regeneran con cada cambio.</p></li><li><strong>Calibra el encaje.</strong><p>El kerf es el ancho total que elimina tu l\xE1ser. La holgura agrega espacio entre dientes. Descarga la probeta, corta y ajusta estos valores antes de producir.</p></li><li><strong>Revisa y exporta.</strong><p>Gira el modelo, separa las piezas y revisa las hojas de corte. Exporta SVG o DXF en mm a escala 1:1.</p></li></ol><div class="export-note shortcuts"><strong>Controles y atajos</strong><p>Arrastrar: girar \xB7 Bot\xF3n derecho, rueda presionada o May\xFAs + arrastrar: desplazar \xB7 Rueda: zoom \xB7 Doble clic: encuadrar.</p><p><kbd>Ctrl</kbd>+<kbd>Z</kbd> deshacer \xB7 <kbd>Ctrl</kbd>+<kbd>May\xFAs</kbd>+<kbd>Z</kbd> o <kbd>Ctrl</kbd>+<kbd>Y</kbd> rehacer \xB7 <kbd>Ctrl</kbd>+<kbd>S</kbd> guardar \xB7 <kbd>F</kbd> encuadrar \xB7 <kbd>1</kbd>\u2013<kbd>7</kbd> vistas (perspectiva, frente, posterior, izquierda, derecha, superior, inferior) \xB7 <kbd>H</kbd> ocultar pieza \xB7 <kbd>I</kbd> aislar \xB7 <kbd>May\xFAs</kbd>+<kbd>H</kbd> mostrar todas \xB7 <kbd>M</kbd> medidas \xB7 <kbd>C</kbd> compartimentos \xB7 <kbd>E</kbd> formas \xB7 <kbd>P</kbd> plano / 3D \xB7 <kbd>Esc</kbd> cerrar panel.</p><p>En el plano de corte, con \xABEditar distribuci\xF3n\xBB: arrastra piezas, <kbd>R</kbd> gira 90\xB0 y las flechas ajustan 1 mm (May\xFAs: 10 mm).</p></div><div class="export-note"><strong>Sobre esta versi\xF3n</strong><p>Diecisiete modelos, edici\xF3n directa en 3D, formas de corte y PNG. Incluye caja normal, abatible, corrediza, charola, huacal, canasta con arco, canasta con asa doble, estuche con divisiones, portador con asa ovalada y canasta de perfil curvo. Todos los modelos se dise\xF1an para ensamble sin pegamento. La abatible usa pivotes integrados y la corrediza, gu\xEDas capturadas por los laterales y tirador integral de MDF. El 3D permite revisar la forma y la apertura; realiza una prueba de corte y armado antes de producir. Las referencias muestran la forma, sin incluir sus grabados.</p></div><button class="btn primary wide" data-close>Empezar a crear</button></dialog>
-<script type="module" src="app.js?v=3.6"></script><script type="module" src="studio-plus.js?v=3.5"></script><script type="module" src="workflow-plus.js?v=3.5"></script><script type="module" src="workshop.js?v=5"></script><script type="module" src="neo-studio.js?v=60"></script></body></html>
+<script type="module" src="app.js?v=3.6"></script><script type="module" src="studio-plus.js?v=3.5"></script><script type="module" src="workflow-plus.js?v=3.5"></script><script type="module" src="workshop.js?v=62"></script><script type="module" src="neo-studio.js?v=62"></script></body></html>
 `,type:"text/html; charset=utf-8",public:!1},"/box/internal-joints.js":{body:`import {frame,rect,materialWeb} from './models.js?v=3.5';
 /* Tenons on horizontal panels and side ends; closed receivers on all walls. */
 function spans(L,s){const m=materialWeb(s),fit=+s.clearance,margin=m+fit,length=L-2*margin;if(length<m)throw Error('Aumenta la medida: las ranuras interiores necesitan margen y pesta\xF1as resistentes.');let n=Math.max(1,Math.round(length/(+s.finger)));n=Math.min(n,Math.floor(length/(m+fit)));if(n%2===0)n--;n=Math.max(n,1);return Array.from({length:(n+1)/2},(_,k)=>[margin+2*k*length/n,margin+(2*k+1)*length/n]);}
@@ -1129,6 +1129,1134 @@ export function captiveBody(s,{W,D,H,t},shell,union,decompose){
  }
  for(const p of out)p.jointHoles=p.holes.map((_,i)=>i);return out;
 }
+`,type:"text/javascript; charset=utf-8",public:!1},"/box/job-library.js":{body:`/* LZ Box Studio \xB7 biblioteca de trabajos de archivo (v62).
+   Dos lugares, siempre identificados:
+   - \xABEsta computadora\xBB: IndexedDB del navegador (sin l\xEDmite pr\xE1ctico de 5 MB).
+   - \xABTu cuenta\xBB: /api/box/library (Supabase). Solo se marca \xABsincronizado\xBB
+     cuando el servidor confirma la escritura.
+   Un trabajo guarda archivo original, operaciones, par\xE1metros, colocaci\xF3n,
+   dimensiones, miniatura y versi\xF3n de formato. Nunca guarda posiciones f\xEDsicas:
+   al abrirlo hay que volver a verificar cama, colocaci\xF3n y origen. */
+export const JOB_FORMAT = 2;
+const DB = 'lzbox-jobs', STORE = 'items';
+let dbPromise = null;
+function db() {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') return reject(Error('Este navegador no permite guardar trabajos de archivo.'));
+    const req = indexedDB.open(DB, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE, {keyPath: 'id'});
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || Error('No se pudo abrir el almacenamiento local.'));
+  });
+  dbPromise.catch(() => { dbPromise = null; });
+  return dbPromise;
+}
+async function tx(mode, fn) {
+  const d = await db();
+  return new Promise((resolve, reject) => {
+    const t = d.transaction(STORE, mode), store = t.objectStore(STORE);
+    let result; const r = fn(store); if (r) r.onsuccess = () => { result = r.result; };
+    t.oncomplete = () => resolve(result); t.onerror = () => reject(t.error || Error('No se pudo guardar en esta computadora.')); t.onabort = () => reject(t.error || Error('Espacio insuficiente en esta computadora.'));
+  });
+}
+export const localAll = () => tx('readonly', (s) => s.getAll()).then((list) => (list || []).filter(validItem));
+export const localGet = (id) => tx('readonly', (s) => s.get(id));
+export const localPut = (item) => tx('readwrite', (s) => s.put(item));
+export const localDelete = (id) => tx('readwrite', (s) => s.delete(id));
+
+export function validItem(item) {
+  return !!item && typeof item.id === 'string' && item.kind === 'file' && Number.isInteger(item.format) && item.format <= JOB_FORMAT && typeof item.name === 'string' && item.source && typeof item.source.data === 'string';
+}
+
+/** Elemento de biblioteca a partir del estado del estudio (sin coordenadas f\xEDsicas). */
+export function makeJobItem({id, name, source, unitOverride, plan, placement, bed, dims, opsSummary, thumb, created}) {
+  if (!String(name || '').trim()) throw Error('Escribe un nombre para el trabajo.');
+  if (!source?.data) throw Error('No hay archivo importado para guardar.');
+  const now = new Date().toISOString();
+  return {id: id || crypto.randomUUID(), kind: 'file', format: JOB_FORMAT, name: String(name).trim().slice(0, 80), created: created || now, updated: now, deletedAt: null,
+    source: {type: source.type, name: String(source.name || '').slice(0, 120), mime: source.mime, data: source.data, size: source.data.length},
+    unitOverride: unitOverride || 'auto', plan: JSON.parse(JSON.stringify(plan)), placement: {x: +placement.x || 0, y: +placement.y || 0, scale: +placement.scale || 1, rotation: +placement.rotation || 0},
+    bedAtSave: bed ? {width: bed.width, height: bed.height} : null, dims: dims ? {width: +dims.width.toFixed(2), height: +dims.height.toFixed(2)} : null,
+    opsSummary: opsSummary || [], thumb: typeof thumb === 'string' && /^data:image\\/(png|jpeg|webp);base64,/.test(thumb) && thumb.length < 150000 ? thumb : null,
+    requiresReference: true, cloud: null};
+}
+const metaOf = (item) => ({name: item.name, dims: item.dims, opsSummary: item.opsSummary, thumb: item.thumb, source: {type: item.source.type, name: item.source.name, size: item.source.size}, created: item.created});
+const payloadOf = (item) => ({source: item.source, unitOverride: item.unitOverride, plan: item.plan, placement: item.placement, bedAtSave: item.bedAtSave});
+
+/* ------------------------------------------------------------ cuenta */
+async function cloud(action, body = {}) {
+  let response;
+  try { response = await fetch('/api/box/library', {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({action, ...body}), signal: AbortSignal.timeout(30000)}); }
+  catch { const e = Error('Sin conexi\xF3n con la biblioteca de la cuenta.'); e.offline = true; throw e; }
+  let value = {}; try { value = await response.json(); } catch {}
+  if (!response.ok) { const e = Error(value.message || 'La biblioteca de la cuenta no respondi\xF3.'); e.status = response.status; e.code = value.code; throw e; }
+  return value;
+}
+export const cloudList = () => cloud('list').then((v) => Array.isArray(v.items) ? v.items : []);
+export async function cloudGet(id) {
+  const v = await cloud('get', {id});
+  return {id: v.id, kind: 'file', format: v.format, name: v.name, created: v.meta?.created || v.createdAt, updated: v.updatedAt, deletedAt: v.deletedAt, ...v.payload, dims: v.meta?.dims || null, opsSummary: v.meta?.opsSummary || [], thumb: v.meta?.thumb || null, requiresReference: true, cloud: {updatedAt: v.updatedAt}};
+}
+export const cloudPut = (item) => cloud('put', {id: item.id, item: {kind: 'file', name: item.name, format: item.format, meta: metaOf(item), payload: payloadOf(item), baseUpdatedAt: item.cloud?.updatedAt || null}});
+export const cloudAction = (action, id, extra = {}) => cloud(action, {id, ...extra});
+
+/**
+ * Biblioteca combinada. \`where\`: 'local' | 'cloud' | 'both'. \`synced\` solo es
+ * verdadero si la copia local coincide con la confirmada por el servidor.
+ */
+export class JobLibrary {
+  constructor() { this.items = []; this.cloudState = 'unknown'; this.cloudMessage = ''; this.listeners = new Set(); }
+  onChange(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
+  emit() { for (const fn of this.listeners) try { fn(); } catch {} }
+  async refresh() {
+    let local = [];
+    try { local = await localAll(); } catch (e) { this.localError = e.message; }
+    let remote = null;
+    try { remote = await cloudList(); this.cloudState = 'on'; this.cloudMessage = 'Biblioteca de tu cuenta activa.'; }
+    catch (e) { this.cloudState = e.status === 401 ? 'signed-out' : e.code === 'not-enabled' ? 'not-enabled' : 'offline'; this.cloudMessage = e.message; }
+    const map = new Map();
+    for (const item of local) map.set(item.id, {...item, where: 'local', synced: false});
+    for (const r of remote || []) {
+      if (r.kind !== 'file') continue;
+      const mine = map.get(r.id);
+      if (mine) {
+        const synced = mine.cloud?.updatedAt && new Date(mine.cloud.updatedAt).getTime() === new Date(r.updatedAt).getTime();
+        const newer = new Date(r.updatedAt) > new Date(mine.cloud?.updatedAt || 0);
+        map.set(r.id, {...mine, where: 'both', synced: !!synced, cloudNewer: newer && !synced, deletedAt: r.deletedAt || mine.deletedAt, remoteUpdated: r.updatedAt});
+      } else map.set(r.id, {id: r.id, kind: 'file', format: r.format, name: r.name, updated: r.updatedAt, deletedAt: r.deletedAt, dims: r.meta?.dims, opsSummary: r.meta?.opsSummary || [], thumb: r.meta?.thumb, source: {type: r.meta?.source?.type, name: r.meta?.source?.name, size: r.meta?.source?.size, data: ''}, where: 'cloud', synced: true, remoteOnly: true, remoteUpdated: r.updatedAt});
+    }
+    this.items = [...map.values()].sort((a, b) => String(b.updated).localeCompare(String(a.updated)));
+    this.emit();
+    return this.items;
+  }
+  /** Guarda primero aqu\xED y despu\xE9s en la cuenta; informa exactamente d\xF3nde qued\xF3. */
+  async save(item, {toCloud = true} = {}) {
+    await localPut(item);
+    let cloudResult = null;
+    if (toCloud && this.cloudState !== 'signed-out' && this.cloudState !== 'not-enabled') {
+      try { const r = await cloudPut(item); item.cloud = {updatedAt: r.updatedAt}; await localPut(item); cloudResult = 'synced'; }
+      catch (e) { cloudResult = e.message; if (e.status === 401) this.cloudState = 'signed-out'; if (e.code === 'not-enabled') this.cloudState = 'not-enabled'; }
+    }
+    await this.refresh();
+    return {item, cloud: cloudResult};
+  }
+  async open(id) {
+    const entry = this.items.find((i) => i.id === id);
+    if (entry && !entry.remoteOnly && !entry.cloudNewer) { const local = await localGet(id); if (local) return local; }
+    const remote = await cloudGet(id);
+    if (!validItem({...remote, source: remote.source})) throw Error('El trabajo guardado en la cuenta est\xE1 incompleto.');
+    await localPut(remote).catch(() => {});
+    return remote;
+  }
+  async rename(id, name) {
+    name = String(name || '').trim().slice(0, 80); if (!name) throw Error('Escribe un nombre.');
+    const entry = this.items.find((i) => i.id === id);
+    const local = await localGet(id).catch(() => null);
+    if (local) { local.name = name; local.updated = new Date().toISOString(); await localPut(local); }
+    if (entry && entry.where !== 'local') { const r = await cloudAction('rename', id, {name}); if (local) { local.cloud = {updatedAt: r.updatedAt}; await localPut(local); } }
+    return this.refresh();
+  }
+  async duplicate(id) {
+    const source = await this.open(id);
+    const copy = {...JSON.parse(JSON.stringify(source)), id: crypto.randomUUID(), name: (source.name + ' (copia)').slice(0, 80), created: new Date().toISOString(), updated: new Date().toISOString(), deletedAt: null, cloud: null};
+    return this.save(copy, {toCloud: this.items.find((i) => i.id === id)?.where !== 'local'});
+  }
+  /** Papelera: se puede restaurar durante 30 d\xEDas. */
+  async remove(id) {
+    const entry = this.items.find((i) => i.id === id), local = await localGet(id).catch(() => null), now = new Date().toISOString();
+    if (local) { local.deletedAt = now; await localPut(local); }
+    if (entry && entry.where !== 'local') { const r = await cloudAction('delete', id); if (local) { local.cloud = {updatedAt: r.updatedAt}; await localPut(local); } }
+    return this.refresh();
+  }
+  async restore(id) {
+    const entry = this.items.find((i) => i.id === id), local = await localGet(id).catch(() => null);
+    if (local) { local.deletedAt = null; await localPut(local); }
+    if (entry && entry.where !== 'local') { const r = await cloudAction('restore', id); if (local) { local.cloud = {updatedAt: r.updatedAt}; await localPut(local); } }
+    return this.refresh();
+  }
+  async purge(id) {
+    const entry = this.items.find((i) => i.id === id);
+    if (entry && entry.where !== 'local') await cloudAction('purge', id);
+    await localDelete(id).catch(() => {});
+    return this.refresh();
+  }
+  /** Sube a la cuenta un trabajo que solo estaba en esta computadora. */
+  async upload(id) { const local = await localGet(id); if (!local) throw Error('No est\xE1 en esta computadora.'); local.cloud = null; const r = await this.save(local, {toCloud: true}); if (r.cloud !== 'synced') throw Error(r.cloud || 'La cuenta no est\xE1 disponible.'); return r; }
+}
+`,type:"text/javascript; charset=utf-8",public:!1},"/box/job-ops.js":{body:`/* LZ Box Studio \xB7 operaciones de m\xE1quina para archivos importados (v62).
+   Une un dise\xF1o importado (svg-import.js), su colocaci\xF3n en la cama y una lista
+   de operaciones ordenadas en un trabajo lz-k40-m2/v2:
+   - Grabado de imagen: raster de 1 bit (la M2 no tiene PWM; la potencia es la
+     del panel). Umbral o difusi\xF3n de error, barridos horizontales.
+   - Grabado vectorial y corte: trayectorias en mm. Dentro de cada operaci\xF3n se
+     eliminan tramos repetidos con el mismo optimizador de Box (sin tocar otras
+     operaciones ni las pasadas elegidas). Interiores antes que contornos.
+   - Los SVG importados se cortan sobre la l\xEDnea dibujada: no se aplica kerf.
+   La generaci\xF3n de instrucciones M2 la hace el conector local. */
+import {optimizeCuts, verifyOptimization} from './cut-optimizer.js?v=3.5';
+import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=1';
+
+export const K40_PROTOCOL_V2 = 'lz-k40-m2/v2';
+export const NATIVE_MM = 0.0254;
+export const OP_TYPES = {
+  raster: {label: 'Grabado imagen', short: 'Imagen', color: '#e8eef5', speed: [10, 400], defaultSpeed: 200, icon: 'image'},
+  engrave: {label: 'Grabado vectorial', short: 'Vectorial', color: '#ff4d6d', speed: [1, 100], defaultSpeed: 60, icon: 'pen'},
+  cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, icon: 'scissors'},
+};
+export const RESOLUTIONS = [2, 3, 4, 5, 6, 8].map((step) => ({step, mm: +(step * NATIVE_MM).toFixed(4), dpi: Math.round(1000 / step)}));
+const RED = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return false; const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16); return r > 180 && g < 90 && b < 90; };
+
+let opSerial = 0;
+export function makeOperation(type, extra = {}) {
+  const t = OP_TYPES[type];
+  if (!t) throw Error('Tipo de operaci\xF3n desconocido.');
+  return {id: extra.id || \`\${type}-\${Date.now().toString(36)}-\${++opSerial}\`, type, name: extra.name || t.label, enabled: extra.enabled ?? true, speed: extra.speed ?? t.defaultSpeed, passes: extra.passes ?? 1,
+    ...(type === 'raster' ? {step: extra.step ?? 4, dither: extra.dither ?? 'auto', invert: !!extra.invert, bidirectional: extra.bidirectional ?? true} : {})};
+}
+
+/**
+ * Propuesta inicial: imagen/rellenos \u2192 grabado imagen; contornos rojos \u2192 corte;
+ * otros contornos \u2192 grabado vectorial. Orden: imagen, vectorial, corte.
+ * Todo queda visible y editable en la tabla de capas.
+ */
+export function defaultPlan(design) {
+  const ops = [], assignment = {};
+  const need = (type) => ops.find((o) => o.type === type) || (ops.push(makeOperation(type)), ops.at(-1));
+  for (const layer of design.layers) {
+    if (layer.kind === 'image' || layer.kind === 'fill') assignment[layer.key] = need('raster').id;
+    else assignment[layer.key] = (RED(layer.color) ? need('cut') : need('engrave')).id;
+  }
+  const rank = {raster: 0, engrave: 1, cut: 2};
+  ops.sort((a, b) => rank[a.type] - rank[b.type]);
+  return {operations: ops, assignment};
+}
+
+/** Qu\xE9 operaciones puede recibir cada tipo de capa. Un relleno nunca se convierte en corte sin elegirlo. */
+export function compatibleTypes(layer) {
+  return layer.kind === 'image' ? ['raster'] : layer.kind === 'fill' ? ['raster', 'engrave-outline', 'cut-outline'] : ['engrave', 'cut', 'raster'];
+}
+
+export function orderWarnings(operations) {
+  const active = operations.filter((o) => o.enabled);
+  const firstCut = active.findIndex((o) => o.type === 'cut');
+  const warnings = [];
+  if (firstCut >= 0 && active.slice(firstCut + 1).some((o) => o.type !== 'cut')) warnings.push('Hay grabados despu\xE9s de un corte: la pieza puede moverse o caer antes de grabarse. Se recomienda grabar antes de cortar.');
+  return warnings;
+}
+
+/* ------------------------------------------------------------ colocaci\xF3n */
+/** Matriz documento(mm) \u2192 cama(mm): escala proporcional y giro alrededor del centro; esquina superior izquierda en (x,y). */
+export function placementMatrix(design, placement) {
+  const b = design.bbox, s = Math.max(0.001, Number(placement.scale) || 1), r = (Number(placement.rotation) || 0) * Math.PI / 180;
+  const c = [b.x + b.width / 2, b.y + b.height / 2];
+  let m = mul([Math.cos(r) * s, Math.sin(r) * s, -Math.sin(r) * s, Math.cos(r) * s, 0, 0], [1, 0, 0, 1, -c[0], -c[1]]);
+  // Geometr\xEDa real (no solo el rect\xE1ngulo): una pieza girada no ocupa su caja original.
+  const placed = boundsOf(design.elements.map((e) => ({subpaths: e.subpaths.map((p) => ({points: p.points.map((q) => apply(m, q))}))})), design.images.map((i) => ({corners: i.corners.map((q) => apply(m, q))})));
+  return mul([1, 0, 0, 1, (Number(placement.x) || 0) - placed.x, (Number(placement.y) || 0) - placed.y], m);
+}
+
+export function placedBounds(design, placement) {
+  const m = placementMatrix(design, placement);
+  return boundsOf(design.elements.map((e) => ({subpaths: e.subpaths.map((p) => ({points: p.points.map((q) => apply(m, q))}))})), design.images.map((i) => ({corners: i.corners.map((q) => apply(m, q))})));
+}
+
+export function boundsCheck(bounds, bed) {
+  const over = [];
+  if (bounds.x < -1e-6) over.push(\`izquierda \${(-bounds.x).toFixed(1)} mm\`);
+  if (bounds.y < -1e-6) over.push(\`arriba \${(-bounds.y).toFixed(1)} mm\`);
+  if (bounds.x + bounds.width > bed.width + 1e-6) over.push(\`derecha \${(bounds.x + bounds.width - bed.width).toFixed(1)} mm\`);
+  if (bounds.y + bounds.height > bed.height + 1e-6) over.push(\`abajo \${(bounds.y + bounds.height - bed.height).toFixed(1)} mm\`);
+  return {ok: !over.length, message: over.length ? \`El dise\xF1o sale de la cama (\${over.join(', ')}). Mu\xE9velo o red\xFAcelo.\` : ''};
+}
+
+/* ------------------------------------------------------------ vectores */
+function pointInPolygon(p, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const a = ring[i], b = ring[j];
+    if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) inside = !inside;
+  }
+  return inside;
+}
+
+/** Trayectorias de una operaci\xF3n vectorial en coordenadas de cama, optimizadas y verificadas. */
+export function vectorPaths(design, placement, operation, assignment) {
+  const m = placementMatrix(design, placement), raw = [];
+  for (const e of design.elements) {
+    const viaStroke = e.stroke && assignment['stroke:' + e.stroke.color] === operation.id;
+    const viaFill = e.fill && assignment['fill:' + e.fill.color] === operation.id + ':outline';
+    if (!viaStroke && !viaFill) continue;
+    for (const s of e.subpaths) {
+      const points = s.points.map((p) => apply(m, p).map((v) => Math.round(v * 1e4) / 1e4));
+      // Un relleno abierto usado como contorno se cierra igual que al rellenar.
+      const closed = s.closed || (viaFill && !viaStroke);
+      if (points.length < (closed ? 3 : 2) || polylineLength(points, closed) < NATIVE_MM) continue;
+      raw.push({points, closed, op: 'cut', passes: 1, parts: [e.id], role: 'outer'});
+    }
+  }
+  if (!raw.length) return {paths: [], lengthMm: 0, savedMm: 0, travelMm: 0};
+  // Interiores primero: un anillo cerrado dentro de otro de la misma operaci\xF3n.
+  const closed = raw.filter((p) => p.closed);
+  for (const p of closed) {
+    const b = boundsOf([{subpaths: [p]}]);
+    if (closed.some((q) => q !== p && (() => { const c = boundsOf([{subpaths: [q]}]); return c.width * c.height > b.width * b.height && b.x >= c.x && b.y >= c.y && b.x + b.width <= c.x + c.width && b.y + b.height <= c.y + c.height && pointInPolygon(p.points[0], q.points); })())) p.role = 'hole';
+  }
+  let result;
+  try {
+    result = optimizeCuts(raw, {tolerance: 0.01});
+    const check = verifyOptimization(raw, result.paths, result.tolerance ?? 0.01);
+    if (!check.ok) throw Error(check.problems[0]);
+  } catch {
+    // Sin optimizaci\xF3n verificable se env\xEDa el original: nunca se pierde un tramo.
+    const length = raw.reduce((s, p) => s + polylineLength(p.points, p.closed), 0);
+    return {paths: raw.map(({points, closed, role}) => ({points, closed, role})), lengthMm: length, savedMm: 0, travelMm: travel(raw), optimized: false};
+  }
+  const paths = result.paths.map(({points, closed, role}) => ({points, closed: !!closed, role: role === 'hole' ? 'hole' : 'outer'}));
+  return {paths, lengthMm: result.stats.after, savedMm: Math.max(0, result.stats.before - result.stats.after), travelMm: result.stats.travelAfter ?? travel(paths), optimized: true};
+}
+function travel(paths, at = [0, 0]) { let d = 0; for (const p of paths) { d += Math.hypot(p.points[0][0] - at[0], p.points[0][1] - at[1]); at = p.closed ? p.points[0] : p.points.at(-1); } return d; }
+
+/* ------------------------------------------------------------ raster */
+/** \xC1rea (cama, mm) que ocupa una operaci\xF3n de imagen, incluido el grosor de los contornos. */
+export function rasterArea(design, placement, operation, assignment) {
+  const m = placementMatrix(design, placement), s = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2]));
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const add = (p, pad = 0) => { x0 = Math.min(x0, p[0] - pad); y0 = Math.min(y0, p[1] - pad); x1 = Math.max(x1, p[0] + pad); y1 = Math.max(y1, p[1] + pad); };
+  const items = rasterItems(design, operation, assignment);
+  for (const {element, mode} of items.shapes) { const pad = mode === 'stroke' ? element.stroke.widthMm * s / 2 : 0; for (const sp of element.subpaths) for (const p of sp.points) add(apply(m, p), pad); }
+  for (const image of items.images) for (const p of image.corners) add(apply(m, p));
+  if (!Number.isFinite(x0)) return null;
+  return {x: Math.max(0, x0), y: Math.max(0, y0), width: x1 - Math.max(0, x0), height: y1 - Math.max(0, y0), matrix: m, scale: s, items};
+}
+function rasterItems(design, operation, assignment) {
+  const shapes = [], images = [];
+  for (const e of design.elements) {
+    if (e.fill && assignment['fill:' + e.fill.color] === operation.id) shapes.push({element: e, mode: 'fill'});
+    if (e.stroke && assignment['stroke:' + e.stroke.color] === operation.id) shapes.push({element: e, mode: 'stroke'});
+  }
+  if (assignment.image === operation.id) images.push(...design.images);
+  return {shapes, images};
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
+const f4 = (n) => Math.round(n * 1e4) / 1e4;
+/** SVG en coordenadas de cama recortado al \xE1rea raster; se dibuja en un canvas para obtener los puntos reales. */
+export function rasterSVG(area, {widthPx, heightPx}) {
+  const {items, matrix, scale} = area;
+  let body = '';
+  for (const {element, mode} of items.shapes) {
+    const d = element.subpaths.map((s) => 'M' + s.points.map((p) => apply(matrix, p).map(f4).join(' ')).join('L') + (s.closed || mode === 'fill' ? 'Z' : '')).join('');
+    body += mode === 'fill' ? \`<path d="\${d}" fill="#000" fill-rule="\${element.fill.rule}"/>\` : \`<path d="\${d}" fill="none" stroke="#000" stroke-width="\${f4(element.stroke.widthMm * scale)}" stroke-linejoin="round" stroke-linecap="round"/>\`;
+  }
+  for (const i of items.images) {
+    const m = mul(matrix, i.matrix);
+    body += \`<image href="\${esc(i.href)}" x="\${i.x}" y="\${i.y}" width="\${i.width}" height="\${i.height}" preserveAspectRatio="\${esc(i.preserve)}" transform="matrix(\${m.map(f4).join(' ')})"/>\`;
+  }
+  return \`<svg xmlns="http://www.w3.org/2000/svg" width="\${widthPx}" height="\${heightPx}" viewBox="\${f4(area.x)} \${f4(area.y)} \${f4(area.width)} \${f4(area.height)}" preserveAspectRatio="none"><rect x="\${f4(area.x)}" y="\${f4(area.y)}" width="\${f4(area.width)}" height="\${f4(area.height)}" fill="#fff"/>\${body}</svg>\`;
+}
+
+export function rasterPixels(area, step) {
+  const pitch = step * NATIVE_MM;
+  return {widthPx: Math.max(1, Math.ceil(area.width / pitch)), heightPx: Math.max(1, Math.ceil(area.height / pitch)), pitch};
+}
+
+/** Escala de grises \u2192 1 bit (true = quemar). Umbral para trazos y logotipos, difusi\xF3n de error para fotos. */
+export function toBits(gray, width, height, {dither = 'threshold', invert = false, threshold = 128} = {}) {
+  const bits = new Uint8Array(width * height);
+  if (dither === 'floyd') {
+    const buf = Float32Array.from(gray, (v) => invert ? 255 - v : v);
+    for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+      const i = y * width + x, old = buf[i], value = old < 128 ? 0 : 255, err = old - value;
+      bits[i] = value === 0 ? 1 : 0;
+      if (x + 1 < width) buf[i + 1] += err * 7 / 16;
+      if (y + 1 < height) { if (x > 0) buf[i + width - 1] += err * 3 / 16; buf[i + width] += err * 5 / 16; if (x + 1 < width) buf[i + width + 1] += err / 16; }
+    }
+  } else for (let i = 0; i < bits.length; i++) bits[i] = (invert ? 255 - gray[i] : gray[i]) < threshold ? 1 : 0;
+  return bits;
+}
+
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = (bytes) => { let c = 0xffffffff; for (const b of bytes) c = CRC[(c ^ b) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+async function deflate(bytes) { return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer()); }
+/** PNG gris de 1 bit (0 = negro = quemar). Compacto: una foto de 300 \xD7 300 mm cabe en el l\xEDmite del conector. */
+export async function encodePNG1(bits, width, height) {
+  const stride = Math.ceil(width / 8), raw = new Uint8Array((stride + 1) * height);
+  for (let y = 0; y < height; y++) { const row = y * (stride + 1); for (let x = 0; x < width; x++) if (!bits[y * width + x]) raw[row + 1 + (x >> 3)] |= 0x80 >> (x & 7); }
+  const chunk = (type, data) => { const out = new Uint8Array(12 + data.length), v = new DataView(out.buffer); v.setUint32(0, data.length); for (let i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i); out.set(data, 8); v.setUint32(8 + data.length, crc32(out.subarray(4, 8 + data.length))); return out; };
+  const ihdr = new Uint8Array(13), v = new DataView(ihdr.buffer); v.setUint32(0, width); v.setUint32(4, height); ihdr[8] = 1; ihdr[9] = 0;
+  const parts = [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', await deflate(raw)), chunk('IEND', new Uint8Array())];
+  const png = new Uint8Array(parts.reduce((s, p) => s + p.length, 0)); let o = 0; for (const p of parts) { png.set(p, o); o += p.length; }
+  return png;
+}
+export function base64(bytes) { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return btoa(s); }
+
+/** Estad\xEDstica de barridos: filas con puntos y longitud recorrida (incluye huecos dentro de la fila). */
+export function sweepStats(bits, width, height, pitch) {
+  let rows = 0, length = 0, burn = 0;
+  for (let y = 0; y < height; y++) {
+    let first = -1, last = -1;
+    for (let x = 0; x < width; x++) if (bits[y * width + x]) { if (first < 0) first = x; last = x; burn++; }
+    if (first >= 0) { rows++; length += (last - first + 1) * pitch; }
+  }
+  return {rows, sweepMm: length, burnPixels: burn};
+}
+
+/* ------------------------------------------------------------ estimaciones */
+const RAPID = 120;      // mm/s aproximado entre trazos (la M2 acelera; es estimaci\xF3n)
+const LINE_CHANGE = 0.03; // s por cambio de fila del raster
+export function estimateOperation(op, data) {
+  if (!op.enabled || !data) return 0;
+  if (op.type === 'raster') { if (!data.sweep) return (data.area.height / (op.step * NATIVE_MM)) * (data.area.width / op.speed + LINE_CHANGE) * op.passes; return (data.sweep.sweepMm / op.speed + data.sweep.rows * LINE_CHANGE) * op.passes; }
+  return (data.lengthMm / op.speed + data.travelMm / RAPID) * op.passes;
+}
+
+/* ------------------------------------------------------------ plan completo */
+/** Calcula todo lo que no necesita el canvas: vectores, \xE1reas raster, l\xEDmites y tiempos. */
+export function analyzePlan(design, placement, plan, bed) {
+  const ops = plan.operations.map((op) => {
+    const data = op.type === 'raster' ? (() => { const area = rasterArea(design, placement, op, plan.assignment); return area ? {area, pixels: rasterPixels(area, op.step)} : null; })() : vectorPaths(design, placement, op, plan.assignment);
+    const empty = !data || (op.type !== 'raster' && !data.paths.length);
+    return {op, data, empty, seconds: empty ? 0 : estimateOperation(op, data)};
+  });
+  const bounds = placedBounds(design, placement), check = boundsCheck(bounds, bed);
+  const active = ops.filter((o) => o.op.enabled && !o.empty);
+  const problems = [];
+  if (!check.ok) problems.push(check.message);
+  if (!active.length) problems.push('No hay operaciones activas con elementos asignados.');
+  for (const o of ops) {
+    if (!o.op.enabled || o.empty) continue;
+    const [lo, hi] = OP_TYPES[o.op.type].speed;
+    if (!(o.op.speed >= lo && o.op.speed <= hi)) problems.push(\`\${o.op.name}: velocidad entre \${lo} y \${hi} mm/s.\`);
+    if (!Number.isInteger(o.op.passes) || o.op.passes < 1 || o.op.passes > 10) problems.push(\`\${o.op.name}: pasadas enteras entre 1 y 10.\`);
+    if (o.op.type === 'raster' && o.data.pixels.widthPx * o.data.pixels.heightPx > 16e6) problems.push(\`\${o.op.name}: el \xE1rea es demasiado grande para esa resoluci\xF3n. Usa una resoluci\xF3n menor.\`);
+  }
+  return {ops, bounds, check, problems, warnings: orderWarnings(plan.operations), seconds: active.reduce((s, o) => s + o.seconds, 0)};
+}
+
+/** Renderiza una operaci\xF3n raster a 1 bit con el canvas del navegador. */
+export async function renderRaster(area, op, {document: doc = globalThis.document} = {}) {
+  const {widthPx, heightPx, pitch} = rasterPixels(area, op.step);
+  if (widthPx * heightPx > 16e6) throw Error(\`\${op.name}: el \xE1rea supera 16 millones de puntos. Reduce la resoluci\xF3n.\`);
+  const svg = rasterSVG(area, {widthPx, heightPx});
+  const url = URL.createObjectURL(new Blob([svg], {type: 'image/svg+xml'}));
+  try {
+    const img = new Image(); img.decoding = 'async'; img.src = url;
+    await img.decode();
+    const canvas = doc.createElement('canvas'); canvas.width = widthPx; canvas.height = heightPx;
+    const ctx = canvas.getContext('2d', {willReadFrequently: true});
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, widthPx, heightPx); ctx.drawImage(img, 0, 0, widthPx, heightPx);
+    const rgba = ctx.getImageData(0, 0, widthPx, heightPx).data, gray = new Uint8ClampedArray(widthPx * heightPx);
+    for (let i = 0, j = 0; j < gray.length; i += 4, j++) gray[j] = 0.299 * rgba[i] + 0.587 * rgba[i + 1] + 0.114 * rgba[i + 2];
+    const photo = area.items.images.length > 0;
+    const dither = op.dither === 'auto' ? (photo ? 'floyd' : 'threshold') : op.dither;
+    const bits = toBits(gray, widthPx, heightPx, {dither, invert: op.invert});
+    return {bits, widthPx, heightPx, pitch, sweep: sweepStats(bits, widthPx, heightPx, pitch), dither};
+  } finally { URL.revokeObjectURL(url); }
+}
+
+/** Trabajo v2 listo para el conector (raster ya convertido a PNG de 1 bit). */
+export async function buildJobV2({design, placement, plan, bed, name}, analysis, renders) {
+  const operations = [];
+  for (const o of analysis.ops) {
+    if (!o.op.enabled || o.empty) continue;
+    if (o.op.type === 'raster') {
+      const r = renders.get(o.op.id);
+      if (!r) throw Error(\`\${o.op.name}: falta preparar la imagen.\`);
+      if (!r.sweep.burnPixels) continue;
+      const png = await encodePNG1(r.bits, r.widthPx, r.heightPx);
+      operations.push({type: 'raster', name: o.op.name, speed: o.op.speed, passes: o.op.passes, raster: {x: f4(o.data.area.x), y: f4(o.data.area.y), step: o.op.step, width: r.widthPx, height: r.heightPx, png: base64(png), bidirectional: o.op.bidirectional !== false}});
+    } else operations.push({type: 'vector', name: o.op.name, speed: o.op.speed, passes: o.op.passes, paths: o.data.paths});
+  }
+  if (!operations.length) throw Error('No hay nada que grabar o cortar con las operaciones activas.');
+  return {protocol: K40_PROTOCOL_V2, board: 'M2', bed: {...bed}, name: String(name || design.name || 'Trabajo').slice(0, 80), operations};
+}
+
+/* ------------------------------------------------------------ vista previa */
+const ruler = (bed) => {
+  let s = '';
+  const major = bed.width > 600 ? 100 : 50;
+  for (let x = 0; x <= bed.width + 1e-6; x += 10) s += \`<path d="M\${x} 0V\${x % major === 0 ? -6 : -3}" stroke="currentColor" stroke-width="0.4" opacity="0.6"/>\`;
+  for (let y = 0; y <= bed.height + 1e-6; y += 10) s += \`<path d="M0 \${y}H\${y % major === 0 ? -6 : -3}" stroke="currentColor" stroke-width="0.4" opacity="0.6"/>\`;
+  for (let x = 0; x <= bed.width + 1e-6; x += major) s += \`<text x="\${x}" y="-9" font-size="6" text-anchor="middle" fill="currentColor" opacity="0.75">\${x}</text>\`;
+  for (let y = major; y <= bed.height + 1e-6; y += major) s += \`<text x="-9" y="\${y + 2}" font-size="6" text-anchor="end" fill="currentColor" opacity="0.75">\${y}</text>\`;
+  return s;
+};
+/**
+ * Vista de cama compartida por escritorio y celular. compact=true usa solo
+ * etiquetas permitidas por el visor del celular (svg, rect, path, circle, image).
+ */
+export function planPreview({bed, analysis, rasterPreviews = new Map(), position = null, compact = false}) {
+  const pad = compact ? 0 : 16, vb = compact ? \`0 0 \${bed.width} \${bed.height}\` : \`\${-pad} \${-pad} \${bed.width + pad + 4} \${bed.height + pad + 4}\`;
+  let s = \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="\${vb}" role="img" aria-label="Cama de \${bed.width} por \${bed.height} mm con el trabajo colocado">\`;
+  if (!compact) {
+    s += \`<defs><pattern id="lzgrid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="currentColor" stroke-width="0.15" opacity="0.35"/></pattern></defs>\`;
+    s += \`<rect width="\${bed.width}" height="\${bed.height}" fill="url(#lzgrid)"/>\` + ruler(bed);
+  }
+  s += \`<rect width="\${bed.width}" height="\${bed.height}" fill="none" stroke="currentColor" stroke-width="0.6"/>\`;
+  for (const o of analysis.ops) {
+    if (!o.op.enabled || o.empty) continue;
+    if (o.op.type === 'raster') {
+      const a = o.data.area, href = rasterPreviews.get(o.op.id);
+      if (href && /^data:image\\/png;base64,/.test(href)) s += \`<image href="\${href}" x="\${f4(a.x)}" y="\${f4(a.y)}" width="\${f4(a.width)}" height="\${f4(a.height)}" preserveAspectRatio="none" opacity="0.92"/>\`;
+      s += \`<rect x="\${f4(a.x)}" y="\${f4(a.y)}" width="\${f4(a.width)}" height="\${f4(a.height)}" fill="\${href ? 'none' : OP_TYPES.raster.color}" fill-opacity="0.12" stroke="\${OP_TYPES.raster.color}" stroke-width="0.4" stroke-dasharray="2 1.5"/>\`;
+    } else {
+      const color = OP_TYPES[o.op.type].color;
+      s += o.data.paths.map((p) => \`<path d="M\${p.points.map((q) => q.map(f4).join(' ')).join('L')}\${p.closed ? 'Z' : ''}" fill="none" stroke="\${color}" stroke-width="\${o.op.type === 'cut' ? 0.6 : 0.45}"/>\`).join('');
+    }
+  }
+  const b = analysis.bounds;
+  if (b.width > 0) {
+    const bad = !analysis.check.ok;
+    s += \`<rect x="\${f4(b.x)}" y="\${f4(b.y)}" width="\${f4(b.width)}" height="\${f4(b.height)}" fill="\${bad ? '#ff3b5c' : 'none'}" fill-opacity="\${bad ? 0.12 : 0}" stroke="\${bad ? '#ff3b5c' : '#9b7bff'}" stroke-width="0.5" stroke-dasharray="3 2"/>\`;
+    if (!compact) s += \`<text x="\${f4(b.x + b.width / 2)}" y="\${f4(b.y < 12 ? b.y + b.height + 7 : b.y - 2.5)}" font-size="5.5" text-anchor="middle" fill="\${bad ? '#ff3b5c' : '#b9a6ff'}">\${b.width.toFixed(1)} \xD7 \${b.height.toFixed(1)} mm \xB7 X \${b.x.toFixed(1)} Y \${b.y.toFixed(1)}</text>\`;
+  }
+  if (Array.isArray(position)) s += \`<circle cx="\${f4(position[0])}" cy="\${f4(position[1])}" r="2.2" fill="#ff3b5c" stroke="#fff" stroke-width="0.7"/>\`;
+  return s + '</svg>';
+}
+
+/** Miniatura PNG de una operaci\xF3n raster ya convertida (para vista previa y biblioteca). */
+export function bitsPreviewURL(render, {document: doc = globalThis.document, maxSide = 900} = {}) {
+  const k = Math.min(1, maxSide / Math.max(render.widthPx, render.heightPx)), w = Math.max(1, Math.round(render.widthPx * k)), h = Math.max(1, Math.round(render.heightPx * k));
+  const canvas = doc.createElement('canvas'); canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d'), img = ctx.createImageData(w, h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const on = render.bits[Math.min(render.heightPx - 1, Math.floor(y / k)) * render.widthPx + Math.min(render.widthPx - 1, Math.floor(x / k))], i = (y * w + x) * 4;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = 235; img.data[i + 3] = on ? 255 : 0;
+  }
+  ctx.putImageData(img, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+`,type:"text/javascript; charset=utf-8",public:!1},"/box/job-studio.js":{body:`/* LZ Box Studio \xB7 \xABOperar m\xE1quina\xBB con dos fuentes de trabajo (v62).
+   - Dise\xF1o Box: el flujo existente (plano, hojas, kerf, registro) sin cambios.
+   - Importar archivo: SVG (prioritario) o PNG/JPG para grabado de imagen.
+   Ambas usan la misma cama, la misma vista y la misma conexi\xF3n del controlador.
+   Nada de lo que ocurre aqu\xED mueve la m\xE1quina: importar, colocar, cambiar de
+   pesta\xF1a o abrir un trabajo guardado solo actualiza la vista. El env\xEDo lo inicia
+   siempre el bot\xF3n de la barra de acciones (o el celular con el control). */
+import {importSVG, imageDesign} from './svg-import.js?v=1';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=1';
+import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
+
+const K40_V1 = 'lz-k40-m2/v1';
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
+const btn = (text, fn, cls = 'btn outline') => { const b = el('button', cls, text); b.type = 'button'; b.onclick = fn; return b; };
+const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d).toLocaleString('es-MX', {minimumFractionDigits: d, maximumFractionDigits: d});
+export const fmtTime = (s) => { if (!Number.isFinite(s) || s <= 0) return '\u2014'; s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60; return h ? \`\${h} h \${String(m).padStart(2, '0')} min\` : m ? \`\${m} min \${String(r).padStart(2, '0')} s\` : \`\${r} s\`; };
+const ICON = {
+  image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5.5 4 4 2.5-2.5L20 18"/>',
+  pen: '<path d="M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10z"/><path d="m14 6 3 3"/>',
+  scissors: '<circle cx="6" cy="7" r="2.5"/><circle cx="6" cy="17" r="2.5"/><path d="M8 8.5 20 17M8 15.5 20 7"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="m3 3 18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a9.9 9.9 0 0 0 5.4-1.6"/>',
+  file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  box: '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>',
+  layers: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  up: '<path d="m6 15 6-6 6 6"/>', down: '<path d="m6 9 6 6 6-6"/>', trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  rotL: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/>', rotR: '<path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/>',
+  center: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/>', corner: '<path d="M4 10V4h6"/><rect x="8" y="8" width="12" height="12" rx="1.5"/>',
+  zoomIn: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5M8 11h6M11 8v6"/>', zoomOut: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5M8 11h6"/>', fit: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>', alert: '<path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/>', cloud: '<path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/>', save: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>',
+};
+const svgIcon = (name, cls = 'neo-ico') => \`<svg class="\${cls}" viewBox="0 0 24 24" aria-hidden="true">\${ICON[name] || ''}</svg>\`;
+const opIcon = {raster: 'image', engrave: 'pen', cut: 'scissors'};
+
+export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) {
+  if (app.jobStudio) return app.jobStudio;
+  const dialog = machine.dialog, $ = (id) => document.getElementById(id);
+  const state = {sendScope: 'all', source: 'box', design: null, file: null, unitOverride: 'auto', plan: null, placement: {x: 0, y: 0, scale: 1, rotation: 0}, libraryId: null, libraryCloud: null, created: null, savedWhere: null, savedAt: null, dirty: false, review: false};
+  let analysis = null, analysisKey = '', renders = new Map(), previews = new Map(), renderTimer = null, renderToken = 0, zoom = 1, saveDraftTimer = null;
+
+  /* ------------------------------------------------------------ DOM */
+  const sourceBar = el('div', 'js-source'); sourceBar.setAttribute('role', 'tablist'); sourceBar.setAttribute('aria-label', 'Fuente del trabajo');
+  const boxTab = btn('', () => setSource('box'), 'js-source-tab'), importTab = btn('', () => setSource('import'), 'js-source-tab');
+  boxTab.innerHTML = svgIcon('box') + '<span>Dise\xF1o Box</span>'; importTab.innerHTML = svgIcon('file') + '<span>Importar archivo</span>';
+  for (const t of [boxTab, importTab]) t.setAttribute('role', 'tab');
+  sourceBar.append(boxTab, importTab);
+
+  const panel = el('div', 'js-import'); panel.hidden = true;
+  const input = el('input'); input.type = 'file'; input.accept = '.svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg'; input.hidden = true;
+  const fileCard = el('section', 'neo-op-card js-file');
+  fileCard.innerHTML = \`<div class="js-file-head"><span class="js-file-icon">\${svgIcon('file')}</span><div><strong class="js-file-name">Sin archivo</strong><span class="js-file-status"><i></i><em>Importa un SVG para placas, logotipos, grabados y cortes.</em></span></div></div>
+   <dl class="js-file-facts"><div><dt>Dimensiones del archivo</dt><dd class="js-file-dims">\u2014</dd></div><div><dt>Objetos</dt><dd class="js-file-count">\u2014</dd></div></dl>
+   <label class="js-units" hidden>Interpretar unidades<select class="js-unit-select"><option value="auto">Autom\xE1tico (96 ppp)</option><option value="px72">px a 72 ppp (Illustrator)</option><option value="px96">px a 96 ppp (Inkscape, web)</option><option value="mm">1 unidad = 1 mm</option></select></label>\`;
+  const openButton = btn('', () => input.click(), 'btn outline js-open'); openButton.innerHTML = svgIcon('folder') + '<span>Abrir SVG o imagen</span>';
+  fileCard.append(openButton, input);
+  const drop = el('div', 'js-drop'); drop.innerHTML = \`\${svgIcon('file', 'js-drop-icon')}<strong>Arrastra aqu\xED un SVG, PNG o JPG</strong><span>SVG: grabado y corte vectorial. PNG/JPG: grabado de imagen.</span>\`;
+  drop.onclick = () => input.click();
+  const issues = el('details', 'neo-op-card js-issues'); issues.hidden = true;
+  const review = el('div', 'js-review'); review.hidden = true;
+  review.innerHTML = \`\${svgIcon('alert')}<div><strong>Trabajo abierto desde la biblioteca</strong><p>Antes de enviarlo revisa que la cama, la colocaci\xF3n y el origen correspondan al material actual. Las posiciones f\xEDsicas no se guardan.</p></div>\`;
+  review.append(btn('Revisado', () => { state.review = false; update(); }, 'btn primary js-review-ok'));
+
+  const place = el('section', 'neo-op-card js-place');
+  place.innerHTML = \`<div class="js-section-head"><h3>Colocaci\xF3n en la cama</h3><span class="js-place-bounds"></span></div>
+   <div class="js-place-grid"><label>X \xB7 mm<input class="js-x" type="number" step="0.1"></label><label>Y \xB7 mm<input class="js-y" type="number" step="0.1"></label>
+   <label>Ancho \xB7 mm<input class="js-w" type="number" step="0.1" min="0.1"></label><label>Alto \xB7 mm<input class="js-h" type="number" step="0.1" min="0.1"></label>
+   <label>Escala \xB7 %<input class="js-scale" type="number" step="0.1" min="1" max="1000"></label><label>Giro \xB7 \xB0<input class="js-rot" type="number" step="0.5"></label></div>
+   <div class="js-place-actions"></div><p class="js-hint">Escala proporcional: ancho y alto cambian juntos. Tambi\xE9n puedes arrastrar el dise\xF1o sobre la cama.</p>\`;
+  const placeActions = place.querySelector('.js-place-actions');
+  const rotL = btn('', () => setPlacement({rotation: norm(state.placement.rotation - 90)}), 'btn quiet js-icon-btn'); rotL.innerHTML = svgIcon('rotL'); rotL.title = 'Girar 90\xB0 a la izquierda'; rotL.setAttribute('aria-label', rotL.title);
+  const rotR = btn('', () => setPlacement({rotation: norm(state.placement.rotation + 90)}), 'btn quiet js-icon-btn'); rotR.innerHTML = svgIcon('rotR'); rotR.title = 'Girar 90\xB0 a la derecha'; rotR.setAttribute('aria-label', rotR.title);
+  const centerB = btn('', () => centerOnBed(), 'btn quiet'); centerB.innerHTML = svgIcon('center') + '<span>Centrar</span>';
+  const cornerB = btn('', () => setPlacement({x: 0, y: 0}), 'btn quiet'); cornerB.innerHTML = svgIcon('corner') + '<span>Esquina 0,0</span>';
+  placeActions.append(rotL, rotR, centerB, cornerB);
+
+  const opsCard = el('section', 'js-ops');
+  opsCard.innerHTML = \`<div class="js-section-head"><h3>Operaciones <span class="js-op-count"></span></h3><button type="button" class="js-link js-to-order">Orden de ejecuci\xF3n</button></div><div class="js-op-list"></div>\`;
+  const addRow = el('div', 'js-add-op');
+  for (const type of ['raster', 'engrave', 'cut']) addRow.append(btn('+ ' + OP_TYPES[type].short, () => addOperation(type), 'btn quiet'));
+  const scopeLabel = el('label', 'js-scope'); scopeLabel.innerHTML = '<span>Enviar a la m\xE1quina</span>';
+  const scopeSelect = el('select', 'js-scope-select'); scopeSelect.onchange = () => { state.sendScope = scopeSelect.value; update(); };
+  scopeLabel.append(scopeSelect);
+  opsCard.append(addRow, scopeLabel, el('p', 'js-op-power', 'Potencia: se ajusta en el panel de la m\xE1quina para cada operaci\xF3n; la M2 no la controla por USB. El grabado de imagen es de 1 bit (encendido/apagado).'));
+  const layers = el('details', 'neo-op-card js-layers'); layers.open = true;
+  layers.innerHTML = '<summary>Capas del archivo y operaci\xF3n asignada</summary><p class="js-hint">Los colores ayudan a proponer la operaci\xF3n; la asignaci\xF3n es tuya. Un relleno solo se corta si eliges \xABContorno como corte\xBB.</p><div class="js-layer-list"></div>';
+  const saveRow = el('div', 'js-save');
+  const saveB = btn('', () => openSave(), 'btn outline js-save-btn'); saveB.innerHTML = svgIcon('save') + '<span>Guardar en biblioteca</span>';
+  saveRow.append(saveB);
+  panel.append(fileCard, drop, review, issues, place, opsCard, layers, saveRow);
+
+  // Centro: pesta\xF1as Vista previa / Orden de operaciones, zoom y leyenda.
+  const centerBar = el('div', 'js-center-bar');
+  const tabPreview = btn('Vista previa', () => setCenter('preview'), 'js-center-tab'), tabOrder = btn('Orden de operaciones', () => setCenter('order'), 'js-center-tab');
+  for (const t of [tabPreview, tabOrder]) t.setAttribute('role', 'tab');
+  const tabs = el('div', 'js-center-tabs'); tabs.setAttribute('role', 'tablist'); tabs.append(tabPreview, tabOrder);
+  const legend = el('div', 'js-legend');
+  legend.innerHTML = Object.entries(OP_TYPES).map(([k, t]) => \`<span data-op="\${k}"><i style="background:\${t.color}"></i>\${t.label}</span>\`).join('');
+  centerBar.append(tabs, legend);
+  const zoomBar = el('div', 'js-zoom'); zoomBar.setAttribute('aria-label', 'Zoom de la vista');
+  const zoomBtn = (name, label, fn) => { const b = btn('', fn, 'js-zoom-btn'); b.innerHTML = name === '1:1' ? '<b>1:1</b>' : svgIcon(name); b.title = label; b.setAttribute('aria-label', label); return b; };
+  zoomBar.append(zoomBtn('zoomIn', 'Acercar', () => setZoom(zoom * 1.25)), zoomBtn('zoomOut', 'Alejar', () => setZoom(zoom / 1.25)), zoomBtn('fit', 'Ajustar a la vista', () => setZoom(1)), zoomBtn('1:1', 'Tama\xF1o real aproximado (96 ppp)', () => realSize()));
+  const orderPanel = el('section', 'js-order'); orderPanel.hidden = true;
+  const bedNote = el('p', 'js-bed-note');
+
+  // Di\xE1logo de guardado.
+  const saveDialog = el('dialog', 'js-save-dialog');
+  saveDialog.innerHTML = \`<form method="dialog"><h2>Guardar trabajo</h2><label>Nombre<input class="js-save-name" maxlength="80" required></label>
+   <label class="js-check"><input type="checkbox" class="js-save-cloud" checked><span>Tambi\xE9n en mi cuenta (para abrirlo desde el celular u otra computadora)</span></label>
+   <p class="js-hint js-save-note">Se guarda el archivo original, las operaciones, velocidades, pasadas, colocaci\xF3n, dimensiones y una miniatura. No se guardan posiciones f\xEDsicas de la m\xE1quina.</p>
+   <p class="js-save-error" role="alert"></p><div class="js-dialog-actions"><button type="submit" class="btn primary" value="save">Guardar</button><button type="button" class="btn outline js-save-cancel">Cancelar</button></div></form>\`;
+  document.body.append(saveDialog);
+  saveDialog.querySelector('.js-save-cancel').onclick = () => saveDialog.close();
+
+  // Ubicaci\xF3n inicial (neo-studio la reorganiza): todo dentro del panel de la m\xE1quina.
+  const layout = dialog.querySelector('.k40-layout');
+  const host = el('div', 'js-host'); host.append(sourceBar, panel); layout?.prepend(host);
+  const previewEl = $('k40Preview');
+  previewEl.before(centerBar); previewEl.after(orderPanel, bedNote); previewEl.parentElement.insertBefore(zoomBar, previewEl);
+
+  /* ------------------------------------------------------------ fuente */
+  function setSource(value, {silent = false} = {}) {
+    if (machine.busy && value !== state.source) { app.toast?.('Hay una operaci\xF3n de m\xE1quina activa. Espera para cambiar de fuente.'); return; }
+    state.source = value === 'import' ? 'import' : 'box';
+    document.body.dataset.jobSource = state.source;
+    boxTab.classList.toggle('active', state.source === 'box'); importTab.classList.toggle('active', state.source === 'import');
+    boxTab.setAttribute('aria-selected', String(state.source === 'box')); importTab.setAttribute('aria-selected', String(state.source === 'import'));
+    panel.hidden = state.source !== 'import';
+    for (const node of dialog.querySelectorAll('.neo-job, .k40-registration, #k40Arrange, .k40-legend, .k40-section-heading label')) node.hidden = state.source === 'import';
+    const aligned = $('k40Origin')?.querySelector('option[value=aligned]'); if (aligned) aligned.hidden = aligned.disabled = state.source === 'import';
+    legend.hidden = state.source !== 'import'; zoomBar.hidden = false; tabOrder.hidden = state.source !== 'import';
+    if (state.source !== 'import') setCenter('preview');
+    try { app.putStorage?.('lzbox-job-source', state.source); } catch {}
+    update(); if (!silent) machine.refresh(true);
+  }
+  function setCenter(which) {
+    const order = which === 'order' && state.source === 'import';
+    tabPreview.classList.toggle('active', !order); tabOrder.classList.toggle('active', order);
+    tabPreview.setAttribute('aria-selected', String(!order)); tabOrder.setAttribute('aria-selected', String(order));
+    previewEl.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order;
+    if (order) renderOrder();
+  }
+  opsCard.querySelector('.js-to-order').onclick = () => setCenter('order');
+
+  /* ------------------------------------------------------------ importar */
+  input.onchange = () => { const f = input.files?.[0]; input.value = ''; if (f) importFile(f); };
+  for (const target of [drop, previewEl]) {
+    target.addEventListener('dragover', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.add('is-over'); });
+    target.addEventListener('dragleave', () => drop.classList.remove('is-over'));
+    target.addEventListener('drop', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.remove('is-over'); const f = e.dataTransfer?.files?.[0]; if (f) importFile(f); });
+  }
+  const readText = (f) => f.text ? f.text() : new Response(f).text();
+  const readDataURL = (f) => new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(Error('No se pudo leer el archivo.')); r.readAsDataURL(f); });
+  async function importFile(file, {fromPhone = false} = {}) {
+    if (machine.busy) throw Error('Hay una operaci\xF3n de m\xE1quina activa. Espera para importar.');
+    const name = String(file.name || 'archivo').slice(0, 120), type = (file.type || '').toLowerCase();
+    try {
+      if (file.size > 8 * 1024 * 1024) throw Error('El archivo supera 8 MB.');
+      if (/\\.svg$/i.test(name) || type === 'image/svg+xml') {
+        const text = await readText(file);
+        loadSource({type: 'svg', name, mime: 'image/svg+xml', data: text}, {fresh: true});
+      } else if (/\\.(png|jpe?g)$/i.test(name) || /^image\\/(png|jpeg)$/.test(type)) {
+        const data = await readDataURL(file);
+        if (!/^data:image\\/(png|jpeg);base64,/.test(data)) throw Error('Solo se aceptan PNG o JPG.');
+        await loadSource({type: 'image', name, mime: data.slice(5, data.indexOf(';')), data}, {fresh: true});
+      } else throw Error('Formato no compatible. Usa SVG (recomendado), PNG o JPG.');
+      if (state.source !== 'import') setSource('import', {silent: true});
+      app.toast?.(fromPhone ? 'Archivo recibido desde el celular. Revisa colocaci\xF3n y operaciones.' : 'Archivo importado. Nada se env\xEDa a la m\xE1quina hasta que lo inicies.');
+    } catch (e) { app.toast?.(e.message); throw e; }
+  }
+  /** Carga un archivo (nuevo o desde la biblioteca) sin tocar la m\xE1quina. */
+  async function loadSource(source, {fresh, unitOverride = 'auto', plan = null, placement = null} = {}) {
+    let design;
+    if (source.type === 'svg') design = importSVG(source.data, {name: source.name, unitOverride});
+    else {
+      const img = new Image(); img.src = source.data; await img.decode().catch(() => { throw Error('La imagen est\xE1 da\xF1ada o no es compatible.'); });
+      design = imageDesign({name: source.name, href: source.data, pixelWidth: img.naturalWidth, pixelHeight: img.naturalHeight});
+    }
+    state.design = design; state.file = source; state.unitOverride = unitOverride;
+    state.plan = plan ? reconcilePlan(plan, design) : defaultPlan(design);
+    const bed = currentBed();
+    if (placement) state.placement = {...placement};
+    else {
+      // Escala inicial 100 %; si no cabe, se reduce proporcionalmente para mostrarlo dentro de la cama.
+      const b = design.bbox, fit = Math.min(1, bed.width / Math.max(b.width, 1e-6), bed.height / Math.max(b.height, 1e-6));
+      state.placement = {x: 0, y: 0, scale: fit < 1 ? Math.floor(fit * 1000) / 1000 : 1, rotation: 0};
+      if (fit < 1) design.issues.push({level: 'warn', code: 'fit', message: \`El dise\xF1o (\${fmt(b.width)} \xD7 \${fmt(b.height)} mm) no cab\xEDa en la cama: se redujo al \${fmt(state.placement.scale * 100)} %. Revisa la escala.\`, count: 1});
+    }
+    if (fresh) { state.libraryId = null; state.libraryCloud = null; state.created = null; state.savedWhere = null; state.savedAt = null; state.review = false; state.dirty = true; }
+    renders = new Map(); previews = new Map(); analysisKey = '';
+    renderStructure(); update(); scheduleDraft();
+  }
+  function reconcilePlan(plan, design) {
+    const operations = (plan.operations || []).filter((o) => OP_TYPES[o.type]).map((o) => makeOperation(o.type, o));
+    const ids = new Set(operations.map((o) => o.id)), assignment = {};
+    for (const layer of design.layers) { const v = plan.assignment?.[layer.key]; if (v && ids.has(String(v).replace(/:outline$/, ''))) assignment[layer.key] = v; }
+    return {operations, assignment};
+  }
+
+  /* ------------------------------------------------------------ colocaci\xF3n */
+  const norm = (a) => { a = ((Number(a) || 0) % 360 + 360) % 360; return a > 180 ? a - 360 : a; };
+  function currentBed() { const m = machine.machine; return m?.bed ? {...m.bed} : {width: Number($('k40Width')?.value) || 400, height: Number($('k40Height')?.value) || 400}; }
+  function setPlacement(change, {silent = false} = {}) {
+    if (!state.design || machine.busy) return;
+    const next = {...state.placement, ...change};
+    for (const k of ['x', 'y', 'scale', 'rotation']) next[k] = Number(next[k]);
+    if (!(next.scale > 0.0001) || ![next.x, next.y, next.rotation].every(Number.isFinite)) return;
+    state.placement = {x: Math.round(next.x * 100) / 100, y: Math.round(next.y * 100) / 100, scale: Math.min(10, next.scale), rotation: norm(next.rotation)};
+    state.dirty = true; if (!silent) { update(); scheduleDraft(); }
+  }
+  function centerOnBed() { if (!state.design) return; const bed = currentBed(), b = placedBounds(state.design, state.placement); setPlacement({x: (bed.width - b.width) / 2, y: (bed.height - b.height) / 2}); }
+  const field = (cls) => place.querySelector(cls);
+  for (const [cls, fn] of [['.js-x', (v) => ({x: v})], ['.js-y', (v) => ({y: v})], ['.js-scale', (v) => ({scale: v / 100})], ['.js-rot', (v) => ({rotation: v})]]) field(cls).addEventListener('change', () => setPlacement(fn(Number(field(cls).value))));
+  for (const [cls, axis] of [['.js-w', 'width'], ['.js-h', 'height']]) field(cls).addEventListener('change', () => {
+    if (!state.design) return; const b = placedBounds(state.design, state.placement), v = Number(field(cls).value);
+    if (v > 0 && b[axis] > 0) setPlacement({scale: state.placement.scale * v / b[axis]});
+  });
+  fileCard.querySelector('.js-unit-select').onchange = async (e) => {
+    if (!state.file || state.file.type !== 'svg') return;
+    try { await loadSource(state.file, {unitOverride: e.target.value === 'px96' ? 'px96' : e.target.value, plan: state.plan, placement: {...state.placement, scale: 1}}); state.dirty = true; } catch (err) { app.toast?.(err.message); }
+  };
+  // Arrastrar el dise\xF1o sobre la cama (solo vista; nunca mueve el cabezal).
+  let drag = null;
+  previewEl.addEventListener('pointerdown', (e) => {
+    if (state.source !== 'import' || !state.design || machine.busy || machine.remoteOwner || $('k40Pick')?.textContent.includes('Selecciona')) return;
+    const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
+    const p = toBed(svg, e), b = placedBounds(state.design, state.placement);
+    if (p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height) return;
+    drag = {start: p, origin: {...state.placement}, svg}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-dragging'); e.preventDefault();
+  });
+  previewEl.addEventListener('pointermove', (e) => { if (!drag) return; const p = toBed(drag.svg, e); setPlacement({x: drag.origin.x + p.x - drag.start.x, y: drag.origin.y + p.y - drag.start.y}, {silent: true}); updateLight(); });
+  const endDrag = () => { if (!drag) return; drag = null; previewEl.classList.remove('is-dragging'); update(); scheduleDraft(); };
+  previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
+  function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
+  function setZoom(z) { zoom = Math.max(1, Math.min(8, z)); previewEl.style.setProperty('--js-zoom', zoom); previewEl.classList.toggle('is-zoomed', zoom > 1.001); }
+  function realSize() { const bed = currentBed(), w = previewEl.clientWidth || 600; setZoom(bed.width / 25.4 * 96 / w); }
+
+  /* ------------------------------------------------------------ operaciones */
+  function addOperation(type) {
+    if (!state.plan || machine.busy) return;
+    const op = makeOperation(type); const rank = {raster: 0, engrave: 1, cut: 2};
+    const index = state.plan.operations.findIndex((o) => rank[o.type] > rank[type]);
+    state.plan.operations.splice(index < 0 ? state.plan.operations.length : index, 0, op);
+    state.dirty = true; renderStructure(); update();
+  }
+  function removeOperation(id) {
+    if (!state.plan || machine.busy) return;
+    state.plan.operations = state.plan.operations.filter((o) => o.id !== id);
+    for (const [k, v] of Object.entries(state.plan.assignment)) if (String(v).replace(/:outline$/, '') === id) delete state.plan.assignment[k];
+    state.dirty = true; renderStructure(); update();
+  }
+  function moveOperation(id, dir) {
+    const list = state.plan?.operations; if (!list || machine.busy) return;
+    const i = list.findIndex((o) => o.id === id), j = i + dir; if (i < 0 || j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]]; state.dirty = true; renderStructure(); update();
+  }
+  function recommendOrder() { const rank = {raster: 0, engrave: 1, cut: 2}; state.plan.operations.sort((a, b) => rank[a.type] - rank[b.type]); state.dirty = true; renderStructure(); update(); }
+  function patchOperation(id, change) {
+    const op = state.plan?.operations.find((o) => o.id === id); if (!op || machine.busy) return false;
+    Object.assign(op, change); state.dirty = true; return true;
+  }
+  function renderOps() {
+    const list = opsCard.querySelector('.js-op-list'); list.replaceChildren();
+    const ops = state.plan?.operations || [];
+    opsCard.querySelector('.js-op-count').textContent = \`(\${ops.length})\`;
+    ops.forEach((op, index) => {
+      const t = OP_TYPES[op.type], card = el('article', 'js-op' + (op.enabled ? '' : ' is-off')); card.dataset.op = op.id; card.dataset.type = op.type; card.style.setProperty('--op-color', t.color);
+      const head = el('div', 'js-op-head');
+      head.innerHTML = \`<span class="js-op-num">\${index + 1}</span><span class="js-op-icon">\${svgIcon(opIcon[op.type])}</span>\`;
+      const name = el('input', 'js-op-name'); name.value = op.name; name.maxLength = 40; name.setAttribute('aria-label', 'Nombre de la operaci\xF3n'); name.onchange = () => { patchOperation(op.id, {name: name.value.trim() || t.label}); update(); renderLayers(); };
+      const eye = btn('', () => { patchOperation(op.id, {enabled: !op.enabled}); renderStructure(); update(); }, 'js-op-eye'); eye.innerHTML = svgIcon(op.enabled ? 'eye' : 'eyeOff'); eye.setAttribute('aria-pressed', String(op.enabled)); eye.setAttribute('aria-label', op.enabled ? 'Desactivar operaci\xF3n' : 'Activar operaci\xF3n'); eye.title = op.enabled ? 'Activa \xB7 pulsa para desactivar' : 'Desactivada \xB7 pulsa para activar';
+      const del = btn('', () => removeOperation(op.id), 'js-op-del'); del.innerHTML = svgIcon('trash'); del.setAttribute('aria-label', 'Quitar operaci\xF3n'); del.title = 'Quitar operaci\xF3n';
+      head.append(name, eye, del);
+      const fields = el('div', 'js-op-fields');
+      const [lo, hi] = t.speed;
+      fields.innerHTML = \`<label>Velocidad \xB7 mm/s<input class="js-op-speed" type="number" min="\${lo}" max="\${hi}" step="1" value="\${op.speed}"></label><label>Pasadas<input class="js-op-passes" type="number" min="1" max="10" step="1" value="\${op.passes}"></label>\`;
+      fields.querySelector('.js-op-speed').onchange = (e) => { patchOperation(op.id, {speed: Number(e.target.value)}); update(); };
+      fields.querySelector('.js-op-passes').onchange = (e) => { patchOperation(op.id, {passes: Number(e.target.value)}); update(); };
+      card.append(head, fields);
+      if (op.type === 'raster') {
+        const extra = el('div', 'js-op-fields');
+        extra.innerHTML = \`<label>Resoluci\xF3n<select class="js-op-step">\${RESOLUTIONS.map((r) => \`<option value="\${r.step}"\${r.step === op.step ? ' selected' : ''}>\${r.mm.toFixed(2)} mm (\${r.dpi} ppp)</option>\`).join('')}</select></label><label>Tratamiento<select class="js-op-dither"><option value="auto">Autom\xE1tico</option><option value="threshold">Umbral (logotipos)</option><option value="floyd">Difusi\xF3n (fotos)</option></select></label>\`;
+        extra.querySelector('.js-op-dither').value = op.dither;
+        extra.querySelector('.js-op-step').onchange = (e) => { patchOperation(op.id, {step: Number(e.target.value)}); update(); };
+        extra.querySelector('.js-op-dither').onchange = (e) => { patchOperation(op.id, {dither: e.target.value}); update(); };
+        const inv = el('label', 'js-check'); inv.innerHTML = \`<input type="checkbox" class="js-op-invert"\${op.invert ? ' checked' : ''}><span>Invertir (grabar lo claro)</span>\`;
+        inv.querySelector('input').onchange = (e) => { patchOperation(op.id, {invert: e.target.checked}); update(); };
+        card.append(extra, inv);
+      }
+      card.append(el('p', 'js-op-meta'));
+      list.append(card);
+    });
+    if (!ops.length) list.append(el('p', 'js-hint', 'Agrega una operaci\xF3n y as\xEDgnale capas del archivo.'));
+  }
+  function renderLayers() {
+    const host = layers.querySelector('.js-layer-list'); host.replaceChildren();
+    if (!state.design) return;
+    for (const layer of state.design.layers) {
+      const row = el('div', 'js-layer');
+      const sw = el('span', 'js-swatch'); sw.style.background = layer.kind === 'image' ? 'linear-gradient(135deg,#ddd,#555)' : /^#/.test(layer.color) ? layer.color : '#888';
+      if (layer.kind === 'stroke') sw.classList.add('is-stroke');
+      const label = el('span', 'js-layer-label'); label.innerHTML = \`<strong>\${layer.kind === 'image' ? 'Im\xE1genes' : layer.kind === 'fill' ? 'Relleno' : 'Contorno'} \${layer.kind === 'image' ? '' : layer.color === 'gradient' ? 'degradado' : layer.color === 'other' ? 'otro color' : layer.color}</strong><small>\${layer.count} elemento\${layer.count === 1 ? '' : 's'}\${layer.kind === 'stroke' ? ' \xB7 ' + fmt(layer.lengthMm / 10, 1) + ' cm' : ''}</small>\`;
+      const select = el('select', 'js-layer-op'); select.setAttribute('aria-label', 'Operaci\xF3n para esta capa');
+      select.append(new Option('No usar', ''));
+      for (const op of state.plan.operations) {
+        for (const kind of compatibleTypes(layer)) {
+          if (kind === op.type) select.append(new Option(\`\${op.name}\`, op.id));
+          else if (kind === op.type + '-outline') select.append(new Option(\`\${op.name} \xB7 contorno del relleno\`, op.id + ':outline'));
+        }
+      }
+      select.value = state.plan.assignment[layer.key] || '';
+      if (select.value !== (state.plan.assignment[layer.key] || '')) select.value = '';
+      select.onchange = () => { if (machine.busy) return; if (select.value) state.plan.assignment[layer.key] = select.value; else delete state.plan.assignment[layer.key]; state.dirty = true; update(); };
+      row.append(sw, label, select); host.append(row);
+      if (!state.plan.assignment[layer.key]) row.classList.add('is-unassigned');
+    }
+    if (state.design.texts.length) host.append(el('p', 'js-layer-warn', \`Textos con fuente (\${state.design.texts.length}): no se pueden grabar ni cortar hasta convertirlos en trazados.\`));
+  }
+  function renderIssues() {
+    const list = state.design?.issues || [];
+    issues.hidden = !list.length; issues.replaceChildren();
+    if (!list.length) return;
+    const errors = list.filter((i) => i.level === 'error').length, warns = list.filter((i) => i.level === 'warn').length;
+    const summary = el('summary'); summary.innerHTML = \`\${svgIcon(errors ? 'alert' : 'check')}<span>Revisi\xF3n del archivo \xB7 \${errors ? errors + ' por corregir' : warns ? warns + ' aviso' + (warns === 1 ? '' : 's') : 'informaci\xF3n'}</span>\`;
+    issues.append(summary); issues.open = errors > 0 || warns > 0; issues.dataset.level = errors ? 'error' : warns ? 'warn' : 'info';
+    const ul = el('ul');
+    for (const i of list) { const li = el('li', 'is-' + i.level); li.textContent = i.message + (i.count > 1 ? \` (\xD7\${i.count})\` : ''); ul.append(li); }
+    issues.append(ul);
+  }
+  function renderOrder() {
+    orderPanel.replaceChildren();
+    const head = el('div', 'js-order-head'); head.append(el('h3', '', 'Orden de operaciones'), btn('Proponer orden recomendado', () => recommendOrder(), 'btn quiet'));
+    orderPanel.append(head, el('p', 'js-hint', 'Se ejecutan de arriba hacia abajo. Recomendado: grabar imagen, grabar vectores y cortar al final para que la pieza no se mueva.'));
+    const list = el('ol', 'js-order-list');
+    (analysis?.ops || []).forEach((o, i) => {
+      const li = el('li', 'js-order-item' + (o.op.enabled ? '' : ' is-off')); li.style.setProperty('--op-color', OP_TYPES[o.op.type].color);
+      const what = o.empty ? 'sin elementos asignados' : o.op.type === 'raster' ? \`\${fmt(o.data.area.width)} \xD7 \${fmt(o.data.area.height)} mm \xB7 \${o.data.pixels.widthPx} \xD7 \${o.data.pixels.heightPx} puntos\` : \`\${o.data.paths.length} trayectoria\${o.data.paths.length === 1 ? '' : 's'} \xB7 \${fmt(o.data.lengthMm / 1000, 2)} m\${o.data.savedMm > 0.05 ? \` \xB7 \${fmt(o.data.savedMm)} mm compartidos sin repetir\` : ''}\`;
+      li.innerHTML = \`<span class="js-op-num">\${i + 1}</span><span class="js-op-icon">\${svgIcon(opIcon[o.op.type])}</span><div><strong>\${escapeHTML(o.op.name)}</strong><small>\${o.op.enabled ? '' : 'Desactivada \xB7 '}\${what} \xB7 \${o.op.speed} mm/s \xD7 \${o.op.passes} pasada\${o.op.passes === 1 ? '' : 's'}</small></div><span class="js-order-time">\${o.op.enabled && !o.empty ? '\u2248 ' + fmtTime(o.seconds) : '\u2014'}</span>\`;
+      const up = btn('', () => moveOperation(o.op.id, -1), 'js-icon-btn'); up.innerHTML = svgIcon('up'); up.disabled = i === 0; up.setAttribute('aria-label', 'Subir');
+      const down = btn('', () => moveOperation(o.op.id, 1), 'js-icon-btn'); down.innerHTML = svgIcon('down'); down.disabled = i === analysis.ops.length - 1; down.setAttribute('aria-label', 'Bajar');
+      li.append(up, down); list.append(li);
+    });
+    orderPanel.append(list);
+    for (const w of analysis?.warnings || []) orderPanel.append(el('p', 'js-order-warn', w));
+    if (analysis) orderPanel.append(el('p', 'js-order-total', \`Tiempo estimado total: \${fmtTime(analysis.seconds)} \xB7 incluye barridos y desplazamientos aproximados; la aceleraci\xF3n real de la M2 puede alargarlo.\`));
+  }
+  const escapeHTML = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
+  function renderStructure() { renderOps(); renderLayers(); renderIssues(); }
+
+  /* ------------------------------------------------------------ an\xE1lisis y raster */
+  function key() { return JSON.stringify([state.file?.name, state.file?.data?.length, state.unitOverride, state.plan, state.placement, currentBed()]); }
+  function analyze() {
+    if (!state.design) { analysis = null; return null; }
+    const k = key(); if (k === analysisKey && analysis) return analysis;
+    analysisKey = k; analysis = analyzePlan(state.design, state.placement, state.plan, currentBed());
+    // Los raster cambian si cambia su \xE1rea, resoluci\xF3n o tratamiento.
+    for (const o of analysis.ops) if (o.op.type === 'raster') { const rk = rasterKey(o); if (renders.get(o.op.id)?.key !== rk) { renders.delete(o.op.id); previews.delete(o.op.id); } }
+    scheduleRender();
+    return analysis;
+  }
+  const rasterKey = (o) => o.data ? JSON.stringify([o.data.area.x, o.data.area.y, o.data.area.width, o.data.area.height, o.data.area.matrix, o.op.step, o.op.dither, o.op.invert, state.plan.assignment, state.file?.data?.length]) : '';
+  function scheduleRender() { clearTimeout(renderTimer); renderTimer = setTimeout(() => renderPending().catch(() => {}), 350); }
+  async function renderPending() {
+    const token = ++renderToken;
+    for (const o of analysis?.ops || []) {
+      if (o.op.type !== 'raster' || o.empty || !o.op.enabled || renders.has(o.op.id)) continue;
+      if (o.data.pixels.widthPx * o.data.pixels.heightPx > 16e6) continue;
+      const k = rasterKey(o), r = await renderRaster(o.data.area, o.op);
+      if (token !== renderToken) return;
+      r.key = k; renders.set(o.op.id, r); previews.set(o.op.id, bitsPreviewURL(r, {maxSide: 700}));
+      o.seconds = (r.sweep.sweepMm / o.op.speed + r.sweep.rows * 0.03) * o.op.passes; o.data.sweep = r.sweep;
+    }
+    if (analysis) analysis.seconds = analysis.ops.filter((o) => o.op.enabled && !o.empty).reduce((s, o) => s + o.seconds, 0);
+    machine.refresh(false); updateMeta();
+  }
+  async function ensureRenders() {
+    analyze();
+    for (const o of analysis.ops) {
+      if (o.op.type !== 'raster' || o.empty || !o.op.enabled) continue;
+      const k = rasterKey(o);
+      if (renders.get(o.op.id)?.key !== k) { const r = await renderRaster(o.data.area, o.op); r.key = k; renders.set(o.op.id, r); previews.set(o.op.id, bitsPreviewURL(r, {maxSide: 700})); o.data.sweep = r.sweep; }
+    }
+  }
+
+  /* ------------------------------------------------------------ interfaz del controlador */
+  function problemText(a) {
+    if (!state.design) return 'Importa un SVG o una imagen para preparar el trabajo.';
+    if (state.design.issues.some((i) => i.level === 'error') && !a.ops.some((o) => o.op.enabled && !o.empty)) return 'Corrige el archivo: no hay elementos compatibles asignados.';
+    if (a.problems.length) return a.problems[0];
+    if (state.review) return 'Revisa la cama, la colocaci\xF3n y el origen del trabajo abierto y pulsa \xABRevisado\xBB.';
+    return '';
+  }
+  const source = {
+    isActive: () => state.source === 'import',
+    name: () => state.file?.name?.replace(/\\.(svg|png|jpe?g)$/i, '') || 'Archivo importado',
+    /** Vista, resumen y estado para el controlador. Con origen actual la vista se desplaza al cabezal. */
+    describe({bed, position, origin}) {
+      if (!state.design) return {preview: emptyBed(bed), compact: emptyBed(bed, true), summary: '', seconds: 0, problem: problemText(null)};
+      let placement = state.placement;
+      if (origin) { const b = placedBounds(state.design, state.placement); placement = {...state.placement, x: state.placement.x + origin[0] - b.x, y: state.placement.y + origin[1] - b.y}; }
+      const a = origin ? analyzePlan(state.design, placement, state.plan, bed) : analyze();
+      if (origin) for (const o of a.ops) { const base = analysis?.ops.find((p) => p.op.id === o.op.id); if (base?.data?.sweep) { o.seconds = base.seconds; } }
+      const active = state.sendScope === 'all' ? a.ops.filter((o) => o.op.enabled && !o.empty) : a.ops.filter((o) => o.op.enabled && !o.empty && o.op.id === state.sendScope);
+      const seconds = active.reduce((s, o) => s + o.seconds, 0);
+      const b = a.bounds;
+      const summary = \`\${state.file.name} \xB7 \${fmt(b.width)} \xD7 \${fmt(b.height)} mm en X \${fmt(b.x)} \xB7 Y \${fmt(b.y)} \xB7 \${state.sendScope === 'all' ? \`\${active.length} \${active.length === 1 ? 'operaci\xF3n activa' : 'operaciones activas'}\` : \`se enviar\xE1 solo \xAB\${active[0]?.op.name || '\u2014'}\xBB\`}. Tiempo estimado: \${fmtTime(seconds)}. SVG importado: se corta sobre la l\xEDnea, sin compensar kerf.\`;
+      return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
+    },
+    support(features) {
+      if (features.includes('operations-v2') && features.includes('raster-1bit')) return {ok: true};
+      const a = analyze(), active = scoped(a);
+      if (active.length === 1 && active[0].op.type !== 'raster') return {ok: true, legacy: true};
+      return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operaci\xF3n vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.0 (enlace en Detalles de conexi\xF3n), o desactiva las dem\xE1s operaciones.'};
+    },
+    /** Trabajo para el conector. Solo se llama al pulsar Recorrer marco o Iniciar. */
+    async buildJob({bed, features, origin}) {
+      const support = source.support(features); if (!support.ok) throw Error(support.message);
+      if (state.review) throw Error(problemText(analysis));
+      await ensureRenders();
+      const a = analysis; if (a.problems.length) throw Error(a.problems[0]);
+      const subset = scoped(a); if (!subset.length) throw Error('La operaci\xF3n elegida para enviar no tiene elementos.');
+      const partial = state.sendScope !== 'all';
+      if (support.legacy) {
+        if (partial && origin === 'current') throw Error('Con el conector 0.6.4, enviar una sola operaci\xF3n desde la posici\xF3n actual la desplazar\xEDa. Usa origen Home o actualiza a 0.7.0.');
+        const o = subset[0];
+        return {protocol: K40_V1, board: 'M2', name: source.name(), bed: {...bed}, speed: o.op.speed, passes: o.op.passes, paths: o.data.paths};
+      }
+      const view = partial ? {...a, ops: a.ops.map((o) => subset.includes(o) ? o : {...o, op: {...o.op, enabled: false}})} : a;
+      const job = await buildJobV2({design: state.design, placement: state.placement, plan: state.plan, bed, name: source.name()}, view, renders);
+      // Esquina del trabajo completo: as\xED cada operaci\xF3n enviada por separado cae en su lugar.
+      if (partial) job.anchor = [Math.max(0, Math.round(a.bounds.x * 1e4) / 1e4), Math.max(0, Math.round(a.bounds.y * 1e4) / 1e4)];
+      return job;
+    },
+  };
+  function scoped(a) { const list = a?.ops.filter((o) => o.op.enabled && !o.empty) || []; return state.sendScope === 'all' ? list : list.filter((o) => o.op.id === state.sendScope); }
+  function renderScope() {
+    const ops = (state.plan?.operations || []).filter((o) => o.enabled);
+    if (state.sendScope !== 'all' && !ops.some((o) => o.id === state.sendScope)) state.sendScope = 'all';
+    const options = [new Option('Todas las operaciones activas (misma potencia del panel)', 'all'), ...ops.map((o, i) => new Option(\`Solo \${o.name} \u2014 para ajustar la potencia antes\`, o.id))];
+    if (scopeSelect.options.length !== options.length || [...scopeSelect.options].some((o, i) => o.value !== options[i].value || o.text !== options[i].text)) scopeSelect.replaceChildren(...options);
+    scopeSelect.value = state.sendScope;
+  }
+  function emptyBed(bed, compact = false) { return \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="\${compact ? \`0 0 \${bed.width} \${bed.height}\` : \`-16 -16 \${bed.width + 20} \${bed.height + 20}\`}" role="img" aria-label="Cama vac\xEDa"><rect width="\${bed.width}" height="\${bed.height}" fill="none" stroke="currentColor" stroke-width="0.6"/></svg>\`; }
+
+  /* ------------------------------------------------------------ actualizaci\xF3n */
+  function updateLight() { machine.refresh(false); updateFields(); }
+  function updateFields() {
+    if (!state.design) return;
+    const b = placedBounds(state.design, state.placement);
+    const set = (cls, v) => { const n = field(cls); if (document.activeElement !== n) n.value = v; };
+    set('.js-x', state.placement.x.toFixed(2)); set('.js-y', state.placement.y.toFixed(2)); set('.js-w', b.width.toFixed(2)); set('.js-h', b.height.toFixed(2));
+    set('.js-scale', (state.placement.scale * 100).toFixed(1)); set('.js-rot', String(state.placement.rotation));
+    place.querySelector('.js-place-bounds').textContent = \`\${fmt(b.width)} \xD7 \${fmt(b.height)} mm\`;
+  }
+  function updateMeta() {
+    const a = analysis;
+    for (const card of opsCard.querySelectorAll('.js-op')) {
+      const o = a?.ops.find((x) => x.op.id === card.dataset.op), meta = card.querySelector('.js-op-meta');
+      if (!o || !meta) continue;
+      const assigned = state.design.layers.filter((l) => String(state.plan.assignment[l.key] || '').replace(/:outline$/, '') === o.op.id).reduce((s, l) => s + l.count, 0);
+      meta.textContent = o.empty ? 'Sin elementos asignados: elige capas abajo.' : \`\${assigned} elemento\${assigned === 1 ? '' : 's'} \xB7 \${o.op.type === 'raster' ? (o.data.sweep ? \`\${o.data.sweep.rows} barridos\` : 'preparando barridos\u2026') : \`\${o.data.paths.length} trayectorias\`} \xB7 \u2248 \${fmtTime(o.seconds)}\`;
+      card.classList.toggle('is-empty', o.empty);
+      const [lo, hi] = OP_TYPES[o.op.type].speed, speed = card.querySelector('.js-op-speed');
+      speed?.setAttribute('aria-invalid', String(!(o.op.speed >= lo && o.op.speed <= hi)));
+      const passes = card.querySelector('.js-op-passes'); passes?.setAttribute('aria-invalid', String(!(Number.isInteger(o.op.passes) && o.op.passes >= 1 && o.op.passes <= 10)));
+    }
+    if (!orderPanel.hidden) renderOrder();
+  }
+  function update() {
+    const has = !!state.design;
+    fileCard.querySelector('.js-file-name').textContent = state.file?.name || 'Sin archivo';
+    const status = fileCard.querySelector('.js-file-status');
+    status.dataset.state = !has ? 'none' : state.dirty ? 'dirty' : state.savedWhere === 'both' ? 'synced' : 'local';
+    status.querySelector('em').textContent = !has ? 'Importa un SVG para placas, logotipos, grabados y cortes.' : state.dirty ? (state.libraryId ? 'Cambios sin guardar' : 'Sin guardar en la biblioteca') : state.savedWhere === 'both' ? 'Guardado en tu cuenta y en esta computadora' : 'Guardado solo en esta computadora';
+    fileCard.querySelector('.js-file-dims').textContent = has ? \`\${fmt(state.design.bbox.width)} \xD7 \${fmt(state.design.bbox.height)} mm\` : '\u2014';
+    fileCard.querySelector('.js-file-count').textContent = has ? \`\${state.design.objectCount} objeto\${state.design.objectCount === 1 ? '' : 's'}\` : '\u2014';
+    const units = fileCard.querySelector('.js-units'); units.hidden = !has || state.file.type !== 'svg' || (state.design.unitsDeclared && state.unitOverride === 'auto');
+    fileCard.querySelector('.js-unit-select').value = state.unitOverride === 'px96' ? 'px96' : state.unitOverride;
+    drop.hidden = has; place.hidden = !has; opsCard.hidden = !has; layers.hidden = !has; saveRow.hidden = !has; review.hidden = !state.review;
+    for (const n of panel.querySelectorAll('input,select,button')) if (!n.closest('.js-review')) n.disabled = machine.busy;
+    if (has) { analyze(); updateFields(); updateMeta(); renderScope(); }
+    const bed = currentBed();
+    bedNote.textContent = state.source === 'import' ? \`\xC1rea de trabajo: \${fmt(bed.width, 0)} \xD7 \${fmt(bed.height, 0)} mm\${machine.machine ? ' (del conector)' : ' (se confirma al conectar)'} \xB7 origen de cama arriba a la izquierda.\` : '';
+    machine.refresh(!machine.busy && state.source === 'import');
+    publish();
+  }
+  let publishTimer = null; function publish() { clearTimeout(publishTimer); publishTimer = setTimeout(() => app.workshopRemote?.publish?.(true), 120); }
+
+  /* ------------------------------------------------------------ biblioteca */
+  function itemFromState(name, cloud) {
+    const a = analyze(), b = placedBounds(state.design, state.placement);
+    return makeJobItem({id: state.libraryId || undefined, created: state.created, name, source: state.file, unitOverride: state.unitOverride, plan: state.plan, placement: state.placement, bed: currentBed(), dims: b,
+      opsSummary: a.ops.map((o) => ({type: o.op.type, name: o.op.name, enabled: o.op.enabled, speed: o.op.speed, passes: o.op.passes})), thumb: thumbnail(a), cloud});
+  }
+  function thumbnail(a) {
+    try {
+      const b = a.bounds, pad = 2, size = 240, k = size / Math.max(b.width + pad * 2, b.height + pad * 2, 1);
+      const canvas = document.createElement('canvas'); canvas.width = Math.ceil((b.width + pad * 2) * k); canvas.height = Math.ceil((b.height + pad * 2) * k);
+      const ctx = canvas.getContext('2d'); ctx.fillStyle = '#0b1218'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(k, 0, 0, k, (pad - b.x) * k, (pad - b.y) * k);
+      for (const o of a.ops) {
+        if (!o.op.enabled || o.empty) continue;
+        if (o.op.type === 'raster') { ctx.fillStyle = 'rgba(232,238,245,.25)'; ctx.fillRect(o.data.area.x, o.data.area.y, o.data.area.width, o.data.area.height); continue; }
+        ctx.strokeStyle = OP_TYPES[o.op.type].color; ctx.lineWidth = 0.8 / k * 2;
+        for (const p of o.data.paths) { ctx.beginPath(); p.points.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); if (p.closed) ctx.closePath(); ctx.stroke(); }
+      }
+      return canvas.toDataURL('image/jpeg', 0.8);
+    } catch { return null; }
+  }
+  function openSave() {
+    if (!state.design) return;
+    saveDialog.querySelector('.js-save-name').value = source.name();
+    const cloudBox = saveDialog.querySelector('.js-save-cloud'), note = saveDialog.querySelector('.js-save-error');
+    note.textContent = library.cloudState === 'signed-out' ? 'Inicia sesi\xF3n para guardar tambi\xE9n en tu cuenta; por ahora se guardar\xE1 en esta computadora.' : library.cloudState === 'not-enabled' ? 'La biblioteca de la cuenta a\xFAn no est\xE1 activada en el servidor: se guardar\xE1 en esta computadora.' : '';
+    cloudBox.disabled = ['signed-out', 'not-enabled'].includes(library.cloudState); if (cloudBox.disabled) cloudBox.checked = false;
+    saveDialog.showModal(); saveDialog.querySelector('.js-save-name').focus();
+  }
+  saveDialog.querySelector('form').onsubmit = async (e) => {
+    e.preventDefault();
+    const note = saveDialog.querySelector('.js-save-error');
+    try { const r = await save(saveDialog.querySelector('.js-save-name').value, saveDialog.querySelector('.js-save-cloud').checked); saveDialog.close(); app.toast?.(r); }
+    catch (err) { note.textContent = err.message; }
+  };
+  async function save(name, cloud = true) {
+    if (!state.design) throw Error('No hay archivo importado.');
+    const item = itemFromState(name, state.libraryCloud);
+    const {cloud: result} = await library.save(item, {toCloud: cloud});
+    state.libraryId = item.id; state.created = item.created; state.libraryCloud = item.cloud; state.dirty = false; state.savedAt = item.updated;
+    state.savedWhere = result === 'synced' ? 'both' : 'local';
+    update(); app.workshop?.refreshLibrary?.();
+    return result === 'synced' ? 'Guardado en tu cuenta y en esta computadora.' : result ? \`Guardado en esta computadora. Cuenta: \${result}\` : 'Guardado en esta computadora.';
+  }
+  /** Abre un trabajo guardado. No ejecuta nada: exige revisar cama, colocaci\xF3n y origen. */
+  async function openSaved(id) {
+    if (machine.busy) throw Error('Hay una operaci\xF3n de m\xE1quina activa.');
+    const item = await library.open(id);
+    await loadSource(item.source, {unitOverride: item.unitOverride, plan: item.plan, placement: item.placement});
+    state.libraryId = item.id; state.created = item.created; state.libraryCloud = item.cloud; state.dirty = false; state.savedAt = item.updated;
+    state.savedWhere = item.cloud?.updatedAt ? 'both' : 'local'; state.review = true;
+    if ($('k40Origin') && $('k40Origin').value !== 'home') { $('k40Origin').value = 'home'; }
+    const bed = currentBed();
+    if (item.bedAtSave && (item.bedAtSave.width !== bed.width || item.bedAtSave.height !== bed.height)) state.design.issues.push({level: 'warn', code: 'bed', message: \`Se guard\xF3 con una cama de \${item.bedAtSave.width} \xD7 \${item.bedAtSave.height} mm; la actual es \${bed.width} \xD7 \${bed.height} mm. Revisa la colocaci\xF3n.\`, count: 1});
+    renderStructure(); setSource('import', {silent: true}); update();
+    return item;
+  }
+
+  /* ------------------------------------------------------------ borrador (sobrevive a recargar la p\xE1gina) */
+  function scheduleDraft() { clearTimeout(saveDraftTimer); saveDraftTimer = setTimeout(() => { if (!state.file) return; localPut({id: '__draft__', kind: 'draft', file: state.file, unitOverride: state.unitOverride, plan: state.plan, placement: state.placement, libraryId: state.libraryId, created: state.created, cloud: state.libraryCloud}).catch(() => {}); }, 800); }
+  async function restoreDraft() {
+    try {
+      const d = await localGet('__draft__'); if (!d?.file) return;
+      await loadSource(d.file, {unitOverride: d.unitOverride, plan: d.plan, placement: d.placement});
+      state.libraryId = d.libraryId || null; state.created = d.created || null; state.libraryCloud = d.cloud || null; state.dirty = true; update();
+    } catch {}
+  }
+
+  /* ------------------------------------------------------------ celular */
+  function snapshot() {
+    const a = state.design ? analyze() : null;
+    return {source: state.source, file: state.file ? {name: state.file.name, type: state.file.type} : null, dims: state.design ? {width: state.design.bbox.width, height: state.design.bbox.height} : null, objects: state.design?.objectCount || 0,
+      placement: state.placement, bounds: a?.bounds || null, sendScope: state.sendScope, review: state.review, dirty: state.dirty, savedWhere: state.savedWhere, cloud: library.cloudState,
+      issues: (state.design?.issues || []).filter((i) => i.level !== 'info').map((i) => i.message).slice(0, 6),
+      problems: a?.problems || [], warnings: a?.warnings || [], seconds: a?.seconds || 0,
+      ops: (a?.ops || []).map((o) => ({id: o.op.id, type: o.op.type, name: o.op.name, enabled: o.op.enabled, speed: o.op.speed, passes: o.op.passes, step: o.op.step, empty: o.empty, seconds: o.seconds, range: OP_TYPES[o.op.type].speed}))};
+  }
+  async function remote(action, args = {}) {
+    const num = (v) => Number(v);
+    switch (action) {
+      case 'source': return setSource(args.value);
+      case 'op': {
+        const op = state.plan?.operations.find((o) => o.id === args.id); if (!op) throw Error('Operaci\xF3n inexistente.');
+        const change = {};
+        if ('enabled' in args) change.enabled = !!args.enabled;
+        if ('speed' in args) { const [lo, hi] = OP_TYPES[op.type].speed; if (!(num(args.speed) >= lo && num(args.speed) <= hi)) throw Error(\`Velocidad entre \${lo} y \${hi} mm/s.\`); change.speed = num(args.speed); }
+        if ('passes' in args) { if (!Number.isInteger(num(args.passes)) || num(args.passes) < 1 || num(args.passes) > 10) throw Error('Pasadas enteras entre 1 y 10.'); change.passes = num(args.passes); }
+        patchOperation(op.id, change); renderStructure(); update(); return;
+      }
+      case 'op-move': moveOperation(args.id, args.dir < 0 ? -1 : 1); return;
+      case 'op-order': recommendOrder(); return;
+      case 'scope': if (args.value !== 'all' && !state.plan?.operations.some((o) => o.id === args.value && o.enabled)) throw Error('Operaci\xF3n inexistente o desactivada.'); state.sendScope = args.value; update(); return;
+      case 'place': {
+        const change = {};
+        for (const k of ['x', 'y', 'rotation']) if (k in args) change[k] = num(args[k]);
+        if ('scale' in args) { if (!(num(args.scale) > 0.001 && num(args.scale) <= 10)) throw Error('Escala inv\xE1lida.'); change.scale = num(args.scale); }
+        setPlacement(change); return;
+      }
+      case 'place-center': centerOnBed(); return;
+      case 'review-ok': state.review = false; update(); return;
+      case 'save': { const msg = await save(String(args.name || source.name()).slice(0, 80), args.cloud !== false); app.toast?.(msg); return; }
+      case 'lib-open': return libraryCommand('open', args);
+      case 'lib-duplicate': return libraryCommand('duplicate', args);
+      case 'lib-rename': return libraryCommand('rename', args);
+      case 'lib-delete': return libraryCommand('delete', args);
+      case 'lib-restore': return libraryCommand('restore', args);
+      case 'lib-list': await library.refresh(); app.workshopRemote?.publishLibrary?.(); return;
+      default: throw Error('Acci\xF3n remota no permitida.');
+    }
+  }
+  async function libraryCommand(kind, {id, scope, name}) {
+    if (scope === 'file') {
+      if (kind === 'open') await openSaved(id);
+      else if (kind === 'duplicate') await library.duplicate(id);
+      else if (kind === 'rename') await library.rename(id, name);
+      else if (kind === 'delete') await library.remove(id);
+      else if (kind === 'restore') await library.restore(id);
+    } else {
+      const box = app.workshop?.libraryApi; if (!box) throw Error('Biblioteca no disponible.');
+      await box[kind](id, name);
+      if (kind === 'open') setSource('box', {silent: true});
+    }
+    app.workshop?.refreshLibrary?.(); app.workshopRemote?.publishLibrary?.();
+  }
+  /** Archivos enviados desde el celular por el enlace (sin pasar por internet). */
+  async function receiveFile({name, type, data}) {
+    let file;
+    if (type === 'image/svg+xml') file = new File([data], name, {type});
+    else { const bin = atob(data.split(',')[1] || ''), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); file = new File([bytes], name, {type}); }
+    await importFile(file, {fromPhone: true});
+  }
+
+  machine.setSource(source);
+  library.onChange(() => { app.workshop?.refreshLibrary?.(); app.workshopRemote?.publishLibrary?.(); });
+  library.refresh().catch(() => {});
+  const api = {source, state, library, setSource, importFile, openSaved, save, snapshot, remote, receiveFile, ui: {sourceBar, panel, centerBar, zoomBar, orderPanel, bedNote}, update, get analysis() { return analysis; }};
+  app.jobStudio = api;
+  let initial = 'box'; try { initial = app.readStorage?.('lzbox-job-source', 'box') === 'import' ? 'import' : 'box'; } catch {}
+  setSource(initial, {silent: true}); setCenter('preview');
+  restoreDraft();
+  return api;
+}
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/k40-control.js":{body:`import {prepareK40Job,k40Preview,placeK40Job,K40_PROTOCOL} from './k40-job.js?v=2';
 import {registeredJob,referencePoints} from './registration.js?v=1';
 const ADDRESS='http://127.0.0.1:17840',PAIRING_KEY='lzbox-k40-pairing-v1';
@@ -1141,12 +2269,12 @@ export function mountK40(app,options={}){
  dialog.innerHTML=\`<header class="k40-header"><div class="k40-brand"><span class="k40-monogram">LZ</span><div><h2 id="k40Title">Control de corte <span>M2 Nano</span></h2><p>BOX STUDIO / TALLER</p></div></div><div class="k40-header-actions"><span class="k40-badge" id="k40Mode">Sin conectar</span><button type="button" class="icon-btn" id="k40Close" aria-label="Cerrar panel">\xD7</button></div></header>
  <div class="k40-layout"><section class="k40-canvas-panel" aria-label="Vista del trabajo"><div class="k40-section-heading"><div><span class="k40-kicker">PLANO DE CORTE</span><h3>\xC1rea de trabajo</h3></div><label>Hoja<select id="k40Sheet"></select></label><button type="button" class="btn outline" id="k40Arrange">Acomodar piezas</button></div><div id="k40Preview" class="k40-preview"></div><div class="k40-legend"><span><i class="k40-inner"></i>Interiores</span><span><i class="k40-outer"></i>Contornos</span><span>Medidas en mm \xB7 kerf conservado</span></div><p id="k40Summary" class="k40-summary"></p>
  <details class="k40-bed"><summary>Medidas de cama y desplazamiento</summary><div class="k40-fields"><label>Ancho \xB7 mm<input id="k40Width" type="number" min="50" max="2500" value="400"></label><label>Alto \xB7 mm<input id="k40Height" type="number" min="50" max="2500" value="400"></label><label>Desplazar X \xB7 mm<input id="k40X" type="number" min="0" step="0.1" value="0"></label><label>Desplazar Y \xB7 mm<input id="k40Y" type="number" min="0" step="0.1" value="0"></label></div><p class="k40-note">Las medidas deben coincidir con las del conector. En origen actual, el contorno del dise\xF1o se alinea al cabezal.</p></details></section>
- <section class="k40-controls" aria-label="Controles de m\xE1quina"><details class="k40-pairing" id="k40BridgePanel" open><summary>Conexi\xF3n USB</summary><p class="k40-note">Inicio autom\xE1tico con Windows. El c\xF3digo se guarda en esta computadora. <a href="https://raw.githubusercontent.com/juandppuente2003-netizen/lz-studio-toolsPublic/codex/box-k40-m2/connectors/k40/LZ-K40-Windows.zip?v=0.6.4" target="_blank" rel="noopener">Conector 0.6.4 para Windows</a>.</p><label for="k40Token">C\xF3digo del conector</label><div class="k40-connect-row"><input id="k40Token" type="password" autocomplete="off" spellcheck="false"><button type="button" id="k40Connect" class="btn outline">Conectar</button></div><label class="k40-confirm"><input id="k40Remember" type="checkbox" checked>Recordar esta computadora</label><div class="k40-actions"><button type="button" id="k40Disconnect" class="btn quiet" disabled>Liberar USB para Sagaon</button><button type="button" id="k40Forget" class="btn quiet">Olvidar c\xF3digo</button></div></details>
+ <section class="k40-controls" aria-label="Controles de m\xE1quina"><details class="k40-pairing" id="k40BridgePanel" open><summary>Conexi\xF3n USB</summary><p class="k40-note">Inicio autom\xE1tico con Windows. El c\xF3digo se guarda en esta computadora. <a id="k40ConnectorLink" href="https://raw.githubusercontent.com/juandppuente2003-netizen/lz-studio-toolsPublic/operar-maquina-v62/connectors/k40/LZ-K40-Windows.zip?v=0.7.0" target="_blank" rel="noopener">Conector 0.7.0 para Windows</a> (grabado de imagen y trabajos combinados; 0.6.4 sigue funcionando para cortes).</p><label for="k40Token">C\xF3digo del conector</label><div class="k40-connect-row"><input id="k40Token" type="password" autocomplete="off" spellcheck="false"><button type="button" id="k40Connect" class="btn outline">Conectar</button></div><label class="k40-confirm"><input id="k40Remember" type="checkbox" checked>Recordar esta computadora</label><div class="k40-actions"><button type="button" id="k40Disconnect" class="btn quiet" disabled>Liberar USB para Sagaon</button><button type="button" id="k40Forget" class="btn quiet">Olvidar c\xF3digo</button></div></details>
  <section class="k40-jog-panel"><div class="k40-section-heading"><h3>Mover cabezal</h3><span id="k40Position" class="k40-position">Sin referencia</span></div><div class="k40-motion-layout"><div class="k40-jog-pad"><button type="button" id="k40Up" class="k40-jog" aria-label="Mover hacia arriba">\u2191</button><button type="button" id="k40Left" class="k40-jog" aria-label="Mover hacia la izquierda">\u2190</button><button type="button" id="k40Home" class="k40-home" title="Ir a la esquina superior izquierda">Home</button><button type="button" id="k40Right" class="k40-jog" aria-label="Mover hacia la derecha">\u2192</button><button type="button" id="k40Down" class="k40-jog" aria-label="Mover hacia abajo">\u2193</button></div><div><label for="k40Step">Paso \xB7 mm</label><select id="k40Step"><option>0.1</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select><button type="button" id="k40UsePosition" class="btn outline wide">Usar esta posici\xF3n como origen</button></div></div><p class="k40-note">Un clic = un movimiento. Haz Home una vez al conectar. Posici\xF3n estimada; si mueves el cabezal a mano, libera USB y vuelve a establecer Home.</p></section>
  <section class="k40-job-settings"><h3>Preparar hoja</h3><label for="k40Origin">Origen del trabajo</label><select id="k40Origin"><option value="home">Desde Home \xB7 esquina superior izquierda</option><option value="current">Desde la posici\xF3n actual \xB7 sin volver a Home</option></select><p id="k40OriginNote" class="k40-note"></p><div class="k40-fields"><label>Velocidad \xB7 mm/s<input id="k40Speed" type="number" min="1" max="100" step="0.1" value="10"></label><label>Pasadas<input id="k40Passes" type="number" min="1" max="10" step="1" value="1"></label></div></section>
 
  <p class="k40-note">Potencia: aj\xFAstala en el panel f\xEDsico de la M2.</p></section></div>
- <footer class="k40-console"><div class="k40-feedback"><span id="k40State" class="k40-state">DESCONECTADA</span><div id="k40Status" class="k40-status" role="status" aria-live="polite">Conecta el conector local para continuar.</div><progress id="k40Progress" class="k40-progress" max="100" value="0" aria-label="Datos enviados a la controladora" hidden></progress><button type="button" id="k40Recover" class="btn outline" hidden>Restablecer conexi\xF3n USB</button><button type="button" id="k40Reconnect" class="btn outline" hidden>Reconectar M2</button></div><div class="k40-run-actions"><button type="button" id="k40Frame" class="btn outline" disabled>Recorrer marco</button><button type="button" id="k40Run" class="btn primary" disabled>Iniciar corte</button><button type="button" id="k40Stop" class="btn k40-stop" disabled><span>\u2161</span> STOP / PAUSA</button></div><section id="k40PausePanel" class="k40-pause-panel" aria-labelledby="k40PauseTitle" hidden><div><h3 id="k40PauseTitle">Pausa del trabajo</h3><p id="k40PauseNote">Esperando a la controladora\u2026</p></div><button type="button" id="k40Resume" class="btn primary" disabled>Reanudar trabajo</button><button type="button" id="k40Cancel" class="btn k40-terminate" disabled>Cancelar trabajo</button></section><p class="k40-stop-note">Stop solicita pausa por USB. Puede terminar lo ya almacenado antes de aceptarla; ante movimiento inesperado usa el paro f\xEDsico.</p></footer>\`;
+ <footer class="k40-console"><div class="k40-feedback"><span id="k40State" class="k40-state">DESCONECTADA</span><div id="k40Status" class="k40-status" role="status" aria-live="polite">Conecta el conector local para continuar.</div><progress id="k40Progress" class="k40-progress" max="100" value="0" aria-label="Datos enviados a la controladora" hidden></progress><button type="button" id="k40Recover" class="btn outline" hidden>Restablecer conexi\xF3n USB</button><button type="button" id="k40Reconnect" class="btn outline" hidden>Reconectar M2</button></div><div class="k40-run-actions"><button type="button" id="k40Frame" class="btn outline" disabled>Recorrer marco</button><button type="button" id="k40Run" class="btn primary" disabled>Iniciar corte</button><button type="button" id="k40Stop" class="btn k40-stop" disabled><span>\u2161</span> STOP / PAUSA</button></div><section id="k40PausePanel" class="k40-pause-panel" aria-labelledby="k40PauseTitle" hidden><div><h3 id="k40PauseTitle">Pausa del trabajo</h3><p id="k40PauseNote">Esperando a la controladora\u2026</p></div><button type="button" id="k40Resume" class="btn primary" disabled>Reanudar trabajo</button><button type="button" id="k40Cancel" class="btn k40-terminate" disabled>Cancelar trabajo</button></section><p class="k40-stop-note">Pausar pide a la M2 detenerse conservando la cola para reanudar. Stop descarta el trabajo y conserva el USB; despu\xE9s haz Home. La M2 puede terminar lo ya almacenado antes de aceptar la orden: ante movimiento inesperado usa el paro f\xEDsico.</p></footer>\`;
  (options.host||document.body).append(dialog);
  const targetPanel=document.createElement('div');targetPanel.className='k40-fields';targetPanel.innerHTML='<button type="button" class="btn outline" id="k40Pulse">Pulso l\xE1ser \xB7 50 ms</button><p id="k40Time" role="status">Tiempo estimado: sin trabajo activo.</p><label>Destino X \xB7 mm<input id="k40TargetX" type="number" min="0" step="0.1" value="0"></label><label>Destino Y \xB7 mm<input id="k40TargetY" type="number" min="0" step="0.1" value="0"></label><button type="button" class="btn outline" id="k40Goto">Ir a punto</button><button type="button" class="btn outline" id="k40Pick">Elegir punto en el plano</button><p>Elige un punto en el plano y pulsa Ir a punto para mover el cabezal sin emisi\xF3n.</p>';
  dialog.querySelector('.k40-jog-panel').append(targetPanel);
@@ -1156,6 +2284,7 @@ export function mountK40(app,options={}){
  dialog.querySelector('.k40-job-settings').after(registration);
  const aligned=document.createElement('option');aligned.value='aligned';aligned.textContent='Registro de puntos \xB7 sin escalar';$('k40Origin').append(aligned);
  let machine=null,job=null,previewOK=false,requesting=false,active=false,controlBusy=false,timer=null,lastState=null,verifiedToken='',epoch=0,polling=false,remoteOwner=false,opened=false;
+ let source=options.jobSource||null,finished=null,preparing=false;
  let pairs=[],referenceDesign=[],registrationSession=null,registrationFingerprint='',currentFingerprint='',currentView=null,activePreview='',activeName='';
  const inputs=['k40Sheet','k40Speed','k40Passes','k40Width','k40Height','k40X','k40Y','k40Origin'];
  const motionIds=['k40Up','k40Left','k40Right','k40Down'];
@@ -1171,8 +2300,8 @@ export function mountK40(app,options={}){
   $('k40Cancel').disabled=!active||controlBusy||['cancelling','recovering'].includes(lastState);
   $('k40Recover').hidden=!['error','unknown'].includes(lastState);$('k40Recover').disabled=controlBusy;
   $('k40Reconnect').hidden=active||!!machine||!verifiedToken;$('k40Reconnect').disabled=requesting;
-  $('k40State').textContent=({pulsing:'PULSO L\xC1SER',sending:'ENVIANDO',sent:'ESPERANDO FIN',pausing:'SOLICITANDO PAUSA',paused:'EN PAUSA',resuming:'REANUDANDO',cancelling:'CANCELANDO',recovering:'LIBERANDO USB',error:'REVISAR USB',unknown:'SIN RESPUESTA'})[lastState]||(machine?(machine.operationAccepted?'ORDEN ACEPTADA':'LISTA'):'DESCONECTADA');
-  $('k40State').dataset.state=lastState||'idle';
+  $('k40State').textContent=preparing?'PREPARANDO':({pulsing:'PULSO L\xC1SER',sending:'EJECUTANDO \xB7 ENVIANDO DATOS',sent:'DATOS ENVIADOS \xB7 ESPERANDO FIN',pausing:'SOLICITANDO PAUSA',paused:'EN PAUSA',resuming:'REANUDANDO',cancelling:'CANCELANDO',recovering:'LIBERANDO USB',error:'REVISAR USB',unknown:'SIN RESPUESTA'})[lastState]||(machine?(finished==='finished'?'TERMINADO':finished==='simulated'?'SIMULACI\xD3N TERMINADA':finished==='cancelled'?'CANCELADO':machine.operationAccepted?'ORDEN ACEPTADA':'LISTA'):'DESCONECTADA');
+  $('k40State').dataset.state=preparing?'preparing':lastState||(machine&&finished?finished:'idle');
   $('k40PauseNote').textContent=lastState==='paused'?'La M2 acept\xF3 la pausa. Conservamos la cola para continuar.':lastState==='resuming'?'Esperando aceptaci\xF3n de reanudaci\xF3n\u2026':lastState==='pausing'?'Pausa solicitada. Puede seguir ejecutando datos almacenados mientras la acepta.':'No se conoce el estado f\xEDsico. Cancela o restablece USB; usa el paro f\xEDsico si contin\xFAa.';
   inputs.forEach(id=>$(id).disabled=active||requesting);$('k40Step').disabled=active||requesting;
   $('k40Token').disabled=active||requesting;$('k40Connect').disabled=active||requesting||!!machine;
@@ -1188,6 +2317,7 @@ export function mountK40(app,options={}){
  }
  function refresh(announce=true){
   job=null;previewOK=false;if(!active)currentView=null;
+  if(source?.isActive()){refreshImported(announce);buttons();return;}
   try{
    job=prepareK40Job(app,{sheet:+$('k40Sheet').value,speed:$('k40Speed').value,passes:$('k40Passes').value,bedWidth:$('k40Width').value,bedHeight:$('k40Height').value,offsetX:$('k40X').value,offsetY:$('k40Y').value});
    if(machine&&(job.bed.width!==machine.bed.width||job.bed.height!==machine.bed.height))throw Error('Las medidas deben coincidir con la cama configurada en el conector.');
@@ -1211,9 +2341,26 @@ export function mountK40(app,options={}){
   }catch(e){$('k40Preview').textContent=e.message;$('k40Summary').textContent='';if(announce&&!active)status(e.message,true);}
   buttons();
  }
+ // Archivo importado: la vista y el resumen vienen del estudio de trabajos; el trabajo real se arma al enviar.
+ function refreshImported(announce){
+  const bed={width:Number($('k40Width').value),height:Number($('k40Height').value)};
+  if($('k40Origin').value==='aligned')$('k40Origin').value='home';
+  const origin=$('k40Origin').value,shift=origin==='current'&&hasPosition()?machine.position:null;
+  const info=source.describe({bed,position:hasPosition()?machine.position:null,origin:shift});
+  $('k40Preview').innerHTML=info.preview;currentView=info;
+  $('k40Summary').textContent=info.summary;
+  $('k40OriginNote').textContent=origin==='current'?'La esquina superior izquierda del dise\xF1o se alinea al cabezal. Al terminar vuelve a este origen; no ejecuta Home.':'El env\xEDo ejecuta Home y coloca el dise\xF1o con las medidas de la cama.';
+  if(machine&&(bed.width!==machine.bed.width||bed.height!==machine.bed.height)){previewOK=false;if(announce&&!active)status('Las medidas deben coincidir con la cama configurada en el conector.',true);return;}
+  if(origin==='current'&&!hasPosition()){previewOK=false;if(announce&&!active)status('Haz Home para usar la posici\xF3n actual como origen.',true);return;}
+  if(info.problem){previewOK=false;if(announce&&!active)status(info.problem,true);return;}
+  const support=machine?source.support(machine.features||[]):null;
+  if(support&&!support.ok){previewOK=false;if(announce&&!active)status(support.message,true);return;}
+  job={imported:true,bed,summary:{minimumCutSeconds:info.seconds}};previewOK=true;
+  if(announce&&!active)status(machine?'Lista. Recorre el marco o inicia el trabajo; nada se mueve hasta que lo pidas.':'Archivo listo. Conecta el conector local para continuar.');
+ }
  async function api(path,body){
   const token=$('k40Token').value.trim();if(!token)throw Error('Pega el c\xF3digo del conector una vez y marca Recordar esta computadora.');
-  let response;try{response=await fetch(ADDRESS+path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(path==='/prepare'?60000:12000),cache:'no-store'});}catch{throw Error('No se pudo comunicar con el conector. Comprueba que est\xE9 iniciado y permite el acceso a la red local si Chrome lo solicita.');}
+  let response;try{response=await fetch(ADDRESS+path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(path==='/prepare'?180000:12000),cache:'no-store'});}catch{throw Error('No se pudo comunicar con el conector. Comprueba que est\xE9 iniciado y permite el acceso a la red local si Chrome lo solicita.');}
   const result=await response.json();if(!response.ok)throw Error(response.status===401?'El c\xF3digo no es v\xE1lido. Copia el c\xF3digo permanente desde Abrir conector.':result.error||'El conector rechaz\xF3 la solicitud.');return result;
  }
  function savedCode(){try{return document.defaultView.localStorage.getItem(PAIRING_KEY)||'';}catch{return '';}}
@@ -1246,8 +2393,11 @@ export function mountK40(app,options={}){
   if(clockStart&&['paused','idle','error'].includes(s.state)){clockSpent+=(Date.now()-clockStart)/1000;clockStart=0;}if(s.state==='sending'&&lastState==='resuming'&&clockTotal)clockStart=Date.now();updateClock();
   if(machine)machine={...machine,...s};lastState=s.state;
   if(PENDING.includes(s.state))active=true;
+  if(s.state==='idle'&&active&&s.outcome?.operation==='cut')finished=s.outcome.result==='cancelled'?'cancelled':s.outcome.result==='simulated'?'simulated':'finished';
+  if(s.state==='idle'&&active&&s.outcome?.result==='cancelled')finished='cancelled';
   if(s.state==='idle'&&active){active=false;if(!options.host)stopPolling();$('k40Progress').hidden=true;if(!s.connected){machine=null;remoteOwner=false;clearRegistration();$('k40Mode').textContent='USB liberado';}refresh(false);status(s.message);}
-  else if(s.state==='sending'){$('k40Progress').hidden=false;$('k40Progress').value=s.percent;status(s.operation==='home'||s.operation==='jog'?'Moviendo cabezal. Esperando fin de la controladora\u2026':\`Enviando \${s.percent}% de datos. No mide el avance f\xEDsico del corte.\`);}
+  else if(s.state==='sending'){$('k40Progress').hidden=false;$('k40Progress').value=s.percent;status(s.operation==='home'||s.operation==='jog'||s.operation==='goto'?'Moviendo cabezal. Esperando fin de la controladora\u2026':\`Ejecutando. Datos enviados a la controladora: \${s.percent}% (no es el avance f\xEDsico).\`);}
+  else if(s.state==='sent'){$('k40Progress').hidden=true;status('Todos los datos llegaron a la controladora. La m\xE1quina sigue trabajando hasta que la placa indique fin; los controles se liberan entonces.');}
   else if(PENDING.includes(s.state)){if(s.state==='error')stopPolling();status(s.message,s.state==='error');}
   buttons();
  }
@@ -1255,24 +2405,25 @@ export function mountK40(app,options={}){
   if(polling)return;polling=true;const generation=epoch;try{const s=await api('/status');if(generation===epoch)consume(s);}catch(e){if(generation!==epoch)return;stopPolling();lastState='unknown';if(machine){machine.position=null;active=true;}status(e.message+' No reenv\xEDes. Comprueba la m\xE1quina y usa su paro f\xEDsico si contin\xFAa.',true);buttons();}finally{polling=false;}
  }
  let clockStart=0,clockSpent=0,clockTotal=0;
- function updateClock(){const elapsed=clockSpent+(clockStart?(Date.now()-clockStart)/1000:0);$('k40Time').textContent=clockTotal?\`Estimaci\xF3n m\xEDnima \xB7 transcurrido \${Math.floor(elapsed)} s \xB7 restante \${Math.max(0,Math.ceil(clockTotal-elapsed))} s\${elapsed>=clockTotal?' \xB7 esperando confirmaci\xF3n de la placa':''}\`:'Tiempo estimado: sin trabajo activo.';}
+ function updateClock(){const elapsed=clockSpent+(clockStart?(Date.now()-clockStart)/1000:0);$('k40Time').textContent=clockTotal?\`Transcurrido \${Math.floor(elapsed)} s (reloj real) \xB7 restante estimado \${Math.max(0,Math.ceil(clockTotal-elapsed))} s\${elapsed>=clockTotal?' \xB7 esperando confirmaci\xF3n de la placa':''}\`:'Tiempo estimado: sin trabajo activo.';}
  async function pulse(){if(remoteOwner||requesting||active||!hasPosition())return;requesting=true;buttons();try{consume(await api('/pulse',{milliseconds:50,confirmed:true}));startPolling();}catch(e){status(e.message,true);}finally{requesting=false;buttons();}}
  async function run(mode,fromRemote=false){
   if(remoteOwner!==fromRemote||!job||!machine||requesting||active||!previewOK)return;
-  let generation;requesting=true;buttons();status('Preparando instrucciones M2\u2026');
+  let generation;requesting=true;preparing=true;finished=null;buttons();status('Preparando instrucciones M2\u2026');
   try{
+   const origin=$('k40Origin').value;let wire=job;
+   if(job.imported){status(mode==='frame'?'Preparando el marco del trabajo\u2026':'Preparando operaciones: rasterizando im\xE1genes y optimizando trayectorias\u2026');wire=await source.buildJob({bed:machine.bed,features:machine.features||[],mode,origin});activePreview=currentView?.compact||'';activeName=source.name();}
+   else{activePreview=k40Preview(currentView||job);activeName=app.state.name;}
    if(mode==='cut'){clockTotal=job.summary.minimumCutSeconds;clockSpent=0;clockStart=Date.now();}else{clockStart=0;clockTotal=0;}updateClock();
-   activePreview=k40Preview(currentView||job);activeName=app.state.name;
-   const origin=fromRemote?'current':$('k40Origin').value;
-   const prepared=await api('/prepare',{job,mode,origin,...(origin==='aligned'?{registration:{pairs,mode:$('k40RegistrationMode').value,session:registrationSession}}:{})});if(!prepared.id)throw Error('El conector no prepar\xF3 un trabajo v\xE1lido.');
-   active=true;lastState=null;generation=++epoch;buttons();let result=await api('/run',{id:prepared.id,confirmed:true});if(generation!==epoch)return;
+   const prepared=await api('/prepare',{job:wire,mode,origin,...(origin==='aligned'?{registration:{pairs,mode:$('k40RegistrationMode').value,session:registrationSession}}:{})});if(!prepared.id)throw Error('El conector no prepar\xF3 un trabajo v\xE1lido.');
+   preparing=false;active=true;lastState=null;generation=++epoch;buttons();let result=await api('/run',{id:prepared.id,confirmed:true});if(generation!==epoch)return;
    if(result.state==='simulated'){result=await api('/acknowledge',{confirmed:true});if(generation!==epoch)return;}
    consume(result);if(result.state==='sending'||result.state==='sent')startPolling();await poll();
-  }catch(e){if(generation!==undefined&&generation!==epoch)return;status(e.message,true);if(active)lastState='unknown';}finally{requesting=false;buttons();}
+  }catch(e){if(generation!==undefined&&generation!==epoch)return;if(!active){clockStart=0;clockTotal=0;updateClock();}status(e.message,true);if(active)lastState='unknown';}finally{preparing=false;requesting=false;buttons();}
  }
  async function motion(action,dx=0,dy=0,fromRemote=false){
   if(remoteOwner!==fromRemote||!machine||requesting||active)return;
-  requesting=true;active=true;lastState=null;const generation=++epoch;buttons();status(action==='home'?'Solicitando Home\u2026':'Solicitando movimiento\u2026');
+  requesting=true;active=true;lastState=null;finished=null;const generation=++epoch;buttons();status(action==='home'?'Solicitando Home\u2026':'Solicitando movimiento\u2026');
   try{const result=await api('/motion',{action,dx,dy,confirmed:true});if(generation!==epoch)return;consume(result);if(active)startPolling();}
   catch(e){if(generation!==epoch)return;await poll();if(!active)status(e.message,true);else{lastState='unknown';status(e.message+' Verifica la m\xE1quina antes de continuar.',true);}}
   finally{requesting=false;buttons();}
@@ -1336,13 +2487,13 @@ export function mountK40(app,options={}){
  $('k40ClearRegistration').onclick=()=>{clearRegistration();refresh();};$('k40RegistrationMode').onchange=()=>{if($('k40Origin').value==='aligned')$('k40Origin').value='home';renderRegistration();refresh(false);};
  app.onUpdate(()=>{if((dialog.open||options.host)&&!active&&!requesting){const selected=$('k40Sheet').value;$('k40Sheet').replaceChildren(...Array.from({length:app.packed?.count||1},(_,i)=>{const o=document.createElement('option');o.value=i;o.textContent='Hoja '+(i+1);return o;}));$('k40Sheet').value=String(Math.min(Number(selected)||0,(app.packed?.count||1)-1));refresh(false);}});
  const settings=()=>({sheet:Number($('k40Sheet').value)||0,speed:Number($('k40Speed').value),passes:Number($('k40Passes').value),bedWidth:Number($('k40Width').value),bedHeight:Number($('k40Height').value),offsetX:Number($('k40X').value),offsetY:Number($('k40Y').value),origin:$('k40Origin').value});
- const controller={dialog,refresh,open,get busy(){return active||requesting||controlBusy;},get machine(){return machine;},get settings(){return settings();},get job(){return job;},get message(){return $('k40Status').textContent;},get stateLabel(){return $('k40State').textContent;},get canPause(){return !$('k40Stop').disabled;},get referenceDesignPoints(){return pairs.map(p=>[...p.design]);},pause:()=>control('pause'),
+ const controller={dialog,refresh,open,setSource(value){source=value;},get finishedState(){return finished;},get busy(){return active||requesting||controlBusy;},get machine(){return machine;},get settings(){return settings();},get job(){return job;},get message(){return $('k40Status').textContent;},get stateLabel(){return $('k40State').textContent;},get canPause(){return !$('k40Stop').disabled;},get referenceDesignPoints(){return pairs.map(p=>[...p.design]);},pause:()=>control('pause'),
   restoreSettings(value={}){if(active||requesting)throw Error('Hay una operaci\xF3n activa.');for(const [key,id] of [['sheet','k40Sheet'],['speed','k40Speed'],['passes','k40Passes'],['bedWidth','k40Width'],['bedHeight','k40Height'],['offsetX','k40X'],['offsetY','k40Y']])if(Number.isFinite(Number(value[key])))$(id).value=value[key];$('k40Origin').value=value.origin==='current'?'current':'home';clearRegistration('La preparaci\xF3n cargada requiere verificar el origen f\xEDsico.');refresh(false);},
   restoreReferencePoints(points){clearRegistration('Plantilla cargada: registra de nuevo las posiciones f\xEDsicas.');referenceDesign=points.filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).map(p=>[...p]);refresh(false);},
-  setRemoteOwner(value){if(value&&(active||requesting||!machine))throw Error('Conecta la m\xE1quina y espera a que quede lista antes de ceder el control.');remoteOwner=!!value;if(value){$('k40Origin').value='current';refresh(false);}buttons();},
+  setRemoteOwner(value){if(value&&(active||requesting||!machine))throw Error('Conecta la m\xE1quina y espera a que quede lista antes de ceder el control.');remoteOwner=!!value;if(value&&hasPosition()&&$('k40Origin').value==='aligned'){$('k40Origin').value='current';refresh(false);}buttons();},
   get remoteOwner(){return remoteOwner;},
-  snapshot(){return {state:lastState||'idle',label:$('k40State').textContent,message:$('k40Status').textContent,position:machine?.position||null,connected:!!machine?.connected,busy:active||requesting,owner:remoteOwner?'phone':'desktop',canPause:!$('k40Stop').disabled,canResume:lastState==='paused',canPulse:!!machine?.features?.includes('timed-pulse')&&hasPosition()&&!active&&!requesting,canRun:!!machine&&!active&&!requesting&&!!job&&previewOK,hasPosition:hasPosition(),elapsedSeconds:Math.floor(clockSpent+(clockStart?(Date.now()-clockStart)/1000:0)),estimatedSeconds:clockTotal,preview:active&&activePreview?activePreview:currentView?k40Preview(currentView):'',name:active&&activeName?activeName:app.state.name,settings:settings()};},
-  async remoteCommand(action,args={}){if(['pause','cancel'].includes(action)){await control(action,true);return;}if(!remoteOwner)throw Error('La computadora conserva el control.');if(['home','jog','frame','cut'].includes(action)&&(active||requesting||controlBusy))throw Error('Espera a que termine la operaci\xF3n anterior.');if(action==='pulse'){if(active||requesting||controlBusy||!machine?.features?.includes('timed-pulse'))throw Error('Actualiza el conector a 0.6.4 y espera a que quede libre.');requesting=true;buttons();try{consume(await api('/pulse',{milliseconds:50,confirmed:true}));startPolling();}finally{requesting=false;buttons();}}else if(action==='home')await motion('home',0,0,true);else if(action==='jog'){const dx=Number(args.dx),dy=Number(args.dy);if(!Number.isFinite(dx)||!Number.isFinite(dy)||Math.max(Math.abs(dx),Math.abs(dy))>50)throw Error('Movimiento inv\xE1lido.');await motion('jog',dx,dy,true);}else if(action==='frame'||action==='cut')await run(action,true);else if(action==='settings'){if(active||requesting)throw Error('Espera a que termine el trabajo.');const speed=Number(args.speed),passes=Number(args.passes);if(!Number.isFinite(speed)||speed<1||speed>100||!Number.isInteger(passes)||passes<1||passes>10)throw Error('Velocidad 1\u2013100 mm/s; pasadas 1\u201310.');$('k40Speed').value=speed;$('k40Passes').value=passes;refresh(false);}else if(action==='resume')await control('resume',true);else throw Error('Acci\xF3n remota no permitida.');}
+  snapshot(){return {state:lastState||'idle',label:$('k40State').textContent,message:$('k40Status').textContent,position:machine?.position||null,connected:!!machine?.connected,busy:active||requesting,owner:remoteOwner?'phone':'desktop',canPause:!$('k40Stop').disabled,canResume:lastState==='paused',canPulse:!!machine?.features?.includes('timed-pulse')&&hasPosition()&&!active&&!requesting,canRun:!!machine&&!active&&!requesting&&!!job&&previewOK,hasPosition:hasPosition(),elapsedSeconds:Math.floor(clockSpent+(clockStart?(Date.now()-clockStart)/1000:0)),estimatedSeconds:clockTotal,preview:active&&activePreview?activePreview:source?.isActive()?(currentView?.compact||''):currentView?k40Preview(currentView):'',name:active&&activeName?activeName:source?.isActive()?source.name():app.state.name,settings:settings(),origin:$('k40Origin').value,source:source?.isActive()?'import':'box',finished,preparing,dataSent:lastState==='sent',canFrame:!!machine&&!active&&!requesting&&!!job&&previewOK,problem:previewOK?'':$('k40Status').dataset.error==='true'?$('k40Status').textContent:''};},
+  async remoteCommand(action,args={}){if(['pause','cancel'].includes(action)){await control(action,true);return;}if(!remoteOwner)throw Error('La computadora conserva el control.');if(['home','jog','frame','cut'].includes(action)&&(active||requesting||controlBusy))throw Error('Espera a que termine la operaci\xF3n anterior.');if(action==='pulse'){if(active||requesting||controlBusy||!machine?.features?.includes('timed-pulse'))throw Error('Actualiza el conector a 0.6.4 y espera a que quede libre.');requesting=true;buttons();try{consume(await api('/pulse',{milliseconds:50,confirmed:true}));startPolling();}finally{requesting=false;buttons();}}else if(action==='home')await motion('home',0,0,true);else if(action==='jog'){const dx=Number(args.dx),dy=Number(args.dy);if(!Number.isFinite(dx)||!Number.isFinite(dy)||Math.max(Math.abs(dx),Math.abs(dy))>50)throw Error('Movimiento inv\xE1lido.');await motion('jog',dx,dy,true);}else if(action==='frame'||action==='cut')await run(action,true);else if(action==='settings'){if(active||requesting)throw Error('Espera a que termine el trabajo.');const speed=Number(args.speed),passes=Number(args.passes);if(!Number.isFinite(speed)||speed<1||speed>100||!Number.isInteger(passes)||passes<1||passes>10)throw Error('Velocidad 1\u2013100 mm/s; pasadas 1\u201310.');$('k40Speed').value=speed;$('k40Passes').value=passes;refresh(false);}else if(action==='resume')await control('resume',true);else if(action==='origin'){if(active||requesting)throw Error('Espera a que termine la operaci\xF3n.');if(!['home','current'].includes(args.value))throw Error('Origen inv\xE1lido.');$('k40Origin').value=args.value;refresh(false);}else if(options.remoteExtra){if(active||requesting||controlBusy)throw Error('Espera a que termine la operaci\xF3n.');await options.remoteExtra(action,args);refresh(false);}else throw Error('Acci\xF3n remota no permitida.');}
  };
  app.machineControl=controller;
  if(options.host)open();
@@ -2193,7 +3344,6 @@ function operate(app) {
   if (speed) row('speed', 'Velocidad', speed);
   if (passes) row('passes', 'Pasadas', passes);
   const origin = $('k40Origin');
-  if (origin) { const r = row('target', 'Origen', origin); r.classList.add('neo-job-origin'); const note = $('k40OriginNote'); if (note) job.append(note); }
   find('.k40-job-settings')?.classList.add('neo-emptied');
 
   const usb = $('k40BridgePanel');
@@ -2209,7 +3359,9 @@ function operate(app) {
   openPhone.onclick = () => remoteButton?.click();
   phone.append(openPhone);
   if (!remoteButton) phone.hidden = true;
-  left.append(job, usbCard, phone);
+  const studio = app.jobStudio;
+  if (studio) left.append(studio.ui.sourceBar, job, studio.ui.panel); else left.append(job, phone);
+  find('.js-host')?.remove();
   const registration = find('.k40-registration');
   if (registration) { registration.classList.add('neo-op-card'); left.append(registration); }
   const power = find('.k40-controls > p.k40-note');
@@ -2218,6 +3370,7 @@ function operate(app) {
 
   // Columna derecha: mover cabezal.
   const right = el('div', 'neo-op-right');
+  right.append(usbCard);
   // Las columnas entran al documento antes de mover nodos: as\xED getElementById los sigue encontrando.
   const layout = find('.k40-layout');
   layout?.prepend(left);
@@ -2258,6 +3411,25 @@ function operate(app) {
       jog.querySelector('label[for=k40Step]')?.classList.add('neo-visually-hidden');
       paintSteps();
     }
+    if (origin) {
+      const originCard = el('div', 'neo-origin');
+      originCard.append(el('p', 'neo-sub', 'Origen del trabajo'));
+      const seg = el('div', 'neo-steps neo-origin-seg');
+      seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Origen del trabajo');
+      const paintOrigin = () => { for (const b of seg.children) { const o = origin.querySelector(\`option[value="\${b.dataset.value}"]\`); b.hidden = !o || o.hidden; b.disabled = origin.disabled || !!o?.disabled; b.setAttribute('aria-pressed', String(origin.value === b.dataset.value)); } };
+      for (const [value, label] of [['home', 'Home'], ['current', 'Posici\xF3n actual'], ['aligned', 'Puntos']]) {
+        const b = el('button', 'neo-step', label); b.type = 'button'; b.dataset.value = value;
+        b.onclick = () => { if (origin.disabled) return; origin.value = value; origin.dispatchEvent(new Event('input', {bubbles: true})); paintOrigin(); };
+        seg.append(b);
+      }
+      origin.classList.add('neo-visually-hidden');
+      originCard.append(seg, origin);
+      const note = $('k40OriginNote'); if (note) originCard.append(note);
+      jog.querySelector('.k40-motion-layout')?.after(originCard);
+      new MutationObserver(paintOrigin).observe(origin, {attributes: true, attributeFilter: ['disabled']});
+      origin.addEventListener('input', paintOrigin); origin.addEventListener('change', paintOrigin);
+      app.onUpdate(paintOrigin); setInterval(paintOrigin, 1000); paintOrigin();
+    }
     withIcon($('k40Home'), 'home');
     withIcon($('k40UsePosition'), 'target');
     withIcon($('k40Goto'), 'target');
@@ -2268,6 +3440,21 @@ function operate(app) {
   // Centro: plano con encabezado y medidas.
   const canvas = find('.k40-canvas-panel');
   canvas?.classList.add('neo-op-card', 'neo-op-plan');
+  if (studio) {
+    openPhone.className = 'btn outline neo-phone-open'; openPhone.innerHTML = icon('phone') + '<span>Control desde celular</span>';
+    studio.ui.centerBar.append(openPhone);
+  }
+  // Acciones: Recorrer marco \xB7 Iniciar \xB7 Pausar \xB7 Reanudar \xB7 Stop (cancela, conserva USB).
+  const runActions = find('.k40-run-actions'), stopB = $('k40Stop'), cancelB = $('k40Cancel'), resumeB = $('k40Resume');
+  if (runActions && stopB && cancelB && resumeB) {
+    stopB.innerHTML = icon('pause') + '<span>Pausar</span>'; stopB.title = 'Pide a la M2 que se detenga conservando la cola para reanudar.';
+    $('k40Run').innerHTML = icon('play') + '<span>Iniciar trabajo</span>';
+    const resumeMirror = el('button', 'btn primary neo-resume-bar'); resumeMirror.type = 'button'; resumeMirror.innerHTML = icon('play') + '<span>Reanudar</span>'; resumeMirror.onclick = () => { if (!resumeB.disabled) resumeB.click(); };
+    cancelB.innerHTML = icon('stop') + '<span>Stop</span>'; cancelB.classList.add('neo-stop-bar'); cancelB.title = 'Detiene y descarta el trabajo. Conserva el USB; despu\xE9s haz Home para volver a referenciar.';
+    runActions.append(resumeMirror, cancelB);
+    const syncResume = () => { resumeMirror.hidden = resumeB.disabled; resumeMirror.disabled = resumeB.disabled; };
+    new MutationObserver(syncResume).observe(resumeB, {attributes: true, attributeFilter: ['disabled']}); syncResume();
+  }
   withIcon($('k40Arrange'), 'layers');
 
   // Consola inferior: estado, tiempo estimado y acciones.
@@ -2285,18 +3472,18 @@ function operate(app) {
     const summary = $('k40Summary');
     const syncClock = () => {
       const live = time.textContent;
-      if (/restante\\s+(\\d+)\\s*s/.test(live)) { const s = Number(live.match(/restante\\s+(\\d+)\\s*s/)[1]); value.textContent = fmtTime(s); note.textContent = 'Restante \xB7 en curso'; return; }
+      if (/restante estimado\\s+(\\d+)\\s*s/.test(live)) { const s = Number(live.match(/restante estimado\\s+(\\d+)\\s*s/)[1]); const e = Number(live.match(/Transcurrido\\s+(\\d+)/)?.[1] || 0); value.textContent = fmtTime(s); note.textContent = \`Restante estimado \xB7 transcurrido \${fmtTime(e)} (real)\`; return; }
       const est = (summary?.textContent || '').match(/Tiempo\\s+m[i\xED]nimo de corte:\\s*([\\d.]+)\\s*s/i);
-      value.textContent = est ? fmtTime(Number(est[1])) : '\u2014';
-      note.textContent = est ? 'Estimaci\xF3n, m\xE1s movimientos y aceleraciones.' : 'Sin trabajo preparado.';
+      const imported = (summary?.textContent || '').match(/Tiempo estimado:\\s*([^.]+)\\./);
+      value.textContent = est ? fmtTime(Number(est[1])) : imported ? '\u2248 ' + imported[1] : '\u2014';
+      note.textContent = est ? 'Estimaci\xF3n, m\xE1s movimientos y aceleraciones.' : imported ? 'Estimaci\xF3n de barridos y trayectorias.' : 'Sin trabajo preparado.';
     };
     for (const node of [time, summary].filter(Boolean)) new MutationObserver(syncClock).observe(node, {childList: true, characterData: true, subtree: true});
     syncClock();
   }
   withIcon($('k40Frame'), 'frame');
-  withIcon($('k40Run'), 'play');
   withIcon($('k40Resume'), 'play');
-  withIcon($('k40Cancel'), 'stop');
+  studio?.setSource(studio.state.source, {silent: true});
 
 
   // Material y nombre del trabajo; estado de conexi\xF3n en la tarjeta USB.
@@ -2411,7 +3598,9 @@ export function parsePairingLink(code){
  const [session,secret]=code.split('.');return {session,secret};
 }
 `,type:"text/javascript; charset=utf-8",public:!0},"/box/peer-transport.js":{body:`// Encrypted peer-to-peer transport. No relay, signaling service or USB token.
-export const REMOTE_ACTIONS=new Set(['settings','pulse','home','jog','frame','cut','pause','resume','cancel']);
+export const REMOTE_ACTIONS=new Set(['settings','pulse','home','jog','frame','cut','pause','resume','cancel','origin','source','op','op-move','op-order','scope','place','place-center','review-ok','save','lib-list','lib-open','lib-duplicate','lib-rename','lib-delete','lib-restore']);
+// Archivos del celular: fragmentos de 12 000 caracteres, hasta 11 MB codificados (8 MB de archivo).
+export const UPLOAD_CHUNK=12000,UPLOAD_MAX=11200000;
 export async function encodePairing(value){
  const bytes=new TextEncoder().encode(JSON.stringify(value));
  const compressed=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
@@ -2806,34 +3995,169 @@ export function referencePoints(job){
  const points=job.paths.flatMap(p=>p.points),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),xm=(x0+x1)/2,ym=(y0+y1)/2;
  return [[x0,y0],[xm,y0],[x1,y0],[x1,ym],[x1,y1],[xm,y1],[x0,y1],[x0,ym]];
 }
-`,type:"text/javascript; charset=utf-8",public:!1},"/box/remote-client.js":{body:`import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader} from './peer-transport.js?v=2';
+`,type:"text/javascript; charset=utf-8",public:!1},"/box/remote-client.js":{body:`import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
 import {pairingRequest,parsePairingLink} from './peer-signaling.js?v=1';
-const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false;const pending=new Map();let parametersDirty=false;
+// Celular: Control / Trabajos / Biblioteca. La computadora conserva el USB y ejecuta cada orden;
+// este celular solo env\xEDa \xF3rdenes expl\xEDcitas (una por pulsaci\xF3n) y nunca reintenta en silencio.
+const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false,library=null,libFilter='all',reviewOpen=false;const pending=new Map(),uploads=new Map();let parametersDirty=false;
 const status=message=>{$('remoteStatus').textContent=message;};
-function controls(){const owner=state?.owner==='phone',idle=owner&&!state?.busy&&!awaiting&&channel?.readyState==='open';for(const id of ['remoteUp','remoteLeft','remoteRight','remoteDown'])$(id).disabled=!idle||!state?.hasPosition;for(const id of ['remoteSettings','remoteSpeed','remotePasses'])$(id).disabled=!idle;$('remoteHome').disabled=!idle;$('remotePulse').disabled=!idle||!state?.canPulse;$('remoteFrame').disabled=!idle||!state?.canRun;$('remoteCut').disabled=!idle||!state?.canRun;$('remoteStop').disabled=!state?.canPause||channel?.readyState!=='open';$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||channel?.readyState!=='open';$('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);}
-function disconnected(){state=null;awaiting=false;$('remoteLinkState').textContent='Enlace perdido';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado.'));}pending.clear();controls();status('Vuelve a enlazar desde la computadora. No se repetir\xE1 ninguna orden.');}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const fmt=(n,d=1)=>Number.isFinite(n)?(Math.round(n*10**d)/10**d).toLocaleString('es-MX',{maximumFractionDigits:d}):'\u2014';
+const fmtTime=s=>{if(!Number.isFinite(s)||s<=0)return '\u2014';s=Math.round(s);const m=Math.floor(s/60),r=s%60;return m?\`\${m} min \${String(r).padStart(2,'0')} s\`:\`\${r} s\`;};
+const open=()=>channel?.readyState==='open';
+const job=()=>state?.job||null;
+function controls(){
+ const owner=state?.owner==='phone',idle=owner&&!state?.busy&&!awaiting&&open();
+ for(const id of ['remoteUp','remoteLeft','remoteRight','remoteDown'])$(id).disabled=!idle||!state?.hasPosition;
+ for(const id of ['remoteSettings','remoteSpeed','remotePasses'])$(id).disabled=!idle;
+ $('remoteHome').disabled=!idle;$('remotePulse').disabled=!idle||!state?.canPulse;
+ $('remoteFrame').disabled=!idle||!(state?.canFrame??state?.canRun);$('remoteCut').disabled=!idle||!state?.canRun;
+ $('remoteStop').disabled=!state?.canPause||!open();$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||!open();
+ $('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);
+ for(const b of document.querySelectorAll('[data-origin]')){b.disabled=!idle||(b.dataset.origin==='current'&&!state?.hasPosition);b.setAttribute('aria-pressed',String(state?.origin===b.dataset.origin));}
+ for(const b of document.querySelectorAll('[data-source]')){b.disabled=!idle;b.setAttribute('aria-pressed',String((job()?.source||state?.source)===b.dataset.source));}
+ for(const n of document.querySelectorAll('#tabJobs input,#tabJobs select,#tabJobs button:not([data-source]):not([data-origin]),#tabLibrary .rm-lib button'))n.disabled=!idle;
+ $('remoteImport').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);
+ $('remoteLibRefresh').disabled=!open();
+}
+function disconnected(){state=null;awaiting=false;$('remoteLinkState').textContent='Enlace perdido';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado.'));}pending.clear();for(const u of uploads.values())u.reject(Error('Enlace desconectado.'));uploads.clear();controls();status('Vuelve a enlazar desde la computadora. No se repetir\xE1 ninguna orden.');}
+// Solo se acepta el subconjunto de SVG que genera Box; nunca marcado arbitrario.
+function safePreview(markup){
+ const svg=markup?new DOMParser().parseFromString(markup,'image/svg+xml').documentElement:null;
+ const tags=new Set(['svg','rect','path','circle','image']);const attributes=new Set(['xmlns','viewBox','role','aria-label','width','height','fill','stroke','stroke-width','d','cx','cy','r','x','y','href','preserveAspectRatio','opacity','fill-opacity','stroke-dasharray']);
+ const ok=n=>tags.has(n.localName)&&[...n.attributes].every(a=>attributes.has(a.name)&&!/[<>]/.test(a.value)&&(a.name!=='href'||(n.localName==='image'&&/^data:image\\/png;base64,[A-Za-z0-9+/=]+$/.test(a.value))));
+ return svg?.localName==='svg'&&[svg,...svg.querySelectorAll('*')].every(ok)?svg:null;
+}
+const stateLabel=s=>{const map={pulsing:'Pulso l\xE1ser',sending:'Ejecutando',sent:'Datos enviados \xB7 esperando fin',pausing:'Solicitando pausa',paused:'En pausa',resuming:'Reanudando',cancelling:'Cancelando',recovering:'Liberando USB',error:'Revisar USB',unknown:'Sin respuesta'};if(s.preparing)return 'Preparando';if(map[s.state])return map[s.state];if(!s.connected)return 'M\xE1quina desconectada';if(s.finished==='finished')return 'Terminado';if(s.finished==='cancelled')return 'Cancelado';return 'Lista';};
 function receive(message){
  if(message.type==='reply'){const p=pending.get(message.id);if(p){clearTimeout(p.timer);pending.delete(message.id);message.ok?p.resolve():p.reject(Error(message.error));}return;}
- if(message.type!=='state'||message.session!==session)return;state=message;$('remotePairing').hidden=true;$('remoteMachine').hidden=false;$('remoteLinkState').textContent='Enlace local cifrado';$('remoteJobName').textContent=message.name;$('remoteMachineState').textContent=message.label;$('remoteOwner').textContent=message.owner==='phone'?'Control de movimientos: este celular.':'La computadora tiene el control; puedes consultar y solicitar Stop.';
- $('remotePosition').textContent=Array.isArray(message.position)?\`X \${message.position[0].toFixed(2)} \xB7 Y \${message.position[1].toFixed(2)} mm \xB7 estimada\`:'Sin referencia';
- // Only the locally generated SVG subset is accepted; never arbitrary markup.
- const svg=message.preview===undefined?null:new DOMParser().parseFromString(message.preview||'','image/svg+xml').documentElement;
- const tags=new Set(['svg','rect','path','circle']);const attributes=new Set(['xmlns','viewBox','role','aria-label','width','height','fill','stroke','stroke-width','d','cx','cy','r']);
- if(svg?.localName==='svg'&&[svg,...svg.querySelectorAll('*')].every(n=>tags.has(n.localName)&&[...n.attributes].every(a=>attributes.has(a.name)&&!/[<>]/.test(a.value))))$('remotePreview').replaceChildren(document.importNode(svg,true));
- if(!parametersDirty&&document.activeElement!==$('remoteSpeed'))$('remoteSpeed').value=message.settings?.speed||10;if(!parametersDirty&&document.activeElement!==$('remotePasses'))$('remotePasses').value=message.settings?.passes||1;$('remoteTime').textContent=message.estimatedSeconds?\`Estimaci\xF3n \xB7 \${message.elapsedSeconds||0} s transcurridos \xB7 \${Math.max(0,Math.ceil(message.estimatedSeconds-(message.elapsedSeconds||0)))} s restantes\`:'';
- status(message.message);controls();
+ if(message.type==='upload-reply'){const u=uploads.get(message.upload);if(u){uploads.delete(message.upload);message.ok?u.resolve():u.reject(Error(message.error||'No se pudo importar.'));}return;}
+ if(message.session!==session)return;
+ if(message.type==='library'){library=message;renderLibrary();return;}
+ if(message.type!=='state')return;
+ state=message;$('remotePairing').hidden=true;$('remoteMachine').hidden=false;$('remoteLinkState').textContent='Enlace local cifrado';
+ const label=stateLabel(message);$('remoteMachineState').textContent=(message.connected?'Puente conectado \xB7 K40 \xB7 ':'')+label;$('remoteLed').dataset.state=message.connected?(['error','unknown'].includes(message.state)?'error':message.busy?'busy':'ok'):'off';
+ $('remoteOwner').textContent=message.owner==='phone'?'Control de movimientos: este celular.':'La computadora tiene el control; puedes consultar y pedir Stop.';
+ $('remoteJobName').textContent=message.name;
+ const j=job();$('remoteJobMeta').textContent=j?.source==='import'&&j.file?\`\${j.objects} objetos \xB7 \${fmt(j.bounds?.width)} \xD7 \${fmt(j.bounds?.height)} mm\`:'Dise\xF1o Box \xB7 corte';
+ $('remotePosition').innerHTML=Array.isArray(message.position)?\`<span>X <b>\${message.position[0].toFixed(2)}</b></span><span>Y <b>\${message.position[1].toFixed(2)}</b></span>\`:'Sin referencia \xB7 haz Home';
+ if(message.preview!==undefined){const svg=safePreview(message.preview);$('remotePreview').replaceChildren(...(svg?[document.importNode(svg,true)]:[]));const copy=svg?document.importNode(svg,true):null;$('remoteJobPreview').replaceChildren(...(copy?[copy]:[]));}
+ // Estado listo / problema
+ const ready=!message.busy&&message.canRun,title=message.busy?label:ready?'Lista para enviar':message.connected?'Revisa el trabajo':'Conecta la m\xE1quina en la computadora';
+ $('remoteReadyTitle').textContent=title;$('remoteReadyText').textContent=message.busy?message.message:ready?'Recorre el marco para comprobar la colocaci\xF3n antes de iniciar.':(message.problem||message.message||'');$('remoteReady').dataset.state=message.busy?'busy':ready?'ok':'warn';
+ if(!parametersDirty&&document.activeElement!==$('remoteSpeed'))$('remoteSpeed').value=message.settings?.speed||10;if(!parametersDirty&&document.activeElement!==$('remotePasses'))$('remotePasses').value=message.settings?.passes||1;
+ $('remoteTime').textContent=message.estimatedSeconds?\`Transcurrido \${fmtTime(message.elapsedSeconds||0)} \xB7 restante estimado \${fmtTime(Math.max(0,message.estimatedSeconds-(message.elapsedSeconds||0)))}\${message.elapsedSeconds>=message.estimatedSeconds?' \xB7 esperando confirmaci\xF3n de la placa':''}\`:j?.source==='import'&&j.seconds?\`Tiempo estimado: \${fmtTime(j.seconds)} (aproximado)\`:'';
+ $('remoteOriginNote').textContent=message.origin==='current'?'El dise\xF1o empieza en la posici\xF3n actual del cabezal.':'El env\xEDo hace Home y coloca el dise\xF1o seg\xFAn la cama.';
+ renderJob();status(message.message);controls();
+}
+function renderJob(){
+ const j=job(),imported=(j?.source||state?.source)==='import';
+ $('remoteImportBlock').hidden=!imported;$('remoteBoxBlock').hidden=imported;
+ $('remoteFileName').textContent=j?.file?.name||'Sin archivo';
+ $('remoteFileMeta').textContent=j?.file?\`\${j.objects} objetos \xB7 archivo \${fmt(j.dims?.width)} \xD7 \${fmt(j.dims?.height)} mm \xB7 \${j.savedWhere==='both'?'en tu cuenta':j.savedWhere==='local'?'en la computadora':'sin guardar'}\`:'Importa un SVG desde este celular o desde la computadora.';
+ const list=$('remoteIssues');list.replaceChildren(...(j?.issues||[]).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
+ for(const [id,key,k] of [['remotePlaceX','x',1],['remotePlaceY','y',1],['remotePlaceScale','scale',100],['remotePlaceRot','rotation',1]])if(document.activeElement!==$(id)&&j?.placement)$(id).value=+(j.placement[key]*k).toFixed(2);
+ const ops=$('remoteOps');
+ if(!ops.contains(document.activeElement)){
+  ops.replaceChildren();$('remoteOpCount').textContent=j?.ops?\`(\${j.ops.length})\`:'';
+  for(const op of j?.ops||[]){
+   const card=document.createElement('article');card.className='rm-op'+(op.enabled?'':' is-off')+(op.empty?' is-empty':'');card.dataset.type=op.type;
+   card.innerHTML=\`<label class="rm-op-head"><input type="checkbox" \${op.enabled?'checked':''} aria-label="Activar \${esc(op.name)}"><span class="rm-op-icon" aria-hidden="true"></span><strong>\${esc(op.name)}</strong></label><div class="rm-fields"><label>Velocidad \xB7 mm/s<input type="number" class="rm-op-speed" min="\${op.range[0]}" max="\${op.range[1]}" value="\${op.speed}" inputmode="decimal"></label><label>Pasadas<input type="number" class="rm-op-passes" min="1" max="10" step="1" value="\${op.passes}" inputmode="numeric"></label></div><small>\${op.empty?'Sin elementos asignados':'\u2248 '+fmtTime(op.seconds)} \xB7 Potencia: ajustar en la m\xE1quina.</small>\`;
+   card.querySelector('input[type=checkbox]').onchange=e=>command('op',{id:op.id,enabled:e.target.checked});
+   card.querySelector('.rm-op-speed').onchange=e=>command('op',{id:op.id,speed:Number(e.target.value)});
+   card.querySelector('.rm-op-passes').onchange=e=>command('op',{id:op.id,passes:Number(e.target.value)});
+   ops.append(card);
+  }
+ }
+ const scope=$('remoteScope');if(document.activeElement!==scope){const opts=[['all','Todas las operaciones activas'],...(j?.ops||[]).filter(o=>o.enabled&&!o.empty).map(o=>[o.id,'Solo '+o.name])];scope.replaceChildren(...opts.map(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;return o;}));scope.value=j?.sendScope||'all';}
+ const warn=[...(j?.problems||[]),...(j?.warnings||[])];$('remoteJobWarn').hidden=!warn.length;$('remoteJobWarn').textContent=warn.join(' ');
+ if(reviewOpen)renderReview();
+}
+function renderReview(){
+ const j=job(),dl=$('remoteReviewList');dl.replaceChildren();
+ const row=(k,v)=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;dl.append(dt,dd);};
+ row('Trabajo',state?.name||'\u2014');
+ if((j?.source||state?.source)==='import'&&j){row('Colocaci\xF3n',j.bounds?\`X \${fmt(j.bounds.x)} \xB7 Y \${fmt(j.bounds.y)} \xB7 \${fmt(j.bounds.width)} \xD7 \${fmt(j.bounds.height)} mm\`:'\u2014');(j.ops||[]).filter(o=>o.enabled&&!o.empty).forEach((o,i)=>row(\`\${i+1}. \${o.name}\`,\`\${o.speed} mm/s \xD7 \${o.passes} pasada\${o.passes===1?'':'s'} \xB7 \u2248 \${fmtTime(o.seconds)}\`));row('Tiempo estimado',fmtTime(j.seconds));}
+ else row('Corte',\`\${state?.settings?.speed||'\u2014'} mm/s \xD7 \${state?.settings?.passes||'\u2014'} pasadas\`);
+ row('Origen',state?.origin==='current'?'Posici\xF3n actual del cabezal':'Home (esquina superior izquierda)');
+ row('Estado',state?.canRun?'Listo para enviar':(state?.problem||state?.message||'No listo'));
+ const problems=[...(j?.problems||[]),...(j?.warnings||[])];if(problems.length)row('Atenci\xF3n',problems.join(' '));
 }
 async function command(action,args={}){
- if(channel?.readyState!=='open')return status('Sin enlace con la computadora.');
+ if(!open())return status('Sin enlace con la computadora.');
  const priority=['pause','cancel'].includes(action);if(awaiting&&!priority)return;const id=++seq;
  if(!priority)awaiting=true;controls();
- try{await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(id);reject(Error('No lleg\xF3 respuesta. Revisa la computadora; no se reenvi\xF3 la orden.'));},15000);pending.set(id,{resolve,reject,timer});channel.send(JSON.stringify({type:'command',session,id,action,args}));});}
- catch(e){status(e.message);}finally{if(!priority)awaiting=false;controls();}
+ try{await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(id);reject(Error('No lleg\xF3 respuesta. Revisa la computadora; no se reenvi\xF3 la orden.'));},action==='save'||action.startsWith('lib-')?45000:15000);pending.set(id,{resolve,reject,timer});channel.send(JSON.stringify({type:'command',session,id,action,args}));});return true;}
+ catch(e){status(e.message);return false;}finally{if(!priority)awaiting=false;controls();}
 }
+/* ---------- Control ---------- */
 for(const [id,x,y] of [['remoteUp',0,-1],['remoteLeft',-1,0],['remoteRight',1,0],['remoteDown',0,1]])$(id).onclick=()=>command('jog',{dx:x*Number($('remoteStep').value),dy:y*Number($('remoteStep').value)});
 for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
+const steps=$('remoteSteps');for(const o of $('remoteStep').options){const b=document.createElement('button');b.type='button';b.textContent=o.value;b.onclick=()=>{$('remoteStep').value=o.value;paintSteps();};steps.append(b);}
+function paintSteps(){for(const b of steps.children)b.setAttribute('aria-pressed',String(b.textContent===$('remoteStep').value));}paintSteps();
+for(const b of document.querySelectorAll('[data-origin]'))b.onclick=()=>command('origin',{value:b.dataset.origin});
+$('remoteFileCard').onclick=()=>showTab('tabJobs');$('remoteBridge').onclick=()=>status(state?.message||'Sin estado.');
+/* ---------- Trabajos ---------- */
 $('remoteSpeed').oninput=$('remotePasses').oninput=()=>{parametersDirty=true;};
-$('remoteSettings').onclick=()=>command('settings',{speed:Number($('remoteSpeed').value),passes:Number($('remotePasses').value)});
+$('remoteSettings').onclick=async()=>{if(await command('settings',{speed:Number($('remoteSpeed').value),passes:Number($('remotePasses').value)}))parametersDirty=false;};
+for(const b of document.querySelectorAll('[data-source]'))b.onclick=()=>command('source',{value:b.dataset.source});
+$('remotePlaceApply').onclick=()=>command('place',{x:Number($('remotePlaceX').value),y:Number($('remotePlaceY').value),scale:Number($('remotePlaceScale').value)/100,rotation:Number($('remotePlaceRot').value)});
+$('remotePlaceCenter').onclick=()=>command('place-center');
+$('remoteScope').onchange=e=>command('scope',{value:e.target.value});
+$('remoteReviewOpen').onclick=()=>{reviewOpen=true;$('remoteReview').hidden=false;renderReview();$('remoteReview').scrollIntoView({block:'start'});};
+$('remoteReviewOk').onclick=async()=>{if(job()?.review&&!(await command('review-ok')))return;reviewOpen=false;$('remoteReview').hidden=true;showTab('tabControl');};
+$('remoteSave').onclick=async()=>{const r=await ask('Guardar en biblioteca',state?.name||'Trabajo',true);if(r)await command('save',{name:r.value,cloud:r.cloud});};
+$('remoteImport').onchange=async()=>{const file=$('remoteImport').files?.[0];$('remoteImport').value='';if(file)await sendFile(file);};
+async function sendFile(file){
+ const mime=/\\.svg$/i.test(file.name)?'image/svg+xml':/\\.png$/i.test(file.name)?'image/png':/\\.jpe?g$/i.test(file.name)?'image/jpeg':file.type;
+ if(!['image/svg+xml','image/png','image/jpeg'].includes(mime))return status('Formato no compatible. Usa SVG, PNG o JPG.');
+ if(file.size>8*1024*1024)return status('El archivo supera 8 MB.');
+ if(!open()||state?.owner!=='phone'||state?.busy)return status('Espera a tener el control y a que la m\xE1quina est\xE9 libre.');
+ let data;try{data=mime==='image/svg+xml'?await file.text():await new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>ko(Error('No se pudo leer el archivo.'));r.readAsDataURL(file);});}catch(e){return status(e.message);}
+ if(data.length>UPLOAD_MAX)return status('El archivo es demasiado grande para enviarlo por el enlace.');
+ const upload=crypto.randomUUID(),count=Math.ceil(data.length/UPLOAD_CHUNK);awaiting=true;controls();
+ try{
+  let timer;const done=new Promise((resolve,reject)=>{uploads.set(upload,{resolve,reject});timer=setTimeout(()=>{if(uploads.delete(upload))reject(Error('La computadora no confirm\xF3 el archivo.'));},120000);}).finally(()=>clearTimeout(timer));
+  for(let index=0;index<count;index++){
+   while(channel.bufferedAmount>512000)await new Promise(r=>setTimeout(r,40));
+   channel.send(JSON.stringify({type:'upload',session,upload,index,count,...(index===0?{name:file.name.slice(0,120),mime}:{}),data:data.slice(index*UPLOAD_CHUNK,(index+1)*UPLOAD_CHUNK)}));
+   $('remoteUpload').textContent=\`Enviando \${file.name} a la computadora\u2026 \${Math.round((index+1)/count*100)} %\`;
+  }
+  await done;$('remoteUpload').textContent=\`\${file.name} importado en la computadora. Revisa colocaci\xF3n y operaciones.\`;
+ }catch(e){$('remoteUpload').textContent=e.message;}
+ finally{awaiting=false;controls();}
+}
+/* ---------- Biblioteca ---------- */
+for(const b of document.querySelectorAll('[data-lib]'))b.onclick=()=>{libFilter=b.dataset.lib;renderLibrary();};
+$('remoteLibSearch').oninput=()=>renderLibrary();$('remoteLibRefresh').onclick=()=>command('lib-list');
+function renderLibrary(){
+ for(const b of document.querySelectorAll('[data-lib]'))b.setAttribute('aria-pressed',String(b.dataset.lib===libFilter));
+ const host=$('remoteLibList');host.replaceChildren();
+ const where={on:'Biblioteca de tu cuenta activa: los archivos guardados ah\xED tambi\xE9n est\xE1n en otras computadoras.','signed-out':'La computadora no tiene sesi\xF3n iniciada: se muestran los trabajos de esa computadora.','not-enabled':'La biblioteca de cuenta a\xFAn no est\xE1 activada: se muestran los trabajos de la computadora.',offline:'Sin conexi\xF3n con la cuenta: se muestran los trabajos de la computadora.'};
+ $('remoteLibWhere').textContent=library?(where[library.cloud]||'Trabajos de la computadora enlazada.'):'Cargando la biblioteca de la computadora\u2026';
+ if(!library)return;
+ const q=$('remoteLibSearch').value.normalize('NFD').replace(/[\u0300-\u036F]/g,'').toLowerCase();
+ const items=library.items.filter(i=>(libFilter==='trash'?i.deleted:!i.deleted)&&(libFilter==='all'||libFilter==='trash'||i.scope===libFilter)&&String(i.name).normalize('NFD').replace(/[\u0300-\u036F]/g,'').toLowerCase().includes(q));
+ if(!items.length){const p=document.createElement('p');p.className='rm-note';p.textContent=libFilter==='trash'?'La papelera est\xE1 vac\xEDa.':'No hay trabajos que coincidan.';host.append(p);return;}
+ for(const i of items){
+  const card=document.createElement('article');card.className='rm-lib-card';
+  const thumb=document.createElement('div');thumb.className='rm-thumb';if(i.thumb&&/^data:image\\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(i.thumb)){const img=document.createElement('img');img.src=i.thumb;img.alt='';thumb.append(img);}else thumb.textContent=i.scope==='box'?'Caja':i.kind==='image'?'Imagen':'SVG';
+  const info=document.createElement('div');info.className='rm-lib-info';
+  const whereText=i.scope==='box'?'En la computadora (navegador)':i.where==='both'?(i.synced?'En tu cuenta \xB7 sincronizado':'En tu cuenta \xB7 versi\xF3n m\xE1s reciente'):i.where==='cloud'?'Solo en tu cuenta':'Solo en la computadora';
+  info.innerHTML=\`<strong>\${esc(i.name)}</strong><small>\${i.scope==='box'?'Dise\xF1o Box':i.kind==='image'?'Imagen':'SVG'} \xB7 \${esc((i.ops||[]).length?i.ops.join(' \xB7 '):'')}</small><small>\${esc(i.dims||'')}</small><small class="rm-where">\${esc(whereText)}</small>\`;
+  const actions=document.createElement('div');actions.className='rm-lib-actions';
+  const b=(t,fn,cls='')=>{const x=document.createElement('button');x.type='button';x.textContent=t;x.className=cls;x.onclick=fn;actions.append(x);return x;};
+  if(i.deleted)b('Restaurar',()=>command('lib-restore',{scope:i.scope,id:i.id}),'rm-primary');
+  else{b('Abrir',async()=>{if(await command('lib-open',{scope:i.scope,id:i.id})){showTab('tabJobs');status('Trabajo abierto en la computadora. Revisa colocaci\xF3n y origen antes de enviarlo.');}},'rm-primary');b('Duplicar',()=>command('lib-duplicate',{scope:i.scope,id:i.id}));b('Renombrar',async()=>{const r=await ask('Renombrar',i.name);if(r)command('lib-rename',{scope:i.scope,id:i.id,name:r.value});});b('Eliminar',()=>command('lib-delete',{scope:i.scope,id:i.id}),'rm-danger-outline');}
+  card.append(thumb,info,actions);host.append(card);
+ }
+ controls();
+}
+function ask(title,value,cloud=false){return new Promise(resolve=>{const d=$('remoteDialog');$('remoteDialogTitle').textContent=title;$('remoteDialogInput').value=value;$('remoteDialogCloudRow').hidden=!cloud;d.returnValue='';d.onclose=()=>resolve(d.returnValue==='ok'&&$('remoteDialogInput').value.trim()?{value:$('remoteDialogInput').value.trim(),cloud:$('remoteDialogCloud').checked}:null);if(d.showModal)d.showModal();else resolve(null);});}
+/* ---------- Pesta\xF1as ---------- */
+function showTab(id){for(const t of ['tabControl','tabJobs','tabLibrary'])$(t).hidden=t!==id;for(const b of document.querySelectorAll('.rm-nav button')){b.classList.toggle('active',b.dataset.tab===id);b.setAttribute('aria-current',b.dataset.tab===id?'page':'false');}if(id==='tabLibrary'&&!library&&open())command('lib-list');window.scrollTo?.(0,0);}
+for(const b of document.querySelectorAll('.rm-nav button'))b.onclick=()=>showTab(b.dataset.tab);
+/* ---------- Emparejamiento (sin cambios de protocolo) ---------- */
 $('remotePair').onclick=async()=>{try{
  $('remotePair').disabled=true;const params=new URLSearchParams(location.hash.slice(1)),automatic=params.has('link');const reference=automatic?parsePairingLink(params.get('link')):null,claim=automatic?crypto.randomUUID():null;
  const offer=automatic?await pairingRequest('offer',{...reference,claim}):await decodePairing(params.get('pair'),'offer');
@@ -2843,13 +4167,119 @@ $('remotePair').onclick=async()=>{try{
  const sdp=await gatherDescription(peer,'answer');
  if(automatic){await pairingRequest('answer',{...reference,claim,sdp});status('Respuesta enviada autom\xE1ticamente. Esperando que la computadora complete el enlace\u2026');}
  else{$('remoteAnswer').closest('label').hidden=false;$('remoteCopy').hidden=false;$('remoteAnswer').value=await encodePairing({version:1,type:'answer',session,expires:offer.expires,sdp});$('remoteCopy').disabled=false;status('Este QR anterior requiere pegar la respuesta en la computadora. Genera un QR nuevo para enlazar autom\xE1ticamente.');}
- // The pairing payload stays in memory only and is removed from browser history.
+ // El c\xF3digo de emparejamiento queda solo en memoria y se quita del historial.
  history.replaceState(null,'',location.pathname+location.search);
 }catch(e){status(e.message);$('remotePair').disabled=false;}};
 $('remoteCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('remoteAnswer').value);status('Respuesta copiada. P\xE9gala en la computadora.');}catch{$('remoteAnswer').focus();$('remoteAnswer').select();status('Selecciona y copia la respuesta.');}};
 window.addEventListener('pagehide',()=>{channel?.close();peer?.close();});controls();
 if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidden=true;$('remoteAnswer').closest('label').hidden=true;$('remoteCopy').hidden=true;status('Conectando con tu computadora\u2026');$('remotePair').onclick();}
-`,type:"text/javascript; charset=utf-8",public:!0},"/box/remote.html":{body:`<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>LZ Box \xB7 Control de taller</title><link rel="stylesheet" href="remote.css?v=2"></head><body><main class="remote-shell"><header><span class="remote-brand">LZ <small>BOX STUDIO</small></span><span id="remoteLinkState">Sin enlace</span></header><section id="remotePairing"><h1>Conecta con tu computadora</h1><p>Escanea el QR desde Box Studio. La computadora mantiene la conexi\xF3n USB.</p><button id="remotePair" type="button">Aceptar emparejamiento</button><label hidden>Respuesta para pegar en la computadora<textarea id="remoteAnswer" rows="3" readonly></textarea></label><button id="remoteCopy" type="button" disabled hidden>Copiar respuesta</button></section><section id="remoteMachine" hidden><div class="remote-job-head"><h1 id="remoteJobName">Trabajo</h1><span id="remoteMachineState"></span></div><div id="remotePreview"></div><p id="remotePosition">Sin referencia</p><p id="remoteOwner">La computadora tiene el control.</p><section class="remote-motion"><label>Paso \xB7 mm<select id="remoteStep"><option>0.1</option><option>0.5</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select></label><div class="remote-pad"><button id="remoteUp" aria-label="Mover hacia arriba">\u2191</button><button id="remoteLeft" aria-label="Mover hacia la izquierda">\u2190</button><button id="remoteHome">Home</button><button id="remoteRight" aria-label="Mover hacia la derecha">\u2192</button><button id="remoteDown" aria-label="Mover hacia abajo">\u2193</button></div></section><label>Velocidad \xB7 mm/s<input id="remoteSpeed" type="number" min="1" max="100" value="10"></label><label>Pasadas<input id="remotePasses" type="number" min="1" max="10" value="1"></label><button id="remoteSettings">Aplicar par\xE1metros</button><p id="remoteTime"></p><div class="remote-run"><button id="remotePulse" disabled>Pulso l\xE1ser \xB7 50 ms</button><p>Potencia del panel de la m\xE1quina. Temporizado por Windows/USB; no por la placa.</p><button id="remoteFrame">Recorrer marco</button><button id="remoteCut">Iniciar corte</button></div><div id="remotePaused" hidden><button id="remoteResume">Reanudar trabajo</button><button id="remoteCancel">Cancelar trabajo</button></div></section><p id="remoteStatus" role="status" aria-live="polite">El enlace funciona entre dispositivos en la misma red. No inicia movimientos al conectar.</p><footer><button id="remoteStop" disabled>\u2161 STOP / PAUSA</button><p>La pausa es una orden USB. Si la m\xE1quina sigue activa, usa su paro f\xEDsico.</p></footer></main><script type="module" src="remote-client.js?v=4"></script></body></html>
+`,type:"text/javascript; charset=utf-8",public:!0},"/box/remote.html":{body:`<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#06090d">
+<title>LZ Box \xB7 Control de taller</title>
+<link rel="stylesheet" href="remote.css?v=3">
+</head>
+<body>
+<main class="remote-shell">
+ <header class="rm-top">
+  <span class="remote-brand"><b>LZ</b> Box Studio</span>
+  <span id="remoteLinkState" class="rm-link">Sin enlace</span>
+ </header>
+
+ <section id="remotePairing" class="rm-pair">
+  <h1>Conecta con tu computadora</h1>
+  <p>Escanea el QR desde <strong>Box Studio \u203A Operar m\xE1quina \u203A Control desde celular</strong>. La computadora conserva la conexi\xF3n USB con la m\xE1quina; este celular la controla por la red local.</p>
+  <button id="remotePair" type="button" class="rm-primary">Aceptar emparejamiento</button>
+  <label hidden>Respuesta para pegar en la computadora<textarea id="remoteAnswer" rows="3" readonly></textarea></label>
+  <button id="remoteCopy" type="button" disabled hidden>Copiar respuesta</button>
+  <p class="rm-note">Sin la computadora encendida y con Box abierto, el celular no puede operar la m\xE1quina: un iPhone no puede conectarse por USB a la controladora.</p>
+ </section>
+
+ <section id="remoteMachine" hidden>
+  <button type="button" id="remoteBridge" class="rm-bridge" aria-live="polite"><i id="remoteLed"></i><span id="remoteMachineState">\u2014</span><small id="remoteOwner">La computadora tiene el control.</small></button>
+
+  <!-- ============ CONTROL ============ -->
+  <section id="tabControl" class="rm-tab" aria-labelledby="navControl">
+   <button type="button" class="rm-file" id="remoteFileCard"><span class="rm-file-icon" aria-hidden="true"></span><span><strong id="remoteJobName">Trabajo</strong><small id="remoteJobMeta"></small></span><b aria-hidden="true">\u203A</b></button>
+   <div id="remotePreview" class="rm-preview" aria-label="Vista de la cama"></div>
+   <div class="rm-status" id="remoteReady"><span class="rm-status-icon" aria-hidden="true"></span><div><strong id="remoteReadyTitle">\u2014</strong><small id="remoteReadyText"></small></div></div>
+   <p id="remoteTime" class="rm-time"></p>
+   <div class="rm-grid2">
+    <div class="rm-card rm-pos"><span>Posici\xF3n estimada (mm)</span><p id="remotePosition">Sin referencia</p><small>Calculada por las \xF3rdenes enviadas; si mueves el cabezal a mano, haz Home.</small></div>
+    <div class="rm-card rm-move"><span>Mover cabezal</span>
+     <div class="remote-pad"><button id="remoteUp" aria-label="Mover hacia arriba">\u2191</button><button id="remoteLeft" aria-label="Mover hacia la izquierda">\u2190</button><button id="remoteHome" class="rm-home">Home</button><button id="remoteRight" aria-label="Mover hacia la derecha">\u2192</button><button id="remoteDown" aria-label="Mover hacia abajo">\u2193</button></div>
+    </div>
+   </div>
+   <div class="rm-card"><span>Paso de movimiento (mm)</span><div class="rm-steps" id="remoteSteps" role="group" aria-label="Paso de movimiento"></div>
+    <select id="remoteStep" class="rm-hidden" aria-hidden="true" tabindex="-1"><option>0.1</option><option>0.5</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select></div>
+   <div class="rm-card"><span>Origen del trabajo</span>
+    <div class="rm-seg" role="group" aria-label="Origen"><button type="button" data-origin="home">Desde Home</button><button type="button" data-origin="current">Posici\xF3n actual</button></div>
+    <small id="remoteOriginNote"></small></div>
+   <button id="remotePulse" class="rm-pulse" disabled>Pulso l\xE1ser \xB7 50 ms</button>
+   <p class="rm-note">Potencia: la del panel de la m\xE1quina. El pulso lo temporiza la computadora por USB.</p>
+   <div class="remote-run"><button id="remoteFrame">Recorrer marco</button><button id="remoteCut" class="rm-primary">Iniciar trabajo</button></div>
+   <div id="remotePaused" class="rm-paused" hidden><p>Trabajo en pausa o sin confirmar.</p><button id="remoteResume" class="rm-primary">Reanudar</button><button id="remoteCancel" class="rm-danger-outline">Cancelar trabajo</button></div>
+  </section>
+
+  <!-- ============ TRABAJOS ============ -->
+  <section id="tabJobs" class="rm-tab" hidden aria-labelledby="navJobs">
+   <div class="rm-head"><h1>Preparar trabajo</h1><label class="rm-import rm-primary" id="remoteImportLabel">+ Importar SVG<input type="file" id="remoteImport" accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label></div>
+   <div class="rm-seg rm-source" role="group" aria-label="Fuente del trabajo"><button type="button" data-source="box">Dise\xF1o Box</button><button type="button" data-source="import">Archivo importado</button></div>
+   <p id="remoteUpload" class="rm-note" role="status"></p>
+   <div id="remoteImportBlock">
+    <div class="rm-file rm-static"><span class="rm-file-icon" aria-hidden="true"></span><span><strong id="remoteFileName">Sin archivo</strong><small id="remoteFileMeta">Importa un SVG desde este celular o desde la computadora.</small></span></div>
+    <div id="remoteJobPreview" class="rm-preview rm-preview-small"></div>
+    <ul id="remoteIssues" class="rm-issues"></ul>
+    <details class="rm-card rm-place"><summary>Colocaci\xF3n en la cama</summary>
+     <div class="rm-fields"><label>X \xB7 mm<input id="remotePlaceX" type="number" step="0.5" inputmode="decimal"></label><label>Y \xB7 mm<input id="remotePlaceY" type="number" step="0.5" inputmode="decimal"></label><label>Escala \xB7 %<input id="remotePlaceScale" type="number" step="1" min="1" inputmode="decimal"></label><label>Giro \xB7 \xB0<input id="remotePlaceRot" type="number" step="90" inputmode="decimal"></label></div>
+     <div class="rm-row"><button type="button" id="remotePlaceApply">Aplicar colocaci\xF3n</button><button type="button" id="remotePlaceCenter">Centrar</button></div>
+    </details>
+    <h2 class="rm-h2">Operaciones <span id="remoteOpCount"></span></h2>
+    <div id="remoteOps" class="rm-ops"></div>
+    <label>Enviar a la m\xE1quina<select id="remoteScope"></select></label>
+    <p class="rm-note">La potencia es la del panel. Si cada operaci\xF3n necesita otra, env\xEDalas por separado y cambia la perilla entre env\xEDos.</p>
+    <p id="remoteJobWarn" class="rm-warn" hidden></p>
+   </div>
+   <div id="remoteBoxBlock" class="rm-card">
+    <span>Dise\xF1o Box \xB7 corte</span>
+    <div class="rm-fields"><label>Velocidad \xB7 mm/s<input id="remoteSpeed" type="number" min="1" max="100" value="10" inputmode="decimal"></label><label>Pasadas<input id="remotePasses" type="number" min="1" max="10" value="1" inputmode="numeric"></label></div>
+    <button id="remoteSettings">Aplicar par\xE1metros</button>
+   </div>
+   <div class="rm-card"><span>Origen</span><div class="rm-seg" role="group" aria-label="Origen"><button type="button" data-origin="home">Desde Home</button><button type="button" data-origin="current">Posici\xF3n actual</button></div></div>
+   <div class="rm-row rm-sticky"><button type="button" id="remoteSave">Guardar en biblioteca</button><button type="button" id="remoteReviewOpen" class="rm-primary">Revisar trabajo</button></div>
+   <section id="remoteReview" class="rm-card rm-review" hidden aria-labelledby="remoteReviewTitle">
+    <h2 id="remoteReviewTitle">Revisi\xF3n antes de enviar</h2>
+    <dl id="remoteReviewList"></dl>
+    <p class="rm-note">Revisa que el material est\xE9 en la cama, que la colocaci\xF3n y el origen correspondan, y la potencia en el panel. Recorre el marco antes de iniciar.</p>
+    <div class="rm-row"><button type="button" id="remoteReviewOk" class="rm-primary">Revisado \xB7 ir a Control</button></div>
+   </section>
+  </section>
+
+  <!-- ============ BIBLIOTECA ============ -->
+  <section id="tabLibrary" class="rm-tab" hidden aria-labelledby="navLibrary">
+   <div class="rm-head"><h1>Mis trabajos</h1><button type="button" id="remoteLibRefresh" class="rm-ghost">Actualizar</button></div>
+   <label class="rm-search"><span class="rm-hidden">Buscar</span><input id="remoteLibSearch" type="search" placeholder="Buscar archivo o trabajo\u2026"></label>
+   <div class="rm-chips" role="group" aria-label="Filtro"><button type="button" data-lib="all">Todos</button><button type="button" data-lib="file">Placas y archivos</button><button type="button" data-lib="box">Cajas</button><button type="button" data-lib="trash">Papelera</button></div>
+   <p id="remoteLibWhere" class="rm-note"></p>
+   <div id="remoteLibList" class="rm-lib"></div>
+   <p class="rm-info">Abrir un trabajo no lo env\xEDa: revisa origen y colocaci\xF3n antes de cada env\xEDo.</p>
+  </section>
+ </section>
+
+ <p id="remoteStatus" role="status" aria-live="polite">El enlace funciona entre dispositivos en la misma red. No inicia movimientos al conectar.</p>
+ <footer class="rm-footer">
+  <button id="remoteStop" class="rm-stop" disabled>\u25A0 STOP</button>
+  <nav class="rm-nav" aria-label="Secciones"><button type="button" id="navControl" data-tab="tabControl" class="active">Control</button><button type="button" id="navJobs" data-tab="tabJobs">Trabajos</button><button type="button" id="navLibrary" data-tab="tabLibrary">Biblioteca</button></nav>
+ </footer>
+</main>
+<dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> Tambi\xE9n en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
+<script type="module" src="remote-client.js?v=5"></script>
+</body>
+</html>
 `,type:"text/html; charset=utf-8",public:!0},"/box/renderer.js":{body:`import {StudioGPU} from './webgl-renderer.js?v=3.5';
 import {loadMaterials,getMaterialAtlas} from './materials.js?v=3.5';
 import {depthRaster} from './depth-renderer.js?v=3.5';
@@ -2986,6 +4416,424 @@ ready(app=>{
  // atajo de ayuda
  document.addEventListener('keydown',e=>{if(e.key==='?'&&!typing(e)){e.preventDefault();$('helpDialog')?.showModal();}});
 });
+`,type:"text/javascript; charset=utf-8",public:!1},"/box/svg-import.js":{body:`/* LZ Box Studio \xB7 importaci\xF3n segura de SVG (v62).
+   Convierte un SVG externo en geometr\xEDa f\xEDsica (mm) sin ejecutar nada:
+   - Se rechazan entidades DTD; scripts, foreignObject, manejadores on* y
+     recursos externos se eliminan y se informan.
+   - Respeta width/height con unidades, viewBox, preserveAspectRatio y todas las
+     transformaciones (matrix, translate, scale, rotate, skewX, skewY) y <use>.
+   - Cada trazado conserva si es abierto o cerrado; las curvas y arcos se
+     aproximan con tolerancia en mm.
+   - Textos, recortes, m\xE1scaras y elementos desconocidos se enumeran con su
+     correcci\xF3n; nunca se omiten en silencio.
+   El resultado no se dibuja con el SVG original: la vista previa y el raster se
+   generan a partir de esta geometr\xEDa ya validada. */
+
+export const MM_PER = {mm: 1, cm: 10, in: 25.4, pt: 25.4 / 72, pc: 25.4 / 6, px: 25.4 / 96, q: 0.25};
+export const MAX_SVG_BYTES = 8 * 1024 * 1024;
+const FLATNESS = 0.03; // mm
+const SHAPES = new Set(['path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon']);
+const CONTAINERS = new Set(['svg', 'g', 'a', 'switch']);
+const NON_RENDERED = new Set(['defs', 'symbol', 'clipPath', 'mask', 'pattern', 'marker', 'linearGradient', 'radialGradient', 'filter', 'metadata', 'title', 'desc', 'style', 'namedview', 'font', 'font-face', 'cursor', 'view', 'animate', 'animateTransform', 'animateMotion', 'set', 'mpath', 'solidcolor', 'meshgradient']);
+const NAMED = {black: '#000000', white: '#ffffff', red: '#ff0000', lime: '#00ff00', green: '#008000', blue: '#0000ff', yellow: '#ffff00', cyan: '#00ffff', aqua: '#00ffff', magenta: '#ff00ff', fuchsia: '#ff00ff', gray: '#808080', grey: '#808080', silver: '#c0c0c0', maroon: '#800000', olive: '#808000', navy: '#000080', purple: '#800080', teal: '#008080', orange: '#ffa500', darkgray: '#a9a9a9', lightgray: '#d3d3d3', pink: '#ffc0cb', brown: '#a52a2a', gold: '#ffd700'};
+
+/* ------------------------------------------------------------ matrices */
+const I = [1, 0, 0, 1, 0, 0];
+export const mul = (m, n) => [m[0] * n[0] + m[2] * n[1], m[1] * n[0] + m[3] * n[1], m[0] * n[2] + m[2] * n[3], m[1] * n[2] + m[3] * n[3], m[0] * n[4] + m[2] * n[5] + m[4], m[1] * n[4] + m[3] * n[5] + m[5]];
+export const apply = (m, p) => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
+const scaleOf = (m) => Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])) || 1;
+const numbers = (s) => (String(s || '').match(/[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?/g) || []).map(Number);
+
+export function parseTransform(text) {
+  let m = I;
+  const re = /(matrix|translate|scale|rotate|skewX|skewY)\\s*\\(([^)]*)\\)/g;
+  const source = String(text || '').trim();
+  let consumed = '';
+  for (let r; (r = re.exec(source));) {
+    consumed += r[0];
+    const a = numbers(r[2]);
+    let t;
+    switch (r[1]) {
+      case 'matrix': if (a.length !== 6) throw Error('matrix() necesita 6 valores'); t = a; break;
+      case 'translate': t = [1, 0, 0, 1, a[0] || 0, a[1] || 0]; break;
+      case 'scale': t = [a[0] ?? 1, 0, 0, a[1] ?? a[0] ?? 1, 0, 0]; break;
+      case 'rotate': {
+        const r0 = (a[0] || 0) * Math.PI / 180, c = Math.cos(r0), s = Math.sin(r0);
+        t = [c, s, -s, c, 0, 0];
+        if (a.length >= 3) t = mul(mul([1, 0, 0, 1, a[1], a[2]], t), [1, 0, 0, 1, -a[1], -a[2]]);
+        break;
+      }
+      case 'skewX': t = [1, 0, Math.tan((a[0] || 0) * Math.PI / 180), 1, 0, 0]; break;
+      case 'skewY': t = [1, Math.tan((a[0] || 0) * Math.PI / 180), 0, 1, 0, 0]; break;
+    }
+    if (!t.every(Number.isFinite)) throw Error('transformaci\xF3n no finita');
+    m = mul(m, t);
+  }
+  if (source && !consumed) throw Error('transformaci\xF3n no reconocida');
+  return m;
+}
+
+/* ------------------------------------------------------------ unidades */
+export function lengthMm(value, fallbackUnit = 'px') {
+  const r = String(value ?? '').trim().match(/^([-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?)\\s*([a-zA-Z%]*)$/);
+  if (!r) return null;
+  const unit = (r[2] || fallbackUnit).toLowerCase();
+  if (!(unit in MM_PER)) return {invalid: unit};
+  return Number(r[1]) * MM_PER[unit];
+}
+
+/* ------------------------------------------------------------ colores */
+export function normalizeColor(value, current = '#000000') {
+  const v = String(value ?? '').trim().toLowerCase();
+  if (!v || v === 'none' || v === 'transparent') return null;
+  if (v === 'currentcolor') return normalizeColor(current);
+  if (v.startsWith('url(')) return 'gradient';
+  if (NAMED[v]) return NAMED[v];
+  let r = v.match(/^#([0-9a-f]{3})$/);
+  if (r) return '#' + r[1].split('').map((c) => c + c).join('');
+  r = v.match(/^#([0-9a-f]{6})(?:[0-9a-f]{2})?$/);
+  if (r) return '#' + r[1];
+  r = v.match(/^rgba?\\(([^)]*)\\)$/);
+  if (r) {
+    const parts = r[1].split(/[,\\s/]+/).filter(Boolean).slice(0, 3).map((p) => p.endsWith('%') ? parseFloat(p) * 2.55 : parseFloat(p));
+    if (parts.length === 3 && parts.every(Number.isFinite)) return '#' + parts.map((n) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, '0')).join('');
+  }
+  return 'other';
+}
+
+/* ------------------------------------------------------------ CSS simple */
+function parseStyleSheets(doc, issues) {
+  const rules = [];
+  for (const node of doc.getElementsByTagName('style')) {
+    const css = (node.textContent || '').replace(/\\/\\*[\\s\\S]*?\\*\\//g, '');
+    if (/@import|url\\(\\s*['"]?(?!#|data:)/i.test(css)) issues.push({level: 'warn', code: 'css-external', message: 'Se ignor\xF3 un recurso CSS externo (@import o url()).'});
+    for (const r of css.matchAll(/([^{}@]+)\\{([^{}]*)\\}/g)) {
+      const decls = parseDeclarations(r[2]);
+      for (const sel of r[1].split(',').map((s) => s.trim()).filter(Boolean)) {
+        const m = sel.match(/^([a-zA-Z][\\w-]*)?((?:[.#][\\w-]+)*)$/);
+        if (!m) { issues.push({level: 'warn', code: 'css-selector', message: \`Regla CSS no compatible ignorada: \xAB\${sel.slice(0, 40)}\xBB. Usa clases simples o estilos en l\xEDnea.\`}); continue; }
+        const classes = [...m[2].matchAll(/\\.([\\w-]+)/g)].map((x) => x[1]);
+        const id = m[2].match(/#([\\w-]+)/)?.[1] || null;
+        rules.push({tag: m[1] || null, classes, id, decls, specificity: (id ? 100 : 0) + classes.length * 10 + (m[1] ? 1 : 0), order: rules.length});
+      }
+    }
+  }
+  return rules.sort((a, b) => a.specificity - b.specificity || a.order - b.order);
+}
+function parseDeclarations(text) {
+  const out = {};
+  for (const part of String(text || '').split(';')) {
+    const i = part.indexOf(':');
+    if (i > 0) out[part.slice(0, i).trim().toLowerCase()] = part.slice(i + 1).replace(/!important/i, '').trim();
+  }
+  return out;
+}
+const STYLE_PROPS = ['fill', 'stroke', 'stroke-width', 'display', 'visibility', 'fill-rule', 'color', 'opacity', 'fill-opacity', 'stroke-opacity'];
+const INHERITED = new Set(['fill', 'stroke', 'stroke-width', 'visibility', 'fill-rule', 'color', 'fill-opacity', 'stroke-opacity']);
+function ownStyle(node, rules) {
+  const style = {};
+  for (const p of STYLE_PROPS) if (node.hasAttribute?.(p)) style[p] = node.getAttribute(p);
+  const classes = (node.getAttribute?.('class') || '').split(/\\s+/).filter(Boolean), id = node.getAttribute?.('id');
+  for (const r of rules) {
+    if (r.tag && r.tag !== node.localName) continue;
+    if (r.id && r.id !== id) continue;
+    if (!r.classes.every((c) => classes.includes(c))) continue;
+    Object.assign(style, r.decls);
+  }
+  Object.assign(style, parseDeclarations(node.getAttribute?.('style')));
+  return style;
+}
+
+/* ------------------------------------------------------------ geometr\xEDa */
+function flattenCubic(out, p0, p1, p2, p3, depth = 0) {
+  const d1 = Math.abs((p1[0] - p3[0]) * (p0[1] - p3[1]) - (p1[1] - p3[1]) * (p0[0] - p3[0]));
+  const d2 = Math.abs((p2[0] - p3[0]) * (p0[1] - p3[1]) - (p2[1] - p3[1]) * (p0[0] - p3[0]));
+  const len = Math.hypot(p3[0] - p0[0], p3[1] - p0[1]);
+  if (depth > 16 || (d1 + d2) <= FLATNESS * Math.max(len, 1e-9) && Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) + Math.hypot(p3[0] - p2[0], p3[1] - p2[1]) <= len * 1.5 + FLATNESS) { out.push(p3); return; }
+  const m = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const a = m(p0, p1), b = m(p1, p2), c = m(p2, p3), ab = m(a, b), bc = m(b, c), mid = m(ab, bc);
+  flattenCubic(out, p0, a, ab, mid, depth + 1);
+  flattenCubic(out, mid, bc, c, p3, depth + 1);
+}
+
+/** Convierte el atributo d en subtrayectorias de puntos ya transformados (mm). */
+export function pathToPolylines(d, matrix) {
+  const tokens = String(d || '').match(/[MmLlHhVvCcSsQqTtAaZz]|[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?/g) || [];
+  const T = (p) => apply(matrix, p);
+  const out = [];
+  let i = 0, cmd = '', cur = [0, 0], start = [0, 0], lastCtrl = null, lastCmd = '', sub = null;
+  const num = () => { const v = Number(tokens[i++]); if (!Number.isFinite(v)) throw Error('Trazado con n\xFAmeros inv\xE1lidos.'); return v; };
+  const flag = () => { // los indicadores de arco pueden venir pegados (\xABa5 5 0 016 0\xBB)
+    const t = tokens[i];
+    if (/^[01]/.test(t) && t.length > 1 && !/[eE.]/.test(t.slice(0, 2))) { tokens[i] = t.slice(1); return Number(t[0]); }
+    return num();
+  };
+  const begin = (p) => { if (sub && sub.points.length > 1) out.push(sub); sub = {points: [T(p)], closed: false}; };
+  const lineTo = (p) => { if (!sub) begin(cur); sub.points.push(T(p)); };
+  while (i < tokens.length) {
+    if (/^[A-Za-z]$/.test(tokens[i])) cmd = tokens[i++];
+    else if (!cmd) throw Error('El trazado no empieza con M.');
+    const rel = cmd === cmd.toLowerCase(), C = cmd.toUpperCase();
+    const pt = () => { const x = num(), y = num(); return rel ? [cur[0] + x, cur[1] + y] : [x, y]; };
+    switch (C) {
+      case 'M': cur = pt(); start = cur; begin(cur); cmd = rel ? 'l' : 'L'; break;
+      case 'L': cur = pt(); lineTo(cur); break;
+      case 'H': { const x = num(); cur = [rel ? cur[0] + x : x, cur[1]]; lineTo(cur); break; }
+      case 'V': { const y = num(); cur = [cur[0], rel ? cur[1] + y : y]; lineTo(cur); break; }
+      case 'C': case 'S': {
+        const c1 = C === 'C' ? pt() : (lastCtrl && /[CS]/.test(lastCmd) ? [2 * cur[0] - lastCtrl[0], 2 * cur[1] - lastCtrl[1]] : cur);
+        const c2 = pt(), end = pt();
+        if (!sub) begin(cur);
+        const pts = []; flattenCubic(pts, T(cur), T(c1), T(c2), T(end)); sub.points.push(...pts);
+        lastCtrl = c2; cur = end; break;
+      }
+      case 'Q': case 'T': {
+        const q = C === 'Q' ? pt() : (lastCtrl && /[QT]/.test(lastCmd) ? [2 * cur[0] - lastCtrl[0], 2 * cur[1] - lastCtrl[1]] : cur);
+        const end = pt();
+        const c1 = [cur[0] + 2 / 3 * (q[0] - cur[0]), cur[1] + 2 / 3 * (q[1] - cur[1])], c2 = [end[0] + 2 / 3 * (q[0] - end[0]), end[1] + 2 / 3 * (q[1] - end[1])];
+        if (!sub) begin(cur);
+        const pts = []; flattenCubic(pts, T(cur), T(c1), T(c2), T(end)); sub.points.push(...pts);
+        lastCtrl = q; cur = end; break;
+      }
+      case 'A': {
+        let rx = Math.abs(num()), ry = Math.abs(num()); const rot = num() * Math.PI / 180, large = flag(), sweep = flag(); const end = pt();
+        if (!sub) begin(cur);
+        if (!rx || !ry) { lineTo(end); cur = end; break; }
+        const cos = Math.cos(rot), sin = Math.sin(rot), dx = (cur[0] - end[0]) / 2, dy = (cur[1] - end[1]) / 2;
+        const x1 = cos * dx + sin * dy, y1 = -sin * dx + cos * dy;
+        const lam = x1 * x1 / (rx * rx) + y1 * y1 / (ry * ry); if (lam > 1) { rx *= Math.sqrt(lam); ry *= Math.sqrt(lam); }
+        const sign = large === sweep ? -1 : 1, num2 = rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1, den = rx * rx * y1 * y1 + ry * ry * x1 * x1;
+        const k = sign * Math.sqrt(Math.max(0, num2 / den)), cx1 = k * rx * y1 / ry, cy1 = -k * ry * x1 / rx;
+        const cx = cos * cx1 - sin * cy1 + (cur[0] + end[0]) / 2, cy = sin * cx1 + cos * cy1 + (cur[1] + end[1]) / 2;
+        const ang = (ux, uy, vx, vy) => { const a = Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy); return a; };
+        const t1 = ang(1, 0, (x1 - cx1) / rx, (y1 - cy1) / ry); let dt = ang((x1 - cx1) / rx, (y1 - cy1) / ry, (-x1 - cx1) / rx, (-y1 - cy1) / ry);
+        if (!sweep && dt > 0) dt -= 2 * Math.PI; else if (sweep && dt < 0) dt += 2 * Math.PI;
+        const radius = Math.max(rx, ry) * scaleOf(matrix), steps = Math.max(4, Math.min(720, Math.ceil(Math.abs(dt) / Math.acos(Math.max(-1, 1 - FLATNESS / Math.max(radius, FLATNESS))) )));
+        for (let s = 1; s <= steps; s++) {
+          const t = t1 + dt * s / steps, x = rx * Math.cos(t), y = ry * Math.sin(t);
+          sub.points.push(s === steps ? T(end) : T([cos * x - sin * y + cx, sin * x + cos * y + cy]));
+        }
+        cur = end; break;
+      }
+      case 'Z':
+        if (sub) { sub.closed = true; const f = sub.points[0], l = sub.points[sub.points.length - 1]; if (sub.points.length > 1 && Math.hypot(f[0] - l[0], f[1] - l[1]) < 1e-9) sub.points.pop(); out.push(sub); sub = null; }
+        cur = start; break;
+      default: throw Error('Comando de trazado desconocido: ' + cmd);
+    }
+    lastCmd = C;
+    if (!/[CSQT]/.test(C)) lastCtrl = null;
+  }
+  if (sub && sub.points.length > 1) out.push(sub);
+  return out.filter((s) => s.points.length >= (s.closed ? 3 : 2) || (s.closed && s.points.length === 2));
+}
+
+function shapeToPath(node) {
+  const a = (k, d = 0) => { const v = node.getAttribute(k); if (v === null || v === '') return d; const r = parseFloat(v); return Number.isFinite(r) ? r : d; };
+  switch (node.localName) {
+    case 'path': return node.getAttribute('d') || '';
+    case 'rect': {
+      const x = a('x'), y = a('y'), w = a('width'), h = a('height');
+      if (!(w > 0 && h > 0)) return '';
+      let rx = node.hasAttribute('rx') ? a('rx') : null, ry = node.hasAttribute('ry') ? a('ry') : null;
+      rx = rx ?? ry ?? 0; ry = ry ?? rx; rx = Math.min(Math.max(rx, 0), w / 2); ry = Math.min(Math.max(ry, 0), h / 2);
+      if (!rx || !ry) return \`M\${x} \${y}H\${x + w}V\${y + h}H\${x}Z\`;
+      return \`M\${x + rx} \${y}H\${x + w - rx}A\${rx} \${ry} 0 0 1 \${x + w} \${y + ry}V\${y + h - ry}A\${rx} \${ry} 0 0 1 \${x + w - rx} \${y + h}H\${x + rx}A\${rx} \${ry} 0 0 1 \${x} \${y + h - ry}V\${y + ry}A\${rx} \${ry} 0 0 1 \${x + rx} \${y}Z\`;
+    }
+    case 'circle': case 'ellipse': {
+      const cx = a('cx'), cy = a('cy'), rx = node.localName === 'circle' ? a('r') : a('rx'), ry = node.localName === 'circle' ? a('r') : a('ry');
+      if (!(rx > 0 && ry > 0)) return '';
+      return \`M\${cx - rx} \${cy}A\${rx} \${ry} 0 1 0 \${cx + rx} \${cy}A\${rx} \${ry} 0 1 0 \${cx - rx} \${cy}Z\`;
+    }
+    case 'line': return \`M\${a('x1')} \${a('y1')}L\${a('x2')} \${a('y2')}\`;
+    case 'polyline': case 'polygon': {
+      const n = numbers(node.getAttribute('points'));
+      if (n.length < 4) return '';
+      let d = \`M\${n[0]} \${n[1]}\`; for (let i = 2; i + 1 < n.length; i += 2) d += \`L\${n[i]} \${n[i + 1]}\`;
+      return d + (node.localName === 'polygon' ? 'Z' : '');
+    }
+  }
+  return '';
+}
+
+/* ------------------------------------------------------------ an\xE1lisis */
+const hrefOf = (node) => node.getAttribute('href') ?? node.getAttributeNS?.('http://www.w3.org/1999/xlink', 'href') ?? node.getAttribute('xlink:href');
+
+/**
+ * @param {string} text  contenido del SVG
+ * @param {{DOMParser, name, unitOverride}} options  unitOverride: 'auto' | 'px96' | 'px72' | 'mm'
+ */
+export function importSVG(text, {DOMParser: Parser = globalThis.DOMParser, name = 'archivo.svg', unitOverride = 'auto'} = {}) {
+  const issues = [];
+  const note = (level, code, message, count = 1) => { const found = issues.find((i) => i.code === code && i.message === message); if (found) found.count += count; else issues.push({level, code, message, count}); };
+  if (typeof text !== 'string' || !text.trim()) throw Error('El archivo est\xE1 vac\xEDo.');
+  if (text.length > MAX_SVG_BYTES) throw Error('El SVG supera 8 MB. Simplifica el dise\xF1o o exporta sin im\xE1genes incrustadas.');
+  if (/<!ENTITY/i.test(text)) throw Error('El SVG declara entidades DTD. Por seguridad no se importa; vuelve a exportarlo como SVG simple.');
+  const doc = new Parser().parseFromString(text, 'image/svg+xml');
+  const root = doc.documentElement;
+  if (!root || root.localName !== 'svg' || doc.getElementsByTagName('parsererror').length) throw Error('El archivo no es un SVG v\xE1lido.');
+
+  // 1 \xB7 Saneamiento: nada ejecutable ni externo sobrevive.
+  for (const node of [...root.querySelectorAll('script')]) { node.remove(); note('info', 'script', 'Se elimin\xF3 un script incrustado; nunca se ejecuta.'); }
+  for (const node of [...root.querySelectorAll('foreignObject, iframe, embed, object, audio, video, canvas')]) { node.remove(); note('warn', 'foreign', \`Se elimin\xF3 contenido no SVG (\${node.localName}). Convi\xE9rtelo en trazados o imagen incrustada.\`); }
+  for (const node of [root, ...root.querySelectorAll('*')]) {
+    for (const attr of [...node.attributes]) {
+      if (/^on/i.test(attr.name)) { node.removeAttribute(attr.name); note('info', 'handler', 'Se eliminaron atributos de evento (on\u2026); nunca se ejecutan.'); }
+      else if (/href$/i.test(attr.name)) {
+        const v = attr.value.trim();
+        const allowed = v.startsWith('#') || (node.localName === 'image' && /^data:image\\/(png|jpeg|jpg|webp);base64,/i.test(v));
+        if (!allowed) { node.removeAttributeNode(attr); note('warn', 'external', node.localName === 'image' ? 'Se bloque\xF3 una imagen enlazada desde fuera del archivo. Incr\xFAstala en el SVG (data:) para grabarla.' : 'Se bloque\xF3 un enlace a un recurso externo.'); }
+      }
+    }
+  }
+  const rules = parseStyleSheets(doc, issues);
+
+  // 2 \xB7 Unidades f\xEDsicas y viewBox.
+  const vb = numbers(root.getAttribute('viewBox'));
+  const hasViewBox = vb.length === 4 && vb[2] > 0 && vb[3] > 0;
+  let wAttr = root.getAttribute('width'), hAttr = root.getAttribute('height');
+  if (/%/.test(wAttr || '')) wAttr = null; if (/%/.test(hAttr || '')) hAttr = null;
+  const unitless = (v) => v !== null && /^[-+\\d.eE]+$/.test(String(v).trim());
+  const pxUnit = unitOverride === 'px72' ? 25.4 / 72 : unitOverride === 'mm' ? 1 : 25.4 / 96;
+  const physical = (v) => { if (v === null || v === undefined || v === '') return null; if (unitless(v)) return Number(v) * pxUnit; const r = lengthMm(v); if (r && typeof r === 'object') { note('warn', 'unit', \`Unidad \xAB\${r.invalid}\xBB no compatible; se interpret\xF3 en px.\`); return parseFloat(v) * pxUnit; } return r; };
+  let widthMm = physical(wAttr), heightMm = physical(hAttr);
+  let unitsDeclared = !!(wAttr && hAttr && !unitless(wAttr) && !unitless(hAttr));
+  if (hasViewBox) {
+    if (widthMm === null && heightMm === null) { widthMm = vb[2] * pxUnit; heightMm = vb[3] * pxUnit; }
+    else if (widthMm === null) widthMm = heightMm * vb[2] / vb[3];
+    else if (heightMm === null) heightMm = widthMm * vb[3] / vb[2];
+  }
+  let rootMatrix;
+  if (hasViewBox) {
+    const sx = widthMm / vb[2], sy = heightMm / vb[3];
+    const par = (root.getAttribute('preserveAspectRatio') || 'xMidYMid meet').trim().split(/\\s+/);
+    if (par[0] === 'none') rootMatrix = [sx, 0, 0, sy, -vb[0] * sx, -vb[1] * sy];
+    else {
+      const s = par[1] === 'slice' ? Math.max(sx, sy) : Math.min(sx, sy);
+      const ax = /xMid/.test(par[0]) ? .5 : /xMax/.test(par[0]) ? 1 : 0, ay = /YMid/.test(par[0]) ? .5 : /YMax/.test(par[0]) ? 1 : 0;
+      rootMatrix = [s, 0, 0, s, (widthMm - vb[2] * s) * ax - vb[0] * s, (heightMm - vb[3] * s) * ay - vb[1] * s];
+    }
+  } else {
+    // Sin viewBox, una unidad de usuario es 1 px CSS.
+    rootMatrix = [pxUnit, 0, 0, pxUnit, 0, 0];
+  }
+  if (unitOverride !== 'auto') { note('info', 'unit-override', unitOverride === 'mm' ? 'Unidades sin dimensi\xF3n interpretadas como mil\xEDmetros (ajuste manual).' : \`Unidades sin dimensi\xF3n interpretadas como px a \${unitOverride === 'px72' ? 72 : 96} ppp (ajuste manual).\`); }
+  else if (!unitsDeclared) note('warn', 'no-units', \`El SVG no declara medidas f\xEDsicas (mm, cm o in). Se interpret\xF3 1 unidad = 1 px a 96 ppp. Si la medida no coincide (p. ej. Illustrator a 72 ppp), cambia la interpretaci\xF3n de unidades.\`);
+
+  // 3 \xB7 Recorrido del \xE1rbol.
+  const elements = [], images = [], texts = [];
+  const byId = new Map(); for (const n of root.querySelectorAll('[id]')) byId.set(n.getAttribute('id'), n);
+  let serial = 0;
+  const walk = (node, matrix, inherited, depth, useStack) => {
+    if (depth > 64) { note('warn', 'depth', 'Anidamiento excesivo: se ignor\xF3 contenido profundo.'); return; }
+    const tag = node.localName;
+    if (!tag) return;
+    if (NON_RENDERED.has(tag) || node.namespaceURI && node.namespaceURI !== 'http://www.w3.org/2000/svg') {
+      if (!NON_RENDERED.has(tag) && node.namespaceURI && !/sodipodi|inkscape/.test(node.namespaceURI)) note('info', 'foreign-ns', \`Se ignor\xF3 un elemento de otro espacio de nombres (\${tag}).\`);
+      return;
+    }
+    const own = ownStyle(node, rules);
+    if (own.display === 'none') { note('info', 'hidden', 'Se omitieron elementos ocultos (display:none). Mu\xE9stralos en tu editor si deben grabarse.'); return; }
+    const style = {...Object.fromEntries(Object.entries(inherited).filter(([k]) => INHERITED.has(k))), ...own};
+    let m = matrix;
+    if (node !== root && node.hasAttribute('transform')) {
+      try { m = mul(matrix, parseTransform(node.getAttribute('transform'))); }
+      catch (e) { note('error', 'transform', \`Transformaci\xF3n inv\xE1lida en <\${tag}> (\${e.message}). Ese elemento no se import\xF3; corr\xEDgelo en tu editor.\`); return; }
+    }
+    if (node !== root && (node.hasAttribute('clip-path') || node.hasAttribute('mask') || own['clip-path'] || own.mask)) note('warn', 'clip', 'Hay recortes o m\xE1scaras: se usan los trazados completos, sin recortar. Aplica el recorte en tu editor (Objeto \u203A Recorte \u203A Liberar/Aplicar como trazado).');
+    if (tag === 'svg' && node !== root) {
+      const x = parseFloat(node.getAttribute('x')) || 0, y = parseFloat(node.getAttribute('y')) || 0;
+      const v = numbers(node.getAttribute('viewBox')), w = parseFloat(node.getAttribute('width')), h = parseFloat(node.getAttribute('height'));
+      m = mul(m, [1, 0, 0, 1, x, y]);
+      if (v.length === 4 && v[2] > 0 && v[3] > 0 && w > 0 && h > 0) m = mul(m, [w / v[2], 0, 0, h / v[3], -v[0] * w / v[2], -v[1] * h / v[3]]);
+    }
+    if (CONTAINERS.has(tag)) { for (const child of node.children) walk(child, m, style, depth + 1, useStack); return; }
+    if (tag === 'use') {
+      const ref = (hrefOf(node) || '').replace(/^#/, ''), target = byId.get(ref);
+      if (!target || useStack.includes(ref)) { note('warn', 'use', 'Un clon (<use>) apunta a un elemento inexistente o circular; no se import\xF3.'); return; }
+      const um = mul(m, [1, 0, 0, 1, parseFloat(node.getAttribute('x')) || 0, parseFloat(node.getAttribute('y')) || 0]);
+      if (target.localName === 'symbol') { for (const child of target.children) walk(child, um, style, depth + 1, [...useStack, ref]); }
+      else walk(target, um, style, depth + 1, [...useStack, ref]);
+      return;
+    }
+    if (tag === 'text' || tag === 'tspan' || tag === 'textPath') {
+      const content = (node.textContent || '').trim().replace(/\\s+/g, ' ');
+      texts.push({text: content.slice(0, 60), font: style['font-family'] || node.getAttribute('font-family') || ''});
+      return;
+    }
+    if (tag === 'image') {
+      const href = hrefOf(node);
+      if (!href) return; // bloqueada arriba y ya informada
+      const x = parseFloat(node.getAttribute('x')) || 0, y = parseFloat(node.getAttribute('y')) || 0, w = parseFloat(node.getAttribute('width')), h = parseFloat(node.getAttribute('height'));
+      if (!(w > 0 && h > 0)) { note('warn', 'image-size', 'Una imagen incrustada no declara ancho y alto; no se puede medir. As\xEDgnale tama\xF1o en tu editor.'); return; }
+      const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]].map((p) => apply(m, p));
+      images.push({id: 'img' + (++serial), href, x, y, width: w, height: h, matrix: m, corners, preserve: node.getAttribute('preserveAspectRatio') || 'xMidYMid meet', opacity: Number(style.opacity ?? 1)});
+      return;
+    }
+    if (SHAPES.has(tag)) {
+      if (style.visibility === 'hidden' || style.visibility === 'collapse') { note('info', 'hidden', 'Se omitieron elementos ocultos (visibility:hidden).'); return; }
+      let subpaths;
+      try { subpaths = pathToPolylines(shapeToPath(node), m); }
+      catch (e) { note('error', 'path', \`Trazado da\xF1ado en <\${tag}\${node.id ? ' #' + node.id : ''}>: \${e.message} No se import\xF3; rep\xE1ralo en tu editor.\`); return; }
+      if (!subpaths.length) { note('info', 'empty', 'Se omitieron formas vac\xEDas (sin tama\xF1o).'); return; }
+      const fill = normalizeColor(style.fill ?? 'black', style.color);
+      const stroke = normalizeColor(style.stroke ?? 'none', style.color);
+      if (fill === 'other' || stroke === 'other') note('warn', 'color', 'Hay colores no reconocidos; se agruparon como \xABotro color\xBB. Revisa la asignaci\xF3n de operaciones.');
+      if (fill === 'gradient') note('info', 'gradient', 'Los rellenos con degradado o patr\xF3n se graban como relleno s\xF3lido.');
+      const strokeWidth = parseFloat(style['stroke-width'] ?? 1);
+      const widthMm = Number.isFinite(strokeWidth) ? Math.max(0, strokeWidth * scaleOf(m)) : 0.1;
+      const id = node.getAttribute('id') || tag + (++serial);
+      elements.push({id, tag, subpaths, fill: fill ? {color: fill, rule: style['fill-rule'] === 'evenodd' ? 'evenodd' : 'nonzero'} : null, stroke: stroke && widthMm > 0 ? {color: stroke, widthMm} : null});
+      if (!fill && !(stroke && widthMm > 0)) note('info', 'invisible', 'Hay formas sin relleno ni contorno (invisibles). Se listan como \xABsin color\xBB y no se asignan a ninguna operaci\xF3n.');
+      return;
+    }
+    note('warn', 'unknown', \`Elemento no compatible <\${tag}> sin importar. Convi\xE9rtelo en trazado en tu editor.\`);
+  };
+  walk(root, rootMatrix, {fill: 'black'}, 0, []);
+  if (texts.length) note('error', 'text', \`Hay \${texts.length} texto\${texts.length === 1 ? '' : 's'} que depende\${texts.length === 1 ? '' : 'n'} de fuentes (\${[...new Set(texts.map((t) => '\xAB' + t.text + '\xBB'))].slice(0, 3).join(', ')}). No se graban: convi\xE9rtelos en trazados (Inkscape: Trayecto \u203A Objeto a trayecto; Illustrator: Texto \u203A Crear contornos).\`);
+  if (!elements.length && !images.length) throw Error(texts.length ? 'El SVG solo contiene textos con fuentes. Convi\xE9rtelos en trazados y vuelve a importar.' : 'El SVG no contiene trazados ni im\xE1genes que se puedan grabar o cortar.');
+  for (const e of elements) for (const s of e.subpaths) if (!s.closed && e.fill && !e.stroke) note('info', 'open-fill', 'Algunos rellenos tienen trazados abiertos: el relleno se cierra al grabar como imagen (como en tu editor).');
+  const bbox = boundsOf(elements, images);
+  return {name, widthMm, heightMm, unitsDeclared, unitOverride, viewBox: hasViewBox ? vb : null, elements, images, texts, issues, bbox, layers: layersOf(elements, images), objectCount: elements.length + images.length};
+}
+
+export function boundsOf(elements, images = []) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const add = (p) => { if (p[0] < x0) x0 = p[0]; if (p[1] < y0) y0 = p[1]; if (p[0] > x1) x1 = p[0]; if (p[1] > y1) y1 = p[1]; };
+  for (const e of elements) for (const s of e.subpaths) s.points.forEach(add);
+  for (const i of images) i.corners.forEach(add);
+  return Number.isFinite(x0) ? {x: x0, y: y0, width: x1 - x0, height: y1 - y0} : {x: 0, y: 0, width: 0, height: 0};
+}
+
+/** Capas por tipo y color. La asignaci\xF3n a operaciones se hace sobre estas capas. */
+export function layersOf(elements, images) {
+  const map = new Map();
+  const add = (key, kind, color, length) => { const l = map.get(key) || {key, kind, color, count: 0, lengthMm: 0}; l.count++; l.lengthMm += length; map.set(key, l); };
+  for (const e of elements) {
+    const length = e.subpaths.reduce((sum, s) => sum + polylineLength(s.points, s.closed), 0);
+    if (e.stroke) add('stroke:' + e.stroke.color, 'stroke', e.stroke.color, length);
+    if (e.fill) add('fill:' + e.fill.color, 'fill', e.fill.color, length);
+  }
+  if (images.length) for (const i of images) add('image', 'image', null, 0);
+  return [...map.values()].sort((a, b) => ({image: 0, fill: 1, stroke: 2})[a.kind] - ({image: 0, fill: 1, stroke: 2})[b.kind] || String(a.color).localeCompare(String(b.color)));
+}
+
+export function polylineLength(points, closed) {
+  let L = 0; for (let i = 1; i < points.length; i++) L += Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]);
+  if (closed && points.length > 2) L += Math.hypot(points[0][0] - points.at(-1)[0], points[0][1] - points.at(-1)[1]);
+  return L;
+}
+
+/** Imagen PNG/JPG como dise\xF1o de grabado (una sola capa de imagen). */
+export function imageDesign({name, href, pixelWidth, pixelHeight, widthMm}) {
+  if (!(pixelWidth > 0 && pixelHeight > 0)) throw Error('La imagen no tiene dimensiones v\xE1lidas.');
+  const w = widthMm > 0 ? widthMm : pixelWidth * 25.4 / 96, h = w * pixelHeight / pixelWidth;
+  const sx = w / pixelWidth;
+  const m = [sx, 0, 0, sx, 0, 0];
+  const corners = [[0, 0], [pixelWidth, 0], [pixelWidth, pixelHeight], [0, pixelHeight]].map((p) => apply(m, p));
+  const images = [{id: 'img1', href, x: 0, y: 0, width: pixelWidth, height: pixelHeight, matrix: m, corners, preserve: 'none', opacity: 1}];
+  return {name, widthMm: w, heightMm: h, unitsDeclared: false, unitOverride: 'auto', viewBox: null, elements: [], images, texts: [], bbox: boundsOf([], images), layers: layersOf([], images), objectCount: 1, raster: true,
+    issues: [{level: 'info', code: 'photo', message: \`Imagen de \${pixelWidth} \xD7 \${pixelHeight} px. Se interpret\xF3 a 96 ppp (\${w.toFixed(1)} \xD7 \${h.toFixed(1)} mm); ajusta la escala a la medida real.\`, count: 1}]};
+}
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/vendor/jspdf.umd.min.js":{body:`/** @license
  *
  * jsPDF - PDF Document creation from JavaScript
@@ -5957,7 +7805,7 @@ function ready(fn){
 
 if(typeof document!=='undefined')ready(init);
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/workshop-remote.js":{body:`import qrcode from './vendor/qrcode.mjs';
-import {createPeer,gatherDescription,encodePairing,decodePairing,CommandGate,sendPeerMessage} from './peer-transport.js?v=2';
+import {createPeer,gatherDescription,encodePairing,decodePairing,CommandGate,sendPeerMessage,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
 import {pairingRequest,pairingSecret} from './peer-signaling.js?v=1';
 
 export function mountRemoteHost(app,machine,mount){
@@ -5965,7 +7813,7 @@ export function mountRemoteHost(app,machine,mount){
  const dialog=document.createElement('dialog');dialog.className='workshop-remote-dialog';dialog.setAttribute('aria-labelledby','peerTitle');
  dialog.innerHTML='<header class="dialog-header"><h2 id="peerTitle">Operar junto a la m\xE1quina</h2><button type="button" id="peerClose" class="btn quiet">Cerrar ventana</button></header><p>La computadora conserva el USB. Deja Box abierto y ambos dispositivos en la misma red local. No se abre ning\xFAn puerto ni se comparte el c\xF3digo USB.</p><ol><li>Genera el enlace y escanea el QR con el celular.</li><li>El celular mostrar\xE1 una respuesta: c\xF3piala y p\xE9gala aqu\xED una vez.</li><li>Cuando el enlace est\xE9 conectado, pulsa Ceder control.</li></ol><button type="button" id="peerGenerate" class="btn primary">Generar emparejamiento</button><div id="peerQR" class="workshop-peer-qr"></div><label>Enlace para el celular<input id="peerLink" readonly></label><label>Respuesta del celular<textarea id="peerAnswer" rows="3" spellcheck="false" autocomplete="off"></textarea></label><div class="workshop-inline-actions"><button type="button" id="peerAccept" class="btn outline">Aceptar respuesta</button><button type="button" id="peerGrant" class="btn primary" disabled>Ceder control al celular</button><button type="button" id="peerRevoke" class="btn outline" disabled>Recuperar control y cerrar enlace</button></div><p id="peerStatus" role="status">Sin enlace. La computadora tiene el control.</p>';
  document.body.append(dialog);const $=id=>dialog.querySelector('#'+id);
- let peer=null,channel=null,session=null,expires=0,gate=null,deadline=null,publishTimer=null,lastPublish=0,lastPreview='',answerTimer=null,pairGeneration=0;
+ let peer=null,channel=null,session=null,expires=0,gate=null,deadline=null,publishTimer=null,lastPublish=0,lastPreview='',answerTimer=null,pairGeneration=0,upload=null;
  const instructions=dialog.querySelector('ol');instructions.innerHTML='<li>Genera el QR y escan\xE9alo con el celular.</li><li>Espera: las pantallas completan el enlace autom\xE1ticamente.</li><li>Al conectar, este celular recibe el control de movimientos autom\xE1ticamente.</li>';
  $('peerGrant').hidden=true;$('peerAnswer').closest('label').hidden=true;$('peerAccept').hidden=true;
  const status=message=>{$('peerStatus').textContent=message;};
@@ -5979,7 +7827,28 @@ export function mountRemoteHost(app,machine,mount){
  function publish(force=false){
   if(channel?.readyState!=='open'||!session||channel.bufferedAmount>256000)return;
   if(!force&&Date.now()-lastPublish<350)return;lastPublish=Date.now();
-  try{const snapshot=machine.snapshot(),preview=snapshot.preview;snapshot.preview=preview===lastPreview?undefined:preview;sendPeerMessage(channel,{type:'state',session,...snapshot});lastPreview=preview;}catch(e){status('No se pudo sincronizar: '+e.message);}
+  try{const snapshot=machine.snapshot(),preview=snapshot.preview;try{snapshot.job=app.jobStudio?.snapshot();}catch{}snapshot.preview=preview===lastPreview?undefined:preview;sendPeerMessage(channel,{type:'state',session,...snapshot});lastPreview=preview;}catch(e){status('No se pudo sincronizar: '+e.message);}
+ }
+/** El celular consulta la biblioteca de esta computadora (y de la cuenta, si hay sesi\xF3n). */
+ function libraryItems(){
+  const studio=app.jobStudio,out=[];
+  const thumb=t=>typeof t==='string'&&t.length<60000&&/^data:image\\/(png|jpeg|webp);base64,/.test(t)?t:null;
+  for(const i of studio?.library.items||[])out.push({scope:'file',id:i.id,kind:i.source?.type==='image'?'image':'svg',name:i.name,dims:i.dims?\`\${i.dims.width} \xD7 \${i.dims.height} mm\`:'',ops:(i.opsSummary||[]).filter(o=>o.enabled!==false).map(o=>o.name),where:i.where,synced:!!i.synced,deleted:!!i.deletedAt,updated:i.updated,thumb:thumb(i.thumb)});
+  for(const i of app.workshop?.libraryApi?.items()||[])out.push({scope:'box',id:i.id,kind:i.kind,name:i.name||i.state?.name,dims:i.state?\`\${i.state.width} \xD7 \${i.state.depth} \xD7 \${i.state.height} mm\`:'',ops:['Corte'],where:'browser',synced:false,deleted:false,updated:i.updated,thumb:thumb(i.thumb)});
+  for(const t of app.workshop?.boxTrash?.()||[])out.push({scope:'box',id:t.item.id,kind:t.item.kind,name:t.item.name||t.item.state?.name,dims:'',ops:[],where:'browser',synced:false,deleted:true,updated:t.deletedAt,thumb:null});
+  return {cloud:studio?.library.cloudState||'unknown',cloudMessage:studio?.library.cloudMessage||'',items:out.sort((a,b)=>String(b.updated).localeCompare(String(a.updated))).slice(0,200)};
+ }
+ function publishLibrary(){if(channel?.readyState!=='open'||!session)return;try{sendPeerMessage(channel,{type:'library',session,...libraryItems()});}catch(e){status('No se pudo enviar la biblioteca: '+e.message);}}
+ async function receiveUpload(m){
+  const reply=(ok,error='')=>{if(channel?.readyState==='open')channel.send(JSON.stringify({type:'upload-reply',upload:m.upload,ok,error}));};
+  if(typeof m.upload!=='string'||m.upload.length>80||!Number.isInteger(m.index)||!Number.isInteger(m.count)||m.count<1||m.count>Math.ceil(UPLOAD_MAX/UPLOAD_CHUNK)||typeof m.data!=='string'||m.data.length>UPLOAD_CHUNK)return reply(false,'Fragmento inv\xE1lido.');
+  if(machine.remoteOwner===false)return reply(false,'La computadora conserva el control.');
+  if(m.index===0){if(typeof m.name!=='string'||!['image/svg+xml','image/png','image/jpeg'].includes(m.mime))return reply(false,'Formato no compatible. Usa SVG, PNG o JPG.');upload={id:m.upload,count:m.count,parts:[],name:m.name.slice(0,120),mime:m.mime,started:Date.now()};}
+  if(!upload||upload.id!==m.upload||upload.parts.length!==m.index||Date.now()-upload.started>120000){upload=null;return reply(false,'Transferencia incompleta. Vuelve a enviar el archivo.');}
+  upload.parts.push(m.data);if(upload.parts.length<upload.count)return;
+  const done=upload;upload=null;
+  try{if(machine.busy)throw Error('Hay una operaci\xF3n activa. Espera para importar.');await app.jobStudio.receiveFile({name:done.name,type:done.mime,data:done.parts.join('')});reply(true);publish(true);}
+  catch(e){reply(false,e.message);}
  }
  open.onclick=()=>dialog.showModal();$('peerClose').onclick=()=>dialog.close();
  $('peerGenerate').onclick=async()=>{
@@ -5987,8 +7856,8 @@ export function mountRemoteHost(app,machine,mount){
   $('peerGenerate').disabled=true;
   try{revoke();const generation=pairGeneration;peer=createPeer();session=crypto.randomUUID();expires=Date.now()+300000;channel=peer.createDataChannel('lz-box-'+session,{ordered:true});
    gate=new CommandGate(async(action,args)=>{if(channel?.readyState!=='open')throw Error('Enlace desconectado.');await machine.remoteCommand(action,args);});
-   channel.onopen=()=>{try{machine.setRemoteOwner(true);clearTimeout(deadline);$('peerRevoke').disabled=false;status('Celular enlazado con control de movimientos. Puedes recuperar el control aqu\xED.');publish(true);publishTimer=setInterval(()=>publish(),700);}catch(e){revoke(e.message);}};
-   channel.onmessage=async event=>{if(typeof event.data!=='string'||event.data.length>4096)return;try{const message=JSON.parse(event.data);if(message.session!==session)return;const reply=await gate.handle(message);if(channel?.readyState==='open')channel.send(JSON.stringify(reply));publish(true);}catch(e){status(e.message);}};
+   channel.onopen=()=>{try{machine.setRemoteOwner(true);clearTimeout(deadline);$('peerRevoke').disabled=false;status('Celular enlazado con control de movimientos. Puedes recuperar el control aqu\xED.');publish(true);publishLibrary();publishTimer=setInterval(()=>publish(),700);}catch(e){revoke(e.message);}};
+   channel.onmessage=async event=>{if(typeof event.data!=='string'||event.data.length>UPLOAD_CHUNK+2000)return;try{const message=JSON.parse(event.data);if(message.session!==session)return;if(message.type==='upload'){await receiveUpload(message);return;}if(event.data.length>4096)return;const reply=await gate.handle(message);if(channel?.readyState==='open')channel.send(JSON.stringify(reply));publish(true);}catch(e){status(e.message);}};
    channel.onclose=()=>{if(channel)revoke('El celular se desconect\xF3. La computadora recuper\xF3 el control; no se reenvi\xF3 ninguna orden.');};
    peer.onconnectionstatechange=()=>{if(peer&&['failed','disconnected'].includes(peer.connectionState))revoke('Enlace perdido. La computadora recuper\xF3 el control.');};
    status('Preparando enlace cifrado en la red local\u2026');const sdp=await gatherDescription(peer,'offer');if(generation!==pairGeneration)return;
@@ -6004,7 +7873,7 @@ export function mountRemoteHost(app,machine,mount){
  $('peerGrant').onclick=()=>{try{if(channel?.readyState!=='open')throw Error('No hay un celular conectado.');machine.setRemoteOwner(true);$('peerGrant').disabled=true;status('Control de movimientos: celular. Stop sigue disponible en la computadora.');publish(true);}catch(e){status(e.message);}};
  $('peerRevoke').onclick=()=>revoke();
  document.defaultView.addEventListener('pagehide',()=>revoke());
- return {publish,revoke,open:()=>dialog.showModal()};
+ return {publish,publishLibrary,revoke,open:()=>dialog.showModal()};
 }
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/workshop-store.js":{body:`export const WORKSHOP_KEY='lzbox-workshop-v1';
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -6032,9 +7901,10 @@ export function filterWorkshop(items,{query='',kind='all',model='all'}={}){
 import {optimizeSheet} from './cut-optimizer.js?v=3.5';
 import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
-import {mountK40} from './k40-control.js?v=13';
+import {mountK40} from './k40-control.js?v=14';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=4';
+import {mountRemoteHost} from './workshop-remote.js?v=5';
+import {mountJobStudio} from './job-studio.js?v=1';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};
@@ -6077,11 +7947,12 @@ export function mountWorkshop(app){
  const globalMachine=el('div','workshop-machine-strip');globalMachine.hidden=true;globalMachine.innerHTML='<span id="workshopMachineMessage"></span>';
  const globalStop=button('\u2161 STOP / PAUSA',()=>app.machineControl?.pause(),'btn workshop-stop');globalMachine.append(globalStop,button('Ver trabajo',()=>show('operate'),'btn outline'));tools.after(globalMachine);
  let saveKind='prepared',renaming=null,current='design',filter={query:'',kind:'all',model:'all'},lastSelected=null,remote=null;
- const machine=mountK40(app,{host:operator,onArrange:()=>show('prepare'),onChange:()=>updateMachine(),onSave:(kind)=>savePreparation(kind)});
+ const machine=mountK40(app,{host:operator,onArrange:()=>show('prepare'),onChange:()=>updateMachine(),onSave:(kind)=>savePreparation(kind),remoteExtra:(action,args)=>app.jobStudio?.remote(action,args)});
  app.machineControl=machine;
  const prepareActions=el('div','workshop-prepare-actions');prepareActions.append(button('Guardar preparaci\xF3n',()=>savePreparation('prepared')),button('Guardar plantilla',()=>savePreparation('template')),button('Posicionar y cortar',()=>show('operate'),'btn primary'));$('workshopPrepareExport').append(prepareActions);
  const operatorTools=el('div','workshop-operator-tools');operatorTools.append(button('Guardar preparaci\xF3n',()=>savePreparation('prepared')),button('Guardar plantilla',()=>savePreparation('template')));operator.prepend(operatorTools);
- remote=mountRemoteHost(app,machine,operatorTools);
+ remote=mountRemoteHost(app,machine,operatorTools);app.workshopRemote=remote;
+ const studio=mountJobStudio(app,machine);
  const nameDialog=el('dialog','workshop-name-dialog');nameDialog.innerHTML='<form><h2 id="workshopNameTitle">Guardar preparaci\xF3n</h2><label>Nombre<input id="workshopItemName" maxlength="80" required></label><p class="hint" id="workshopNameHint"></p><div class="workshop-inline-actions"><button class="btn primary" type="submit">Guardar</button><button class="btn outline" type="button" id="workshopNameCancel">Cancelar</button></div></form>';document.body.append(nameDialog);
  nameDialog.querySelector('form').onsubmit=e=>{e.preventDefault();try{
   const name=$('workshopItemName').value.trim();if(!name)throw Error('Escribe un nombre.');
@@ -6117,8 +7988,16 @@ export function mountWorkshop(app){
  const refreshPlanTools=app.planEdit.refreshTools.bind(app.planEdit);app.planEdit.refreshTools=(...args)=>{refreshPlanTools(...args);update();};
  $('workshopApplyPosition').onclick=()=>{const x=Number($('workshopPieceX').value),y=Number($('workshopPieceY').value);if(!Number.isFinite(x)||!Number.isFinite(y))return app.toast('Coordenadas inv\xE1lidas.');app.planEdit.setPlacement(app.planEdit.selected,q=>({...q,x,y}));};$('workshopRotatePiece').onclick=()=>app.planEdit.rotate();
  function updateMachine(){if(!app.machineControl)return;const m=app.machineControl;const bed=m.machine?.connected?m.machine.bed:null;if(JSON.stringify(app.displayBed)!==JSON.stringify(bed)){app.displayBed=bed;if(app.view==='2d')app.redrawPlan();}bedLabel.textContent=bed?\`Cama de m\xE1quina: \${bed.width} \xD7 \${bed.height} mm. El rect\xE1ngulo interior es el material.\`:'Cama: se obtiene al conectar la m\xE1quina. Material: tama\xF1o de hoja configurado.';live.textContent=m.stateLabel;live.dataset.busy=String(m.busy);globalMachine.hidden=!m.busy||current==='operate';$('workshopMachineMessage').textContent=m.stateLabel+' \xB7 '+m.message;globalStop.disabled=!m.canPause;remote?.publish();}
- function allItems(){return [...app.designs().map(p=>({...p,kind:'design',name:p.state.name})),...readWorkshop(storage)].sort((a,b)=>String(b.updated).localeCompare(String(a.updated)));}
- library.innerHTML='<header class="workshop-library-head"><div><span class="eyebrow">BIBLIOTECA DEL TALLER</span><h1>Dise\xF1os y trabajos</h1><p>Guardados en este navegador. Las plantillas requieren volver a referenciar la m\xE1quina.</p></div><div id="workshopLibraryActions"></div></header><div class="workshop-library-body"><div class="workshop-library-main"><div class="workshop-library-filters"><label class="workshop-library-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="workshopSearch" type="search" placeholder="Buscar dise\xF1o, modelo o material\u2026" aria-label="Buscar en biblioteca"></label><div class="workshop-kind-chips" role="group" aria-label="Tipo de elemento"><button type="button" data-kind="all">Todos</button><button type="button" data-kind="design">Dise\xF1os</button><button type="button" data-kind="prepared">Preparaciones</button><button type="button" data-kind="template">Plantillas</button></div><select id="workshopKind" aria-label="Tipo de elemento" hidden><option value="all">Todos los tipos</option><option value="design">Dise\xF1os editables</option><option value="prepared">Trabajos preparados</option><option value="template">Plantillas de posicionamiento</option></select><div class="workshop-view-toggle" role="group" aria-label="Vista"><button type="button" data-view="grid" aria-label="Cuadr\xEDcula"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg></button><button type="button" data-view="list" aria-label="Lista"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></button></div></div><div class="workshop-library-filters2"><select id="workshopModelFilter" aria-label="Filtrar por modelo"><option value="all">Todos los modelos</option></select><span id="workshopLibraryCount"></span><label class="workshop-sort">Orden<select id="workshopSort" aria-label="Orden"><option value="recent">M\xE1s recientes</option><option value="old">M\xE1s antiguos</option><option value="name">Nombre</option></select></label></div><div id="workshopLibraryGrid" class="workshop-library-grid"></div><div id="workshopLibraryUndo" class="workshop-library-undo" hidden></div><section class="workshop-starters" aria-labelledby="workshopStartersTitle"><h2 id="workshopStartersTitle">Empieza con un modelo del cat\xE1logo</h2><div id="workshopStarters" class="workshop-starters-grid"></div></section></div><aside id="workshopLibraryDetail" class="workshop-library-detail" aria-label="Detalles del dise\xF1o"></aside></div>';
+ const TRASH='lzbox-workshop-trash';
+ const readTrash=()=>{try{const v=JSON.parse(storage.getItem(TRASH)||'[]');return Array.isArray(v)?v.filter(t=>t&&t.item&&Date.now()-new Date(t.deletedAt).getTime()<30*864e5):[];}catch{return [];}};
+ const writeTrash=list=>{try{storage.setItem(TRASH,JSON.stringify(list.slice(0,30)));}catch{}};
+ function boxItems(){return [...app.designs().map(p=>({...p,kind:'design',name:p.state.name})),...readWorkshop(storage)];}
+ function fileItems(){return (studio?.library.items||[]).map(i=>({...i,kind:'file'}));}
+ function allItems(){
+  if(filter.kind==='trash')return [...readTrash().map(t=>({...t.item,deletedAt:t.deletedAt,trashed:true})),...fileItems().filter(i=>i.deletedAt).map(i=>({...i,trashed:true}))].sort((a,b)=>String(b.deletedAt).localeCompare(String(a.deletedAt)));
+  return [...boxItems(),...fileItems().filter(i=>!i.deletedAt)].sort((a,b)=>String(b.updated).localeCompare(String(a.updated)));
+ }
+ library.innerHTML='<header class="workshop-library-head"><div><span class="eyebrow">BIBLIOTECA DEL TALLER</span><h1>Dise\xF1os y trabajos</h1><p id="workshopLibraryWhere">Dise\xF1os y preparaciones Box: este navegador. Archivos importados: esta computadora y, si inicias sesi\xF3n, tu cuenta.</p></div><div id="workshopLibraryActions"></div></header><div class="workshop-library-body"><div class="workshop-library-main"><div class="workshop-library-filters"><label class="workshop-library-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="workshopSearch" type="search" placeholder="Buscar dise\xF1o, modelo o material\u2026" aria-label="Buscar en biblioteca"></label><div class="workshop-kind-chips" role="group" aria-label="Tipo de elemento"><button type="button" data-kind="all">Todos</button><button type="button" data-kind="design">Dise\xF1os</button><button type="button" data-kind="prepared">Preparaciones</button><button type="button" data-kind="template">Plantillas</button><button type="button" data-kind="file">Archivos SVG / imagen</button><button type="button" data-kind="trash">Papelera</button></div><select id="workshopKind" aria-label="Tipo de elemento" hidden><option value="all">Todos los tipos</option><option value="design">Dise\xF1os editables</option><option value="prepared">Trabajos preparados</option><option value="template">Plantillas de posicionamiento</option></select><div class="workshop-view-toggle" role="group" aria-label="Vista"><button type="button" data-view="grid" aria-label="Cuadr\xEDcula"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg></button><button type="button" data-view="list" aria-label="Lista"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></button></div></div><div class="workshop-library-filters2"><select id="workshopModelFilter" aria-label="Filtrar por modelo"><option value="all">Todos los modelos</option></select><span id="workshopLibraryCount"></span><label class="workshop-sort">Orden<select id="workshopSort" aria-label="Orden"><option value="recent">M\xE1s recientes</option><option value="old">M\xE1s antiguos</option><option value="name">Nombre</option></select></label></div><div id="workshopLibraryGrid" class="workshop-library-grid"></div><div id="workshopLibraryUndo" class="workshop-library-undo" hidden></div><section class="workshop-starters" aria-labelledby="workshopStartersTitle"><h2 id="workshopStartersTitle">Empieza con un modelo del cat\xE1logo</h2><div id="workshopStarters" class="workshop-starters-grid"></div></section></div><aside id="workshopLibraryDetail" class="workshop-library-detail" aria-label="Detalles del dise\xF1o"></aside></div>';
  for(const [id,info] of Object.entries(modelInfo)){const o=el('option','',info.name);o.value=id;$('workshopModelFilter').append(o);}
  for(const [id,key] of [['workshopSearch','query'],['workshopKind','kind'],['workshopModelFilter','model']])$(id).addEventListener('input',()=>{filter[key]=$(id).value;renderLibrary();});
  let sortMode='recent',selectedItem=null,libraryView=app.readStorage('lzbox-library-view','grid')==='list'?'list':'grid';
@@ -6127,14 +8006,26 @@ export function mountWorkshop(app){
  for(const b of library.querySelectorAll('[data-view]'))b.onclick=()=>{libraryView=b.dataset.view;app.putStorage('lzbox-library-view',libraryView);renderLibrary();};
  $('workshopLibraryActions').append(button('Guardar dise\xF1o actual',()=>app.quickSave(),'btn primary'),button('Importar desde archivo',()=>$('importBtn')?.click()),button('Exportar biblioteca',()=>exportLibrary()),button('Respaldo de dise\xF1os',()=>{$('projectsBtn').dataset.legacy='1';app.showProjects();$('projectsDialog').showModal();},'btn quiet'));
  $('projectsBtn').onclick=()=>show('library');
- const kindLabel={design:'Dise\xF1o',prepared:'Preparaci\xF3n',template:'Plantilla'};
+ const kindLabel={design:'Dise\xF1o',prepared:'Preparaci\xF3n',template:'Plantilla',file:'Archivo'};
  const modelImage=model=>document.querySelector(\`#modelCatalog [data-model="\${model}"] img\`)?.getAttribute('src')||'';
  const ago=date=>{const t=new Date(date).getTime();if(!Number.isFinite(t))return '';const s=Math.max(0,(Date.now()-t)/1000);if(s<60)return 'hace un momento';const m=s/60,h=m/60,d=h/24;if(m<60)return \`hace \${Math.round(m)} min\`;if(h<24)return \`hace \${Math.round(h)} hora\${Math.round(h)===1?'':'s'}\`;if(d<7)return \`hace \${Math.round(d)} d\xEDa\${Math.round(d)===1?'':'s'}\`;if(d<30)return \`hace \${Math.round(d/7)} semana\${Math.round(d/7)===1?'':'s'}\`;return new Date(t).toLocaleDateString('es-MX',{dateStyle:'medium'});};
  const itemKey=item=>item.kind+':'+item.id;
- const thumbFor=item=>{const preview=el('div','workshop-library-thumb');const src=typeof item.thumb==='string'&&/^data:image\\/(png|jpeg|webp);base64,/.test(item.thumb)?item.thumb:modelImage(item.state.model);if(src){const img=el('img');img.src=src;img.alt='Vista de '+item.name;img.loading='lazy';preview.append(img);}else preview.append(el('span','',modelInfo[item.state.model]?.name||'Dise\xF1o'));const badge=el('span','workshop-kind-badge is-'+item.kind,kindLabel[item.kind]||'Dise\xF1o');preview.append(badge);return preview;};
- const rename=item=>{renaming=item;$('workshopNameTitle').textContent='Renombrar';$('workshopItemName').value=item.name;$('workshopNameHint').textContent='';nameDialog.showModal();$('workshopItemName').focus();};
- const menuFor=item=>{const menu=el('details','workshop-card-menu');const sum=el('summary','btn outline');sum.setAttribute('aria-label','M\xE1s acciones');sum.textContent='\u22EF';const list=el('div','workshop-card-menu-list');list.append(button('Duplicar',()=>{menu.open=false;duplicate(item);},'btn quiet'),button('Renombrar',()=>{menu.open=false;rename(item);},'btn quiet'),button('Eliminar',()=>{menu.open=false;remove(item);},'btn quiet workshop-danger'));menu.append(sum,list);return menu;};
+ const thumbFor=item=>{if(item.kind==='file')return fileThumb(item);const preview=el('div','workshop-library-thumb');const src=typeof item.thumb==='string'&&/^data:image\\/(png|jpeg|webp);base64,/.test(item.thumb)?item.thumb:modelImage(item.state.model);if(src){const img=el('img');img.src=src;img.alt='Vista de '+item.name;img.loading='lazy';preview.append(img);}else preview.append(el('span','',modelInfo[item.state.model]?.name||'Dise\xF1o'));const badge=el('span','workshop-kind-badge is-'+item.kind,kindLabel[item.kind]||'Dise\xF1o');preview.append(badge);return preview;};
+ const whereLabel=i=>i.where==='both'?(i.synced?'En tu cuenta \xB7 sincronizado':'En tu cuenta \xB7 hay una versi\xF3n m\xE1s reciente'):i.where==='cloud'?'Solo en tu cuenta':'Solo en esta computadora';
+ const fileThumb=item=>{const preview=el('div','workshop-library-thumb is-file');if(item.thumb&&/^data:image\\/(png|jpeg|webp);base64,/.test(item.thumb)){const img=el('img');img.src=item.thumb;img.alt='Vista de '+item.name;preview.append(img);}else preview.append(el('span','',item.source?.type==='image'?'Imagen':'SVG'));preview.append(el('span','workshop-kind-badge is-file',item.source?.type==='image'?'Imagen':'SVG'));return preview;};
+ const opsText=item=>(item.opsSummary||[]).filter(o=>o.enabled!==false).map(o=>o.name).join(' \xB7 ')||'Sin operaciones';
+ const rename=item=>{if(item.kind==='file'){const name=prompt('Nuevo nombre',item.name);if(name)studio.library.rename(item.id,name).then(renderLibrary).catch(e=>app.toast(e.message));return;}renaming=item;$('workshopNameTitle').textContent='Renombrar';$('workshopItemName').value=item.name;$('workshopNameHint').textContent='';nameDialog.showModal();$('workshopItemName').focus();};
+ const menuFor=item=>{if(item.trashed){const b=button('Restaurar',()=>restoreItem(item),'btn outline');return b;}const menu=el('details','workshop-card-menu');const sum=el('summary','btn outline');sum.setAttribute('aria-label','M\xE1s acciones');sum.textContent='\u22EF';const list=el('div','workshop-card-menu-list');list.append(button('Duplicar',()=>{menu.open=false;duplicate(item);},'btn quiet'),button('Renombrar',()=>{menu.open=false;rename(item);},'btn quiet'),button('Eliminar',()=>{menu.open=false;remove(item);},'btn quiet workshop-danger'));menu.append(sum,list);return menu;};
  function renderDetail(item){const box=$('workshopLibraryDetail');if(!box)return;box.replaceChildren();if(!item){box.hidden=true;return;}box.hidden=false;
+  if(item.kind==='file'||item.trashed){const head=el('div','workshop-detail-head');head.append(el('h2','',item.trashed?'En la papelera':'Detalles del trabajo'));const close=button('\xD7',()=>{selectedItem=null;renderLibrary();},'workshop-detail-close');close.setAttribute('aria-label','Cerrar detalles');head.append(close);
+   const facts=el('dl','workshop-detail-facts');const fact=(k,v)=>{const d=el('div');d.append(el('dt','',k),el('dd','',v));facts.append(d);};
+   if(item.kind==='file'){fact('Archivo original',\`\${item.source?.name||'\u2014'} \xB7 \${item.source?.type==='image'?'imagen para grabado':'SVG'}\`);fact('Dimensiones colocadas',item.dims?\`\${item.dims.width} \xD7 \${item.dims.height} mm\`:'\u2014');fact('Operaciones',opsText(item));fact('D\xF3nde est\xE1 guardado',whereLabel(item));}
+   box.append(head,thumbFor(item),el('h3','',item.name),el('p','workshop-detail-time',(item.trashed?'Eliminado ':'Modificado ')+ago(item.trashed?item.deletedAt:item.updated)),facts);
+   if(item.trashed){box.append(el('p','workshop-reference-note','Se conserva 30 d\xEDas en la papelera.'),button('Restaurar',()=>restoreItem(item),'btn primary'));return;}
+   box.append(el('p','workshop-reference-note','Al abrirlo no se env\xEDa nada: revisa cama, colocaci\xF3n y origen antes de iniciar.'));
+   const main=el('div','workshop-detail-actions');main.append(button('Abrir en Operar m\xE1quina',()=>openItem(item),'btn primary'));const minor=el('div','workshop-detail-minor');minor.append(button('Duplicar',()=>duplicate(item)),button('Renombrar',()=>rename(item)),button('Eliminar',()=>remove(item),'btn outline workshop-danger'));
+   if(item.where==='local'&&studio.library.cloudState==='on')minor.append(button('Subir a mi cuenta',()=>studio.library.upload(item.id).then(()=>app.toast('Sincronizado con tu cuenta.')).catch(e=>app.toast(e.message))));
+   box.append(main,minor);return;}
   const head=el('div','workshop-detail-head');head.append(el('h2','','Detalles del dise\xF1o'));const close=button('\xD7',()=>{selectedItem=null;renderLibrary();},'workshop-detail-close');close.setAttribute('aria-label','Cerrar detalles');head.append(close);
   const title=el('div','workshop-detail-title');title.append(el('h3','',item.name),el('span','workshop-kind-badge is-'+item.kind,kindLabel[item.kind]||'Dise\xF1o'));
   const facts=el('dl','workshop-detail-facts');const fact=(k,v,sub)=>{const d=el('div');d.append(el('dt','',k));const dd=el('dd','',v);if(sub)dd.append(el('small','',sub));d.append(dd);facts.append(d);};
@@ -6143,7 +8034,7 @@ export function mountWorkshop(app){
   const minor=el('div','workshop-detail-minor');minor.append(button('Duplicar',()=>duplicate(item)),button('Renombrar',()=>rename(item)),button('Eliminar',()=>remove(item),'btn outline workshop-danger'));
   box.append(head,thumbFor(item),title,el('p','workshop-detail-time','Modificado '+ago(item.updated)),facts);if(item.requiresReference)box.append(el('p','workshop-reference-note','Requiere establecer referencias f\xEDsicas.'));box.append(main,minor);}
  function renderStarters(){const host=$('workshopStarters');if(!host||host.childElementCount)return;for(const card of document.querySelectorAll('#modelCatalog [data-model]')){const b=el('button','workshop-starter');b.type='button';const img=card.querySelector('img');if(img){const i=el('img');i.src=img.getAttribute('src');i.alt='';i.loading='lazy';b.append(i);}b.append(el('strong','',card.querySelector('strong')?.textContent||card.dataset.model),el('span','',card.querySelector('span')?.textContent||''));b.onclick=()=>{if(machine.busy)return app.toast('Hay una operaci\xF3n de m\xE1quina activa.');card.click();show('design');app.toast('Modelo cargado con medidas iniciales.');};host.append(b);}}
- function renderLibrary(){let list=filterWorkshop(allItems(),filter);const grid=$('workshopLibraryGrid');if(!grid)return;grid.replaceChildren();grid.classList.toggle('is-list',libraryView==='list');
+ function renderLibrary(){const norm=v=>String(v).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();const all=allItems();let list=filter.kind==='trash'?all.filter(i=>norm(i.name).includes(norm(filter.query))):[...filterWorkshop(all.filter(i=>i.kind!=='file'),{...filter,kind:filter.kind==='file'?'__none__':filter.kind}),...(['all','file'].includes(filter.kind)&&filter.model==='all'?all.filter(i=>i.kind==='file'&&norm(\`\${i.name} \${i.source?.name||''}\`).includes(norm(filter.query))):[])].sort((a,b)=>String(b.updated).localeCompare(String(a.updated)));const grid=$('workshopLibraryGrid');if(!grid)return;grid.replaceChildren();grid.classList.toggle('is-list',libraryView==='list');
   if(sortMode==='name')list=[...list].sort((a,b)=>String(a.name).localeCompare(String(b.name),'es'));else if(sortMode==='old')list=[...list].reverse();
   for(const b of library.querySelectorAll('[data-kind]')){const on=b.dataset.kind===(filter.kind||'all');b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));}
   for(const b of library.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===libraryView));
@@ -6152,20 +8043,24 @@ export function mountWorkshop(app){
   if(!list.length){grid.append(el('p','workshop-empty','No hay elementos que mostrar. Guarda un dise\xF1o o una preparaci\xF3n para volver a utilizarlo, o empieza con un modelo del cat\xE1logo.'));renderDetail(null);return;}
   if(!selectedItem)selectedItem=itemKey(list[0]);
   for(const item of list){const card=el('article','workshop-library-card');card.tabIndex=0;card.classList.toggle('is-selected',itemKey(item)===selectedItem);card.onclick=e=>{if(e.target.closest('button,summary,details'))return;selectedItem=itemKey(item);renderLibrary();};card.onkeydown=e=>{if(e.key==='Enter'&&e.target===card){selectedItem=itemKey(item);renderLibrary();}};
-   const info=el('div','workshop-library-info');info.append(el('span','workshop-item-kind',({design:'Dise\xF1o editable',prepared:'Trabajo preparado',template:'Plantilla de posicionamiento'})[item.kind]),el('h2','',item.name),el('p','workshop-card-meta',\`\${item.state.width} \xD7 \${item.state.depth} \xD7 \${item.state.height} mm \xB7 \${item.state.thickness} mm \${item.state.texture==='mdf'||!item.state.texture?'MDF':item.state.texture}\`),el('p','workshop-card-time','Modificado '+ago(item.updated)));
+   const info=el('div','workshop-library-info');if(item.kind==='file')info.append(el('span','workshop-item-kind',(item.source?.type==='image'?'Imagen':'SVG')+' \xB7 '+(item.opsSummary||[]).filter(o=>o.enabled!==false).length+' operaciones'),el('h2','',item.name),el('p','workshop-card-meta',(item.dims?\`\${item.dims.width} \xD7 \${item.dims.height} mm \xB7 \`:'')+whereLabel(item)),el('p','workshop-card-time',(item.trashed?'Eliminado ':'Modificado ')+ago(item.trashed?item.deletedAt:item.updated)));else info.append(el('span','workshop-item-kind',item.trashed?'En la papelera':({design:'Dise\xF1o editable',prepared:'Trabajo preparado',template:'Plantilla de posicionamiento'})[item.kind]),el('h2','',item.name),el('p','workshop-card-meta',\`\${item.state.width} \xD7 \${item.state.depth} \xD7 \${item.state.height} mm \xB7 \${item.state.thickness} mm \${item.state.texture==='mdf'||!item.state.texture?'MDF':item.state.texture}\`),el('p','workshop-card-time','Modificado '+ago(item.updated)));
    if(item.requiresReference)info.append(el('p','workshop-reference-note','Requiere establecer referencias f\xEDsicas.'));
-   const actions=el('div','workshop-library-card-actions');actions.append(button('Abrir',()=>openItem(item),'btn primary'),menuFor(item));card.append(thumbFor(item),info,actions);grid.append(card);
+   const actions=el('div','workshop-library-card-actions');if(item.trashed)actions.append(menuFor(item));else actions.append(button('Abrir',()=>openItem(item),'btn primary'),menuFor(item));card.append(thumbFor(item),info,actions);grid.append(card);
   }
   renderDetail(list.find(i=>itemKey(i)===selectedItem));
  }
- function openItem(item){if(machine.busy)return app.toast('Hay una operaci\xF3n de m\xE1quina activa. Espera para cargar otro trabajo.');try{app.loadDesign(item.state,item.kind==='design'?item.id:null);if(item.kind!=='design'){machine.restoreSettings(item.settings);machine.restoreReferencePoints(item.references||[]);}show(item.kind==='design'?'design':'prepare');app.toast(item.kind==='template'?'Plantilla cargada. Establece sus referencias en Operar m\xE1quina.':'Trabajo cargado.');}catch(e){app.toast(e.message);}}
- function duplicate(item){try{if(item.kind==='design'){const copy={...structuredClone(item),id:crypto.randomUUID(),updated:new Date().toISOString()};copy.state.name=(item.name+' (copia)').slice(0,80);delete copy.kind;delete copy.name;if(!app.putStorage('lzbox-projects',[copy,...app.designs()]))return;}else{const copy={...structuredClone(item),id:crypto.randomUUID(),name:(item.name+' (copia)').slice(0,80),updated:new Date().toISOString()};writeWorkshop(storage,[copy,...readWorkshop(storage)]);}renderLibrary();app.toast('Copia guardada.');}catch(e){app.toast(e.message);}}
- function remove(item){try{const before=item.kind==='design'?app.designs():readWorkshop(storage),after=before.filter(p=>p.id!==item.id);if(item.kind==='design'){if(!app.putStorage('lzbox-projects',after))return;}else writeWorkshop(storage,after);renderLibrary();const undo=$('workshopLibraryUndo');undo.hidden=false;undo.replaceChildren(el('span','',\`\xAB\${item.name}\xBB eliminado. \`),button('Deshacer',()=>{try{const now=item.kind==='design'?app.designs():readWorkshop(storage);if(!now.some(p=>p.id===item.id)){if(item.kind==='design')app.putStorage('lzbox-projects',[item,...now]);else writeWorkshop(storage,[item,...now]);}undo.hidden=true;renderLibrary();}catch(e){app.toast(e.message);}}));}catch(e){app.toast(e.message);}}
+ function openItem(item){if(machine.busy)return app.toast('Hay una operaci\xF3n de m\xE1quina activa. Espera para cargar otro trabajo.');if(item.kind==='file'){studio.openSaved(item.id).then(()=>{show('operate');app.toast('Trabajo abierto. Revisa cama, colocaci\xF3n y origen; nada se env\xEDa hasta que lo inicies.');}).catch(e=>app.toast(e.message));return;}try{studio.setSource('box',{silent:true});app.loadDesign(item.state,item.kind==='design'?item.id:null);if(item.kind!=='design'){machine.restoreSettings(item.settings);machine.restoreReferencePoints(item.references||[]);}show(item.kind==='design'?'design':'prepare');app.toast(item.kind==='template'?'Plantilla cargada. Establece sus referencias en Operar m\xE1quina.':'Trabajo cargado.');}catch(e){app.toast(e.message);}}
+ function duplicate(item){if(item.kind==='file'){studio.library.duplicate(item.id).then(()=>{renderLibrary();app.toast('Copia guardada.');}).catch(e=>app.toast(e.message));return;}try{if(item.kind==='design'){const copy={...structuredClone(item),id:crypto.randomUUID(),updated:new Date().toISOString()};copy.state.name=(item.name+' (copia)').slice(0,80);delete copy.kind;delete copy.name;if(!app.putStorage('lzbox-projects',[copy,...app.designs()]))return;}else{const copy={...structuredClone(item),id:crypto.randomUUID(),name:(item.name+' (copia)').slice(0,80),updated:new Date().toISOString()};writeWorkshop(storage,[copy,...readWorkshop(storage)]);}renderLibrary();app.toast('Copia guardada.');}catch(e){app.toast(e.message);}}
+ function remove(item){if(item.kind==='file'){studio.library.remove(item.id).then(()=>{renderLibrary();showUndo(item,()=>studio.library.restore(item.id).then(renderLibrary));}).catch(e=>app.toast(e.message));return;}try{writeTrash([{item,deletedAt:new Date().toISOString()},...readTrash().filter(t=>t.item.id!==item.id)]);const before=item.kind==='design'?app.designs():readWorkshop(storage),after=before.filter(p=>p.id!==item.id);if(item.kind==='design'){if(!app.putStorage('lzbox-projects',after))return;}else writeWorkshop(storage,after);renderLibrary();const undo=$('workshopLibraryUndo');undo.hidden=false;undo.replaceChildren(el('span','',\`\xAB\${item.name}\xBB eliminado. \`),button('Deshacer',()=>{try{writeTrash(readTrash().filter(t=>t.item.id!==item.id));const now=item.kind==='design'?app.designs():readWorkshop(storage);if(!now.some(p=>p.id===item.id)){if(item.kind==='design')app.putStorage('lzbox-projects',[item,...now]);else writeWorkshop(storage,[item,...now]);}undo.hidden=true;renderLibrary();}catch(e){app.toast(e.message);}}));}catch(e){app.toast(e.message);}}
+ function showUndo(item,fn){const undo=$('workshopLibraryUndo');undo.hidden=false;undo.replaceChildren(el('span','',\`\xAB\${item.name}\xBB enviado a la papelera. \`),button('Deshacer',()=>{undo.hidden=true;Promise.resolve(fn()).catch(e=>app.toast(e.message));}));}
+ function restoreItem(item){if(item.kind==='file'){studio.library.restore(item.id).then(()=>{renderLibrary();app.toast('Restaurado.');}).catch(e=>app.toast(e.message));return;}try{const t=readTrash().find(x=>x.item.id===item.id);if(!t)throw Error('Ya no est\xE1 en la papelera.');const clean={...t.item};delete clean.deletedAt;delete clean.trashed;if(clean.kind==='design'){const copy={...clean};delete copy.kind;delete copy.name;if(!app.designs().some(p=>p.id===copy.id))app.putStorage('lzbox-projects',[copy,...app.designs()]);}else if(!readWorkshop(storage).some(p=>p.id===clean.id))writeWorkshop(storage,[clean,...readWorkshop(storage)]);writeTrash(readTrash().filter(x=>x.item.id!==item.id));renderLibrary();app.toast('Restaurado.');}catch(e){app.toast(e.message);}}
  function exportLibrary(){const blob=new Blob([JSON.stringify({app:'LZ Box Workshop',version:1,designs:app.designs(),workshop:readWorkshop(storage)},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='LZ-Box-biblioteca.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
  app.onUpdate(update);document.addEventListener('storage',()=>{if(current==='library')renderLibrary();});
  // Saved designs can change without a geometry update (save and rename).
  for(const id of ['confirmSave','saveCopy'])$(id)?.addEventListener('click',()=>{if(current==='library')renderLibrary();});
- document.body.classList.remove('box-booting');document.querySelector('.box-loading')?.remove();app.workshop={show,get space(){return current;},savePreparation};applyLayout();show(spaces.some(s=>s[0]===preferences.space)?preferences.space:'design');update();if(new URLSearchParams(document.location.search).get('celular')==='1'){show('operate');remote.open();}return app.workshop;
+ document.body.classList.remove('box-booting');document.querySelector('.box-loading')?.remove();const findBox=id=>boxItems().find(i=>i.id===id)||readTrash().map(t=>t.item).find(i=>i.id===id);
+ const libraryApi={items:()=>boxItems(),trash:()=>readTrash(),open:async id=>{const i=findBox(id);if(!i)throw Error('Elemento inexistente.');openItem(i);},duplicate:async id=>{const i=findBox(id);if(!i)throw Error('Elemento inexistente.');duplicate(i);},rename:async (id,name)=>{const i=findBox(id);name=String(name||'').trim().slice(0,80);if(!i||!name)throw Error('Nombre inv\xE1lido.');if(i.kind==='design'){const all=app.designs().map(p=>p.id===id?{...p,updated:new Date().toISOString(),state:{...p.state,name}}:p);app.putStorage('lzbox-projects',all);}else writeWorkshop(storage,readWorkshop(storage).map(p=>p.id===id?{...p,name,updated:new Date().toISOString()}:p));renderLibrary();},delete:async id=>{const i=findBox(id);if(!i)throw Error('Elemento inexistente.');remove(i);},restore:async id=>{const t=readTrash().find(x=>x.item.id===id);if(!t)throw Error('Ya no est\xE1 en la papelera.');restoreItem({...t.item,trashed:true});}};
+ app.workshop={show,get space(){return current;},savePreparation,libraryApi,refreshLibrary:()=>{if(current==='library')renderLibrary();},boxTrash:readTrash};applyLayout();show(spaces.some(s=>s[0]===preferences.space)?preferences.space:'design');update();if(new URLSearchParams(document.location.search).get('celular')==='1'){show('operate');remote.open();}return app.workshop;
 }
 if(typeof document!=='undefined'){
  if(globalThis.lzApp)mountWorkshop(globalThis.lzApp);else{let count=0;const timer=setInterval(()=>{if(globalThis.lzApp||++count>200){clearInterval(timer);if(globalThis.lzApp)mountWorkshop(globalThis.lzApp);}},25);}
@@ -9456,4 +11351,4 @@ export function setupViewport({wrap,controls,editable=false,canPan=()=>false,isP
 }
 `,type:"text/javascript; charset=utf-8",public:!1},"/worker.js":{body:`import {processPixels} from './processor.js';
 self.onmessage=({data:m})=>{try{const pixels=new Uint8ClampedArray(m.buffer);processPixels(pixels,m.width,m.height,m.params,m.pixelsPerCm,m.offsetX||0,m.offsetY||0);self.postMessage({buffer:pixels.buffer},[pixels.buffer]);}catch(e){self.postMessage({error:e.message});}};
-`,type:"text/javascript; charset=utf-8",public:!1}},p=Object.freeze({supabaseUrl:"https://mmqqfeywxvlwzmxsbxic.supabase.co",publishableKey:"sb_publishable_2Tp3tasLtQze6B2Ac9IQCw_zRwueNWd",googleEnabled:!1,enforceToolAccess:!0});async function E(a,{fetchUpstream:n,verify:h,token:d}){let e=(r,c=200)=>Response.json(r,{status:c,headers:{"Cache-Control":"private, no-store","Referrer-Policy":"no-referrer","X-Content-Type-Options":"nosniff"}});if(a.method!=="POST")return e({message:"Metodo no permitido."},405);if(a.headers.get("Origin")!==new URL(a.url).origin)return e({message:"Solicitud no permitida."},403);if(!a.headers.get("Content-Type")?.startsWith("application/json"))return e({message:"Solicitud invalida."},415);if(Number(a.headers.get("Content-Length")||0)>4e4)return e({message:"Solicitud demasiado grande."},413);let i=await a.text();if(i.length>4e4)return e({message:"Solicitud demasiado grande."},413);let t;try{t=JSON.parse(i)}catch{return e({message:"Solicitud invalida."},400)}if(!t||!["create","poll","remove","offer","answer"].includes(t.action)||typeof t.session!="string"||!/^[0-9a-f-]{36}$/i.test(t.session))return e({message:"Emparejamiento invalido."},400);let s=["create","poll","remove"].includes(t.action);if(s){let r=await h(d);if(!r||r.blocked)return e({message:"Inicia sesion para emparejar."},401)}if((!s||t.action==="create")&&(typeof t.secret!="string"||!/^[a-f0-9]{64}$/.test(t.secret)))return e({message:"QR invalido."},400);if(["create","answer"].includes(t.action)&&(typeof t.sdp!="string"||!t.sdp.length||new TextEncoder().encode(t.sdp).length>3e4))return e({message:"Enlace invalido."},400);if(!s&&(typeof t.claim!="string"||!/^[0-9a-f-]{36}$/i.test(t.claim)))return e({message:"Celular invalido."},400);let o=await n(p.supabaseUrl+"/rest/v1/rpc/lz_box_pair_exchange",{method:"POST",headers:{apikey:p.publishableKey,...s?{Authorization:"Bearer "+d}:{},"Content-Type":"application/json"},body:JSON.stringify({p_action:t.action,p_id:t.session,p_secret:t.secret||null,p_sdp:t.sdp||null,p_claim:t.claim||null})});if(!o.ok){let r;try{r=await o.json()}catch{}return e({message:r?.message?.match(/^(El QR|Emparejamiento|Este QR|Respuesta de enlace|Espera dos|Inicia sesion)/)?r.message:"No se pudo completar el emparejamiento. Genera otro QR."},o.status===401||o.status===403?403:409)}return e(await o.json())}var g="__Host-lz_session",m={"Cache-Control":"private, no-store","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","Cross-Origin-Opener-Policy":"same-origin","Cross-Origin-Embedder-Policy":"credentialless"},l=(a,n=200,h={})=>new Response(JSON.stringify(a),{status:n,headers:{...m,"Content-Type":"application/json",...h}});function f(a,n){return`${g}=${a||""}; Path=/; HttpOnly; Secure; SameSite=Lax; ${n===null?"":"Max-Age="+n}`}function v(a){return a.headers.get("Cookie")?.split(";").map(n=>n.trim()).find(n=>n.startsWith(g+"="))?.slice(g.length+1)||null}var y={crop:"/crop.html",editor:"/editor.html",recolor:"/editor.html?tool=recolor",opacity:"/opacity.html",thickness:"/thickness.html",texture:"/textures.html",text:"/text-creator.html",mockups:"/mockups.html",vectorize:"/vectorize.html",analyzer:"/analyzer.html",sheet:"/gang-sheet.html",color:"/color-enhance.html",upscale:"/upscale.html",extract:"/extract.html"};function x(a){return a.pathname==="/premium.html"?"editor":a.pathname==="/editor.html"?a.searchParams.get("tool")==="recolor"?"recolor":"editor":Object.keys(y).find(n=>y[n]===a.pathname)}function M(a,n){let h=new Set(n.filter(e=>e.enabled).map(e=>e.id)),d=e=>{let i=x(new URL(e,"https://local.test"));return!i||h.has(i)};return a.replace(/<article\b[^>]*class="tool-card"[^>]*>[\s\S]*?<\/article>/g,e=>{let i=e.match(/class="open-tool" href="([^"]+)"/);return i&&!d(i[1])?"":e}).replace(/<a\b[^>]*href="([^"]+)"[^>]*>[\s\S]*?<\/a>/g,(e,i)=>d(i)?e:"")}function A({assets:a,fetchUpstream:n=fetch}={}){async function h(){let e=await n(p.supabaseUrl+"/rest/v1/lz_tools?select=id,name,enabled",{headers:{apikey:p.publishableKey,Authorization:"Bearer "+p.publishableKey}});if(!e.ok)throw new Error("No se pudo consultar las herramientas.");return e.json()}async function d(e,i=!1){if(!e||e.length>8192||!/^[A-Za-z0-9_.-]+$/.test(e))return null;let t=p.supabaseUrl,s={apikey:p.publishableKey,Authorization:"Bearer "+e},o=await n(t+"/auth/v1/user",{headers:s});if(o.status===401||o.status===403)return null;if(!o.ok)throw new Error("No se pudo verificar la sesi\xF3n.");let r=await o.json();if(!r.id)return null;if(i&&!(await n(t+"/rest/v1/rpc/lz_ensure_profile",{method:"POST",headers:{...s,"Content-Type":"application/json"},body:"{}"})).ok)throw new Error("No se pudo crear tu perfil.");let c=await n(t+"/rest/v1/lz_profiles?id=eq."+encodeURIComponent(r.id)+"&select=id,blocked",{headers:s});if(!c.ok)throw new Error("No se pudo verificar tu cuenta.");let u=await c.json();return u[0]?{user:r,blocked:u[0].blocked}:null}return{async fetch(e){let i=new URL(e.url),t;try{t=decodeURIComponent(i.pathname)}catch{return l({message:"Ruta inv\xE1lida."},400)}if(t.includes("\\")||t.includes("\0")||t.split("/").some(s=>s===".."))return l({message:"Ruta inv\xE1lida."},400);t==="/"&&(t="/index.html");try{if(t==="/api/box/pair")return await E(e,{fetchUpstream:n,verify:d,token:v(e)});if(t==="/api/account/session"){if(e.method!=="POST")return l({message:"M\xE9todo no permitido."},405);if(e.headers.get("Origin")!==i.origin)return l({message:"Solicitud no permitida."},403);if(!e.headers.get("Content-Type")?.startsWith("application/json"))return l({message:"Solicitud inv\xE1lida."},415);if(Number(e.headers.get("Content-Length")||0)>1e4)return l({message:"Solicitud demasiado grande."},413);let r=await e.text();if(r.length>1e4)return l({message:"Solicitud demasiado grande."},413);let c;try{c=JSON.parse(r)}catch{return l({message:"Solicitud inv\xE1lida."},400)}if(c.access_token===null)return l({ok:!0},200,{"Set-Cookie":f(null,0)});let u=typeof c.access_token=="string"?c.access_token:null,b=await d(u,!0);return b?b.blocked?l({message:"Tu cuenta est\xE1 suspendida. Comun\xEDcate con el administrador."},403,{"Set-Cookie":f(null,0)}):l({ok:!0},200,{"Set-Cookie":f(u,c.remember===!1?null:3600)}):l({message:"Inicia sesi\xF3n para continuar."},401,{"Set-Cookie":f(null,0)})}if(t==="/box"||t==="/box/")return["GET","HEAD"].includes(e.method)?new Response(null,{status:307,headers:{...m,Location:"/box/index.html"+i.search}}):l({message:"M\xE9todo no permitido."},405);let s=a[t];if(!s)return new Response("No encontrado",{status:404,headers:m});if(!["GET","HEAD"].includes(e.method))return l({message:"M\xE9todo no permitido."},405);if(!s.public){let r=await d(v(e));if(!r||r.blocked){if(s.type.startsWith("text/html")){let c=t.slice(1)+i.search;return new Response(null,{status:303,headers:{...m,Location:"/account.html?return="+encodeURIComponent(c),"Set-Cookie":f(null,0)}})}return l({message:r?.blocked?"Cuenta suspendida.":"Inicia sesi\xF3n para usar las herramientas."},r?.blocked?403:401)}}let o=s.body;if(s.type.startsWith("text/html")&&t!=="/account.html"){let r=await h(),c=x(i);if(c&&!r.some(u=>u.id===c&&u.enabled))return new Response('<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Herramienta desactivada</title><link rel="stylesheet" href="account.css"><body class="account-body"><main class="account-main"><h1>Herramienta desactivada</h1><p>El administrador ha desactivado esta herramienta.</p><a class="account-primary" href="/index.html">Ver herramientas disponibles</a></main></body></html>',{status:403,headers:{...m,"Content-Type":"text/html; charset=utf-8"}});o=M(o,r),t==="/editor.html"&&!r.some(u=>u.id==="recolor"&&u.enabled)&&(o=o.replace("<body",'<body data-recolor-disabled="true"'))}return new Response(e.method==="HEAD"?null:o,{headers:{...m,"Content-Type":s.type}})}catch{return l({message:"No pudimos verificar el acceso. Intenta de nuevo en unos momentos."},503)}}}}var w=A({assets:S});function k(a){let n=new URL(a.url),h=n.searchParams.getAll("__lz_path");if(h.length){let d=h.at(-1);return n.pathname="/"+d.replace(/^\/+/,""),n.searchParams.delete("__lz_path"),n.searchParams.get("path")===d&&n.searchParams.delete("path"),new Request(n,a)}return a}function _(a){return{fetch(n){return a.fetch(k(n))}}}var L=_(w);export{L as default};
+`,type:"text/javascript; charset=utf-8",public:!1}},h=Object.freeze({supabaseUrl:"https://mmqqfeywxvlwzmxsbxic.supabase.co",publishableKey:"sb_publishable_2Tp3tasLtQze6B2Ac9IQCw_zRwueNWd",googleEnabled:!1,enforceToolAccess:!0});async function M(n,{fetchUpstream:a,verify:p,token:c}){let e=(r,i=200)=>Response.json(r,{status:i,headers:{"Cache-Control":"private, no-store","Referrer-Policy":"no-referrer","X-Content-Type-Options":"nosniff"}});if(n.method!=="POST")return e({message:"Metodo no permitido."},405);if(n.headers.get("Origin")!==new URL(n.url).origin)return e({message:"Solicitud no permitida."},403);if(!n.headers.get("Content-Type")?.startsWith("application/json"))return e({message:"Solicitud invalida."},415);if(Number(n.headers.get("Content-Length")||0)>4e4)return e({message:"Solicitud demasiado grande."},413);let s=await n.text();if(s.length>4e4)return e({message:"Solicitud demasiado grande."},413);let t;try{t=JSON.parse(s)}catch{return e({message:"Solicitud invalida."},400)}if(!t||!["create","poll","remove","offer","answer"].includes(t.action)||typeof t.session!="string"||!/^[0-9a-f-]{36}$/i.test(t.session))return e({message:"Emparejamiento invalido."},400);let o=["create","poll","remove"].includes(t.action);if(o){let r=await p(c);if(!r||r.blocked)return e({message:"Inicia sesion para emparejar."},401)}if((!o||t.action==="create")&&(typeof t.secret!="string"||!/^[a-f0-9]{64}$/.test(t.secret)))return e({message:"QR invalido."},400);if(["create","answer"].includes(t.action)&&(typeof t.sdp!="string"||!t.sdp.length||new TextEncoder().encode(t.sdp).length>3e4))return e({message:"Enlace invalido."},400);if(!o&&(typeof t.claim!="string"||!/^[0-9a-f-]{36}$/i.test(t.claim)))return e({message:"Celular invalido."},400);let l=await a(h.supabaseUrl+"/rest/v1/rpc/lz_box_pair_exchange",{method:"POST",headers:{apikey:h.publishableKey,...o?{Authorization:"Bearer "+c}:{},"Content-Type":"application/json"},body:JSON.stringify({p_action:t.action,p_id:t.session,p_secret:t.secret||null,p_sdp:t.sdp||null,p_claim:t.claim||null})});if(!l.ok){let r;try{r=await l.json()}catch{}return e({message:r?.message?.match(/^(El QR|Emparejamiento|Este QR|Respuesta de enlace|Espera dos|Inicia sesion)/)?r.message:"No se pudo completar el emparejamiento. Genera otro QR."},l.status===401||l.status===403?403:409)}return e(await l.json())}var y=38e5;async function A(n,{fetchUpstream:a,verify:p,token:c}){let e=(i,u=200)=>Response.json(i,{status:u,headers:{"Cache-Control":"private, no-store","Referrer-Policy":"no-referrer","X-Content-Type-Options":"nosniff"}});if(n.method!=="POST")return e({message:"Metodo no permitido."},405);if(n.headers.get("Origin")!==new URL(n.url).origin)return e({message:"Solicitud no permitida."},403);if(!n.headers.get("Content-Type")?.startsWith("application/json"))return e({message:"Solicitud invalida."},415);if(Number(n.headers.get("Content-Length")||0)>y)return e({message:"El trabajo es demasiado grande para la biblioteca de la cuenta (m\xE1x. 3.5 MB). Se conserva en esta computadora."},413);let s=await n.text();if(s.length>y)return e({message:"El trabajo es demasiado grande para la biblioteca de la cuenta (m\xE1x. 3.5 MB). Se conserva en esta computadora."},413);let t;try{t=JSON.parse(s)}catch{return e({message:"Solicitud invalida."},400)}if(!t||!["list","get","put","rename","delete","restore","purge"].includes(t.action))return e({message:"Accion invalida."},400);if(t.action!=="list"&&(typeof t.id!="string"||!/^[0-9a-f-]{36}$/i.test(t.id)))return e({message:"Elemento invalido."},400);if(t.action==="put"&&(!t.item||typeof t.item!="object"||!["file","prepared","template"].includes(t.item.kind)||typeof t.item.name!="string"||!Number.isInteger(t.item.format)))return e({message:"Elemento invalido."},400);let o=await p(c);if(!o||o.blocked)return e({message:"Inicia sesi\xF3n para sincronizar la biblioteca con tu cuenta."},401);let l=t.action==="put"?t.item:t.action==="rename"?{name:String(t.name||"")}:null,r=await a(h.supabaseUrl+"/rest/v1/rpc/lz_box_library",{method:"POST",headers:{apikey:h.publishableKey,Authorization:"Bearer "+c,"Content-Type":"application/json"},body:JSON.stringify({p_action:t.action,p_id:t.id||null,p_item:l})});if(!r.ok){let i;try{i=await r.json()}catch{}return r.status===404||i?.code==="PGRST202"?e({message:"La biblioteca de la cuenta a\xFAn no est\xE1 activada en el servidor. Los trabajos se guardan en esta computadora.",code:"not-enabled"},503):e({message:i?.message?.match(/^(Inicia sesion|Elemento|El elemento|Este trabajo|La biblioteca|Nombre|Primero|Accion)/)?i.message:"No se pudo completar la operaci\xF3n en la biblioteca de la cuenta."},r.status===401||r.status===403?403:409)}return e(await r.json())}var b="__Host-lz_session",m={"Cache-Control":"private, no-store","X-Content-Type-Options":"nosniff","Referrer-Policy":"no-referrer","Cross-Origin-Opener-Policy":"same-origin","Cross-Origin-Embedder-Policy":"credentialless"},d=(n,a=200,p={})=>new Response(JSON.stringify(n),{status:a,headers:{...m,"Content-Type":"application/json",...p}});function f(n,a){return`${b}=${n||""}; Path=/; HttpOnly; Secure; SameSite=Lax; ${a===null?"":"Max-Age="+a}`}function g(n){return n.headers.get("Cookie")?.split(";").map(a=>a.trim()).find(a=>a.startsWith(b+"="))?.slice(b.length+1)||null}var x={crop:"/crop.html",editor:"/editor.html",recolor:"/editor.html?tool=recolor",opacity:"/opacity.html",thickness:"/thickness.html",texture:"/textures.html",text:"/text-creator.html",mockups:"/mockups.html",vectorize:"/vectorize.html",analyzer:"/analyzer.html",sheet:"/gang-sheet.html",color:"/color-enhance.html",upscale:"/upscale.html",extract:"/extract.html"};function w(n){return n.pathname==="/premium.html"?"editor":n.pathname==="/editor.html"?n.searchParams.get("tool")==="recolor"?"recolor":"editor":Object.keys(x).find(a=>x[a]===n.pathname)}function k(n,a){let p=new Set(a.filter(e=>e.enabled).map(e=>e.id)),c=e=>{let s=w(new URL(e,"https://local.test"));return!s||p.has(s)};return n.replace(/<article\b[^>]*class="tool-card"[^>]*>[\s\S]*?<\/article>/g,e=>{let s=e.match(/class="open-tool" href="([^"]+)"/);return s&&!c(s[1])?"":e}).replace(/<a\b[^>]*href="([^"]+)"[^>]*>[\s\S]*?<\/a>/g,(e,s)=>c(s)?e:"")}function C({assets:n,fetchUpstream:a=fetch}={}){async function p(){let e=await a(h.supabaseUrl+"/rest/v1/lz_tools?select=id,name,enabled",{headers:{apikey:h.publishableKey,Authorization:"Bearer "+h.publishableKey}});if(!e.ok)throw new Error("No se pudo consultar las herramientas.");return e.json()}async function c(e,s=!1){if(!e||e.length>8192||!/^[A-Za-z0-9_.-]+$/.test(e))return null;let t=h.supabaseUrl,o={apikey:h.publishableKey,Authorization:"Bearer "+e},l=await a(t+"/auth/v1/user",{headers:o});if(l.status===401||l.status===403)return null;if(!l.ok)throw new Error("No se pudo verificar la sesi\xF3n.");let r=await l.json();if(!r.id)return null;if(s&&!(await a(t+"/rest/v1/rpc/lz_ensure_profile",{method:"POST",headers:{...o,"Content-Type":"application/json"},body:"{}"})).ok)throw new Error("No se pudo crear tu perfil.");let i=await a(t+"/rest/v1/lz_profiles?id=eq."+encodeURIComponent(r.id)+"&select=id,blocked",{headers:o});if(!i.ok)throw new Error("No se pudo verificar tu cuenta.");let u=await i.json();return u[0]?{user:r,blocked:u[0].blocked}:null}return{async fetch(e){let s=new URL(e.url),t;try{t=decodeURIComponent(s.pathname)}catch{return d({message:"Ruta inv\xE1lida."},400)}if(t.includes("\\")||t.includes("\0")||t.split("/").some(o=>o===".."))return d({message:"Ruta inv\xE1lida."},400);t==="/"&&(t="/index.html");try{if(t==="/api/box/pair")return await M(e,{fetchUpstream:a,verify:c,token:g(e)});if(t==="/api/box/library")return await A(e,{fetchUpstream:a,verify:c,token:g(e)});if(t==="/api/account/session"){if(e.method!=="POST")return d({message:"M\xE9todo no permitido."},405);if(e.headers.get("Origin")!==s.origin)return d({message:"Solicitud no permitida."},403);if(!e.headers.get("Content-Type")?.startsWith("application/json"))return d({message:"Solicitud inv\xE1lida."},415);if(Number(e.headers.get("Content-Length")||0)>1e4)return d({message:"Solicitud demasiado grande."},413);let r=await e.text();if(r.length>1e4)return d({message:"Solicitud demasiado grande."},413);let i;try{i=JSON.parse(r)}catch{return d({message:"Solicitud inv\xE1lida."},400)}if(i.access_token===null)return d({ok:!0},200,{"Set-Cookie":f(null,0)});let u=typeof i.access_token=="string"?i.access_token:null,v=await c(u,!0);return v?v.blocked?d({message:"Tu cuenta est\xE1 suspendida. Comun\xEDcate con el administrador."},403,{"Set-Cookie":f(null,0)}):d({ok:!0},200,{"Set-Cookie":f(u,i.remember===!1?null:3600)}):d({message:"Inicia sesi\xF3n para continuar."},401,{"Set-Cookie":f(null,0)})}if(t==="/box"||t==="/box/")return["GET","HEAD"].includes(e.method)?new Response(null,{status:307,headers:{...m,Location:"/box/index.html"+s.search}}):d({message:"M\xE9todo no permitido."},405);let o=n[t];if(!o)return new Response("No encontrado",{status:404,headers:m});if(!["GET","HEAD"].includes(e.method))return d({message:"M\xE9todo no permitido."},405);if(!o.public){let r=await c(g(e));if(!r||r.blocked){if(o.type.startsWith("text/html")){let i=t.slice(1)+s.search;return new Response(null,{status:303,headers:{...m,Location:"/account.html?return="+encodeURIComponent(i),"Set-Cookie":f(null,0)}})}return d({message:r?.blocked?"Cuenta suspendida.":"Inicia sesi\xF3n para usar las herramientas."},r?.blocked?403:401)}}let l=o.body;if(o.type.startsWith("text/html")&&t!=="/account.html"){let r=await p(),i=w(s);if(i&&!r.some(u=>u.id===i&&u.enabled))return new Response('<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Herramienta desactivada</title><link rel="stylesheet" href="account.css"><body class="account-body"><main class="account-main"><h1>Herramienta desactivada</h1><p>El administrador ha desactivado esta herramienta.</p><a class="account-primary" href="/index.html">Ver herramientas disponibles</a></main></body></html>',{status:403,headers:{...m,"Content-Type":"text/html; charset=utf-8"}});l=k(l,r),t==="/editor.html"&&!r.some(u=>u.id==="recolor"&&u.enabled)&&(l=l.replace("<body",'<body data-recolor-disabled="true"'))}return new Response(e.method==="HEAD"?null:l,{headers:{...m,"Content-Type":o.type}})}catch{return d({message:"No pudimos verificar el acceso. Intenta de nuevo en unos momentos."},503)}}}}var _=C({assets:E});function T(n){let a=new URL(n.url),p=a.searchParams.getAll("__lz_path");if(p.length){let c=p.at(-1);return a.pathname="/"+c.replace(/^\/+/,""),a.searchParams.delete("__lz_path"),a.searchParams.get("path")===c&&a.searchParams.delete("path"),new Request(a,n)}return n}function S(n){return{fetch(a){return n.fetch(T(a))}}}var $=S(_);export{$ as default};

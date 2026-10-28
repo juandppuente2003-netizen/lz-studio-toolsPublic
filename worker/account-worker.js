@@ -1,5 +1,6 @@
 import {AUTH_CONFIG} from '../web/auth-config.js';
 import {boxPairing} from './box-pairing.js';
+import {boxLibrary} from './box-library.js';
 const COOKIE='__Host-lz_session';
 // Cross-origin isolation lets the image AI use several CPU threads (SharedArrayBuffer).
 // `credentialless` keeps Google Fonts and other public resources loading without CORP headers;
@@ -29,6 +30,7 @@ export function createHandler({assets,fetchUpstream=fetch}={}){
   const url=new URL(request.url);let path;try{path=decodeURIComponent(url.pathname);}catch{return json({message:'Ruta inválida.'},400);}if(path.includes('\\')||path.includes('\0')||path.split('/').some(s=>s==='..'))return json({message:'Ruta inválida.'},400);if(path==='/')path='/index.html';
   try{
    if(path==='/api/box/pair')return await boxPairing(request,{fetchUpstream,verify,token:tokenFrom(request)});
+   if(path==='/api/box/library')return await boxLibrary(request,{fetchUpstream,verify,token:tokenFrom(request)});
    if(path==='/api/account/session'){
     if(request.method!=='POST')return json({message:'Método no permitido.'},405);
     if(request.headers.get('Origin')!==url.origin)return json({message:'Solicitud no permitida.'},403);

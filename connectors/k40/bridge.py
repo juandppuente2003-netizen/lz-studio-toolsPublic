@@ -18,10 +18,12 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from registration import register_job
+from operations import PROTOCOL_V2, validate_job_v2, bounds_v2, place_v2, summary_v2
 
 PROTOCOL = 'lz-k40-m2/v1'
+BRIDGE_VERSION = '0.7.0'
 ENGINE_VERSION = '0.9.9100'
-MAX_BODY = 4_000_000
+MAX_BODY = 6_000_000
 DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com',
                    'https://lz-studio-tools-d-git-a183ed-juandppuente2003-netizens-projects.vercel.app'}
 
@@ -228,12 +230,19 @@ class M2Engine:
             native = self.device.view.position(origin[0] * UNITS_PER_MM, origin[1] * UNITS_PER_MM)
             driver.native_x, driver.native_y = map(lambda n: int(round(n)), native)
         if mode == 'frame':
-            points = [p for path in job['paths'] for p in path['points']]
-            xs, ys = [p[0] for p in points], [p[1] for p in points]
-            x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+            if job.get('protocol') == PROTOCOL_V2:
+                x0, y0, x1, y1 = bounds_v2(job)
+            else:
+                points = [p for path in job['paths'] for p in path['points']]
+                xs, ys = [p[0] for p in points], [p[1] for p in points]
+                x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
             for x, y in [(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)]:
                 driver.move_abs(x * UNITS_PER_MM, y * UNITS_PER_MM)
             # No LineCut and no laser_on in the frame branch.
+        elif job.get('protocol') == PROTOCOL_V2:
+            self._compile_operations(driver, job)
+            driver.rapid_mode()
+            driver.laser_off()
         else:
             settings = {'speed': job['speed'], 'power': 1000,
                         'raster_step_x': 0, 'raster_step_y': 0}
@@ -255,6 +264,39 @@ class M2Engine:
         if '_start' in job:
             driver.move_abs(origin[0] * UNITS_PER_MM, origin[1] * UNITS_PER_MM)
         return output.getvalue()
+
+    def _compile_operations(self, driver, job):
+        """Operations run in the order received; each keeps its speed and passes."""
+        from meerk40t.core.cutcode.linecut import LineCut
+        from meerk40t.core.cutcode.rastercut import RasterCut
+        from meerk40t.core.units import UNITS_PER_MM
+        for op in job['operations']:
+            if op['type'] == 'vector':
+                settings = {'speed': op['speed'], 'power': 1000,
+                            'raster_step_x': 0, 'raster_step_y': 0}
+                for _ in range(op['passes']):
+                    for path in op['paths']:
+                        points = [self.device.view.position(x * UNITS_PER_MM, y * UNITS_PER_MM)
+                                  for x, y in path['points']]
+                        pairs = list(zip(points, points[1:]))
+                        if path['closed']:
+                            pairs.append((points[-1], points[0]))
+                        for start, end in pairs:
+                            if start != end:
+                                driver.plot(LineCut(start, end, settings=settings))
+                        driver.plot_start()
+            else:
+                r = op['raster']
+                # Horizontal on/off sweeps, one row every `step` native units.
+                settings = {'speed': op['speed'], 'power': 1000,
+                            'raster_step_x': 0, 'raster_step_y': r['step']}
+                ox, oy = [int(round(v)) for v in self.device.view.position(r['x'] * UNITS_PER_MM, r['y'] * UNITS_PER_MM)]
+                for _ in range(op['passes']):
+                    cut = RasterCut(r['image'].copy(), ox, oy, r['step'], r['step'], inverted=False,
+                                    bidirectional=r['bidirectional'], horizontal=True, settings=settings)
+                    driver.plot(cut)
+                    driver.plot_start()
+            driver.rapid_mode()
 
     def compile_motion(self, start, target, home=False):
         from meerk40t.lihuiyu.driver import LihuiyuDriver
@@ -452,11 +494,15 @@ class Bridge:
         self.cleanup_thread = None
         self.session_id = None
         self.pulse_abort = threading.Event()
+        # Last finished operation as reported by the controller: finished/cancelled.
+        self.outcome = None
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': '0.6.4', 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb'],
+                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome'],
+                'jobProtocols': [PROTOCOL, PROTOCOL_V2], 'rasterPower': 'on-off',
+                'outcome': self.outcome,
                 'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog', 'goto', 'frame') and self.position is not None,
                 'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
@@ -489,11 +535,19 @@ class Bridge:
             if mode not in ('cut', 'frame'):
                 raise ValueError('Operación no compatible.')
             self.id, self.payload, self.state = None, b'', 'idle'
-            job = validate_job(raw, self.bed)
+            v2 = isinstance(raw, dict) and raw.get('protocol') == PROTOCOL_V2
+            job = validate_job_v2(raw, self.bed) if v2 else validate_job(raw, self.bed)
             if origin not in ('home', 'current', 'aligned'):
                 raise ValueError('Origen no compatible.')
             start = [0, 0]
-            if origin == 'aligned':
+            if v2 and origin == 'aligned':
+                raise ValueError('La alineación por puntos solo está disponible para diseños Box. Usa Home u origen actual.')
+            if v2 and origin == 'current':
+                if self.position is None:
+                    raise ValueError('Haz Home una vez para establecer la posición antes de usar el origen actual.')
+                start = list(self.position)
+                job = place_v2(job, start, self.bed)
+            elif origin == 'aligned':
                 start = list(self.position) if self.position is not None else [0, 0]
                 job = validate_job(register_job(job, registration, self.session_id, self.position), self.bed)
             elif origin == 'current':
@@ -514,7 +568,9 @@ class Bridge:
             self.id = hashlib.sha256(payload + secrets.token_bytes(32)).hexdigest()
             self.expires = time.monotonic() + 300
             self.state = 'prepared'
-            return {'id': self.id, 'bytes': len(payload), 'mode': mode, **self.info()}
+            self.outcome = None
+            extra = {'operations': summary_v2(job)} if v2 else {}
+            return {'id': self.id, 'bytes': len(payload), 'mode': mode, **extra, **self.info()}
 
     def run(self, job_id, confirmed):
         with self.lock:
@@ -639,6 +695,7 @@ class Bridge:
                 with self.lock:
                     if finished and self.engine is probe and self.state == 'sent':
                         self.position, self.pending_position, self.state = self.pending_position, None, 'idle'
+                        self.outcome = {'operation': self.operation, 'result': 'finished'}
                         self.message = ('Orden de movimiento aceptada. Posición estimada por instrucciones; puedes enviar la siguiente orden. No es una medición de parada física.' if rapid else 'Operación terminada según la controladora. Lista para continuar.')
                         self.id, self.payload = None, b''
             except ConnectionError:
@@ -668,6 +725,7 @@ class Bridge:
                     if not self.simulation:
                         self.engine.rearm()
                     self.state, self.id, self.payload, self.job = 'idle', None, b'', None
+                    self.outcome = {'operation': self.operation, 'result': 'cancelled'}
                     self.message = 'Cancelado. USB conservado; haz Home para volver a referenciar. El trabajo anterior no se puede reanudar.'
                 elif self.engine.usb_failed or not self.engine.connected() or time.monotonic() - self.control_started > 15:
                     self.state, self.message = 'error', 'No llegó confirmación del reset. Usa el paro físico si sigue activa; restablece USB después.'
@@ -765,6 +823,7 @@ class Bridge:
             if confirmed is not True or self.state not in ('sent', 'simulated', 'cancelled', 'error'):
                 raise ValueError('Cancela o espera el envío y verifica que la máquina se detuvo.')
             if self.state in ('sent', 'simulated'):
+                self.outcome = {'operation': self.operation, 'result': 'simulated' if self.state == 'simulated' else 'acknowledged'}
                 self.position = self.pending_position
             else:
                 self.position = None

@@ -455,7 +455,6 @@ function operate(app) {
   if (speed) row('speed', 'Velocidad', speed);
   if (passes) row('passes', 'Pasadas', passes);
   const origin = $('k40Origin');
-  if (origin) { const r = row('target', 'Origen', origin); r.classList.add('neo-job-origin'); const note = $('k40OriginNote'); if (note) job.append(note); }
   find('.k40-job-settings')?.classList.add('neo-emptied');
 
   const usb = $('k40BridgePanel');
@@ -471,7 +470,9 @@ function operate(app) {
   openPhone.onclick = () => remoteButton?.click();
   phone.append(openPhone);
   if (!remoteButton) phone.hidden = true;
-  left.append(job, usbCard, phone);
+  const studio = app.jobStudio;
+  if (studio) left.append(studio.ui.sourceBar, job, studio.ui.panel); else left.append(job, phone);
+  find('.js-host')?.remove();
   const registration = find('.k40-registration');
   if (registration) { registration.classList.add('neo-op-card'); left.append(registration); }
   const power = find('.k40-controls > p.k40-note');
@@ -480,6 +481,7 @@ function operate(app) {
 
   // Columna derecha: mover cabezal.
   const right = el('div', 'neo-op-right');
+  right.append(usbCard);
   // Las columnas entran al documento antes de mover nodos: así getElementById los sigue encontrando.
   const layout = find('.k40-layout');
   layout?.prepend(left);
@@ -520,6 +522,25 @@ function operate(app) {
       jog.querySelector('label[for=k40Step]')?.classList.add('neo-visually-hidden');
       paintSteps();
     }
+    if (origin) {
+      const originCard = el('div', 'neo-origin');
+      originCard.append(el('p', 'neo-sub', 'Origen del trabajo'));
+      const seg = el('div', 'neo-steps neo-origin-seg');
+      seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Origen del trabajo');
+      const paintOrigin = () => { for (const b of seg.children) { const o = origin.querySelector(`option[value="${b.dataset.value}"]`); b.hidden = !o || o.hidden; b.disabled = origin.disabled || !!o?.disabled; b.setAttribute('aria-pressed', String(origin.value === b.dataset.value)); } };
+      for (const [value, label] of [['home', 'Home'], ['current', 'Posición actual'], ['aligned', 'Puntos']]) {
+        const b = el('button', 'neo-step', label); b.type = 'button'; b.dataset.value = value;
+        b.onclick = () => { if (origin.disabled) return; origin.value = value; origin.dispatchEvent(new Event('input', {bubbles: true})); paintOrigin(); };
+        seg.append(b);
+      }
+      origin.classList.add('neo-visually-hidden');
+      originCard.append(seg, origin);
+      const note = $('k40OriginNote'); if (note) originCard.append(note);
+      jog.querySelector('.k40-motion-layout')?.after(originCard);
+      new MutationObserver(paintOrigin).observe(origin, {attributes: true, attributeFilter: ['disabled']});
+      origin.addEventListener('input', paintOrigin); origin.addEventListener('change', paintOrigin);
+      app.onUpdate(paintOrigin); setInterval(paintOrigin, 1000); paintOrigin();
+    }
     withIcon($('k40Home'), 'home');
     withIcon($('k40UsePosition'), 'target');
     withIcon($('k40Goto'), 'target');
@@ -530,6 +551,21 @@ function operate(app) {
   // Centro: plano con encabezado y medidas.
   const canvas = find('.k40-canvas-panel');
   canvas?.classList.add('neo-op-card', 'neo-op-plan');
+  if (studio) {
+    openPhone.className = 'btn outline neo-phone-open'; openPhone.innerHTML = icon('phone') + '<span>Control desde celular</span>';
+    studio.ui.centerBar.append(openPhone);
+  }
+  // Acciones: Recorrer marco · Iniciar · Pausar · Reanudar · Stop (cancela, conserva USB).
+  const runActions = find('.k40-run-actions'), stopB = $('k40Stop'), cancelB = $('k40Cancel'), resumeB = $('k40Resume');
+  if (runActions && stopB && cancelB && resumeB) {
+    stopB.innerHTML = icon('pause') + '<span>Pausar</span>'; stopB.title = 'Pide a la M2 que se detenga conservando la cola para reanudar.';
+    $('k40Run').innerHTML = icon('play') + '<span>Iniciar trabajo</span>';
+    const resumeMirror = el('button', 'btn primary neo-resume-bar'); resumeMirror.type = 'button'; resumeMirror.innerHTML = icon('play') + '<span>Reanudar</span>'; resumeMirror.onclick = () => { if (!resumeB.disabled) resumeB.click(); };
+    cancelB.innerHTML = icon('stop') + '<span>Stop</span>'; cancelB.classList.add('neo-stop-bar'); cancelB.title = 'Detiene y descarta el trabajo. Conserva el USB; después haz Home para volver a referenciar.';
+    runActions.append(resumeMirror, cancelB);
+    const syncResume = () => { resumeMirror.hidden = resumeB.disabled; resumeMirror.disabled = resumeB.disabled; };
+    new MutationObserver(syncResume).observe(resumeB, {attributes: true, attributeFilter: ['disabled']}); syncResume();
+  }
   withIcon($('k40Arrange'), 'layers');
 
   // Consola inferior: estado, tiempo estimado y acciones.
@@ -547,18 +583,18 @@ function operate(app) {
     const summary = $('k40Summary');
     const syncClock = () => {
       const live = time.textContent;
-      if (/restante\s+(\d+)\s*s/.test(live)) { const s = Number(live.match(/restante\s+(\d+)\s*s/)[1]); value.textContent = fmtTime(s); note.textContent = 'Restante · en curso'; return; }
+      if (/restante estimado\s+(\d+)\s*s/.test(live)) { const s = Number(live.match(/restante estimado\s+(\d+)\s*s/)[1]); const e = Number(live.match(/Transcurrido\s+(\d+)/)?.[1] || 0); value.textContent = fmtTime(s); note.textContent = `Restante estimado · transcurrido ${fmtTime(e)} (real)`; return; }
       const est = (summary?.textContent || '').match(/Tiempo\s+m[ií]nimo de corte:\s*([\d.]+)\s*s/i);
-      value.textContent = est ? fmtTime(Number(est[1])) : '—';
-      note.textContent = est ? 'Estimación, más movimientos y aceleraciones.' : 'Sin trabajo preparado.';
+      const imported = (summary?.textContent || '').match(/Tiempo estimado:\s*([^.]+)\./);
+      value.textContent = est ? fmtTime(Number(est[1])) : imported ? '≈ ' + imported[1] : '—';
+      note.textContent = est ? 'Estimación, más movimientos y aceleraciones.' : imported ? 'Estimación de barridos y trayectorias.' : 'Sin trabajo preparado.';
     };
     for (const node of [time, summary].filter(Boolean)) new MutationObserver(syncClock).observe(node, {childList: true, characterData: true, subtree: true});
     syncClock();
   }
   withIcon($('k40Frame'), 'frame');
-  withIcon($('k40Run'), 'play');
   withIcon($('k40Resume'), 'play');
-  withIcon($('k40Cancel'), 'stop');
+  studio?.setSource(studio.state.source, {silent: true});
 
 
   // Material y nombre del trabajo; estado de conexión en la tarjeta USB.
