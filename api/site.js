@@ -1295,7 +1295,7 @@ export class JobLibrary {
    - Los SVG importados se cortan sobre la l\xEDnea dibujada: no se aplica kerf.
    La generaci\xF3n de instrucciones M2 la hace el conector local. */
 import {optimizeCuts, verifyOptimization} from './cut-optimizer.js?v=3.5';
-import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=1';
+import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=2';
 
 export const K40_PROTOCOL_V2 = 'lz-k40-m2/v2';
 export const NATIVE_MM = 0.0254;
@@ -1436,22 +1436,32 @@ function rasterItems(design, operation, assignment) {
     if (e.stroke && assignment['stroke:' + e.stroke.color] === operation.id) shapes.push({element: e, mode: 'stroke'});
   }
   if (assignment.image === operation.id) images.push(...design.images);
-  return {shapes, images};
+  // Orden del documento: lo que est\xE1 encima tapa lo de abajo (un blanco encima \xABborra\xBB).
+  const ordered = [...shapes.map((s) => ({...s, z: s.element.z ?? 0, sub: s.mode === 'stroke' ? 0.5 : 0})), ...images.map((image) => ({mode: 'image', image, z: image.z ?? 0, sub: 0}))].sort((a, b) => a.z - b.z || a.sub - b.sub);
+  return {shapes, images, ordered};
+}
+const luminance = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return 0; const v = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)); return 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]; };
+/** Color con el que se rasteriza: \xABsolid\xBB = todo color graba y solo el blanco no; \xABgray\xBB = brillo real. */
+export function rasterColor(color, tone) {
+  if (tone === 'gray') return /^#[0-9a-f]{6}$/.test(color || '') ? color : '#000000';
+  return luminance(color) >= 235 ? '#ffffff' : '#000000';
 }
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
 const f4 = (n) => Math.round(n * 1e4) / 1e4;
 /** SVG en coordenadas de cama recortado al \xE1rea raster; se dibuja en un canvas para obtener los puntos reales. */
-export function rasterSVG(area, {widthPx, heightPx}) {
+export function rasterSVG(area, {widthPx, heightPx}, {tone = 'solid'} = {}) {
   const {items, matrix, scale} = area;
   let body = '';
-  for (const {element, mode} of items.shapes) {
+  for (const item of items.ordered || [...items.shapes, ...items.images.map((image) => ({mode: 'image', image}))]) {
+    if (item.mode === 'image') {
+      const i = item.image, m = mul(matrix, i.matrix);
+      body += \`<image href="\${esc(i.href)}" x="\${i.x}" y="\${i.y}" width="\${i.width}" height="\${i.height}" preserveAspectRatio="\${esc(i.preserve)}" transform="matrix(\${m.map(f4).join(' ')})"/>\`;
+      continue;
+    }
+    const {element, mode} = item;
     const d = element.subpaths.map((s) => 'M' + s.points.map((p) => apply(matrix, p).map(f4).join(' ')).join('L') + (s.closed || mode === 'fill' ? 'Z' : '')).join('');
-    body += mode === 'fill' ? \`<path d="\${d}" fill="#000" fill-rule="\${element.fill.rule}"/>\` : \`<path d="\${d}" fill="none" stroke="#000" stroke-width="\${f4(element.stroke.widthMm * scale)}" stroke-linejoin="round" stroke-linecap="round"/>\`;
-  }
-  for (const i of items.images) {
-    const m = mul(matrix, i.matrix);
-    body += \`<image href="\${esc(i.href)}" x="\${i.x}" y="\${i.y}" width="\${i.width}" height="\${i.height}" preserveAspectRatio="\${esc(i.preserve)}" transform="matrix(\${m.map(f4).join(' ')})"/>\`;
+    body += mode === 'fill' ? \`<path d="\${d}" fill="\${rasterColor(element.fill.color, tone)}" fill-rule="\${element.fill.rule}"/>\` : \`<path d="\${d}" fill="none" stroke="\${rasterColor(element.stroke.color, tone)}" stroke-width="\${f4(element.stroke.widthMm * scale)}" stroke-linejoin="round" stroke-linecap="round"/>\`;
   }
   return \`<svg xmlns="http://www.w3.org/2000/svg" width="\${widthPx}" height="\${heightPx}" viewBox="\${f4(area.x)} \${f4(area.y)} \${f4(area.width)} \${f4(area.height)}" preserveAspectRatio="none"><rect x="\${f4(area.x)}" y="\${f4(area.y)}" width="\${f4(area.width)}" height="\${f4(area.height)}" fill="#fff"/>\${body}</svg>\`;
 }
@@ -1538,7 +1548,10 @@ export function analyzePlan(design, placement, plan, bed) {
 export async function renderRaster(area, op, {document: doc = globalThis.document} = {}) {
   const {widthPx, heightPx, pitch} = rasterPixels(area, op.step);
   if (widthPx * heightPx > 16e6) throw Error(\`\${op.name}: el \xE1rea supera 16 millones de puntos. Reduce la resoluci\xF3n.\`);
-  const svg = rasterSVG(area, {widthPx, heightPx});
+  const photo = area.items.images.length > 0;
+  // auto: logotipos con colores s\xF3lidos (todo color graba, el blanco no); umbral/difusi\xF3n usan el brillo real.
+  const tone = op.dither === 'auto' ? 'solid' : 'gray';
+  const svg = rasterSVG(area, {widthPx, heightPx}, {tone});
   const url = URL.createObjectURL(new Blob([svg], {type: 'image/svg+xml'}));
   try {
     const img = new Image(); img.decoding = 'async'; img.src = url;
@@ -1548,7 +1561,6 @@ export async function renderRaster(area, op, {document: doc = globalThis.documen
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, widthPx, heightPx); ctx.drawImage(img, 0, 0, widthPx, heightPx);
     const rgba = ctx.getImageData(0, 0, widthPx, heightPx).data, gray = new Uint8ClampedArray(widthPx * heightPx);
     for (let i = 0, j = 0; j < gray.length; i += 4, j++) gray[j] = 0.299 * rgba[i] + 0.587 * rgba[i + 1] + 0.114 * rgba[i + 2];
-    const photo = area.items.images.length > 0;
     const dither = op.dither === 'auto' ? (photo ? 'floyd' : 'threshold') : op.dither;
     const bits = toBits(gray, widthPx, heightPx, {dither, invert: op.invert});
     return {bits, widthPx, heightPx, pitch, sweep: sweepStats(bits, widthPx, heightPx, pitch), dither};
@@ -1586,8 +1598,15 @@ const ruler = (bed) => {
  * Vista de cama compartida por escritorio y celular. compact=true usa solo
  * etiquetas permitidas por el visor del celular (svg, rect, path, circle, image).
  */
-export function planPreview({bed, analysis, rasterPreviews = new Map(), position = null, compact = false}) {
-  const pad = compact ? 0 : 16, vb = compact ? \`0 0 \${bed.width} \${bed.height}\` : \`\${-pad} \${-pad} \${bed.width + pad + 4} \${bed.height + pad + 4}\`;
+export function planPreview({bed, analysis, rasterPreviews = new Map(), position = null, compact = false, zoom = 1, center = null}) {
+  const pad = compact ? 0 : 16;
+  let vb = compact ? \`0 0 \${bed.width} \${bed.height}\` : \`\${-pad} \${-pad} \${bed.width + pad + 4} \${bed.height + pad + 4}\`;
+  if (!compact && zoom > 1.001) {
+    // Acercar = recortar la vista alrededor del dise\xF1o (sin barras de desplazamiento).
+    const w = (bed.width + pad + 4) / zoom, h = (bed.height + pad + 4) / zoom, c = center || [bed.width / 2, bed.height / 2];
+    const x = Math.min(Math.max(c[0] - w / 2, -pad), bed.width + 4 - w), y = Math.min(Math.max(c[1] - h / 2, -pad), bed.height + 4 - h);
+    vb = \`\${f4(x)} \${f4(y)} \${f4(w)} \${f4(h)}\`;
+  }
   let s = \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="\${vb}" role="img" aria-label="Cama de \${bed.width} por \${bed.height} mm con el trabajo colocado">\`;
   if (!compact) {
     s += \`<defs><pattern id="lzgrid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="currentColor" stroke-width="0.15" opacity="0.35"/></pattern></defs>\`;
@@ -1609,7 +1628,7 @@ export function planPreview({bed, analysis, rasterPreviews = new Map(), position
   if (b.width > 0) {
     const bad = !analysis.check.ok;
     s += \`<rect x="\${f4(b.x)}" y="\${f4(b.y)}" width="\${f4(b.width)}" height="\${f4(b.height)}" fill="\${bad ? '#ff3b5c' : 'none'}" fill-opacity="\${bad ? 0.12 : 0}" stroke="\${bad ? '#ff3b5c' : '#9b7bff'}" stroke-width="0.5" stroke-dasharray="3 2"/>\`;
-    if (!compact) s += \`<text x="\${f4(b.x + b.width / 2)}" y="\${f4(b.y < 12 ? b.y + b.height + 7 : b.y - 2.5)}" font-size="5.5" text-anchor="middle" fill="\${bad ? '#ff3b5c' : '#b9a6ff'}">\${b.width.toFixed(1)} \xD7 \${b.height.toFixed(1)} mm \xB7 X \${b.x.toFixed(1)} Y \${b.y.toFixed(1)}</text>\`;
+    if (!compact) s += \`<text x="\${f4(b.x + b.width / 2)}" y="\${f4(b.y < 12 ? b.y + b.height + 7 : b.y - 2.5)}" font-size="5.5" text-anchor="middle" fill="\${bad ? '#ff3b5c' : '#b9a6ff'}">\${b.width.toFixed(1)} \xD7 \${b.height.toFixed(1)} mm \xB7 X \${(Math.abs(b.x) < 0.05 ? 0 : b.x).toFixed(1)} Y \${(Math.abs(b.y) < 0.05 ? 0 : b.y).toFixed(1)}</text>\`;
   }
   if (Array.isArray(position)) s += \`<circle cx="\${f4(position[0])}" cy="\${f4(position[1])}" r="2.2" fill="#ff3b5c" stroke="#fff" stroke-width="0.7"/>\`;
   return s + '</svg>';
@@ -1634,14 +1653,14 @@ export function bitsPreviewURL(render, {document: doc = globalThis.document, max
    Nada de lo que ocurre aqu\xED mueve la m\xE1quina: importar, colocar, cambiar de
    pesta\xF1a o abrir un trabajo guardado solo actualiza la vista. El env\xEDo lo inicia
    siempre el bot\xF3n de la barra de acciones (o el celular con el control). */
-import {importSVG, imageDesign} from './svg-import.js?v=1';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=1';
+import {importSVG, imageDesign} from './svg-import.js?v=2';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=2';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 const btn = (text, fn, cls = 'btn outline') => { const b = el('button', cls, text); b.type = 'button'; b.onclick = fn; return b; };
-const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d).toLocaleString('es-MX', {minimumFractionDigits: d, maximumFractionDigits: d});
+const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d + 0).toLocaleString('es-MX', {minimumFractionDigits: d, maximumFractionDigits: d});
 export const fmtTime = (s) => { if (!Number.isFinite(s) || s <= 0) return '\u2014'; s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60; return h ? \`\${h} h \${String(m).padStart(2, '0')} min\` : m ? \`\${m} min \${String(r).padStart(2, '0')} s\` : \`\${r} s\`; };
 const ICON = {
   image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5.5 4 4 2.5-2.5L20 18"/>',
@@ -1757,7 +1776,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     panel.hidden = state.source !== 'import';
     for (const node of dialog.querySelectorAll('.neo-job, .k40-registration, #k40Arrange, .k40-legend, .k40-section-heading label')) node.hidden = state.source === 'import';
     const aligned = $('k40Origin')?.querySelector('option[value=aligned]'); if (aligned) aligned.hidden = aligned.disabled = state.source === 'import';
-    legend.hidden = state.source !== 'import'; zoomBar.hidden = false; tabOrder.hidden = state.source !== 'import';
+    legend.hidden = state.source !== 'import'; zoomBar.hidden = state.source !== 'import'; tabOrder.hidden = state.source !== 'import';
     if (state.source !== 'import') setCenter('preview');
     try { app.putStorage?.('lzbox-job-source', state.source); } catch {}
     update(); if (!silent) machine.refresh(true);
@@ -1766,7 +1785,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const order = which === 'order' && state.source === 'import';
     tabPreview.classList.toggle('active', !order); tabOrder.classList.toggle('active', order);
     tabPreview.setAttribute('aria-selected', String(!order)); tabOrder.setAttribute('aria-selected', String(order));
-    previewEl.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order;
+    previewEl.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order || state.source !== 'import';
     if (order) renderOrder();
   }
   opsCard.querySelector('.js-to-order').onclick = () => setCenter('order');
@@ -1878,8 +1897,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   const endDrag = () => { if (!drag) return; drag = null; previewEl.classList.remove('is-dragging'); update(); scheduleDraft(); };
   previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
   function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
-  function setZoom(z) { zoom = Math.max(1, Math.min(8, z)); previewEl.style.setProperty('--js-zoom', zoom); previewEl.classList.toggle('is-zoomed', zoom > 1.001); }
-  function realSize() { const bed = currentBed(), w = previewEl.clientWidth || 600; setZoom(bed.width / 25.4 * 96 / w); }
+  function setZoom(z) { zoom = Math.max(1, Math.min(12, z)); machine.refresh(false); }
+  function realSize() { const bed = currentBed(), w = (previewEl.clientWidth || 600) - 28; setZoom((bed.width + 20) / 25.4 * 96 / w); }
 
   /* ------------------------------------------------------------ operaciones */
   function addOperation(type) {
@@ -1925,7 +1944,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       card.append(head, fields);
       if (op.type === 'raster') {
         const extra = el('div', 'js-op-fields');
-        extra.innerHTML = \`<label>Resoluci\xF3n<select class="js-op-step">\${RESOLUTIONS.map((r) => \`<option value="\${r.step}"\${r.step === op.step ? ' selected' : ''}>\${r.mm.toFixed(2)} mm (\${r.dpi} ppp)</option>\`).join('')}</select></label><label>Tratamiento<select class="js-op-dither"><option value="auto">Autom\xE1tico</option><option value="threshold">Umbral (logotipos)</option><option value="floyd">Difusi\xF3n (fotos)</option></select></label>\`;
+        extra.innerHTML = \`<label>Resoluci\xF3n<select class="js-op-step">\${RESOLUTIONS.map((r) => \`<option value="\${r.step}"\${r.step === op.step ? ' selected' : ''}>\${r.mm.toFixed(2)} mm (\${r.dpi} ppp)</option>\`).join('')}</select></label><label>Tratamiento<select class="js-op-dither"><option value="auto">Colores s\xF3lidos (logotipos)</option><option value="threshold">Umbral por brillo</option><option value="floyd">Tonos \xB7 difusi\xF3n (fotos)</option></select></label>\`;
         extra.querySelector('.js-op-dither').value = op.dither;
         extra.querySelector('.js-op-step').onchange = (e) => { patchOperation(op.id, {step: Number(e.target.value)}); update(); };
         extra.querySelector('.js-op-dither').onchange = (e) => { patchOperation(op.id, {dither: e.target.value}); update(); };
@@ -1945,7 +1964,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const row = el('div', 'js-layer');
       const sw = el('span', 'js-swatch'); sw.style.background = layer.kind === 'image' ? 'linear-gradient(135deg,#ddd,#555)' : /^#/.test(layer.color) ? layer.color : '#888';
       if (layer.kind === 'stroke') sw.classList.add('is-stroke');
-      const label = el('span', 'js-layer-label'); label.innerHTML = \`<strong>\${layer.kind === 'image' ? 'Im\xE1genes' : layer.kind === 'fill' ? 'Relleno' : 'Contorno'} \${layer.kind === 'image' ? '' : layer.color === 'gradient' ? 'degradado' : layer.color === 'other' ? 'otro color' : layer.color}</strong><small>\${layer.count} elemento\${layer.count === 1 ? '' : 's'}\${layer.kind === 'stroke' ? ' \xB7 ' + fmt(layer.lengthMm / 10, 1) + ' cm' : ''}</small>\`;
+      const label = el('span', 'js-layer-label'); const white = layer.kind !== 'image' && /^#(f[a-f0-9]){3}$/i.test(layer.color);
+      label.innerHTML = \`<strong>\${layer.kind === 'image' ? 'Im\xE1genes' : layer.kind === 'fill' ? 'Relleno' : 'Contorno'} \${layer.kind === 'image' ? '' : layer.color === 'gradient' ? 'degradado' : layer.color === 'other' ? 'otro color' : layer.color}</strong><small>\${layer.count} elemento\${layer.count === 1 ? '' : 's'}\${layer.kind === 'stroke' ? ' \xB7 ' + fmt(layer.lengthMm / 10, 1) + ' cm' : ''}\${white ? ' \xB7 blanco: no graba y tapa lo de abajo' : ''}</small>\`;
       const select = el('select', 'js-layer-op'); select.setAttribute('aria-label', 'Operaci\xF3n para esta capa');
       select.append(new Option('No usar', ''));
       for (const op of state.plan.operations) {
@@ -2050,7 +2070,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const seconds = active.reduce((s, o) => s + o.seconds, 0);
       const b = a.bounds;
       const summary = \`\${state.file.name} \xB7 \${fmt(b.width)} \xD7 \${fmt(b.height)} mm en X \${fmt(b.x)} \xB7 Y \${fmt(b.y)} \xB7 \${state.sendScope === 'all' ? \`\${active.length} \${active.length === 1 ? 'operaci\xF3n activa' : 'operaciones activas'}\` : \`se enviar\xE1 solo \xAB\${active[0]?.op.name || '\u2014'}\xBB\`}. Tiempo estimado: \${fmtTime(seconds)}. SVG importado: se corta sobre la l\xEDnea, sin compensar kerf.\`;
-      return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
+      const b0 = a.bounds, center = [b0.x + b0.width / 2, b0.y + b0.height / 2];
+      return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
     support(features) {
       if (features.includes('operations-v2') && features.includes('raster-1bit')) return {ok: true};
@@ -4452,7 +4473,7 @@ const FLATNESS = 0.03; // mm
 const SHAPES = new Set(['path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon']);
 const CONTAINERS = new Set(['svg', 'g', 'a', 'switch']);
 const NON_RENDERED = new Set(['defs', 'symbol', 'clipPath', 'mask', 'pattern', 'marker', 'linearGradient', 'radialGradient', 'filter', 'metadata', 'title', 'desc', 'style', 'namedview', 'font', 'font-face', 'cursor', 'view', 'animate', 'animateTransform', 'animateMotion', 'set', 'mpath', 'solidcolor', 'meshgradient']);
-const NAMED = {black: '#000000', white: '#ffffff', red: '#ff0000', lime: '#00ff00', green: '#008000', blue: '#0000ff', yellow: '#ffff00', cyan: '#00ffff', aqua: '#00ffff', magenta: '#ff00ff', fuchsia: '#ff00ff', gray: '#808080', grey: '#808080', silver: '#c0c0c0', maroon: '#800000', olive: '#808000', navy: '#000080', purple: '#800080', teal: '#008080', orange: '#ffa500', darkgray: '#a9a9a9', lightgray: '#d3d3d3', pink: '#ffc0cb', brown: '#a52a2a', gold: '#ffd700'};
+const NAMED = {aliceblue:'#f0f8ff',antiquewhite:'#faebd7',aqua:'#00ffff',aquamarine:'#7fffd4',azure:'#f0ffff',beige:'#f5f5dc',bisque:'#ffe4c4',black:'#000000',blanchedalmond:'#ffebcd',blue:'#0000ff',blueviolet:'#8a2be2',brown:'#a52a2a',burlywood:'#deb887',cadetblue:'#5f9ea0',chartreuse:'#7fff00',chocolate:'#d2691e',coral:'#ff7f50',cornflowerblue:'#6495ed',cornsilk:'#fff8dc',crimson:'#dc143c',cyan:'#00ffff',darkblue:'#00008b',darkcyan:'#008b8b',darkgoldenrod:'#b8860b',darkgray:'#a9a9a9',darkgreen:'#006400',darkgrey:'#a9a9a9',darkkhaki:'#bdb76b',darkmagenta:'#8b008b',darkolivegreen:'#556b2f',darkorange:'#ff8c00',darkorchid:'#9932cc',darkred:'#8b0000',darksalmon:'#e9967a',darkseagreen:'#8fbc8f',darkslateblue:'#483d8b',darkslategray:'#2f4f4f',darkslategrey:'#2f4f4f',darkturquoise:'#00ced1',darkviolet:'#9400d3',deeppink:'#ff1493',deepskyblue:'#00bfff',dimgray:'#696969',dimgrey:'#696969',dodgerblue:'#1e90ff',firebrick:'#b22222',floralwhite:'#fffaf0',forestgreen:'#228b22',fuchsia:'#ff00ff',gainsboro:'#dcdcdc',ghostwhite:'#f8f8ff',gold:'#ffd700',goldenrod:'#daa520',gray:'#808080',grey:'#808080',green:'#008000',greenyellow:'#adff2f',honeydew:'#f0fff0',hotpink:'#ff69b4',indianred:'#cd5c5c',indigo:'#4b0082',ivory:'#fffff0',khaki:'#f0e68c',lavender:'#e6e6fa',lavenderblush:'#fff0f5',lawngreen:'#7cfc00',lemonchiffon:'#fffacd',lightblue:'#add8e6',lightcoral:'#f08080',lightcyan:'#e0ffff',lightgoldenrodyellow:'#fafad2',lightgray:'#d3d3d3',lightgreen:'#90ee90',lightgrey:'#d3d3d3',lightpink:'#ffb6c1',lightsalmon:'#ffa07a',lightseagreen:'#20b2aa',lightskyblue:'#87cefa',lightslategray:'#778899',lightslategrey:'#778899',lightsteelblue:'#b0c4de',lightyellow:'#ffffe0',lime:'#00ff00',limegreen:'#32cd32',linen:'#faf0e6',magenta:'#ff00ff',maroon:'#800000',mediumaquamarine:'#66cdaa',mediumblue:'#0000cd',mediumorchid:'#ba55d3',mediumpurple:'#9370db',mediumseagreen:'#3cb371',mediumslateblue:'#7b68ee',mediumspringgreen:'#00fa9a',mediumturquoise:'#48d1cc',mediumvioletred:'#c71585',midnightblue:'#191970',mintcream:'#f5fffa',mistyrose:'#ffe4e1',moccasin:'#ffe4b5',navajowhite:'#ffdead',navy:'#000080',oldlace:'#fdf5e6',olive:'#808000',olivedrab:'#6b8e23',orange:'#ffa500',orangered:'#ff4500',orchid:'#da70d6',palegoldenrod:'#eee8aa',palegreen:'#98fb98',paleturquoise:'#afeeee',palevioletred:'#db7093',papayawhip:'#ffefd5',peachpuff:'#ffdab9',peru:'#cd853f',pink:'#ffc0cb',plum:'#dda0dd',powderblue:'#b0e0e6',purple:'#800080',rebeccapurple:'#663399',red:'#ff0000',rosybrown:'#bc8f8f',royalblue:'#4169e1',saddlebrown:'#8b4513',salmon:'#fa8072',sandybrown:'#f4a460',seagreen:'#2e8b57',seashell:'#fff5ee',sienna:'#a0522d',silver:'#c0c0c0',skyblue:'#87ceeb',slateblue:'#6a5acd',slategray:'#708090',slategrey:'#708090',snow:'#fffafa',springgreen:'#00ff7f',steelblue:'#4682b4',tan:'#d2b48c',teal:'#008080',thistle:'#d8bfd8',tomato:'#ff6347',turquoise:'#40e0d0',violet:'#ee82ee',wheat:'#f5deb3',white:'#ffffff',whitesmoke:'#f5f5f5',yellow:'#ffff00',yellowgreen:'#9acd32'};
 
 /* ------------------------------------------------------------ matrices */
 const I = [1, 0, 0, 1, 0, 0];
@@ -4510,6 +4531,14 @@ export function normalizeColor(value, current = '#000000') {
   if (r) return '#' + r[1].split('').map((c) => c + c).join('');
   r = v.match(/^#([0-9a-f]{6})(?:[0-9a-f]{2})?$/);
   if (r) return '#' + r[1];
+  r = v.match(/^hsla?\\(([^)]*)\\)$/);
+  if (r) {
+    const [h, sat, l] = r[1].split(/[,\\s/]+/).filter(Boolean).map(parseFloat);
+    if ([h, sat, l].every(Number.isFinite)) {
+      const S = sat / 100, L = l / 100, k = (n) => (n + h / 30) % 12, a = S * Math.min(L, 1 - L), f = (n) => L - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+      return '#' + [f(0), f(8), f(4)].map((x) => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
+    }
+  }
   r = v.match(/^rgba?\\(([^)]*)\\)$/);
   if (r) {
     const parts = r[1].split(/[,\\s/]+/).filter(Boolean).slice(0, 3).map((p) => p.endsWith('%') ? parseFloat(p) * 2.55 : parseFloat(p));
@@ -4739,7 +4768,7 @@ export function importSVG(text, {DOMParser: Parser = globalThis.DOMParser, name 
   // 3 \xB7 Recorrido del \xE1rbol.
   const elements = [], images = [], texts = [];
   const byId = new Map(); for (const n of root.querySelectorAll('[id]')) byId.set(n.getAttribute('id'), n);
-  let serial = 0;
+  let serial = 0, order = 0;
   const walk = (node, matrix, inherited, depth, useStack) => {
     if (depth > 64) { note('warn', 'depth', 'Anidamiento excesivo: se ignor\xF3 contenido profundo.'); return; }
     const tag = node.localName;
@@ -4783,7 +4812,7 @@ export function importSVG(text, {DOMParser: Parser = globalThis.DOMParser, name 
       const x = parseFloat(node.getAttribute('x')) || 0, y = parseFloat(node.getAttribute('y')) || 0, w = parseFloat(node.getAttribute('width')), h = parseFloat(node.getAttribute('height'));
       if (!(w > 0 && h > 0)) { note('warn', 'image-size', 'Una imagen incrustada no declara ancho y alto; no se puede medir. As\xEDgnale tama\xF1o en tu editor.'); return; }
       const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]].map((p) => apply(m, p));
-      images.push({id: 'img' + (++serial), href, x, y, width: w, height: h, matrix: m, corners, preserve: node.getAttribute('preserveAspectRatio') || 'xMidYMid meet', opacity: Number(style.opacity ?? 1)});
+      images.push({id: 'img' + (++serial), z: ++order, href, x, y, width: w, height: h, matrix: m, corners, preserve: node.getAttribute('preserveAspectRatio') || 'xMidYMid meet', opacity: Number(style.opacity ?? 1)});
       return;
     }
     if (SHAPES.has(tag)) {
@@ -4792,14 +4821,15 @@ export function importSVG(text, {DOMParser: Parser = globalThis.DOMParser, name 
       try { subpaths = pathToPolylines(shapeToPath(node), m); }
       catch (e) { note('error', 'path', \`Trazado da\xF1ado en <\${tag}\${node.id ? ' #' + node.id : ''}>: \${e.message} No se import\xF3; rep\xE1ralo en tu editor.\`); return; }
       if (!subpaths.length) { note('info', 'empty', 'Se omitieron formas vac\xEDas (sin tama\xF1o).'); return; }
-      const fill = normalizeColor(style.fill ?? 'black', style.color);
+      const transparent = (v) => v !== undefined && Number(v) === 0;
+      const fill = transparent(style['fill-opacity']) || transparent(own.opacity) ? null : normalizeColor(style.fill ?? 'black', style.color);
       const stroke = normalizeColor(style.stroke ?? 'none', style.color);
       if (fill === 'other' || stroke === 'other') note('warn', 'color', 'Hay colores no reconocidos; se agruparon como \xABotro color\xBB. Revisa la asignaci\xF3n de operaciones.');
       if (fill === 'gradient') note('info', 'gradient', 'Los rellenos con degradado o patr\xF3n se graban como relleno s\xF3lido.');
       const strokeWidth = parseFloat(style['stroke-width'] ?? 1);
       const widthMm = Number.isFinite(strokeWidth) ? Math.max(0, strokeWidth * scaleOf(m)) : 0.1;
       const id = node.getAttribute('id') || tag + (++serial);
-      elements.push({id, tag, subpaths, fill: fill ? {color: fill, rule: style['fill-rule'] === 'evenodd' ? 'evenodd' : 'nonzero'} : null, stroke: stroke && widthMm > 0 ? {color: stroke, widthMm} : null});
+      elements.push({id, z: ++order, tag, subpaths, fill: fill ? {color: fill, rule: style['fill-rule'] === 'evenodd' ? 'evenodd' : 'nonzero'} : null, stroke: stroke && widthMm > 0 ? {color: stroke, widthMm} : null});
       if (!fill && !(stroke && widthMm > 0)) note('info', 'invisible', 'Hay formas sin relleno ni contorno (invisibles). Se listan como \xABsin color\xBB y no se asignan a ninguna operaci\xF3n.');
       return;
     }
@@ -7921,7 +7951,7 @@ import {modelInfo} from './models.js?v=3.5';
 import {mountK40} from './k40-control.js?v=14';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
 import {mountRemoteHost} from './workshop-remote.js?v=5';
-import {mountJobStudio} from './job-studio.js?v=2';
+import {mountJobStudio} from './job-studio.js?v=3';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};

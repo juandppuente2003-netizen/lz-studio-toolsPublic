@@ -530,3 +530,5 @@ html body.workshop .neo-operate #k40Stop span{font-size:14px}
 .js-scope{display:grid;gap:5px;font-size:12px;color:#a9b6c6;margin:2px 0 0}
 .js-scope select{min-height:38px;border-radius:9px;border:1px solid #243041;background:#070a0e;color:#fff;padding:6px 10px;font:13px inherit}
 html body.workshop .neo-operate [hidden],html body.workshop .neo-operate[hidden]{display:none!important}
+.js-layer{grid-template-columns:20px minmax(0,1fr) 150px}
+.js-layer-op{font-size:12.5px!important;padding:6px 8px!important}

@@ -9,7 +9,7 @@
    - Los SVG importados se cortan sobre la línea dibujada: no se aplica kerf.
    La generación de instrucciones M2 la hace el conector local. */
 import {optimizeCuts, verifyOptimization} from './cut-optimizer.js?v=3.5';
-import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=1';
+import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=2';
 
 export const K40_PROTOCOL_V2 = 'lz-k40-m2/v2';
 export const NATIVE_MM = 0.0254;
@@ -150,22 +150,32 @@ function rasterItems(design, operation, assignment) {
     if (e.stroke && assignment['stroke:' + e.stroke.color] === operation.id) shapes.push({element: e, mode: 'stroke'});
   }
   if (assignment.image === operation.id) images.push(...design.images);
-  return {shapes, images};
+  // Orden del documento: lo que está encima tapa lo de abajo (un blanco encima «borra»).
+  const ordered = [...shapes.map((s) => ({...s, z: s.element.z ?? 0, sub: s.mode === 'stroke' ? 0.5 : 0})), ...images.map((image) => ({mode: 'image', image, z: image.z ?? 0, sub: 0}))].sort((a, b) => a.z - b.z || a.sub - b.sub);
+  return {shapes, images, ordered};
+}
+const luminance = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return 0; const v = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)); return 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]; };
+/** Color con el que se rasteriza: «solid» = todo color graba y solo el blanco no; «gray» = brillo real. */
+export function rasterColor(color, tone) {
+  if (tone === 'gray') return /^#[0-9a-f]{6}$/.test(color || '') ? color : '#000000';
+  return luminance(color) >= 235 ? '#ffffff' : '#000000';
 }
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
 const f4 = (n) => Math.round(n * 1e4) / 1e4;
 /** SVG en coordenadas de cama recortado al área raster; se dibuja en un canvas para obtener los puntos reales. */
-export function rasterSVG(area, {widthPx, heightPx}) {
+export function rasterSVG(area, {widthPx, heightPx}, {tone = 'solid'} = {}) {
   const {items, matrix, scale} = area;
   let body = '';
-  for (const {element, mode} of items.shapes) {
+  for (const item of items.ordered || [...items.shapes, ...items.images.map((image) => ({mode: 'image', image}))]) {
+    if (item.mode === 'image') {
+      const i = item.image, m = mul(matrix, i.matrix);
+      body += `<image href="${esc(i.href)}" x="${i.x}" y="${i.y}" width="${i.width}" height="${i.height}" preserveAspectRatio="${esc(i.preserve)}" transform="matrix(${m.map(f4).join(' ')})"/>`;
+      continue;
+    }
+    const {element, mode} = item;
     const d = element.subpaths.map((s) => 'M' + s.points.map((p) => apply(matrix, p).map(f4).join(' ')).join('L') + (s.closed || mode === 'fill' ? 'Z' : '')).join('');
-    body += mode === 'fill' ? `<path d="${d}" fill="#000" fill-rule="${element.fill.rule}"/>` : `<path d="${d}" fill="none" stroke="#000" stroke-width="${f4(element.stroke.widthMm * scale)}" stroke-linejoin="round" stroke-linecap="round"/>`;
-  }
-  for (const i of items.images) {
-    const m = mul(matrix, i.matrix);
-    body += `<image href="${esc(i.href)}" x="${i.x}" y="${i.y}" width="${i.width}" height="${i.height}" preserveAspectRatio="${esc(i.preserve)}" transform="matrix(${m.map(f4).join(' ')})"/>`;
+    body += mode === 'fill' ? `<path d="${d}" fill="${rasterColor(element.fill.color, tone)}" fill-rule="${element.fill.rule}"/>` : `<path d="${d}" fill="none" stroke="${rasterColor(element.stroke.color, tone)}" stroke-width="${f4(element.stroke.widthMm * scale)}" stroke-linejoin="round" stroke-linecap="round"/>`;
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${widthPx}" height="${heightPx}" viewBox="${f4(area.x)} ${f4(area.y)} ${f4(area.width)} ${f4(area.height)}" preserveAspectRatio="none"><rect x="${f4(area.x)}" y="${f4(area.y)}" width="${f4(area.width)}" height="${f4(area.height)}" fill="#fff"/>${body}</svg>`;
 }
@@ -252,7 +262,10 @@ export function analyzePlan(design, placement, plan, bed) {
 export async function renderRaster(area, op, {document: doc = globalThis.document} = {}) {
   const {widthPx, heightPx, pitch} = rasterPixels(area, op.step);
   if (widthPx * heightPx > 16e6) throw Error(`${op.name}: el área supera 16 millones de puntos. Reduce la resolución.`);
-  const svg = rasterSVG(area, {widthPx, heightPx});
+  const photo = area.items.images.length > 0;
+  // auto: logotipos con colores sólidos (todo color graba, el blanco no); umbral/difusión usan el brillo real.
+  const tone = op.dither === 'auto' ? 'solid' : 'gray';
+  const svg = rasterSVG(area, {widthPx, heightPx}, {tone});
   const url = URL.createObjectURL(new Blob([svg], {type: 'image/svg+xml'}));
   try {
     const img = new Image(); img.decoding = 'async'; img.src = url;
@@ -262,7 +275,6 @@ export async function renderRaster(area, op, {document: doc = globalThis.documen
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, widthPx, heightPx); ctx.drawImage(img, 0, 0, widthPx, heightPx);
     const rgba = ctx.getImageData(0, 0, widthPx, heightPx).data, gray = new Uint8ClampedArray(widthPx * heightPx);
     for (let i = 0, j = 0; j < gray.length; i += 4, j++) gray[j] = 0.299 * rgba[i] + 0.587 * rgba[i + 1] + 0.114 * rgba[i + 2];
-    const photo = area.items.images.length > 0;
     const dither = op.dither === 'auto' ? (photo ? 'floyd' : 'threshold') : op.dither;
     const bits = toBits(gray, widthPx, heightPx, {dither, invert: op.invert});
     return {bits, widthPx, heightPx, pitch, sweep: sweepStats(bits, widthPx, heightPx, pitch), dither};
@@ -300,8 +312,15 @@ const ruler = (bed) => {
  * Vista de cama compartida por escritorio y celular. compact=true usa solo
  * etiquetas permitidas por el visor del celular (svg, rect, path, circle, image).
  */
-export function planPreview({bed, analysis, rasterPreviews = new Map(), position = null, compact = false}) {
-  const pad = compact ? 0 : 16, vb = compact ? `0 0 ${bed.width} ${bed.height}` : `${-pad} ${-pad} ${bed.width + pad + 4} ${bed.height + pad + 4}`;
+export function planPreview({bed, analysis, rasterPreviews = new Map(), position = null, compact = false, zoom = 1, center = null}) {
+  const pad = compact ? 0 : 16;
+  let vb = compact ? `0 0 ${bed.width} ${bed.height}` : `${-pad} ${-pad} ${bed.width + pad + 4} ${bed.height + pad + 4}`;
+  if (!compact && zoom > 1.001) {
+    // Acercar = recortar la vista alrededor del diseño (sin barras de desplazamiento).
+    const w = (bed.width + pad + 4) / zoom, h = (bed.height + pad + 4) / zoom, c = center || [bed.width / 2, bed.height / 2];
+    const x = Math.min(Math.max(c[0] - w / 2, -pad), bed.width + 4 - w), y = Math.min(Math.max(c[1] - h / 2, -pad), bed.height + 4 - h);
+    vb = `${f4(x)} ${f4(y)} ${f4(w)} ${f4(h)}`;
+  }
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" role="img" aria-label="Cama de ${bed.width} por ${bed.height} mm con el trabajo colocado">`;
   if (!compact) {
     s += `<defs><pattern id="lzgrid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="currentColor" stroke-width="0.15" opacity="0.35"/></pattern></defs>`;
@@ -323,7 +342,7 @@ export function planPreview({bed, analysis, rasterPreviews = new Map(), position
   if (b.width > 0) {
     const bad = !analysis.check.ok;
     s += `<rect x="${f4(b.x)}" y="${f4(b.y)}" width="${f4(b.width)}" height="${f4(b.height)}" fill="${bad ? '#ff3b5c' : 'none'}" fill-opacity="${bad ? 0.12 : 0}" stroke="${bad ? '#ff3b5c' : '#9b7bff'}" stroke-width="0.5" stroke-dasharray="3 2"/>`;
-    if (!compact) s += `<text x="${f4(b.x + b.width / 2)}" y="${f4(b.y < 12 ? b.y + b.height + 7 : b.y - 2.5)}" font-size="5.5" text-anchor="middle" fill="${bad ? '#ff3b5c' : '#b9a6ff'}">${b.width.toFixed(1)} × ${b.height.toFixed(1)} mm · X ${b.x.toFixed(1)} Y ${b.y.toFixed(1)}</text>`;
+    if (!compact) s += `<text x="${f4(b.x + b.width / 2)}" y="${f4(b.y < 12 ? b.y + b.height + 7 : b.y - 2.5)}" font-size="5.5" text-anchor="middle" fill="${bad ? '#ff3b5c' : '#b9a6ff'}">${b.width.toFixed(1)} × ${b.height.toFixed(1)} mm · X ${(Math.abs(b.x) < 0.05 ? 0 : b.x).toFixed(1)} Y ${(Math.abs(b.y) < 0.05 ? 0 : b.y).toFixed(1)}</text>`;
   }
   if (Array.isArray(position)) s += `<circle cx="${f4(position[0])}" cy="${f4(position[1])}" r="2.2" fill="#ff3b5c" stroke="#fff" stroke-width="0.7"/>`;
   return s + '</svg>';

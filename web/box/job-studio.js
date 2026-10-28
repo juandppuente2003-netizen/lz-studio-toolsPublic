@@ -5,14 +5,14 @@
    Nada de lo que ocurre aquí mueve la máquina: importar, colocar, cambiar de
    pestaña o abrir un trabajo guardado solo actualiza la vista. El envío lo inicia
    siempre el botón de la barra de acciones (o el celular con el control). */
-import {importSVG, imageDesign} from './svg-import.js?v=1';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=1';
+import {importSVG, imageDesign} from './svg-import.js?v=2';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=2';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 const btn = (text, fn, cls = 'btn outline') => { const b = el('button', cls, text); b.type = 'button'; b.onclick = fn; return b; };
-const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d).toLocaleString('es-MX', {minimumFractionDigits: d, maximumFractionDigits: d});
+const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d + 0).toLocaleString('es-MX', {minimumFractionDigits: d, maximumFractionDigits: d});
 export const fmtTime = (s) => { if (!Number.isFinite(s) || s <= 0) return '—'; s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60; return h ? `${h} h ${String(m).padStart(2, '0')} min` : m ? `${m} min ${String(r).padStart(2, '0')} s` : `${r} s`; };
 const ICON = {
   image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5.5 4 4 2.5-2.5L20 18"/>',
@@ -128,7 +128,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     panel.hidden = state.source !== 'import';
     for (const node of dialog.querySelectorAll('.neo-job, .k40-registration, #k40Arrange, .k40-legend, .k40-section-heading label')) node.hidden = state.source === 'import';
     const aligned = $('k40Origin')?.querySelector('option[value=aligned]'); if (aligned) aligned.hidden = aligned.disabled = state.source === 'import';
-    legend.hidden = state.source !== 'import'; zoomBar.hidden = false; tabOrder.hidden = state.source !== 'import';
+    legend.hidden = state.source !== 'import'; zoomBar.hidden = state.source !== 'import'; tabOrder.hidden = state.source !== 'import';
     if (state.source !== 'import') setCenter('preview');
     try { app.putStorage?.('lzbox-job-source', state.source); } catch {}
     update(); if (!silent) machine.refresh(true);
@@ -137,7 +137,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const order = which === 'order' && state.source === 'import';
     tabPreview.classList.toggle('active', !order); tabOrder.classList.toggle('active', order);
     tabPreview.setAttribute('aria-selected', String(!order)); tabOrder.setAttribute('aria-selected', String(order));
-    previewEl.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order;
+    previewEl.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order || state.source !== 'import';
     if (order) renderOrder();
   }
   opsCard.querySelector('.js-to-order').onclick = () => setCenter('order');
@@ -249,8 +249,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   const endDrag = () => { if (!drag) return; drag = null; previewEl.classList.remove('is-dragging'); update(); scheduleDraft(); };
   previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
   function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
-  function setZoom(z) { zoom = Math.max(1, Math.min(8, z)); previewEl.style.setProperty('--js-zoom', zoom); previewEl.classList.toggle('is-zoomed', zoom > 1.001); }
-  function realSize() { const bed = currentBed(), w = previewEl.clientWidth || 600; setZoom(bed.width / 25.4 * 96 / w); }
+  function setZoom(z) { zoom = Math.max(1, Math.min(12, z)); machine.refresh(false); }
+  function realSize() { const bed = currentBed(), w = (previewEl.clientWidth || 600) - 28; setZoom((bed.width + 20) / 25.4 * 96 / w); }
 
   /* ------------------------------------------------------------ operaciones */
   function addOperation(type) {
@@ -296,7 +296,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       card.append(head, fields);
       if (op.type === 'raster') {
         const extra = el('div', 'js-op-fields');
-        extra.innerHTML = `<label>Resolución<select class="js-op-step">${RESOLUTIONS.map((r) => `<option value="${r.step}"${r.step === op.step ? ' selected' : ''}>${r.mm.toFixed(2)} mm (${r.dpi} ppp)</option>`).join('')}</select></label><label>Tratamiento<select class="js-op-dither"><option value="auto">Automático</option><option value="threshold">Umbral (logotipos)</option><option value="floyd">Difusión (fotos)</option></select></label>`;
+        extra.innerHTML = `<label>Resolución<select class="js-op-step">${RESOLUTIONS.map((r) => `<option value="${r.step}"${r.step === op.step ? ' selected' : ''}>${r.mm.toFixed(2)} mm (${r.dpi} ppp)</option>`).join('')}</select></label><label>Tratamiento<select class="js-op-dither"><option value="auto">Colores sólidos (logotipos)</option><option value="threshold">Umbral por brillo</option><option value="floyd">Tonos · difusión (fotos)</option></select></label>`;
         extra.querySelector('.js-op-dither').value = op.dither;
         extra.querySelector('.js-op-step').onchange = (e) => { patchOperation(op.id, {step: Number(e.target.value)}); update(); };
         extra.querySelector('.js-op-dither').onchange = (e) => { patchOperation(op.id, {dither: e.target.value}); update(); };
@@ -316,7 +316,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const row = el('div', 'js-layer');
       const sw = el('span', 'js-swatch'); sw.style.background = layer.kind === 'image' ? 'linear-gradient(135deg,#ddd,#555)' : /^#/.test(layer.color) ? layer.color : '#888';
       if (layer.kind === 'stroke') sw.classList.add('is-stroke');
-      const label = el('span', 'js-layer-label'); label.innerHTML = `<strong>${layer.kind === 'image' ? 'Imágenes' : layer.kind === 'fill' ? 'Relleno' : 'Contorno'} ${layer.kind === 'image' ? '' : layer.color === 'gradient' ? 'degradado' : layer.color === 'other' ? 'otro color' : layer.color}</strong><small>${layer.count} elemento${layer.count === 1 ? '' : 's'}${layer.kind === 'stroke' ? ' · ' + fmt(layer.lengthMm / 10, 1) + ' cm' : ''}</small>`;
+      const label = el('span', 'js-layer-label'); const white = layer.kind !== 'image' && /^#(f[a-f0-9]){3}$/i.test(layer.color);
+      label.innerHTML = `<strong>${layer.kind === 'image' ? 'Imágenes' : layer.kind === 'fill' ? 'Relleno' : 'Contorno'} ${layer.kind === 'image' ? '' : layer.color === 'gradient' ? 'degradado' : layer.color === 'other' ? 'otro color' : layer.color}</strong><small>${layer.count} elemento${layer.count === 1 ? '' : 's'}${layer.kind === 'stroke' ? ' · ' + fmt(layer.lengthMm / 10, 1) + ' cm' : ''}${white ? ' · blanco: no graba y tapa lo de abajo' : ''}</small>`;
       const select = el('select', 'js-layer-op'); select.setAttribute('aria-label', 'Operación para esta capa');
       select.append(new Option('No usar', ''));
       for (const op of state.plan.operations) {
@@ -421,7 +422,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const seconds = active.reduce((s, o) => s + o.seconds, 0);
       const b = a.bounds;
       const summary = `${state.file.name} · ${fmt(b.width)} × ${fmt(b.height)} mm en X ${fmt(b.x)} · Y ${fmt(b.y)} · ${state.sendScope === 'all' ? `${active.length} ${active.length === 1 ? 'operación activa' : 'operaciones activas'}` : `se enviará solo «${active[0]?.op.name || '—'}»`}. Tiempo estimado: ${fmtTime(seconds)}. SVG importado: se corta sobre la línea, sin compensar kerf.`;
-      return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
+      const b0 = a.bounds, center = [b0.x + b0.width / 2, b0.y + b0.height / 2];
+      return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
     support(features) {
       if (features.includes('operations-v2') && features.includes('raster-1bit')) return {ok: true};

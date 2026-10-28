@@ -171,3 +171,16 @@ test('imagen PNG/JPG como grabado raster', () => {
   const plan = defaultPlan(d); assert.deepEqual(plan.operations.map((o) => o.type), ['raster']);
   const m = placementMatrix(d, {x: 0, y: 0, scale: 0.5, rotation: 0}); close(apply(m, [254, 127])[0], 127);
 });
+
+test('colores: todos los colores graban, el blanco encima tapa, orden del documento y CSS de Illustrator', async () => {
+  const {rasterColor} = await import('./web/box/job-ops.js');
+  const d = load(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><style>.st0{fill:#1D1D1B;}.st1{fill:#FFFFFF;}.st2{fill:#FFED00;}</style>
+    <rect class="st0" width="100" height="100"/><rect class="st1" x="20" y="20" width="60" height="60"/><circle class="st2" cx="50" cy="50" r="10"/><rect x="0" y="0" width="5" height="5" fill="DarkOrange"/><rect x="5" y="0" width="5" height="5" fill="hsl(200,50%,50%)" fill-opacity="0"/></svg>`);
+  assert.deepEqual(d.layers.map((l) => l.color).sort(), ['#1d1d1b', '#ff8c00', '#ffed00', '#ffffff']);
+  const plan = defaultPlan(d), op = plan.operations[0];
+  const area = rasterArea(d, {x: 0, y: 0, scale: 1, rotation: 0}, op, plan.assignment);
+  const svg = rasterSVG(area, rasterPixels(area, 4), {tone: 'solid'});
+  const fills = [...svg.matchAll(/<path[^>]*fill="(#[0-9a-f]{6})"/g)].map((m) => m[1]);
+  assert.deepEqual(fills, ['#000000', '#ffffff', '#000000', '#000000']); // amarillo y naranja graban; blanco tapa
+  assert.equal(rasterColor('#ffed00', 'gray'), '#ffed00');
+});
