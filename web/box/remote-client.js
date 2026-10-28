@@ -20,7 +20,7 @@ function controls(){
  for(const b of document.querySelectorAll('[data-origin]')){b.disabled=!idle||(b.dataset.origin==='current'&&!state?.hasPosition);b.setAttribute('aria-pressed',String(state?.origin===b.dataset.origin));}
  for(const b of document.querySelectorAll('[data-source]')){b.disabled=!idle;b.setAttribute('aria-pressed',String((job()?.source||state?.source)===b.dataset.source));}
  for(const n of document.querySelectorAll('#tabJobs input,#tabJobs select,#tabJobs button:not([data-source]):not([data-origin]),#tabLibrary .rm-lib button'))n.disabled=!idle;
- $('remoteImport').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);
+ $('remoteImport').disabled=$('remoteAdd').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);$('remoteAddLabel').classList.toggle('is-disabled',!idle);
  $('remoteLibRefresh').disabled=!open();
 }
 function disconnected(){if(!session&&!state)return;const was=!!state;state=null;awaiting=false;$('remoteLinkState').textContent='Reconectando…';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado. La orden no se reenvió.'));}pending.clear();for(const u of uploads.values())u.reject(Error('Enlace desconectado.'));uploads.clear();releaseWake();const c=channel,pr=peer;channel=null;peer=null;if(c){c.onclose=null;try{c.close();}catch{}}if(pr){pr.onconnectionstatechange=null;try{pr.close();}catch{}}controls();
@@ -111,8 +111,11 @@ $('remoteScope').onchange=e=>command('scope',{value:e.target.value});
 $('remoteReviewOpen').onclick=()=>{reviewOpen=true;$('remoteReview').hidden=false;renderReview();$('remoteReview').scrollIntoView?.({block:'start'});};
 $('remoteReviewOk').onclick=async()=>{if(job()?.review&&!(await command('review-ok')))return;reviewOpen=false;$('remoteReview').hidden=true;showTab('tabControl');};
 $('remoteSave').onclick=async()=>{const r=await ask('Guardar en biblioteca',state?.name||'Trabajo',true);if(r)await command('save',{name:r.value,cloud:r.cloud});};
-$('remoteImport').onchange=async()=>{const file=$('remoteImport').files?.[0];$('remoteImport').value='';if(file)await sendFile(file);};
-async function sendFile(file){
+// Varios archivos: «Importar» reemplaza con el primero y suma los demás; «+ Agregar» los suma todos.
+async function sendFiles(list,append){for(const [i,file] of list.entries()){const ok=await sendFile(file,append||i>0);if(!ok)break;}}
+$('remoteImport').onchange=async()=>{const files=[...($('remoteImport').files||[])];$('remoteImport').value='';if(files.length)await sendFiles(files,false);};
+$('remoteAdd').onchange=async()=>{const files=[...($('remoteAdd').files||[])];$('remoteAdd').value='';if(files.length)await sendFiles(files,true);};
+async function sendFile(file,append=false){
  const mime=/\.svg$/i.test(file.name)?'image/svg+xml':/\.png$/i.test(file.name)?'image/png':/\.jpe?g$/i.test(file.name)?'image/jpeg':file.type;
  if(!['image/svg+xml','image/png','image/jpeg'].includes(mime))return status('Formato no compatible. Usa SVG, PNG o JPG.');
  if(file.size>8*1024*1024)return status('El archivo supera 8 MB.');
@@ -124,11 +127,11 @@ async function sendFile(file){
   let timer;const done=new Promise((resolve,reject)=>{uploads.set(upload,{resolve,reject});timer=setTimeout(()=>{if(uploads.delete(upload))reject(Error('La computadora no confirmó el archivo.'));},120000);}).finally(()=>clearTimeout(timer));
   for(let index=0;index<count;index++){
    while(channel.bufferedAmount>512000)await new Promise(r=>setTimeout(r,40));
-   channel.send(JSON.stringify({type:'upload',session,upload,index,count,...(index===0?{name:file.name.slice(0,120),mime}:{}),data:data.slice(index*UPLOAD_CHUNK,(index+1)*UPLOAD_CHUNK)}));
+   channel.send(JSON.stringify({type:'upload',session,upload,index,count,...(index===0?{name:file.name.slice(0,120),mime,append:!!append}:{}),data:data.slice(index*UPLOAD_CHUNK,(index+1)*UPLOAD_CHUNK)}));
    $('remoteUpload').textContent=`Enviando ${file.name} a la computadora… ${Math.round((index+1)/count*100)} %`;
   }
-  await done;$('remoteUpload').textContent=`${file.name} importado en la computadora. Revisa colocación y operaciones.`;
- }catch(e){$('remoteUpload').textContent=e.message;}
+  await done;$('remoteUpload').textContent=`${file.name} ${append?'agregado':'importado'} en la computadora. Revisa colocación y operaciones.`;return true;
+ }catch(e){$('remoteUpload').textContent=e.message;return false;}
  finally{awaiting=false;controls();}
 }
 /* ---------- Biblioteca ---------- */

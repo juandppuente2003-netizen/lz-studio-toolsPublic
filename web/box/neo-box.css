@@ -532,3 +532,8 @@ html body.workshop .neo-operate #k40Stop span{font-size:14px}
 html body.workshop .neo-operate [hidden],html body.workshop .neo-operate[hidden]{display:none!important}
 .js-layer{grid-template-columns:20px minmax(0,1fr) 150px}
 .js-layer-op{font-size:12.5px!important;padding:6px 8px!important}
+.js-pieces{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px;max-height:220px;overflow:auto}
+.js-pieces li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:6px 8px;border:1px solid #1c2531;border-radius:9px;background:#070a0e;font-size:12.5px}
+.js-pieces li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.js-pieces small{color:#8ea2b3;font-variant-numeric:tabular-nums}
+.js-piece-del{width:28px;height:28px;border:0;border-radius:7px;background:transparent;color:#8ea2b3;font-size:18px;cursor:pointer}.js-piece-del:hover{color:#ff8ea2;background:#1a0f14}
+.js-add-files{width:100%;margin-top:8px;min-height:38px;font-size:12.5px}

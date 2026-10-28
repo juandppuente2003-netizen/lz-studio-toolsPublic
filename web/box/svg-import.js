@@ -425,3 +425,37 @@ export function imageDesign({name, href, pixelWidth, pixelHeight, widthMm}) {
   return {name, widthMm: w, heightMm: h, unitsDeclared: false, unitOverride: 'auto', viewBox: null, elements: [], images, texts: [], bbox: boundsOf([], images), layers: layersOf([], images), objectCount: 1, raster: true,
     issues: [{level: 'info', code: 'photo', message: `Imagen de ${pixelWidth} × ${pixelHeight} px. Se interpretó a 96 ppp (${w.toFixed(1)} × ${h.toFixed(1)} mm); ajusta la escala a la medida real.`, count: 1}]};
 }
+
+/**
+ * Varios archivos en una sola cama: cada pieza conserva su geometría y se desplaza por
+ * `offset` (mm del documento). Las capas por color se combinan entre archivos.
+ */
+export function mergeDesigns(pieces) {
+  const elements = [], images = [], texts = [], issues = [], info = [];
+  let objectCount = 0, unitsDeclared = true;
+  const many = pieces.length > 1;
+  pieces.forEach((p, index) => {
+    const [dx, dy] = p.offset || [0, 0], T = [1, 0, 0, 1, dx, dy], pre = many ? `p${index}-` : '', zBase = many ? index * 1e6 : 0;
+    const shift = (q) => [q[0] + dx, q[1] + dy];
+    for (const e of p.design.elements) elements.push({...e, id: pre + e.id, z: zBase + (e.z || 0), piece: index, subpaths: e.subpaths.map((s) => ({...s, points: s.points.map(shift)}))});
+    for (const im of p.design.images) images.push({...im, id: pre + im.id, z: zBase + (im.z || 0), piece: index, matrix: mul(T, im.matrix), corners: im.corners.map(shift)});
+    texts.push(...p.design.texts);
+    for (const issue of p.design.issues) issues.push(many ? {...issue, message: `${p.design.name}: ${issue.message}`} : issue);
+    objectCount += p.design.objectCount; unitsDeclared = unitsDeclared && p.design.unitsDeclared;
+    const b = p.design.bbox;
+    info.push({index, name: p.design.name, bbox: {x: b.x + dx, y: b.y + dy, width: b.width, height: b.height}});
+  });
+  return {name: many ? `${pieces.length} archivos` : pieces[0].design.name, widthMm: pieces[0].design.widthMm, heightMm: pieces[0].design.heightMm, unitsDeclared, unitOverride: pieces[0].design.unitOverride,
+    viewBox: null, elements, images, texts, issues, bbox: boundsOf(elements, images), layers: layersOf(elements, images), objectCount, pieces: info};
+}
+
+/** Dónde colocar un archivo nuevo: a la derecha del último, o en una fila nueva si no cabe. */
+export function nextOffset(existing, size, {maxWidth = 400, gap = 5} = {}) {
+  if (!existing.length) return null;
+  const right = existing.reduce((a, p) => Math.max(a, p.bbox.x + p.bbox.width), -Infinity);
+  const left = existing.reduce((a, p) => Math.min(a, p.bbox.x), Infinity);
+  const last = existing.at(-1).bbox;
+  if (right + gap + size.width - left <= maxWidth) return {x: right + gap, y: last.y};
+  const bottom = existing.reduce((a, p) => Math.max(a, p.bbox.y + p.bbox.height), -Infinity);
+  return {x: left, y: bottom + gap};
+}

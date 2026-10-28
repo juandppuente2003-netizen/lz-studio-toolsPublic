@@ -35,19 +35,25 @@ export function makeOperation(type, extra = {}) {
  * Todo queda visible y editable en la tabla de capas.
  */
 export function defaultPlan(design) {
-  const ops = [], assignment = {};
-  const need = (type) => ops.find((o) => o.type === type) || (ops.push(makeOperation(type)), ops.at(-1));
-  // Regla del taller: rojo = corte (contorno o relleno rojo → su contorno se corta).
-  // Negro y demás colores = grabado: rellenos e imágenes como imagen, contornos como vector.
-  for (const layer of design.layers) {
-    if (layer.kind === 'image') assignment[layer.key] = need('raster').id;
-    else if (RED(layer.color)) assignment[layer.key] = need('cut').id + (layer.kind === 'fill' ? ':outline' : '');
-    else if (layer.kind === 'fill') assignment[layer.key] = need('raster').id;
-    else assignment[layer.key] = need('engrave').id;
-  }
+  const plan = {operations: [], assignment: {}};
+  for (const layer of design.layers) assignLayerDefault(plan, layer);
   const rank = {raster: 0, engrave: 1, cut: 2};
-  ops.sort((a, b) => rank[a.type] - rank[b.type]);
-  return {operations: ops, assignment};
+  plan.operations.sort((a, b) => rank[a.type] - rank[b.type]);
+  return plan;
+}
+
+/**
+ * Regla del taller para una capa nueva: rojo = corte (un relleno rojo, por su contorno);
+ * imágenes y rellenos de otros colores = grabado imagen; contornos de otros colores = grabado vectorial.
+ * Reutiliza la operación existente del mismo tipo.
+ */
+export function assignLayerDefault(plan, layer) {
+  const need = (type) => { let op = plan.operations.find((o) => o.type === type); if (!op) { op = makeOperation(type); const rank = {raster: 0, engrave: 1, cut: 2}; const i = plan.operations.findIndex((o) => rank[o.type] > rank[type]); plan.operations.splice(i < 0 ? plan.operations.length : i, 0, op); } return op; };
+  if (layer.kind === 'image') plan.assignment[layer.key] = need('raster').id;
+  else if (RED(layer.color)) plan.assignment[layer.key] = need('cut').id + (layer.kind === 'fill' ? ':outline' : '');
+  else if (layer.kind === 'fill') plan.assignment[layer.key] = need('raster').id;
+  else plan.assignment[layer.key] = need('engrave').id;
+  return plan;
 }
 
 /** Qué operaciones puede recibir cada tipo de capa. Un relleno nunca se convierte en corte sin elegirlo. */

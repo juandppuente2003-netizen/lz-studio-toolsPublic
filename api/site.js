@@ -1050,7 +1050,7 @@ export function coupon(s){\r
 <link rel="stylesheet" href="k40-control.css?v=5">
 <link rel="stylesheet" href="workshop.css?v=5">
 <link rel="stylesheet" href="../lz-appbar.css?v=60">
-<link rel="stylesheet" href="neo-box.css?v=62">
+<link rel="stylesheet" href="neo-box.css?v=64">
 <style>body.box-booting{visibility:hidden}body.box-booting .lz-appbar{visibility:visible}body.box-booting .box-loading{visibility:visible;position:fixed;inset:60px 0 0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#030405;color:#f3f7fc;font:15px system-ui,sans-serif}.box-loading strong{font-size:20px}.box-loading a{color:#2ee6ff}.box-loading:before{content:"";width:38px;height:38px;border-radius:50%;border:3px solid #18202b;border-top-color:#2ee6ff;animation:lzspin .8s linear infinite}@keyframes lzspin{to{transform:rotate(360deg)}}</style></head>
 <body class="box-booting"><div class="box-loading" role="status"><strong>LZ Box Studio</strong><span>Preparando tu espacio de trabajo\u2026</span><a href="index.html">Volver a cargar</a></div>
 <header class="lz-appbar lz-top-nav" aria-label="LZ Studio Tools navegaci\xF3n"><a class="lz-logo" href="../index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name"><b>LZ</b> STUDIO TOOLS</span></a><nav class="lz-mainnav" aria-label="Secciones de LZ Studio Tools"><a class="lz-nav-link" href="../index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg><span>Inicio</span></a><a class="lz-nav-link" href="../dtf.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Herramientas DTF</span></a><a class="lz-nav-link active" aria-current="page" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg><span>LZ Box Studio</span></a></nav><div class="lz-appbar-actions"><a class="lz-help" href="#ayuda" onclick="document.getElementById('helpBtn')?.click();return false;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg><span>Ayuda</span></a><a class="account-link" href="../account.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="lz-acc-label">Mi cuenta</span></a></div></header>
@@ -1097,7 +1097,7 @@ export function coupon(s){\r
 <dialog id="saveDialog"><div class="dialog-header"><h2>Guardar dise\xF1o</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><label class="field-title" for="designName">Nombre del dise\xF1o</label><input id="designName" maxlength="80" placeholder="Ej. Caja para regalo"><p class="hint">Se guarda en este navegador. Exporta un respaldo para conservarlo en otro dispositivo.</p><button id="confirmSave" class="btn primary wide">Guardar dise\xF1o</button><button id="saveCopy" type="button" class="btn outline wide">Guardar como copia nueva</button></dialog>
 <dialog id="projectsDialog"><div class="dialog-header"><div><span class="eyebrow">TU MESA DE TRABAJO</span><h2>Mis dise\xF1os</h2></div><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><div id="projectSearchMount" class="project-search-mount"></div><div id="projectsList"></div><div class="backup-actions"><button id="newBtn" class="btn outline">Nuevo dise\xF1o</button><button id="backupBtn" class="btn outline">Exportar respaldo JSON</button><button id="importBtn" class="btn outline">Importar dise\xF1o</button><input type="file" id="importFile" accept=".json,application/json" hidden></div><p class="hint">Guardados en este navegador, sin sincronizaci\xF3n entre dispositivos.</p></dialog>
 <dialog id="helpDialog"><div class="dialog-header"><h2>De la idea a tu primera caja</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><ol class="help-steps"><li><strong>Elige el modelo y las medidas.</strong><p>Las exteriores incluyen el MDF. Las interiores corresponden al espacio \xFAtil de la caja armada.</p></li><li><strong>Mide tu material.</strong><p>Selecciona 2, 2.5, 3, 4, 5 o 6 mm, o escribe el espesor real entre 1 y 20 mm. Los encastres se regeneran con cada cambio.</p></li><li><strong>Calibra el encaje.</strong><p>El kerf es el ancho total que elimina tu l\xE1ser. La holgura agrega espacio entre dientes. Descarga la probeta, corta y ajusta estos valores antes de producir.</p></li><li><strong>Revisa y exporta.</strong><p>Gira el modelo, separa las piezas y revisa las hojas de corte. Exporta SVG o DXF en mm a escala 1:1.</p></li></ol><div class="export-note shortcuts"><strong>Controles y atajos</strong><p>Arrastrar: girar \xB7 Bot\xF3n derecho, rueda presionada o May\xFAs + arrastrar: desplazar \xB7 Rueda: zoom \xB7 Doble clic: encuadrar.</p><p><kbd>Ctrl</kbd>+<kbd>Z</kbd> deshacer \xB7 <kbd>Ctrl</kbd>+<kbd>May\xFAs</kbd>+<kbd>Z</kbd> o <kbd>Ctrl</kbd>+<kbd>Y</kbd> rehacer \xB7 <kbd>Ctrl</kbd>+<kbd>S</kbd> guardar \xB7 <kbd>F</kbd> encuadrar \xB7 <kbd>1</kbd>\u2013<kbd>7</kbd> vistas (perspectiva, frente, posterior, izquierda, derecha, superior, inferior) \xB7 <kbd>H</kbd> ocultar pieza \xB7 <kbd>I</kbd> aislar \xB7 <kbd>May\xFAs</kbd>+<kbd>H</kbd> mostrar todas \xB7 <kbd>M</kbd> medidas \xB7 <kbd>C</kbd> compartimentos \xB7 <kbd>E</kbd> formas \xB7 <kbd>P</kbd> plano / 3D \xB7 <kbd>Esc</kbd> cerrar panel.</p><p>En el plano de corte, con \xABEditar distribuci\xF3n\xBB: arrastra piezas, <kbd>R</kbd> gira 90\xB0 y las flechas ajustan 1 mm (May\xFAs: 10 mm).</p></div><div class="export-note"><strong>Sobre esta versi\xF3n</strong><p>Diecisiete modelos, edici\xF3n directa en 3D, formas de corte y PNG. Incluye caja normal, abatible, corrediza, charola, huacal, canasta con arco, canasta con asa doble, estuche con divisiones, portador con asa ovalada y canasta de perfil curvo. Todos los modelos se dise\xF1an para ensamble sin pegamento. La abatible usa pivotes integrados y la corrediza, gu\xEDas capturadas por los laterales y tirador integral de MDF. El 3D permite revisar la forma y la apertura; realiza una prueba de corte y armado antes de producir. Las referencias muestran la forma, sin incluir sus grabados.</p></div><button class="btn primary wide" data-close>Empezar a crear</button></dialog>
-<script type="module" src="app.js?v=3.6"></script><script type="module" src="studio-plus.js?v=3.5"></script><script type="module" src="workflow-plus.js?v=3.5"></script><script type="module" src="workshop.js?v=63"></script><script type="module" src="neo-studio.js?v=62"></script></body></html>
+<script type="module" src="app.js?v=3.6"></script><script type="module" src="studio-plus.js?v=3.5"></script><script type="module" src="workflow-plus.js?v=3.5"></script><script type="module" src="workshop.js?v=64"></script><script type="module" src="neo-studio.js?v=62"></script></body></html>
 `,type:"text/html; charset=utf-8",public:!1},"/box/internal-joints.js":{body:`import {frame,rect,materialWeb} from './models.js?v=3.5';
 /* Tenons on horizontal panels and side ends; closed receivers on all walls. */
 function spans(L,s){const m=materialWeb(s),fit=+s.clearance,margin=m+fit,length=L-2*margin;if(length<m)throw Error('Aumenta la medida: las ranuras interiores necesitan margen y pesta\xF1as resistentes.');let n=Math.max(1,Math.round(length/(+s.finger)));n=Math.min(n,Math.floor(length/(m+fit)));if(n%2===0)n--;n=Math.max(n,1);return Array.from({length:(n+1)/2},(_,k)=>[margin+2*k*length/n,margin+(2*k+1)*length/n]);}
@@ -1321,19 +1321,25 @@ export function makeOperation(type, extra = {}) {
  * Todo queda visible y editable en la tabla de capas.
  */
 export function defaultPlan(design) {
-  const ops = [], assignment = {};
-  const need = (type) => ops.find((o) => o.type === type) || (ops.push(makeOperation(type)), ops.at(-1));
-  // Regla del taller: rojo = corte (contorno o relleno rojo \u2192 su contorno se corta).
-  // Negro y dem\xE1s colores = grabado: rellenos e im\xE1genes como imagen, contornos como vector.
-  for (const layer of design.layers) {
-    if (layer.kind === 'image') assignment[layer.key] = need('raster').id;
-    else if (RED(layer.color)) assignment[layer.key] = need('cut').id + (layer.kind === 'fill' ? ':outline' : '');
-    else if (layer.kind === 'fill') assignment[layer.key] = need('raster').id;
-    else assignment[layer.key] = need('engrave').id;
-  }
+  const plan = {operations: [], assignment: {}};
+  for (const layer of design.layers) assignLayerDefault(plan, layer);
   const rank = {raster: 0, engrave: 1, cut: 2};
-  ops.sort((a, b) => rank[a.type] - rank[b.type]);
-  return {operations: ops, assignment};
+  plan.operations.sort((a, b) => rank[a.type] - rank[b.type]);
+  return plan;
+}
+
+/**
+ * Regla del taller para una capa nueva: rojo = corte (un relleno rojo, por su contorno);
+ * im\xE1genes y rellenos de otros colores = grabado imagen; contornos de otros colores = grabado vectorial.
+ * Reutiliza la operaci\xF3n existente del mismo tipo.
+ */
+export function assignLayerDefault(plan, layer) {
+  const need = (type) => { let op = plan.operations.find((o) => o.type === type); if (!op) { op = makeOperation(type); const rank = {raster: 0, engrave: 1, cut: 2}; const i = plan.operations.findIndex((o) => rank[o.type] > rank[type]); plan.operations.splice(i < 0 ? plan.operations.length : i, 0, op); } return op; };
+  if (layer.kind === 'image') plan.assignment[layer.key] = need('raster').id;
+  else if (RED(layer.color)) plan.assignment[layer.key] = need('cut').id + (layer.kind === 'fill' ? ':outline' : '');
+  else if (layer.kind === 'fill') plan.assignment[layer.key] = need('raster').id;
+  else plan.assignment[layer.key] = need('engrave').id;
+  return plan;
 }
 
 /** Qu\xE9 operaciones puede recibir cada tipo de capa. Un relleno nunca se convierte en corte sin elegirlo. */
@@ -1657,8 +1663,8 @@ export function bitsPreviewURL(render, {document: doc = globalThis.document, max
    Nada de lo que ocurre aqu\xED mueve la m\xE1quina: importar, colocar, cambiar de
    pesta\xF1a o abrir un trabajo guardado solo actualiza la vista. El env\xEDo lo inicia
    siempre el bot\xF3n de la barra de acciones (o el celular con el control). */
-import {importSVG, imageDesign} from './svg-import.js?v=2';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=3';
+import {importSVG, imageDesign, mergeDesigns, nextOffset, apply} from './svg-import.js?v=3';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=4';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -1688,7 +1694,7 @@ const opIcon = {raster: 'image', engrave: 'pen', cut: 'scissors'};
 export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) {
   if (app.jobStudio) return app.jobStudio;
   const dialog = machine.dialog, $ = (id) => document.getElementById(id);
-  const state = {sendScope: 'all', source: 'box', design: null, file: null, unitOverride: 'auto', plan: null, placement: {x: 0, y: 0, scale: 1, rotation: 0}, libraryId: null, libraryCloud: null, created: null, savedWhere: null, savedAt: null, dirty: false, review: false};
+  const state = {pieces: [], sendScope: 'all', source: 'box', design: null, file: null, unitOverride: 'auto', plan: null, placement: {x: 0, y: 0, scale: 1, rotation: 0}, libraryId: null, libraryCloud: null, created: null, savedWhere: null, savedAt: null, dirty: false, review: false};
   let analysis = null, analysisKey = '', renders = new Map(), previews = new Map(), renderTimer = null, renderToken = 0, zoom = 1, saveDraftTimer = null;
 
   /* ------------------------------------------------------------ DOM */
@@ -1699,14 +1705,17 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   sourceBar.append(boxTab, importTab);
 
   const panel = el('div', 'js-import'); panel.hidden = true;
-  const input = el('input'); input.type = 'file'; input.accept = '.svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg'; input.hidden = true;
+  const input = el('input'); input.type = 'file'; input.accept = '.svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg'; input.multiple = true; input.hidden = true;
+  const addInput = el('input'); addInput.type = 'file'; addInput.accept = input.accept; addInput.multiple = true; addInput.hidden = true;
   const fileCard = el('section', 'neo-op-card js-file');
   fileCard.innerHTML = \`<div class="js-file-head"><span class="js-file-icon">\${svgIcon('file')}</span><div><strong class="js-file-name">Sin archivo</strong><span class="js-file-status"><i></i><em>Importa un SVG para placas, logotipos, grabados y cortes.</em></span></div></div>
    <dl class="js-file-facts"><div><dt>Dimensiones del archivo</dt><dd class="js-file-dims">\u2014</dd></div><div><dt>Objetos</dt><dd class="js-file-count">\u2014</dd></div></dl>
    <label class="js-units" hidden>Interpretar unidades<select class="js-unit-select"><option value="auto">Autom\xE1tico (96 ppp)</option><option value="px72">px a 72 ppp (Illustrator)</option><option value="px96">px a 96 ppp (Inkscape, web)</option><option value="mm">1 unidad = 1 mm</option></select></label>\`;
   const openButton = btn('', () => input.click(), 'btn outline js-open'); openButton.innerHTML = svgIcon('folder') + '<span>Abrir SVG o imagen</span>';
-  fileCard.append(openButton, input);
-  const drop = el('div', 'js-drop'); drop.innerHTML = \`\${svgIcon('file', 'js-drop-icon')}<strong>Arrastra aqu\xED un SVG, PNG o JPG</strong><span>SVG: grabado y corte vectorial. PNG/JPG: grabado de imagen.</span>\`;
+  const addButton = btn('', () => addInput.click(), 'btn quiet js-add-files'); addButton.innerHTML = '<span>+ Agregar m\xE1s archivos a la cama</span>';
+  const pieceList = el('ul', 'js-pieces'); pieceList.hidden = true;
+  fileCard.append(pieceList, openButton, addButton, input, addInput);
+  const drop = el('div', 'js-drop'); drop.innerHTML = \`\${svgIcon('file', 'js-drop-icon')}<strong>Arrastra aqu\xED uno o varios SVG, PNG o JPG</strong><span>SVG: grabado y corte vectorial. PNG/JPG: grabado de imagen. Varios archivos se acomodan juntos en la cama.</span>\`;
   drop.onclick = () => input.click();
   const issues = el('details', 'neo-op-card js-issues'); issues.hidden = true;
   const review = el('div', 'js-review'); review.hidden = true;
@@ -1718,7 +1727,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
    <div class="js-place-grid"><label>X \xB7 mm<input class="js-x" type="number" step="0.1"></label><label>Y \xB7 mm<input class="js-y" type="number" step="0.1"></label>
    <label>Ancho \xB7 mm<input class="js-w" type="number" step="0.1" min="0.1"></label><label>Alto \xB7 mm<input class="js-h" type="number" step="0.1" min="0.1"></label>
    <label>Escala \xB7 %<input class="js-scale" type="number" step="0.1" min="1" max="1000"></label><label>Giro \xB7 \xB0<input class="js-rot" type="number" step="0.5"></label></div>
-   <div class="js-place-actions"></div><p class="js-hint">Escala proporcional: ancho y alto cambian juntos. Tambi\xE9n puedes arrastrar el dise\xF1o sobre la cama.</p>\`;
+   <div class="js-place-actions"></div><p class="js-hint">Escala proporcional: ancho y alto cambian juntos. Arrastra sobre la cama para mover; con varios archivos, arrastra cada uno por separado (X, Y, escala y giro aplican al conjunto).</p>\`;
   const placeActions = place.querySelector('.js-place-actions');
   const rotL = btn('', () => setPlacement({rotation: norm(state.placement.rotation - 90)}), 'btn quiet js-icon-btn'); rotL.innerHTML = svgIcon('rotL'); rotL.title = 'Girar 90\xB0 a la izquierda'; rotL.setAttribute('aria-label', rotL.title);
   const rotR = btn('', () => setPlacement({rotation: norm(state.placement.rotation + 90)}), 'btn quiet js-icon-btn'); rotR.innerHTML = svgIcon('rotR'); rotR.title = 'Girar 90\xB0 a la derecha'; rotR.setAttribute('aria-label', rotR.title);
@@ -1796,41 +1805,93 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   opsCard.querySelector('.js-to-order').onclick = () => setCenter('order');
 
   /* ------------------------------------------------------------ importar */
-  input.onchange = () => { const f = input.files?.[0]; input.value = ''; if (f) importFile(f); };
+  input.onchange = () => { const files = [...(input.files || [])]; input.value = ''; if (files.length) importFiles(files, {append: false}).catch(() => {}); };
+  addInput.onchange = () => { const files = [...(addInput.files || [])]; addInput.value = ''; if (files.length) importFiles(files, {append: true}).catch(() => {}); };
   for (const target of [drop, previewEl]) {
     target.addEventListener('dragover', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.add('is-over'); });
     target.addEventListener('dragleave', () => drop.classList.remove('is-over'));
-    target.addEventListener('drop', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.remove('is-over'); const f = e.dataTransfer?.files?.[0]; if (f) importFile(f); });
+    target.addEventListener('drop', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.remove('is-over'); const files = [...(e.dataTransfer?.files || [])]; if (files.length) importFiles(files, {append: !!state.design}).catch(() => {}); });
   }
   const readText = (f) => f.text ? f.text() : new Response(f).text();
   const readDataURL = (f) => new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(Error('No se pudo leer el archivo.')); r.readAsDataURL(f); });
-  async function importFile(file, {fromPhone = false} = {}) {
-    if (machine.busy) throw Error('Hay una operaci\xF3n de m\xE1quina activa. Espera para importar.');
+  async function readSource(file) {
     const name = String(file.name || 'archivo').slice(0, 120), type = (file.type || '').toLowerCase();
-    try {
-      if (file.size > 8 * 1024 * 1024) throw Error('El archivo supera 8 MB.');
-      if (/\\.svg$/i.test(name) || type === 'image/svg+xml') {
-        const text = await readText(file);
-        loadSource({type: 'svg', name, mime: 'image/svg+xml', data: text}, {fresh: true});
-      } else if (/\\.(png|jpe?g)$/i.test(name) || /^image\\/(png|jpeg)$/.test(type)) {
-        const data = await readDataURL(file);
-        if (!/^data:image\\/(png|jpeg);base64,/.test(data)) throw Error('Solo se aceptan PNG o JPG.');
-        await loadSource({type: 'image', name, mime: data.slice(5, data.indexOf(';')), data}, {fresh: true});
-      } else throw Error('Formato no compatible. Usa SVG (recomendado), PNG o JPG.');
-      if (state.source !== 'import') setSource('import', {silent: true});
-      app.toast?.(fromPhone ? 'Archivo recibido desde el celular. Revisa colocaci\xF3n y operaciones.' : 'Archivo importado. Nada se env\xEDa a la m\xE1quina hasta que lo inicies.');
-    } catch (e) { app.toast?.(e.message); throw e; }
+    if (file.size > 8 * 1024 * 1024) throw Error(\`\${name}: el archivo supera 8 MB.\`);
+    if (/\\.svg$/i.test(name) || type === 'image/svg+xml') return {type: 'svg', name, mime: 'image/svg+xml', data: await readText(file)};
+    if (/\\.(png|jpe?g)$/i.test(name) || /^image\\/(png|jpeg)$/.test(type)) {
+      const data = await readDataURL(file);
+      if (!/^data:image\\/(png|jpeg);base64,/.test(data)) throw Error(\`\${name}: solo se aceptan PNG o JPG.\`);
+      return {type: 'image', name, mime: data.slice(5, data.indexOf(';')), data};
+    }
+    throw Error(\`\${name}: formato no compatible. Usa SVG (recomendado), PNG o JPG.\`);
+  }
+  /** Uno o varios archivos. append=false reemplaza lo importado; append=true los suma a la cama. */
+  async function importFiles(files, {append = false, fromPhone = false} = {}) {
+    if (machine.busy) throw Error('Hay una operaci\xF3n de m\xE1quina activa. Espera para importar.');
+    const errors = []; let added = 0;
+    for (const [i, file] of files.entries()) {
+      try {
+        const source = await readSource(file);
+        if (!append && i === 0) await loadSource(source, {fresh: true}); else await appendSource(source);
+        added++;
+      } catch (e) { errors.push(e.message); }
+    }
+    if (added && state.source !== 'import') setSource('import', {silent: true});
+    const msg = added ? \`\${added === 1 ? 'Archivo importado' : added + ' archivos importados'}\${fromPhone ? ' desde el celular' : ''}. Nada se env\xEDa a la m\xE1quina hasta que lo inicies.\` : '';
+    app.toast?.([msg, ...errors].filter(Boolean).join(' '));
+    if (!added) throw Error(errors[0] || 'No se import\xF3 ning\xFAn archivo.');
+  }
+  const importFile = (file, options = {}) => importFiles([file], options);
+  /** Carga un archivo (nuevo o desde la biblioteca) sin tocar la m\xE1quina. */
+  async function decode(source, unitOverride = 'auto') {
+    if (source.type === 'svg') return importSVG(source.data, {name: source.name, unitOverride});
+    const img = new Image(); img.src = source.data; await img.decode().catch(() => { throw Error(\`\${source.name}: la imagen est\xE1 da\xF1ada o no es compatible.\`); });
+    return imageDesign({name: source.name, href: source.data, pixelWidth: img.naturalWidth, pixelHeight: img.naturalHeight});
+  }
+  /** Archivo combinado que se guarda en biblioteca/borrador: uno solo, o la lista con sus posiciones. */
+  function combinedFile() {
+    if (state.pieces.length === 1) return state.pieces[0].source;
+    return {type: 'multi', name: \`\${state.pieces.length} archivos\`, mime: 'application/json', data: JSON.stringify(state.pieces.map((p) => ({...p.source, unitOverride: p.unitOverride, offset: p.offset})))};
+  }
+  /** Recalcula el dise\xF1o combinado; las capas nuevas reciben la regla de colores sin tocar las ya elegidas. */
+  function rebuild({keepPlan = true} = {}) {
+    state.design = mergeDesigns(state.pieces.map((p) => ({design: p.design, offset: p.offset})));
+    state.file = combinedFile();
+    if (!keepPlan || !state.plan) state.plan = defaultPlan(state.design);
+    else for (const layer of state.design.layers) if (!(layer.key in state.plan.assignment) && !state.knownLayers?.has(layer.key)) assignLayerDefault(state.plan, layer);
+    state.knownLayers = new Set(state.design.layers.map((l) => l.key));
+    renders = new Map(); previews = new Map(); analysisKey = '';
+  }
+  async function appendSource(source) {
+    if (!state.design) return loadSource(source, {fresh: true});
+    const design = await decode(source, state.unitOverride);
+    const placed = state.pieces.map((p) => ({bbox: {x: p.design.bbox.x + p.offset[0], y: p.design.bbox.y + p.offset[1], width: p.design.bbox.width, height: p.design.bbox.height}}));
+    const bed = currentBed(), at = nextOffset(placed, design.bbox, {maxWidth: bed.width / Math.max(state.placement.scale, 0.01)});
+    state.pieces.push({source, unitOverride: state.unitOverride, design, offset: [at.x - design.bbox.x, at.y - design.bbox.y]});
+    rebuild(); state.dirty = true;
+    const b = placedBounds(state.design, state.placement);
+    if (b.x + b.width > bed.width + 1e-6 || b.y + b.height > bed.height + 1e-6) state.design.issues.push({level: 'warn', code: 'fit', message: \`\${source.name} no cabe junto a los dem\xE1s en la cama: mu\xE9velo (arrastr\xE1ndolo) o reduce la escala.\`, count: 1});
+    renderStructure(); update(); scheduleDraft();
+  }
+  function removePiece(index) {
+    if (machine.busy || state.pieces.length < 2) return;
+    state.pieces.splice(index, 1); rebuild(); state.dirty = true; renderStructure(); update(); scheduleDraft();
   }
   /** Carga un archivo (nuevo o desde la biblioteca) sin tocar la m\xE1quina. */
   async function loadSource(source, {fresh, unitOverride = 'auto', plan = null, placement = null} = {}) {
-    let design;
-    if (source.type === 'svg') design = importSVG(source.data, {name: source.name, unitOverride});
-    else {
-      const img = new Image(); img.src = source.data; await img.decode().catch(() => { throw Error('La imagen est\xE1 da\xF1ada o no es compatible.'); });
-      design = imageDesign({name: source.name, href: source.data, pixelWidth: img.naturalWidth, pixelHeight: img.naturalHeight});
+    let list;
+    if (source.type === 'multi') { try { list = JSON.parse(source.data); } catch { throw Error('El trabajo guardado est\xE1 da\xF1ado.'); } if (!Array.isArray(list) || !list.length || list.length > 40) throw Error('El trabajo guardado est\xE1 da\xF1ado.'); }
+    else list = [{...source, unitOverride, offset: [0, 0]}];
+    const pieces = [];
+    for (const item of list) {
+      const src = {type: item.type, name: item.name, mime: item.mime, data: item.data};
+      const u = item.unitOverride || unitOverride;
+      pieces.push({source: src, unitOverride: u, design: await decode(src, u), offset: Array.isArray(item.offset) && item.offset.every(Number.isFinite) ? item.offset : [0, 0]});
     }
-    state.design = design; state.file = source; state.unitOverride = unitOverride;
-    state.plan = plan ? reconcilePlan(plan, design) : defaultPlan(design);
+    state.pieces = pieces; state.unitOverride = unitOverride; state.knownLayers = null;
+    state.plan = null; rebuild({keepPlan: false});
+    const design = state.design;
+    if (plan) { state.plan = reconcilePlan(plan, design); state.knownLayers = new Set(design.layers.map((l) => l.key)); }
     const bed = currentBed();
     if (placement) state.placement = {...placement};
     else {
@@ -1848,7 +1909,6 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       }
     }
     if (fresh) { state.libraryId = null; state.libraryCloud = null; state.created = null; state.savedWhere = null; state.savedAt = null; state.review = false; state.dirty = true; }
-    renders = new Map(); previews = new Map(); analysisKey = '';
     renderStructure(); update(); scheduleDraft();
   }
   function reconcilePlan(plan, design) {
@@ -1877,8 +1937,12 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     if (v > 0 && b[axis] > 0) setPlacement({scale: state.placement.scale * v / b[axis]});
   });
   fileCard.querySelector('.js-unit-select').onchange = async (e) => {
-    if (!state.file || state.file.type !== 'svg') return;
-    try { await loadSource(state.file, {unitOverride: e.target.value === 'px96' ? 'px96' : e.target.value, plan: state.plan, placement: {...state.placement, scale: 1}}); state.dirty = true; } catch (err) { app.toast?.(err.message); }
+    if (!state.design || machine.busy) return;
+    try {
+      const u = e.target.value;
+      for (const piece of state.pieces) if (piece.source.type === 'svg') { piece.unitOverride = u; piece.design = await decode(piece.source, u); }
+      state.unitOverride = u; rebuild(); state.placement = {...state.placement, scale: 1}; state.dirty = true; renderStructure(); update(); scheduleDraft();
+    } catch (err) { app.toast?.(err.message); }
   };
   // Arrastrar el dise\xF1o sobre la cama (solo vista; nunca mueve el cabezal).
   let drag = null;
@@ -1887,19 +1951,36 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
     const p = toBed(svg, e), b = placedBounds(state.design, state.placement);
     if (p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height) return;
-    drag = {start: p, origin: {...state.placement}, svg}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-dragging'); e.preventDefault();
+    // Con varios archivos se arrastra el que est\xE1 bajo el puntero; los dem\xE1s no se mueven.
+    let piece = null;
+    if (state.pieces.length > 1) {
+      const m = placementMatrix(state.design, state.placement);
+      const boxOf = (pc) => { const c = [[pc.bbox.x, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y + pc.bbox.height], [pc.bbox.x, pc.bbox.y + pc.bbox.height]].map((q) => apply(m, q)); return {x0: Math.min(...c.map((q) => q[0])), x1: Math.max(...c.map((q) => q[0])), y0: Math.min(...c.map((q) => q[1])), y1: Math.max(...c.map((q) => q[1]))}; };
+      const hit = [...state.design.pieces].reverse().find((pc) => { const r = boxOf(pc); return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1; });
+      if (hit) { const other = state.design.pieces.find((pc) => pc.index !== hit.index); piece = {index: hit.index, offset: [...state.pieces[hit.index].offset], m, ref: [other.bbox.x, other.bbox.y], refBed: apply(m, [other.bbox.x, other.bbox.y]), refIndex: other.index}; }
+    }
+    drag = {start: p, origin: {...state.placement}, svg, piece}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-dragging'); e.preventDefault();
   });
   // La vista se redibuja en cada movimiento: se usa siempre el SVG actual (el anterior ya no est\xE1 en pantalla).
   previewEl.addEventListener('pointermove', (e) => {
     if (!drag) return;
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
+    if (drag.piece) {
+      const p = toBed(svg, e), {m, index} = drag.piece, det = m[0] * m[3] - m[1] * m[2] || 1, dX = p.x - drag.start.x, dY = p.y - drag.start.y;
+      const piece = state.pieces[index]; piece.offset = [drag.piece.offset[0] + (m[3] * dX - m[2] * dY) / det, drag.piece.offset[1] + (-m[1] * dX + m[0] * dY) / det];
+      rebuild();
+      // Mantener fijo el resto: se compensa el cambio de la caja del conjunto.
+      const other = state.design.pieces.find((pc) => pc.index === drag.piece.refIndex), now = apply(placementMatrix(state.design, drag.origin), [other.bbox.x, other.bbox.y]);
+      state.placement = {...drag.origin, x: drag.origin.x + drag.piece.refBed[0] - now[0], y: drag.origin.y + drag.piece.refBed[1] - now[1]};
+      state.dirty = true; updateLight(); return;
+    }
     const p = toBed(svg, e), bed = currentBed(), b = placedBounds(state.design, drag.origin);
     // Se mantiene dentro de la cama mientras se arrastra (si el dise\xF1o cabe).
     const clamp = (v, size, max) => size <= max ? Math.min(Math.max(v, 0), max - size) : v;
     const x = clamp(b.x + p.x - drag.start.x, b.width, bed.width), y = clamp(b.y + p.y - drag.start.y, b.height, bed.height);
     setPlacement({x: drag.origin.x + x - b.x, y: drag.origin.y + y - b.y}, {silent: true}); updateLight();
   });
-  const endDrag = () => { if (!drag) return; drag = null; previewEl.classList.remove('is-dragging'); update(); scheduleDraft(); };
+  const endDrag = () => { if (!drag) return; const moved = drag.piece; drag = null; previewEl.classList.remove('is-dragging'); if (moved) renderStructure(); update(); scheduleDraft(); };
   previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
   function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
   function setZoom(z) { zoom = Math.max(1, Math.min(12, z)); machine.refresh(false); }
@@ -2063,7 +2144,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   }
   const source = {
     isActive: () => state.source === 'import',
-    name: () => state.file?.name?.replace(/\\.(svg|png|jpe?g)$/i, '') || 'Archivo importado',
+    name: () => (state.pieces.length > 1 ? state.pieces.map((p) => p.source.name.replace(/\\.(svg|png|jpe?g)$/i, '')).join(' + ').slice(0, 80) : state.file?.name?.replace(/\\.(svg|png|jpe?g)$/i, '')) || 'Archivo importado',
     /** Vista, resumen y estado para el controlador. Con origen actual la vista se desplaza al cabezal. */
     describe({bed, position, origin}) {
       if (!state.design) return {preview: emptyBed(bed), compact: emptyBed(bed, true), summary: '', seconds: 0, problem: problemText(null)};
@@ -2074,7 +2155,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const active = state.sendScope === 'all' ? a.ops.filter((o) => o.op.enabled && !o.empty) : a.ops.filter((o) => o.op.enabled && !o.empty && o.op.id === state.sendScope);
       const seconds = active.reduce((s, o) => s + o.seconds, 0);
       const b = a.bounds;
-      const summary = \`\${state.file.name} \xB7 \${fmt(b.width)} \xD7 \${fmt(b.height)} mm en X \${fmt(b.x)} \xB7 Y \${fmt(b.y)} \xB7 \${state.sendScope === 'all' ? \`\${active.length} \${active.length === 1 ? 'operaci\xF3n activa' : 'operaciones activas'}\` : \`se enviar\xE1 solo \xAB\${active[0]?.op.name || '\u2014'}\xBB\`}. Tiempo estimado: \${fmtTime(seconds)}. SVG importado: se corta sobre la l\xEDnea, sin compensar kerf.\`;
+      const summary = \`\${state.pieces.length > 1 ? state.pieces.length + ' archivos' : state.file.name} \xB7 \${fmt(b.width)} \xD7 \${fmt(b.height)} mm en X \${fmt(b.x)} \xB7 Y \${fmt(b.y)} \xB7 \${state.sendScope === 'all' ? \`\${active.length} \${active.length === 1 ? 'operaci\xF3n activa' : 'operaciones activas'}\` : \`se enviar\xE1 solo \xAB\${active[0]?.op.name || '\u2014'}\xBB\`}. Tiempo estimado: \${fmtTime(seconds)}. SVG importado: se corta sobre la l\xEDnea, sin compensar kerf.\`;
       const b0 = a.bounds, center = [b0.x + b0.width / 2, b0.y + b0.height / 2];
       return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
@@ -2141,12 +2222,17 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   function update() {
     const has = !!state.design;
     fileCard.querySelector('.js-file-name').textContent = state.file?.name || 'Sin archivo';
+    pieceList.hidden = state.pieces.length < 2; addButton.hidden = !has;
+    if (state.pieces.length > 1 && pieceList.childElementCount !== state.pieces.length + 0 || pieceList.dataset.key !== state.pieces.map((p) => p.source.name).join('|')) {
+      pieceList.dataset.key = state.pieces.map((p) => p.source.name).join('|');
+      pieceList.replaceChildren(...(state.pieces.length > 1 ? state.pieces.map((p, i) => { const li = el('li'); li.append(el('span', '', p.source.name), el('small', '', \`\${fmt(p.design.bbox.width)} \xD7 \${fmt(p.design.bbox.height)} mm\`)); const x = btn('\xD7', () => removePiece(i), 'js-piece-del'); x.setAttribute('aria-label', 'Quitar ' + p.source.name); x.title = 'Quitar este archivo'; li.append(x); return li; }) : []));
+    }
     const status = fileCard.querySelector('.js-file-status');
     status.dataset.state = !has ? 'none' : state.dirty ? 'dirty' : state.savedWhere === 'both' ? 'synced' : 'local';
     status.querySelector('em').textContent = !has ? 'Importa un SVG para placas, logotipos, grabados y cortes.' : state.dirty ? (state.libraryId ? 'Cambios sin guardar' : 'Sin guardar en la biblioteca') : state.savedWhere === 'both' ? 'Guardado en tu cuenta y en esta computadora' : 'Guardado solo en esta computadora';
     fileCard.querySelector('.js-file-dims').textContent = has ? \`\${fmt(state.design.bbox.width)} \xD7 \${fmt(state.design.bbox.height)} mm\` : '\u2014';
     fileCard.querySelector('.js-file-count').textContent = has ? \`\${state.design.objectCount} objeto\${state.design.objectCount === 1 ? '' : 's'}\` : '\u2014';
-    const units = fileCard.querySelector('.js-units'); units.hidden = !has || state.file.type !== 'svg' || (state.design.unitsDeclared && state.unitOverride === 'auto');
+    const units = fileCard.querySelector('.js-units'); units.hidden = !has || !state.pieces.some((p) => p.source.type === 'svg') || (state.design.unitsDeclared && state.unitOverride === 'auto');
     fileCard.querySelector('.js-unit-select').value = state.unitOverride === 'px96' ? 'px96' : state.unitOverride;
     drop.hidden = has; place.hidden = !has; opsCard.hidden = !has; layers.hidden = !has; saveRow.hidden = !has; review.hidden = !state.review;
     for (const n of panel.querySelectorAll('input,select,button')) if (!n.closest('.js-review')) n.disabled = machine.busy;
@@ -2283,11 +2369,11 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     app.workshop?.refreshLibrary?.(); app.workshopRemote?.publishLibrary?.();
   }
   /** Archivos enviados desde el celular por el enlace (sin pasar por internet). */
-  async function receiveFile({name, type, data}) {
+  async function receiveFile({name, type, data, append = false}) {
     let file;
     if (type === 'image/svg+xml') file = new File([data], name, {type});
     else { const bin = atob(data.split(',')[1] || ''), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); file = new File([bytes], name, {type}); }
-    await importFile(file, {fromPhone: true});
+    await importFiles([file], {append: append && !!state.design, fromPhone: true});
   }
 
   machine.setSource(source);
@@ -4060,7 +4146,7 @@ function controls(){
  for(const b of document.querySelectorAll('[data-origin]')){b.disabled=!idle||(b.dataset.origin==='current'&&!state?.hasPosition);b.setAttribute('aria-pressed',String(state?.origin===b.dataset.origin));}
  for(const b of document.querySelectorAll('[data-source]')){b.disabled=!idle;b.setAttribute('aria-pressed',String((job()?.source||state?.source)===b.dataset.source));}
  for(const n of document.querySelectorAll('#tabJobs input,#tabJobs select,#tabJobs button:not([data-source]):not([data-origin]),#tabLibrary .rm-lib button'))n.disabled=!idle;
- $('remoteImport').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);
+ $('remoteImport').disabled=$('remoteAdd').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);$('remoteAddLabel').classList.toggle('is-disabled',!idle);
  $('remoteLibRefresh').disabled=!open();
 }
 function disconnected(){if(!session&&!state)return;const was=!!state;state=null;awaiting=false;$('remoteLinkState').textContent='Reconectando\u2026';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado. La orden no se reenvi\xF3.'));}pending.clear();for(const u of uploads.values())u.reject(Error('Enlace desconectado.'));uploads.clear();releaseWake();const c=channel,pr=peer;channel=null;peer=null;if(c){c.onclose=null;try{c.close();}catch{}}if(pr){pr.onconnectionstatechange=null;try{pr.close();}catch{}}controls();
@@ -4151,8 +4237,11 @@ $('remoteScope').onchange=e=>command('scope',{value:e.target.value});
 $('remoteReviewOpen').onclick=()=>{reviewOpen=true;$('remoteReview').hidden=false;renderReview();$('remoteReview').scrollIntoView?.({block:'start'});};
 $('remoteReviewOk').onclick=async()=>{if(job()?.review&&!(await command('review-ok')))return;reviewOpen=false;$('remoteReview').hidden=true;showTab('tabControl');};
 $('remoteSave').onclick=async()=>{const r=await ask('Guardar en biblioteca',state?.name||'Trabajo',true);if(r)await command('save',{name:r.value,cloud:r.cloud});};
-$('remoteImport').onchange=async()=>{const file=$('remoteImport').files?.[0];$('remoteImport').value='';if(file)await sendFile(file);};
-async function sendFile(file){
+// Varios archivos: \xABImportar\xBB reemplaza con el primero y suma los dem\xE1s; \xAB+ Agregar\xBB los suma todos.
+async function sendFiles(list,append){for(const [i,file] of list.entries()){const ok=await sendFile(file,append||i>0);if(!ok)break;}}
+$('remoteImport').onchange=async()=>{const files=[...($('remoteImport').files||[])];$('remoteImport').value='';if(files.length)await sendFiles(files,false);};
+$('remoteAdd').onchange=async()=>{const files=[...($('remoteAdd').files||[])];$('remoteAdd').value='';if(files.length)await sendFiles(files,true);};
+async function sendFile(file,append=false){
  const mime=/\\.svg$/i.test(file.name)?'image/svg+xml':/\\.png$/i.test(file.name)?'image/png':/\\.jpe?g$/i.test(file.name)?'image/jpeg':file.type;
  if(!['image/svg+xml','image/png','image/jpeg'].includes(mime))return status('Formato no compatible. Usa SVG, PNG o JPG.');
  if(file.size>8*1024*1024)return status('El archivo supera 8 MB.');
@@ -4164,11 +4253,11 @@ async function sendFile(file){
   let timer;const done=new Promise((resolve,reject)=>{uploads.set(upload,{resolve,reject});timer=setTimeout(()=>{if(uploads.delete(upload))reject(Error('La computadora no confirm\xF3 el archivo.'));},120000);}).finally(()=>clearTimeout(timer));
   for(let index=0;index<count;index++){
    while(channel.bufferedAmount>512000)await new Promise(r=>setTimeout(r,40));
-   channel.send(JSON.stringify({type:'upload',session,upload,index,count,...(index===0?{name:file.name.slice(0,120),mime}:{}),data:data.slice(index*UPLOAD_CHUNK,(index+1)*UPLOAD_CHUNK)}));
+   channel.send(JSON.stringify({type:'upload',session,upload,index,count,...(index===0?{name:file.name.slice(0,120),mime,append:!!append}:{}),data:data.slice(index*UPLOAD_CHUNK,(index+1)*UPLOAD_CHUNK)}));
    $('remoteUpload').textContent=\`Enviando \${file.name} a la computadora\u2026 \${Math.round((index+1)/count*100)} %\`;
   }
-  await done;$('remoteUpload').textContent=\`\${file.name} importado en la computadora. Revisa colocaci\xF3n y operaciones.\`;
- }catch(e){$('remoteUpload').textContent=e.message;}
+  await done;$('remoteUpload').textContent=\`\${file.name} \${append?'agregado':'importado'} en la computadora. Revisa colocaci\xF3n y operaciones.\`;return true;
+ }catch(e){$('remoteUpload').textContent=e.message;return false;}
  finally{awaiting=false;controls();}
 }
 /* ---------- Biblioteca ---------- */
@@ -4313,7 +4402,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
 
   <!-- ============ TRABAJOS ============ -->
   <section id="tabJobs" class="rm-tab" hidden aria-labelledby="navJobs">
-   <div class="rm-head"><h1>Preparar trabajo</h1><label class="rm-import rm-primary" id="remoteImportLabel">+ Importar SVG<input type="file" id="remoteImport" accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label></div>
+   <div class="rm-head"><h1>Preparar trabajo</h1><label class="rm-import rm-primary" id="remoteImportLabel">Importar SVG<input type="file" id="remoteImport" multiple accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label><label class="rm-import" id="remoteAddLabel">+ Agregar<input type="file" id="remoteAdd" multiple accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label></div>
    <div class="rm-seg rm-source" role="group" aria-label="Fuente del trabajo"><button type="button" data-source="box">Dise\xF1o Box</button><button type="button" data-source="import">Archivo importado</button></div>
    <p id="remoteUpload" class="rm-note" role="status"></p>
    <div id="remoteImportBlock">
@@ -4364,7 +4453,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
  </footer>
 </main>
 <dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> Tambi\xE9n en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
-<script type="module" src="remote-client.js?v=6"></script>
+<script type="module" src="remote-client.js?v=7"></script>
 </body>
 </html>
 `,type:"text/html; charset=utf-8",public:!0},"/box/renderer.js":{body:`import {StudioGPU} from './webgl-renderer.js?v=3.5';
@@ -4929,6 +5018,40 @@ export function imageDesign({name, href, pixelWidth, pixelHeight, widthMm}) {
   const images = [{id: 'img1', href, x: 0, y: 0, width: pixelWidth, height: pixelHeight, matrix: m, corners, preserve: 'none', opacity: 1}];
   return {name, widthMm: w, heightMm: h, unitsDeclared: false, unitOverride: 'auto', viewBox: null, elements: [], images, texts: [], bbox: boundsOf([], images), layers: layersOf([], images), objectCount: 1, raster: true,
     issues: [{level: 'info', code: 'photo', message: \`Imagen de \${pixelWidth} \xD7 \${pixelHeight} px. Se interpret\xF3 a 96 ppp (\${w.toFixed(1)} \xD7 \${h.toFixed(1)} mm); ajusta la escala a la medida real.\`, count: 1}]};
+}
+
+/**
+ * Varios archivos en una sola cama: cada pieza conserva su geometr\xEDa y se desplaza por
+ * \`offset\` (mm del documento). Las capas por color se combinan entre archivos.
+ */
+export function mergeDesigns(pieces) {
+  const elements = [], images = [], texts = [], issues = [], info = [];
+  let objectCount = 0, unitsDeclared = true;
+  const many = pieces.length > 1;
+  pieces.forEach((p, index) => {
+    const [dx, dy] = p.offset || [0, 0], T = [1, 0, 0, 1, dx, dy], pre = many ? \`p\${index}-\` : '', zBase = many ? index * 1e6 : 0;
+    const shift = (q) => [q[0] + dx, q[1] + dy];
+    for (const e of p.design.elements) elements.push({...e, id: pre + e.id, z: zBase + (e.z || 0), piece: index, subpaths: e.subpaths.map((s) => ({...s, points: s.points.map(shift)}))});
+    for (const im of p.design.images) images.push({...im, id: pre + im.id, z: zBase + (im.z || 0), piece: index, matrix: mul(T, im.matrix), corners: im.corners.map(shift)});
+    texts.push(...p.design.texts);
+    for (const issue of p.design.issues) issues.push(many ? {...issue, message: \`\${p.design.name}: \${issue.message}\`} : issue);
+    objectCount += p.design.objectCount; unitsDeclared = unitsDeclared && p.design.unitsDeclared;
+    const b = p.design.bbox;
+    info.push({index, name: p.design.name, bbox: {x: b.x + dx, y: b.y + dy, width: b.width, height: b.height}});
+  });
+  return {name: many ? \`\${pieces.length} archivos\` : pieces[0].design.name, widthMm: pieces[0].design.widthMm, heightMm: pieces[0].design.heightMm, unitsDeclared, unitOverride: pieces[0].design.unitOverride,
+    viewBox: null, elements, images, texts, issues, bbox: boundsOf(elements, images), layers: layersOf(elements, images), objectCount, pieces: info};
+}
+
+/** D\xF3nde colocar un archivo nuevo: a la derecha del \xFAltimo, o en una fila nueva si no cabe. */
+export function nextOffset(existing, size, {maxWidth = 400, gap = 5} = {}) {
+  if (!existing.length) return null;
+  const right = existing.reduce((a, p) => Math.max(a, p.bbox.x + p.bbox.width), -Infinity);
+  const left = existing.reduce((a, p) => Math.min(a, p.bbox.x), Infinity);
+  const last = existing.at(-1).bbox;
+  if (right + gap + size.width - left <= maxWidth) return {x: right + gap, y: last.y};
+  const bottom = existing.reduce((a, p) => Math.max(a, p.bbox.y + p.bbox.height), -Infinity);
+  return {x: left, y: bottom + gap};
 }
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/vendor/jspdf.umd.min.js":{body:`/** @license
  *
@@ -7986,11 +8109,11 @@ export function mountRemoteHost(app,machine,mount){
  async function receiveUpload(m){
   const reply=(ok,error='')=>{if(channel?.readyState==='open')channel.send(JSON.stringify({type:'upload-reply',upload:m.upload,ok,error}));};
   if(typeof m.upload!=='string'||m.upload.length>80||!Number.isInteger(m.index)||!Number.isInteger(m.count)||m.count<1||m.count>Math.ceil(UPLOAD_MAX/UPLOAD_CHUNK)||typeof m.data!=='string'||m.data.length>UPLOAD_CHUNK)return reply(false,'Fragmento inv\xE1lido.');
-  if(m.index===0){if(typeof m.name!=='string'||!['image/svg+xml','image/png','image/jpeg'].includes(m.mime))return reply(false,'Formato no compatible. Usa SVG, PNG o JPG.');upload={id:m.upload,count:m.count,parts:[],name:m.name.slice(0,120),mime:m.mime,started:Date.now()};}
+  if(m.index===0){if(typeof m.name!=='string'||!['image/svg+xml','image/png','image/jpeg'].includes(m.mime))return reply(false,'Formato no compatible. Usa SVG, PNG o JPG.');upload={id:m.upload,count:m.count,parts:[],name:m.name.slice(0,120),mime:m.mime,append:m.append===true,started:Date.now()};}
   if(!upload||upload.id!==m.upload||upload.parts.length!==m.index||Date.now()-upload.started>120000){upload=null;return reply(false,'Transferencia incompleta. Vuelve a enviar el archivo.');}
   upload.parts.push(m.data);if(upload.parts.length<upload.count)return;
   const done=upload;upload=null;
-  try{if(machine.busy)throw Error('Hay una operaci\xF3n activa. Espera para importar.');await app.jobStudio.receiveFile({name:done.name,type:done.mime,data:done.parts.join('')});reply(true);publish(true);}
+  try{if(machine.busy)throw Error('Hay una operaci\xF3n activa. Espera para importar.');await app.jobStudio.receiveFile({name:done.name,type:done.mime,data:done.parts.join(''),append:done.append});reply(true);publish(true);}
   catch(e){reply(false,e.message);}
  }
  open.onclick=()=>dialog.showModal();$('peerClose').onclick=()=>dialog.close();
@@ -8042,8 +8165,8 @@ import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
 import {mountK40} from './k40-control.js?v=14';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=6';
-import {mountJobStudio} from './job-studio.js?v=4';
+import {mountRemoteHost} from './workshop-remote.js?v=7';
+import {mountJobStudio} from './job-studio.js?v=5';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};

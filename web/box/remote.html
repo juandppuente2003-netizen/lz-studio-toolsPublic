@@ -53,7 +53,7 @@
 
   <!-- ============ TRABAJOS ============ -->
   <section id="tabJobs" class="rm-tab" hidden aria-labelledby="navJobs">
-   <div class="rm-head"><h1>Preparar trabajo</h1><label class="rm-import rm-primary" id="remoteImportLabel">+ Importar SVG<input type="file" id="remoteImport" accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label></div>
+   <div class="rm-head"><h1>Preparar trabajo</h1><label class="rm-import rm-primary" id="remoteImportLabel">Importar SVG<input type="file" id="remoteImport" multiple accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label><label class="rm-import" id="remoteAddLabel">+ Agregar<input type="file" id="remoteAdd" multiple accept=".svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg" hidden></label></div>
    <div class="rm-seg rm-source" role="group" aria-label="Fuente del trabajo"><button type="button" data-source="box">Diseño Box</button><button type="button" data-source="import">Archivo importado</button></div>
    <p id="remoteUpload" class="rm-note" role="status"></p>
    <div id="remoteImportBlock">
@@ -104,6 +104,6 @@
  </footer>
 </main>
 <dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> También en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
-<script type="module" src="remote-client.js?v=6"></script>
+<script type="module" src="remote-client.js?v=7"></script>
 </body>
 </html>

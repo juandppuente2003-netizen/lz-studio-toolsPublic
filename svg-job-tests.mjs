@@ -197,3 +197,21 @@ test('regla del taller: rojo = corte (también relleno rojo, por su contorno), n
   const cut = a.ops.find((o) => o.op.type === 'cut'); assert.equal(cut.data.paths.length, 2);
   const raster = a.ops.find((o) => o.op.type === 'raster'); assert.ok(raster.data.area.width < 25); // el rojo no entra al grabado
 });
+
+test('varios archivos: se combinan, se acomodan sin encimarse y comparten capas por color', async () => {
+  const {mergeDesigns, nextOffset} = await import('./web/box/svg-import.js');
+  const a = load('<svg xmlns="http://www.w3.org/2000/svg" width="60mm" height="40mm" viewBox="0 0 60 40"><rect width="60" height="40" stroke="red" fill="none"/></svg>', {name: 'a.svg'});
+  const b = load('<svg xmlns="http://www.w3.org/2000/svg" width="50mm" height="30mm" viewBox="0 0 50 30"><rect width="50" height="30" stroke="red" fill="none"/><circle cx="25" cy="15" r="5" fill="#000"/></svg>', {name: 'b.svg'});
+  const at = nextOffset([{bbox: a.bbox}], b.bbox, {maxWidth: 400});
+  assert.deepEqual(at, {x: 65, y: 0});
+  const wrap = nextOffset([{bbox: a.bbox}], b.bbox, {maxWidth: 100});
+  assert.deepEqual(wrap, {x: 0, y: 45});
+  const m = mergeDesigns([{design: a, offset: [0, 0]}, {design: b, offset: [at.x, at.y]}]);
+  assert.equal(m.pieces.length, 2); close(m.bbox.width, 115); assert.equal(m.objectCount, 3);
+  assert.deepEqual(m.layers.map((l) => l.key).sort(), ['fill:#000000', 'stroke:#ff0000']);
+  assert.equal(m.layers.find((l) => l.key === 'stroke:#ff0000').count, 2);
+  assert.ok(new Set(m.elements.map((e) => e.id)).size === m.elements.length, 'ids únicos');
+  const plan = defaultPlan(m), an = analyzePlan(m, {x: 0, y: 0, scale: 1, rotation: 0}, plan, BED);
+  assert.equal(an.ops.find((o) => o.op.type === 'cut').data.paths.length, 2);
+  assert.equal(mergeDesigns([{design: a, offset: [0, 0]}]).elements[0].id, a.elements[0].id, 'un archivo queda igual');
+});

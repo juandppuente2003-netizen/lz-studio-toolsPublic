@@ -5,8 +5,8 @@
    Nada de lo que ocurre aquí mueve la máquina: importar, colocar, cambiar de
    pestaña o abrir un trabajo guardado solo actualiza la vista. El envío lo inicia
    siempre el botón de la barra de acciones (o el celular con el control). */
-import {importSVG, imageDesign} from './svg-import.js?v=2';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=3';
+import {importSVG, imageDesign, mergeDesigns, nextOffset, apply} from './svg-import.js?v=3';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=4';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -36,7 +36,7 @@ const opIcon = {raster: 'image', engrave: 'pen', cut: 'scissors'};
 export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) {
   if (app.jobStudio) return app.jobStudio;
   const dialog = machine.dialog, $ = (id) => document.getElementById(id);
-  const state = {sendScope: 'all', source: 'box', design: null, file: null, unitOverride: 'auto', plan: null, placement: {x: 0, y: 0, scale: 1, rotation: 0}, libraryId: null, libraryCloud: null, created: null, savedWhere: null, savedAt: null, dirty: false, review: false};
+  const state = {pieces: [], sendScope: 'all', source: 'box', design: null, file: null, unitOverride: 'auto', plan: null, placement: {x: 0, y: 0, scale: 1, rotation: 0}, libraryId: null, libraryCloud: null, created: null, savedWhere: null, savedAt: null, dirty: false, review: false};
   let analysis = null, analysisKey = '', renders = new Map(), previews = new Map(), renderTimer = null, renderToken = 0, zoom = 1, saveDraftTimer = null;
 
   /* ------------------------------------------------------------ DOM */
@@ -47,14 +47,17 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   sourceBar.append(boxTab, importTab);
 
   const panel = el('div', 'js-import'); panel.hidden = true;
-  const input = el('input'); input.type = 'file'; input.accept = '.svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg'; input.hidden = true;
+  const input = el('input'); input.type = 'file'; input.accept = '.svg,image/svg+xml,.png,image/png,.jpg,.jpeg,image/jpeg'; input.multiple = true; input.hidden = true;
+  const addInput = el('input'); addInput.type = 'file'; addInput.accept = input.accept; addInput.multiple = true; addInput.hidden = true;
   const fileCard = el('section', 'neo-op-card js-file');
   fileCard.innerHTML = `<div class="js-file-head"><span class="js-file-icon">${svgIcon('file')}</span><div><strong class="js-file-name">Sin archivo</strong><span class="js-file-status"><i></i><em>Importa un SVG para placas, logotipos, grabados y cortes.</em></span></div></div>
    <dl class="js-file-facts"><div><dt>Dimensiones del archivo</dt><dd class="js-file-dims">—</dd></div><div><dt>Objetos</dt><dd class="js-file-count">—</dd></div></dl>
    <label class="js-units" hidden>Interpretar unidades<select class="js-unit-select"><option value="auto">Automático (96 ppp)</option><option value="px72">px a 72 ppp (Illustrator)</option><option value="px96">px a 96 ppp (Inkscape, web)</option><option value="mm">1 unidad = 1 mm</option></select></label>`;
   const openButton = btn('', () => input.click(), 'btn outline js-open'); openButton.innerHTML = svgIcon('folder') + '<span>Abrir SVG o imagen</span>';
-  fileCard.append(openButton, input);
-  const drop = el('div', 'js-drop'); drop.innerHTML = `${svgIcon('file', 'js-drop-icon')}<strong>Arrastra aquí un SVG, PNG o JPG</strong><span>SVG: grabado y corte vectorial. PNG/JPG: grabado de imagen.</span>`;
+  const addButton = btn('', () => addInput.click(), 'btn quiet js-add-files'); addButton.innerHTML = '<span>+ Agregar más archivos a la cama</span>';
+  const pieceList = el('ul', 'js-pieces'); pieceList.hidden = true;
+  fileCard.append(pieceList, openButton, addButton, input, addInput);
+  const drop = el('div', 'js-drop'); drop.innerHTML = `${svgIcon('file', 'js-drop-icon')}<strong>Arrastra aquí uno o varios SVG, PNG o JPG</strong><span>SVG: grabado y corte vectorial. PNG/JPG: grabado de imagen. Varios archivos se acomodan juntos en la cama.</span>`;
   drop.onclick = () => input.click();
   const issues = el('details', 'neo-op-card js-issues'); issues.hidden = true;
   const review = el('div', 'js-review'); review.hidden = true;
@@ -66,7 +69,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
    <div class="js-place-grid"><label>X · mm<input class="js-x" type="number" step="0.1"></label><label>Y · mm<input class="js-y" type="number" step="0.1"></label>
    <label>Ancho · mm<input class="js-w" type="number" step="0.1" min="0.1"></label><label>Alto · mm<input class="js-h" type="number" step="0.1" min="0.1"></label>
    <label>Escala · %<input class="js-scale" type="number" step="0.1" min="1" max="1000"></label><label>Giro · °<input class="js-rot" type="number" step="0.5"></label></div>
-   <div class="js-place-actions"></div><p class="js-hint">Escala proporcional: ancho y alto cambian juntos. También puedes arrastrar el diseño sobre la cama.</p>`;
+   <div class="js-place-actions"></div><p class="js-hint">Escala proporcional: ancho y alto cambian juntos. Arrastra sobre la cama para mover; con varios archivos, arrastra cada uno por separado (X, Y, escala y giro aplican al conjunto).</p>`;
   const placeActions = place.querySelector('.js-place-actions');
   const rotL = btn('', () => setPlacement({rotation: norm(state.placement.rotation - 90)}), 'btn quiet js-icon-btn'); rotL.innerHTML = svgIcon('rotL'); rotL.title = 'Girar 90° a la izquierda'; rotL.setAttribute('aria-label', rotL.title);
   const rotR = btn('', () => setPlacement({rotation: norm(state.placement.rotation + 90)}), 'btn quiet js-icon-btn'); rotR.innerHTML = svgIcon('rotR'); rotR.title = 'Girar 90° a la derecha'; rotR.setAttribute('aria-label', rotR.title);
@@ -144,41 +147,93 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   opsCard.querySelector('.js-to-order').onclick = () => setCenter('order');
 
   /* ------------------------------------------------------------ importar */
-  input.onchange = () => { const f = input.files?.[0]; input.value = ''; if (f) importFile(f); };
+  input.onchange = () => { const files = [...(input.files || [])]; input.value = ''; if (files.length) importFiles(files, {append: false}).catch(() => {}); };
+  addInput.onchange = () => { const files = [...(addInput.files || [])]; addInput.value = ''; if (files.length) importFiles(files, {append: true}).catch(() => {}); };
   for (const target of [drop, previewEl]) {
     target.addEventListener('dragover', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.add('is-over'); });
     target.addEventListener('dragleave', () => drop.classList.remove('is-over'));
-    target.addEventListener('drop', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.remove('is-over'); const f = e.dataTransfer?.files?.[0]; if (f) importFile(f); });
+    target.addEventListener('drop', (e) => { if (state.source !== 'import' || machine.busy) return; e.preventDefault(); drop.classList.remove('is-over'); const files = [...(e.dataTransfer?.files || [])]; if (files.length) importFiles(files, {append: !!state.design}).catch(() => {}); });
   }
   const readText = (f) => f.text ? f.text() : new Response(f).text();
   const readDataURL = (f) => new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(Error('No se pudo leer el archivo.')); r.readAsDataURL(f); });
-  async function importFile(file, {fromPhone = false} = {}) {
-    if (machine.busy) throw Error('Hay una operación de máquina activa. Espera para importar.');
+  async function readSource(file) {
     const name = String(file.name || 'archivo').slice(0, 120), type = (file.type || '').toLowerCase();
-    try {
-      if (file.size > 8 * 1024 * 1024) throw Error('El archivo supera 8 MB.');
-      if (/\.svg$/i.test(name) || type === 'image/svg+xml') {
-        const text = await readText(file);
-        loadSource({type: 'svg', name, mime: 'image/svg+xml', data: text}, {fresh: true});
-      } else if (/\.(png|jpe?g)$/i.test(name) || /^image\/(png|jpeg)$/.test(type)) {
-        const data = await readDataURL(file);
-        if (!/^data:image\/(png|jpeg);base64,/.test(data)) throw Error('Solo se aceptan PNG o JPG.');
-        await loadSource({type: 'image', name, mime: data.slice(5, data.indexOf(';')), data}, {fresh: true});
-      } else throw Error('Formato no compatible. Usa SVG (recomendado), PNG o JPG.');
-      if (state.source !== 'import') setSource('import', {silent: true});
-      app.toast?.(fromPhone ? 'Archivo recibido desde el celular. Revisa colocación y operaciones.' : 'Archivo importado. Nada se envía a la máquina hasta que lo inicies.');
-    } catch (e) { app.toast?.(e.message); throw e; }
+    if (file.size > 8 * 1024 * 1024) throw Error(`${name}: el archivo supera 8 MB.`);
+    if (/\.svg$/i.test(name) || type === 'image/svg+xml') return {type: 'svg', name, mime: 'image/svg+xml', data: await readText(file)};
+    if (/\.(png|jpe?g)$/i.test(name) || /^image\/(png|jpeg)$/.test(type)) {
+      const data = await readDataURL(file);
+      if (!/^data:image\/(png|jpeg);base64,/.test(data)) throw Error(`${name}: solo se aceptan PNG o JPG.`);
+      return {type: 'image', name, mime: data.slice(5, data.indexOf(';')), data};
+    }
+    throw Error(`${name}: formato no compatible. Usa SVG (recomendado), PNG o JPG.`);
+  }
+  /** Uno o varios archivos. append=false reemplaza lo importado; append=true los suma a la cama. */
+  async function importFiles(files, {append = false, fromPhone = false} = {}) {
+    if (machine.busy) throw Error('Hay una operación de máquina activa. Espera para importar.');
+    const errors = []; let added = 0;
+    for (const [i, file] of files.entries()) {
+      try {
+        const source = await readSource(file);
+        if (!append && i === 0) await loadSource(source, {fresh: true}); else await appendSource(source);
+        added++;
+      } catch (e) { errors.push(e.message); }
+    }
+    if (added && state.source !== 'import') setSource('import', {silent: true});
+    const msg = added ? `${added === 1 ? 'Archivo importado' : added + ' archivos importados'}${fromPhone ? ' desde el celular' : ''}. Nada se envía a la máquina hasta que lo inicies.` : '';
+    app.toast?.([msg, ...errors].filter(Boolean).join(' '));
+    if (!added) throw Error(errors[0] || 'No se importó ningún archivo.');
+  }
+  const importFile = (file, options = {}) => importFiles([file], options);
+  /** Carga un archivo (nuevo o desde la biblioteca) sin tocar la máquina. */
+  async function decode(source, unitOverride = 'auto') {
+    if (source.type === 'svg') return importSVG(source.data, {name: source.name, unitOverride});
+    const img = new Image(); img.src = source.data; await img.decode().catch(() => { throw Error(`${source.name}: la imagen está dañada o no es compatible.`); });
+    return imageDesign({name: source.name, href: source.data, pixelWidth: img.naturalWidth, pixelHeight: img.naturalHeight});
+  }
+  /** Archivo combinado que se guarda en biblioteca/borrador: uno solo, o la lista con sus posiciones. */
+  function combinedFile() {
+    if (state.pieces.length === 1) return state.pieces[0].source;
+    return {type: 'multi', name: `${state.pieces.length} archivos`, mime: 'application/json', data: JSON.stringify(state.pieces.map((p) => ({...p.source, unitOverride: p.unitOverride, offset: p.offset})))};
+  }
+  /** Recalcula el diseño combinado; las capas nuevas reciben la regla de colores sin tocar las ya elegidas. */
+  function rebuild({keepPlan = true} = {}) {
+    state.design = mergeDesigns(state.pieces.map((p) => ({design: p.design, offset: p.offset})));
+    state.file = combinedFile();
+    if (!keepPlan || !state.plan) state.plan = defaultPlan(state.design);
+    else for (const layer of state.design.layers) if (!(layer.key in state.plan.assignment) && !state.knownLayers?.has(layer.key)) assignLayerDefault(state.plan, layer);
+    state.knownLayers = new Set(state.design.layers.map((l) => l.key));
+    renders = new Map(); previews = new Map(); analysisKey = '';
+  }
+  async function appendSource(source) {
+    if (!state.design) return loadSource(source, {fresh: true});
+    const design = await decode(source, state.unitOverride);
+    const placed = state.pieces.map((p) => ({bbox: {x: p.design.bbox.x + p.offset[0], y: p.design.bbox.y + p.offset[1], width: p.design.bbox.width, height: p.design.bbox.height}}));
+    const bed = currentBed(), at = nextOffset(placed, design.bbox, {maxWidth: bed.width / Math.max(state.placement.scale, 0.01)});
+    state.pieces.push({source, unitOverride: state.unitOverride, design, offset: [at.x - design.bbox.x, at.y - design.bbox.y]});
+    rebuild(); state.dirty = true;
+    const b = placedBounds(state.design, state.placement);
+    if (b.x + b.width > bed.width + 1e-6 || b.y + b.height > bed.height + 1e-6) state.design.issues.push({level: 'warn', code: 'fit', message: `${source.name} no cabe junto a los demás en la cama: muévelo (arrastrándolo) o reduce la escala.`, count: 1});
+    renderStructure(); update(); scheduleDraft();
+  }
+  function removePiece(index) {
+    if (machine.busy || state.pieces.length < 2) return;
+    state.pieces.splice(index, 1); rebuild(); state.dirty = true; renderStructure(); update(); scheduleDraft();
   }
   /** Carga un archivo (nuevo o desde la biblioteca) sin tocar la máquina. */
   async function loadSource(source, {fresh, unitOverride = 'auto', plan = null, placement = null} = {}) {
-    let design;
-    if (source.type === 'svg') design = importSVG(source.data, {name: source.name, unitOverride});
-    else {
-      const img = new Image(); img.src = source.data; await img.decode().catch(() => { throw Error('La imagen está dañada o no es compatible.'); });
-      design = imageDesign({name: source.name, href: source.data, pixelWidth: img.naturalWidth, pixelHeight: img.naturalHeight});
+    let list;
+    if (source.type === 'multi') { try { list = JSON.parse(source.data); } catch { throw Error('El trabajo guardado está dañado.'); } if (!Array.isArray(list) || !list.length || list.length > 40) throw Error('El trabajo guardado está dañado.'); }
+    else list = [{...source, unitOverride, offset: [0, 0]}];
+    const pieces = [];
+    for (const item of list) {
+      const src = {type: item.type, name: item.name, mime: item.mime, data: item.data};
+      const u = item.unitOverride || unitOverride;
+      pieces.push({source: src, unitOverride: u, design: await decode(src, u), offset: Array.isArray(item.offset) && item.offset.every(Number.isFinite) ? item.offset : [0, 0]});
     }
-    state.design = design; state.file = source; state.unitOverride = unitOverride;
-    state.plan = plan ? reconcilePlan(plan, design) : defaultPlan(design);
+    state.pieces = pieces; state.unitOverride = unitOverride; state.knownLayers = null;
+    state.plan = null; rebuild({keepPlan: false});
+    const design = state.design;
+    if (plan) { state.plan = reconcilePlan(plan, design); state.knownLayers = new Set(design.layers.map((l) => l.key)); }
     const bed = currentBed();
     if (placement) state.placement = {...placement};
     else {
@@ -196,7 +251,6 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       }
     }
     if (fresh) { state.libraryId = null; state.libraryCloud = null; state.created = null; state.savedWhere = null; state.savedAt = null; state.review = false; state.dirty = true; }
-    renders = new Map(); previews = new Map(); analysisKey = '';
     renderStructure(); update(); scheduleDraft();
   }
   function reconcilePlan(plan, design) {
@@ -225,8 +279,12 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     if (v > 0 && b[axis] > 0) setPlacement({scale: state.placement.scale * v / b[axis]});
   });
   fileCard.querySelector('.js-unit-select').onchange = async (e) => {
-    if (!state.file || state.file.type !== 'svg') return;
-    try { await loadSource(state.file, {unitOverride: e.target.value === 'px96' ? 'px96' : e.target.value, plan: state.plan, placement: {...state.placement, scale: 1}}); state.dirty = true; } catch (err) { app.toast?.(err.message); }
+    if (!state.design || machine.busy) return;
+    try {
+      const u = e.target.value;
+      for (const piece of state.pieces) if (piece.source.type === 'svg') { piece.unitOverride = u; piece.design = await decode(piece.source, u); }
+      state.unitOverride = u; rebuild(); state.placement = {...state.placement, scale: 1}; state.dirty = true; renderStructure(); update(); scheduleDraft();
+    } catch (err) { app.toast?.(err.message); }
   };
   // Arrastrar el diseño sobre la cama (solo vista; nunca mueve el cabezal).
   let drag = null;
@@ -235,19 +293,36 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
     const p = toBed(svg, e), b = placedBounds(state.design, state.placement);
     if (p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height) return;
-    drag = {start: p, origin: {...state.placement}, svg}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-dragging'); e.preventDefault();
+    // Con varios archivos se arrastra el que está bajo el puntero; los demás no se mueven.
+    let piece = null;
+    if (state.pieces.length > 1) {
+      const m = placementMatrix(state.design, state.placement);
+      const boxOf = (pc) => { const c = [[pc.bbox.x, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y + pc.bbox.height], [pc.bbox.x, pc.bbox.y + pc.bbox.height]].map((q) => apply(m, q)); return {x0: Math.min(...c.map((q) => q[0])), x1: Math.max(...c.map((q) => q[0])), y0: Math.min(...c.map((q) => q[1])), y1: Math.max(...c.map((q) => q[1]))}; };
+      const hit = [...state.design.pieces].reverse().find((pc) => { const r = boxOf(pc); return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1; });
+      if (hit) { const other = state.design.pieces.find((pc) => pc.index !== hit.index); piece = {index: hit.index, offset: [...state.pieces[hit.index].offset], m, ref: [other.bbox.x, other.bbox.y], refBed: apply(m, [other.bbox.x, other.bbox.y]), refIndex: other.index}; }
+    }
+    drag = {start: p, origin: {...state.placement}, svg, piece}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-dragging'); e.preventDefault();
   });
   // La vista se redibuja en cada movimiento: se usa siempre el SVG actual (el anterior ya no está en pantalla).
   previewEl.addEventListener('pointermove', (e) => {
     if (!drag) return;
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
+    if (drag.piece) {
+      const p = toBed(svg, e), {m, index} = drag.piece, det = m[0] * m[3] - m[1] * m[2] || 1, dX = p.x - drag.start.x, dY = p.y - drag.start.y;
+      const piece = state.pieces[index]; piece.offset = [drag.piece.offset[0] + (m[3] * dX - m[2] * dY) / det, drag.piece.offset[1] + (-m[1] * dX + m[0] * dY) / det];
+      rebuild();
+      // Mantener fijo el resto: se compensa el cambio de la caja del conjunto.
+      const other = state.design.pieces.find((pc) => pc.index === drag.piece.refIndex), now = apply(placementMatrix(state.design, drag.origin), [other.bbox.x, other.bbox.y]);
+      state.placement = {...drag.origin, x: drag.origin.x + drag.piece.refBed[0] - now[0], y: drag.origin.y + drag.piece.refBed[1] - now[1]};
+      state.dirty = true; updateLight(); return;
+    }
     const p = toBed(svg, e), bed = currentBed(), b = placedBounds(state.design, drag.origin);
     // Se mantiene dentro de la cama mientras se arrastra (si el diseño cabe).
     const clamp = (v, size, max) => size <= max ? Math.min(Math.max(v, 0), max - size) : v;
     const x = clamp(b.x + p.x - drag.start.x, b.width, bed.width), y = clamp(b.y + p.y - drag.start.y, b.height, bed.height);
     setPlacement({x: drag.origin.x + x - b.x, y: drag.origin.y + y - b.y}, {silent: true}); updateLight();
   });
-  const endDrag = () => { if (!drag) return; drag = null; previewEl.classList.remove('is-dragging'); update(); scheduleDraft(); };
+  const endDrag = () => { if (!drag) return; const moved = drag.piece; drag = null; previewEl.classList.remove('is-dragging'); if (moved) renderStructure(); update(); scheduleDraft(); };
   previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
   function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
   function setZoom(z) { zoom = Math.max(1, Math.min(12, z)); machine.refresh(false); }
@@ -411,7 +486,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   }
   const source = {
     isActive: () => state.source === 'import',
-    name: () => state.file?.name?.replace(/\.(svg|png|jpe?g)$/i, '') || 'Archivo importado',
+    name: () => (state.pieces.length > 1 ? state.pieces.map((p) => p.source.name.replace(/\.(svg|png|jpe?g)$/i, '')).join(' + ').slice(0, 80) : state.file?.name?.replace(/\.(svg|png|jpe?g)$/i, '')) || 'Archivo importado',
     /** Vista, resumen y estado para el controlador. Con origen actual la vista se desplaza al cabezal. */
     describe({bed, position, origin}) {
       if (!state.design) return {preview: emptyBed(bed), compact: emptyBed(bed, true), summary: '', seconds: 0, problem: problemText(null)};
@@ -422,7 +497,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const active = state.sendScope === 'all' ? a.ops.filter((o) => o.op.enabled && !o.empty) : a.ops.filter((o) => o.op.enabled && !o.empty && o.op.id === state.sendScope);
       const seconds = active.reduce((s, o) => s + o.seconds, 0);
       const b = a.bounds;
-      const summary = `${state.file.name} · ${fmt(b.width)} × ${fmt(b.height)} mm en X ${fmt(b.x)} · Y ${fmt(b.y)} · ${state.sendScope === 'all' ? `${active.length} ${active.length === 1 ? 'operación activa' : 'operaciones activas'}` : `se enviará solo «${active[0]?.op.name || '—'}»`}. Tiempo estimado: ${fmtTime(seconds)}. SVG importado: se corta sobre la línea, sin compensar kerf.`;
+      const summary = `${state.pieces.length > 1 ? state.pieces.length + ' archivos' : state.file.name} · ${fmt(b.width)} × ${fmt(b.height)} mm en X ${fmt(b.x)} · Y ${fmt(b.y)} · ${state.sendScope === 'all' ? `${active.length} ${active.length === 1 ? 'operación activa' : 'operaciones activas'}` : `se enviará solo «${active[0]?.op.name || '—'}»`}. Tiempo estimado: ${fmtTime(seconds)}. SVG importado: se corta sobre la línea, sin compensar kerf.`;
       const b0 = a.bounds, center = [b0.x + b0.width / 2, b0.y + b0.height / 2];
       return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
@@ -489,12 +564,17 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   function update() {
     const has = !!state.design;
     fileCard.querySelector('.js-file-name').textContent = state.file?.name || 'Sin archivo';
+    pieceList.hidden = state.pieces.length < 2; addButton.hidden = !has;
+    if (state.pieces.length > 1 && pieceList.childElementCount !== state.pieces.length + 0 || pieceList.dataset.key !== state.pieces.map((p) => p.source.name).join('|')) {
+      pieceList.dataset.key = state.pieces.map((p) => p.source.name).join('|');
+      pieceList.replaceChildren(...(state.pieces.length > 1 ? state.pieces.map((p, i) => { const li = el('li'); li.append(el('span', '', p.source.name), el('small', '', `${fmt(p.design.bbox.width)} × ${fmt(p.design.bbox.height)} mm`)); const x = btn('×', () => removePiece(i), 'js-piece-del'); x.setAttribute('aria-label', 'Quitar ' + p.source.name); x.title = 'Quitar este archivo'; li.append(x); return li; }) : []));
+    }
     const status = fileCard.querySelector('.js-file-status');
     status.dataset.state = !has ? 'none' : state.dirty ? 'dirty' : state.savedWhere === 'both' ? 'synced' : 'local';
     status.querySelector('em').textContent = !has ? 'Importa un SVG para placas, logotipos, grabados y cortes.' : state.dirty ? (state.libraryId ? 'Cambios sin guardar' : 'Sin guardar en la biblioteca') : state.savedWhere === 'both' ? 'Guardado en tu cuenta y en esta computadora' : 'Guardado solo en esta computadora';
     fileCard.querySelector('.js-file-dims').textContent = has ? `${fmt(state.design.bbox.width)} × ${fmt(state.design.bbox.height)} mm` : '—';
     fileCard.querySelector('.js-file-count').textContent = has ? `${state.design.objectCount} objeto${state.design.objectCount === 1 ? '' : 's'}` : '—';
-    const units = fileCard.querySelector('.js-units'); units.hidden = !has || state.file.type !== 'svg' || (state.design.unitsDeclared && state.unitOverride === 'auto');
+    const units = fileCard.querySelector('.js-units'); units.hidden = !has || !state.pieces.some((p) => p.source.type === 'svg') || (state.design.unitsDeclared && state.unitOverride === 'auto');
     fileCard.querySelector('.js-unit-select').value = state.unitOverride === 'px96' ? 'px96' : state.unitOverride;
     drop.hidden = has; place.hidden = !has; opsCard.hidden = !has; layers.hidden = !has; saveRow.hidden = !has; review.hidden = !state.review;
     for (const n of panel.querySelectorAll('input,select,button')) if (!n.closest('.js-review')) n.disabled = machine.busy;
@@ -631,11 +711,11 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     app.workshop?.refreshLibrary?.(); app.workshopRemote?.publishLibrary?.();
   }
   /** Archivos enviados desde el celular por el enlace (sin pasar por internet). */
-  async function receiveFile({name, type, data}) {
+  async function receiveFile({name, type, data, append = false}) {
     let file;
     if (type === 'image/svg+xml') file = new File([data], name, {type});
     else { const bin = atob(data.split(',')[1] || ''), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); file = new File([bytes], name, {type}); }
-    await importFile(file, {fromPhone: true});
+    await importFiles([file], {append: append && !!state.design, fromPhone: true});
   }
 
   machine.setSource(source);

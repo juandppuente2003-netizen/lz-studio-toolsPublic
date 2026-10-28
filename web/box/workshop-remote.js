@@ -84,11 +84,11 @@ export function mountRemoteHost(app,machine,mount){
  async function receiveUpload(m){
   const reply=(ok,error='')=>{if(channel?.readyState==='open')channel.send(JSON.stringify({type:'upload-reply',upload:m.upload,ok,error}));};
   if(typeof m.upload!=='string'||m.upload.length>80||!Number.isInteger(m.index)||!Number.isInteger(m.count)||m.count<1||m.count>Math.ceil(UPLOAD_MAX/UPLOAD_CHUNK)||typeof m.data!=='string'||m.data.length>UPLOAD_CHUNK)return reply(false,'Fragmento inválido.');
-  if(m.index===0){if(typeof m.name!=='string'||!['image/svg+xml','image/png','image/jpeg'].includes(m.mime))return reply(false,'Formato no compatible. Usa SVG, PNG o JPG.');upload={id:m.upload,count:m.count,parts:[],name:m.name.slice(0,120),mime:m.mime,started:Date.now()};}
+  if(m.index===0){if(typeof m.name!=='string'||!['image/svg+xml','image/png','image/jpeg'].includes(m.mime))return reply(false,'Formato no compatible. Usa SVG, PNG o JPG.');upload={id:m.upload,count:m.count,parts:[],name:m.name.slice(0,120),mime:m.mime,append:m.append===true,started:Date.now()};}
   if(!upload||upload.id!==m.upload||upload.parts.length!==m.index||Date.now()-upload.started>120000){upload=null;return reply(false,'Transferencia incompleta. Vuelve a enviar el archivo.');}
   upload.parts.push(m.data);if(upload.parts.length<upload.count)return;
   const done=upload;upload=null;
-  try{if(machine.busy)throw Error('Hay una operación activa. Espera para importar.');await app.jobStudio.receiveFile({name:done.name,type:done.mime,data:done.parts.join('')});reply(true);publish(true);}
+  try{if(machine.busy)throw Error('Hay una operación activa. Espera para importar.');await app.jobStudio.receiveFile({name:done.name,type:done.mime,data:done.parts.join(''),append:done.append});reply(true);publish(true);}
   catch(e){reply(false,e.message);}
  }
  open.onclick=()=>dialog.showModal();$('peerClose').onclick=()=>dialog.close();
