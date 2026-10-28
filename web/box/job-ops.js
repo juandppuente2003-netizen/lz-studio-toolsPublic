@@ -19,7 +19,7 @@ export const OP_TYPES = {
   cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, icon: 'scissors'},
 };
 export const RESOLUTIONS = [2, 3, 4, 5, 6, 8].map((step) => ({step, mm: +(step * NATIVE_MM).toFixed(4), dpi: Math.round(1000 / step)}));
-const RED = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return false; const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16); return r > 180 && g < 90 && b < 90; };
+const RED = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return false; const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16); return r >= 150 && g <= 110 && b <= 110 && r - Math.max(g, b) >= 80; };
 
 let opSerial = 0;
 export function makeOperation(type, extra = {}) {
@@ -37,9 +37,13 @@ export function makeOperation(type, extra = {}) {
 export function defaultPlan(design) {
   const ops = [], assignment = {};
   const need = (type) => ops.find((o) => o.type === type) || (ops.push(makeOperation(type)), ops.at(-1));
+  // Regla del taller: rojo = corte (contorno o relleno rojo → su contorno se corta).
+  // Negro y demás colores = grabado: rellenos e imágenes como imagen, contornos como vector.
   for (const layer of design.layers) {
-    if (layer.kind === 'image' || layer.kind === 'fill') assignment[layer.key] = need('raster').id;
-    else assignment[layer.key] = (RED(layer.color) ? need('cut') : need('engrave')).id;
+    if (layer.kind === 'image') assignment[layer.key] = need('raster').id;
+    else if (RED(layer.color)) assignment[layer.key] = need('cut').id + (layer.kind === 'fill' ? ':outline' : '');
+    else if (layer.kind === 'fill') assignment[layer.key] = need('raster').id;
+    else assignment[layer.key] = need('engrave').id;
   }
   const rank = {raster: 0, engrave: 1, cut: 2};
   ops.sort((a, b) => rank[a.type] - rank[b.type]);

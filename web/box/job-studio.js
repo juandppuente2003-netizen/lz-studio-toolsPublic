@@ -6,7 +6,7 @@
    pestaña o abrir un trabajo guardado solo actualiza la vista. El envío lo inicia
    siempre el botón de la barra de acciones (o el celular con el control). */
 import {importSVG, imageDesign} from './svg-import.js?v=2';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=2';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=3';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -83,7 +83,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   scopeLabel.append(scopeSelect);
   opsCard.append(addRow, scopeLabel, el('p', 'js-op-power', 'Potencia: se ajusta en el panel de la máquina para cada operación; la M2 no la controla por USB. El grabado de imagen es de 1 bit (encendido/apagado).'));
   const layers = el('details', 'neo-op-card js-layers'); layers.open = true;
-  layers.innerHTML = '<summary>Capas del archivo y operación asignada</summary><p class="js-hint">Los colores ayudan a proponer la operación; la asignación es tuya. Un relleno solo se corta si eliges «Contorno como corte».</p><div class="js-layer-list"></div>';
+  layers.innerHTML = '<summary>Capas del archivo y operación asignada</summary><p class="js-hint">Regla automática: <b>rojo = corte</b> (un relleno rojo se corta por su contorno) y <b>negro y demás colores = grabado</b>. Puedes cambiar cualquier capa.</p><div class="js-layer-list"></div>';
+  layers.append(btn('Volver a asignar por color (rojo = corte)', () => { if (!state.design || machine.busy) return; state.plan = defaultPlan(state.design); state.sendScope = 'all'; state.dirty = true; renderStructure(); update(); }, 'btn quiet js-reassign'));
   const saveRow = el('div', 'js-save');
   const saveB = btn('', () => openSave(), 'btn outline js-save-btn'); saveB.innerHTML = svgIcon('save') + '<span>Guardar en biblioteca</span>';
   saveRow.append(saveB);

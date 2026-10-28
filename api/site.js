@@ -1305,7 +1305,7 @@ export const OP_TYPES = {
   cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, icon: 'scissors'},
 };
 export const RESOLUTIONS = [2, 3, 4, 5, 6, 8].map((step) => ({step, mm: +(step * NATIVE_MM).toFixed(4), dpi: Math.round(1000 / step)}));
-const RED = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return false; const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16); return r > 180 && g < 90 && b < 90; };
+const RED = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return false; const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16); return r >= 150 && g <= 110 && b <= 110 && r - Math.max(g, b) >= 80; };
 
 let opSerial = 0;
 export function makeOperation(type, extra = {}) {
@@ -1323,9 +1323,13 @@ export function makeOperation(type, extra = {}) {
 export function defaultPlan(design) {
   const ops = [], assignment = {};
   const need = (type) => ops.find((o) => o.type === type) || (ops.push(makeOperation(type)), ops.at(-1));
+  // Regla del taller: rojo = corte (contorno o relleno rojo \u2192 su contorno se corta).
+  // Negro y dem\xE1s colores = grabado: rellenos e im\xE1genes como imagen, contornos como vector.
   for (const layer of design.layers) {
-    if (layer.kind === 'image' || layer.kind === 'fill') assignment[layer.key] = need('raster').id;
-    else assignment[layer.key] = (RED(layer.color) ? need('cut') : need('engrave')).id;
+    if (layer.kind === 'image') assignment[layer.key] = need('raster').id;
+    else if (RED(layer.color)) assignment[layer.key] = need('cut').id + (layer.kind === 'fill' ? ':outline' : '');
+    else if (layer.kind === 'fill') assignment[layer.key] = need('raster').id;
+    else assignment[layer.key] = need('engrave').id;
   }
   const rank = {raster: 0, engrave: 1, cut: 2};
   ops.sort((a, b) => rank[a.type] - rank[b.type]);
@@ -1654,7 +1658,7 @@ export function bitsPreviewURL(render, {document: doc = globalThis.document, max
    pesta\xF1a o abrir un trabajo guardado solo actualiza la vista. El env\xEDo lo inicia
    siempre el bot\xF3n de la barra de acciones (o el celular con el control). */
 import {importSVG, imageDesign} from './svg-import.js?v=2';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=2';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds} from './job-ops.js?v=3';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -1731,7 +1735,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   scopeLabel.append(scopeSelect);
   opsCard.append(addRow, scopeLabel, el('p', 'js-op-power', 'Potencia: se ajusta en el panel de la m\xE1quina para cada operaci\xF3n; la M2 no la controla por USB. El grabado de imagen es de 1 bit (encendido/apagado).'));
   const layers = el('details', 'neo-op-card js-layers'); layers.open = true;
-  layers.innerHTML = '<summary>Capas del archivo y operaci\xF3n asignada</summary><p class="js-hint">Los colores ayudan a proponer la operaci\xF3n; la asignaci\xF3n es tuya. Un relleno solo se corta si eliges \xABContorno como corte\xBB.</p><div class="js-layer-list"></div>';
+  layers.innerHTML = '<summary>Capas del archivo y operaci\xF3n asignada</summary><p class="js-hint">Regla autom\xE1tica: <b>rojo = corte</b> (un relleno rojo se corta por su contorno) y <b>negro y dem\xE1s colores = grabado</b>. Puedes cambiar cualquier capa.</p><div class="js-layer-list"></div>';
+  layers.append(btn('Volver a asignar por color (rojo = corte)', () => { if (!state.design || machine.busy) return; state.plan = defaultPlan(state.design); state.sendScope = 'all'; state.dirty = true; renderStructure(); update(); }, 'btn quiet js-reassign'));
   const saveRow = el('div', 'js-save');
   const saveB = btn('', () => openSave(), 'btn outline js-save-btn'); saveB.innerHTML = svgIcon('save') + '<span>Guardar en biblioteca</span>';
   saveRow.append(saveB);
@@ -7951,7 +7956,7 @@ import {modelInfo} from './models.js?v=3.5';
 import {mountK40} from './k40-control.js?v=14';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
 import {mountRemoteHost} from './workshop-remote.js?v=5';
-import {mountJobStudio} from './job-studio.js?v=3';
+import {mountJobStudio} from './job-studio.js?v=4';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};

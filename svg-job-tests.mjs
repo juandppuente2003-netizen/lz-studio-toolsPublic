@@ -184,3 +184,16 @@ test('colores: todos los colores graban, el blanco encima tapa, orden del docume
   assert.deepEqual(fills, ['#000000', '#ffffff', '#000000', '#000000']); // amarillo y naranja graban; blanco tapa
   assert.equal(rasterColor('#ffed00', 'gray'), '#ffed00');
 });
+
+test('regla del taller: rojo = corte (también relleno rojo, por su contorno), negro = grabado', () => {
+  const d = load(`<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="100mm" viewBox="0 0 100 100">
+    <rect x="5" y="5" width="90" height="90" fill="#E30613"/><path d="M20 50H80" stroke="#000" fill="none"/><circle cx="50" cy="30" r="10" fill="#000"/><rect x="10" y="10" width="10" height="10" stroke="#ff0000" fill="none"/></svg>`);
+  const plan = defaultPlan(d), id = Object.fromEntries(plan.operations.map((o) => [o.type, o.id]));
+  assert.equal(plan.assignment['fill:#e30613'], id.cut + ':outline');
+  assert.equal(plan.assignment['stroke:#ff0000'], id.cut);
+  assert.equal(plan.assignment['fill:#000000'], id.raster);
+  assert.equal(plan.assignment['stroke:#000000'], id.engrave);
+  const a = analyzePlan(d, {x: 0, y: 0, scale: 1, rotation: 0}, plan, BED);
+  const cut = a.ops.find((o) => o.op.type === 'cut'); assert.equal(cut.data.paths.length, 2);
+  const raster = a.ops.find((o) => o.op.type === 'raster'); assert.ok(raster.data.area.width < 25); // el rojo no entra al grabado
+});
