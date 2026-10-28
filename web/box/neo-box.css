@@ -360,3 +360,21 @@ html body.workshop .workshop-library-card-actions>.btn.primary{font-size:14px}
 /* Cama de corte: ocupa el alto visible y queda arriba, completa y centrada. */
 html body.workshop .neo-operate .k40-preview{aspect-ratio:auto!important;height:clamp(380px,calc(100dvh - 300px),760px)!important;min-height:0!important;max-height:none!important;display:flex!important;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;overflow:hidden}
 html body.workshop .neo-operate .k40-preview svg{width:100%!important;height:100%!important;max-width:100%;max-height:100%;display:block}
+
+/* Aviso de máquina activa fuera de «Operar máquina» ----------------------- */
+html body.workshop .workshop-machine-strip.neo-machine-strip{position:sticky;top:64px;z-index:39;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0;padding:10px 18px;background:#071a20f2;color:#e5edf5;border:0;border-bottom:1px solid #2ee6ff55;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html body.workshop .workshop-machine-strip.neo-machine-strip[hidden]{display:none}
+html body.workshop .neo-machine-strip.is-alert{background:#231805f2;border-bottom-color:#ffb84d88}
+html body.workshop .neo-machine-strip.is-paused{background:#1b1408f2;border-bottom-color:#ffb84d55}
+.neo-strip-icon,html body.workshop .workshop-machine-strip>span.neo-strip-icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:10px;background:#0b2730;color:#2ee6ff;flex:none}
+html body.workshop .neo-machine-strip.is-alert .neo-strip-icon,html body.workshop .neo-machine-strip.is-paused .neo-strip-icon{background:#3a2708;color:#ffb84d}
+.neo-strip-text{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:1px}
+.neo-strip-title{font-size:14px;color:#fff}
+html body.workshop .neo-machine-strip #workshopMachineMessage{flex:none;font-size:12.5px;line-height:1.4;color:#c9d3df}
+html body.workshop .neo-machine-strip .btn{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 14px;font-size:13px}
+html body.workshop .neo-machine-strip .btn[hidden]{display:none}
+html body.workshop .neo-machine-strip .neo-strip-recover{background:#ffb84d;border-color:#ffb84d;color:#1d1200;font-weight:650}
+html body.workshop .neo-machine-strip .neo-strip-recover:hover:not(:disabled){background:#ffc96f;border-color:#ffc96f}
+html body.workshop .neo-machine-strip .workshop-stop{background:#3a0d15;border-color:#ff4d6d;color:#ffd0d8}
+@media (max-width:760px){html body.workshop .workshop-machine-strip.neo-machine-strip{top:auto;position:relative;padding:10px}.neo-strip-text{flex-basis:100%}}
+.neo-strip-detail{font-size:12.5px;line-height:1.4;color:#c9d3df}

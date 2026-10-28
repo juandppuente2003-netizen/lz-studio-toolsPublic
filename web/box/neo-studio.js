@@ -66,6 +66,7 @@ ready((app) => {
   safe(() => design(app, prefs));
   safe(() => prepare(app));
   safe(() => operate(app));
+  safe(() => machineStrip(app));
   document.body.classList.add('neo-ready');
 });
 
@@ -578,4 +579,70 @@ function fmtTime(seconds) {
   if (!Number.isFinite(seconds)) return '—';
   const m = Math.floor(seconds / 60), s = Math.round(seconds % 60);
   return m ? `${m} min ${String(s).padStart(2, '0')} s` : `${s} s`;
+}
+
+/* ---------------------------------------------------------------- Aviso de máquina activa */
+// Barra que aparece fuera de «Operar máquina» mientras hay un trabajo: queda fija bajo la
+// cabecera (no flota sobre el diseño) y ofrece las acciones válidas para cada estado.
+// Los botones nuevos solo pulsan los controles originales de k40-control.js.
+function machineStrip(app) {
+  const strip = document.querySelector('.workshop-machine-strip');
+  const message = $('workshopMachineMessage');
+  if (!strip || !message) return;
+  strip.classList.add('neo-machine-strip');
+  strip.setAttribute('role', 'status');
+  const lead = el('span', 'neo-strip-icon');
+  lead.innerHTML = icon('alert');
+  strip.prepend(lead);
+  const text = el('div', 'neo-strip-text');
+  const title = el('strong', 'neo-strip-title');
+  message.before(text);
+  const detail = el('span', 'neo-strip-detail');
+  text.append(title, detail, message);
+  message.classList.add('neo-visually-hidden');
+  const stop = [...strip.querySelectorAll('button')].find((b) => /STOP/i.test(b.textContent));
+  const view = [...strip.querySelectorAll('button')].find((b) => /Ver trabajo/i.test(b.textContent));
+  const mirror = (id, label, iconName, cls) => {
+    const source = $(id);
+    const b = el('button', 'btn ' + cls);
+    b.type = 'button';
+    b.innerHTML = icon(iconName) + `<span>${label}</span>`;
+    b.onclick = () => { if (source && !source.disabled && !source.hidden) source.click(); };
+    b.dataset.mirror = id;
+    return b;
+  };
+  const recover = mirror('k40Recover', 'Restablecer USB', 'usb', 'neo-strip-recover');
+  const cancel = mirror('k40Cancel', 'Cancelar trabajo', 'stop', 'outline neo-strip-cancel');
+  const resume = mirror('k40Resume', 'Reanudar', 'play', 'primary neo-strip-resume');
+  (stop || view)?.before(resume, recover, cancel);
+  if (view) { view.classList.add('neo-strip-view'); view.insertAdjacentHTML('afterbegin', icon('target')); }
+
+  const titles = {error: 'Revisa la conexión USB', unknown: 'La máquina no responde', paused: 'Trabajo en pausa', pausing: 'Solicitando pausa', resuming: 'Reanudando', cancelling: 'Cancelando trabajo', recovering: 'Liberando USB', sending: 'Cortando', sent: 'Terminando corte', pulsing: 'Pulso láser'};
+  const paint = () => {
+    const machine = app.machineControl;
+    const state = machine?.snapshot?.().state || 'idle';
+    const alert = ['error', 'unknown'].includes(state);
+    strip.dataset.state = state;
+    strip.classList.toggle('is-alert', alert);
+    strip.classList.toggle('is-paused', ['paused', 'pausing'].includes(state));
+    title.textContent = titles[state] || 'Trabajo de máquina activo';
+    // El mensaje original repite la etiqueta del estado («REVISAR USB · …»): se muestra sin ella.
+    detail.textContent = (machine?.message || message.textContent || '').replace(/^[A-ZÁÉÍÓÚÑ ]+ · /, '');
+    lead.innerHTML = icon(alert ? 'alert' : state === 'paused' ? 'pause' : 'laser');
+    for (const b of [recover, cancel, resume]) {
+      const source = $(b.dataset.mirror);
+      // La sección de máquina está oculta en las otras pestañas: solo cuenta el panel de pausa.
+      const usable = !!source && !source.hidden && !source.disabled && !source.closest('#k40PausePanel')?.hidden;
+      b.hidden = !usable;
+    }
+    // STOP solo se muestra cuando realmente puede pedir la pausa.
+    if (stop) stop.hidden = stop.disabled;
+  };
+  const watch = (node, opts) => node && new MutationObserver(paint).observe(node, opts);
+  watch(strip, {attributes: true, attributeFilter: ['hidden']});
+  watch(message, {childList: true, characterData: true, subtree: true});
+  watch($('k40State'), {childList: true, characterData: true, subtree: true});
+  for (const id of ['k40Recover', 'k40Cancel', 'k40Resume', 'k40Stop', 'k40PausePanel']) watch($(id), {attributes: true, attributeFilter: ['hidden', 'disabled']});
+  if (stop) watch(stop, {attributes: true, attributeFilter: ['disabled']});
+  paint();
 }
