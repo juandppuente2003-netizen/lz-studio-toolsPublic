@@ -1097,7 +1097,7 @@ export function coupon(s){\r
 <dialog id="saveDialog"><div class="dialog-header"><h2>Guardar dise\xF1o</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><label class="field-title" for="designName">Nombre del dise\xF1o</label><input id="designName" maxlength="80" placeholder="Ej. Caja para regalo"><p class="hint">Se guarda en este navegador. Exporta un respaldo para conservarlo en otro dispositivo.</p><button id="confirmSave" class="btn primary wide">Guardar dise\xF1o</button><button id="saveCopy" type="button" class="btn outline wide">Guardar como copia nueva</button></dialog>
 <dialog id="projectsDialog"><div class="dialog-header"><div><span class="eyebrow">TU MESA DE TRABAJO</span><h2>Mis dise\xF1os</h2></div><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><div id="projectSearchMount" class="project-search-mount"></div><div id="projectsList"></div><div class="backup-actions"><button id="newBtn" class="btn outline">Nuevo dise\xF1o</button><button id="backupBtn" class="btn outline">Exportar respaldo JSON</button><button id="importBtn" class="btn outline">Importar dise\xF1o</button><input type="file" id="importFile" accept=".json,application/json" hidden></div><p class="hint">Guardados en este navegador, sin sincronizaci\xF3n entre dispositivos.</p></dialog>
 <dialog id="helpDialog"><div class="dialog-header"><h2>De la idea a tu primera caja</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><ol class="help-steps"><li><strong>Elige el modelo y las medidas.</strong><p>Las exteriores incluyen el MDF. Las interiores corresponden al espacio \xFAtil de la caja armada.</p></li><li><strong>Mide tu material.</strong><p>Selecciona 2, 2.5, 3, 4, 5 o 6 mm, o escribe el espesor real entre 1 y 20 mm. Los encastres se regeneran con cada cambio.</p></li><li><strong>Calibra el encaje.</strong><p>El kerf es el ancho total que elimina tu l\xE1ser. La holgura agrega espacio entre dientes. Descarga la probeta, corta y ajusta estos valores antes de producir.</p></li><li><strong>Revisa y exporta.</strong><p>Gira el modelo, separa las piezas y revisa las hojas de corte. Exporta SVG o DXF en mm a escala 1:1.</p></li></ol><div class="export-note shortcuts"><strong>Controles y atajos</strong><p>Arrastrar: girar \xB7 Bot\xF3n derecho, rueda presionada o May\xFAs + arrastrar: desplazar \xB7 Rueda: zoom \xB7 Doble clic: encuadrar.</p><p><kbd>Ctrl</kbd>+<kbd>Z</kbd> deshacer \xB7 <kbd>Ctrl</kbd>+<kbd>May\xFAs</kbd>+<kbd>Z</kbd> o <kbd>Ctrl</kbd>+<kbd>Y</kbd> rehacer \xB7 <kbd>Ctrl</kbd>+<kbd>S</kbd> guardar \xB7 <kbd>F</kbd> encuadrar \xB7 <kbd>1</kbd>\u2013<kbd>7</kbd> vistas (perspectiva, frente, posterior, izquierda, derecha, superior, inferior) \xB7 <kbd>H</kbd> ocultar pieza \xB7 <kbd>I</kbd> aislar \xB7 <kbd>May\xFAs</kbd>+<kbd>H</kbd> mostrar todas \xB7 <kbd>M</kbd> medidas \xB7 <kbd>C</kbd> compartimentos \xB7 <kbd>E</kbd> formas \xB7 <kbd>P</kbd> plano / 3D \xB7 <kbd>Esc</kbd> cerrar panel.</p><p>En el plano de corte, con \xABEditar distribuci\xF3n\xBB: arrastra piezas, <kbd>R</kbd> gira 90\xB0 y las flechas ajustan 1 mm (May\xFAs: 10 mm).</p></div><div class="export-note"><strong>Sobre esta versi\xF3n</strong><p>Diecisiete modelos, edici\xF3n directa en 3D, formas de corte y PNG. Incluye caja normal, abatible, corrediza, charola, huacal, canasta con arco, canasta con asa doble, estuche con divisiones, portador con asa ovalada y canasta de perfil curvo. Todos los modelos se dise\xF1an para ensamble sin pegamento. La abatible usa pivotes integrados y la corrediza, gu\xEDas capturadas por los laterales y tirador integral de MDF. El 3D permite revisar la forma y la apertura; realiza una prueba de corte y armado antes de producir. Las referencias muestran la forma, sin incluir sus grabados.</p></div><button class="btn primary wide" data-close>Empezar a crear</button></dialog>
-<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=62"><\/script><script type="module" src="neo-studio.js?v=62"><\/script></body></html>
+<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=63"><\/script><script type="module" src="neo-studio.js?v=62"><\/script></body></html>
 `,type:"text/html; charset=utf-8",public:!1},"/box/internal-joints.js":{body:`import {frame,rect,materialWeb} from './models.js?v=3.5';
 /* Tenons on horizontal panels and side ends; closed receivers on all walls. */
 function spans(L,s){const m=materialWeb(s),fit=+s.clearance,margin=m+fit,length=L-2*margin;if(length<m)throw Error('Aumenta la medida: las ranuras interiores necesitan margen y pesta\xF1as resistentes.');let n=Math.max(1,Math.round(length/(+s.finger)));n=Math.min(n,Math.floor(length/(m+fit)));if(n%2===0)n--;n=Math.max(n,1);return Array.from({length:(n+1)/2},(_,k)=>[margin+2*k*length/n,margin+(2*k+1)*length/n]);}
@@ -4063,7 +4063,8 @@ function controls(){
  $('remoteImport').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);
  $('remoteLibRefresh').disabled=!open();
 }
-function disconnected(){state=null;awaiting=false;$('remoteLinkState').textContent='Enlace perdido';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado.'));}pending.clear();for(const u of uploads.values())u.reject(Error('Enlace desconectado.'));uploads.clear();controls();status('Vuelve a enlazar desde la computadora. No se repetir\xE1 ninguna orden.');}
+function disconnected(){if(!session&&!state)return;const was=!!state;state=null;awaiting=false;$('remoteLinkState').textContent='Reconectando\u2026';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado. La orden no se reenvi\xF3.'));}pending.clear();for(const u of uploads.values())u.reject(Error('Enlace desconectado.'));uploads.clear();releaseWake();const c=channel,pr=peer;channel=null;peer=null;if(c){c.onclose=null;try{c.close();}catch{}}if(pr){pr.onconnectionstatechange=null;try{pr.close();}catch{}}controls();
+ if(saved()){status((was?'Se perdi\xF3 el enlace. ':'')+'Reconectando con la computadora\u2026 No se repetir\xE1 ninguna orden.');scheduleReconnect(1500);}else status('Vuelve a enlazar desde la computadora. No se repetir\xE1 ninguna orden.');}
 // Solo se acepta el subconjunto de SVG que genera Box; nunca marcado arbitrario.
 function safePreview(markup){
  const svg=markup?new DOMParser().parseFromString(markup,'image/svg+xml').documentElement:null;
@@ -4078,7 +4079,7 @@ function receive(message){
  if(message.session!==session)return;
  if(message.type==='library'){library=message;renderLibrary();return;}
  if(message.type!=='state')return;
- state=message;$('remotePairing').hidden=true;$('remoteMachine').hidden=false;$('remoteLinkState').textContent='Enlace local cifrado';
+ state=message;$('remotePairing').hidden=true;$('remoteMachine').hidden=false;$('remotePersist').hidden=!saved();$('remoteLinkState').textContent='Enlace local cifrado';
  const label=stateLabel(message);$('remoteMachineState').textContent=(message.connected?'Puente conectado \xB7 K40 \xB7 ':'')+label;$('remoteLed').dataset.state=message.connected?(['error','unknown'].includes(message.state)?'error':message.busy?'busy':'ok'):'off';
  $('remoteOwner').textContent=message.owner==='phone'?'Control de movimientos: este celular.':'La computadora tiene el control; puedes consultar y pedir Stop.';
  $('remoteJobName').textContent=message.name;
@@ -4147,7 +4148,7 @@ for(const b of document.querySelectorAll('[data-source]'))b.onclick=()=>command(
 $('remotePlaceApply').onclick=()=>command('place',{x:Number($('remotePlaceX').value),y:Number($('remotePlaceY').value),scale:Number($('remotePlaceScale').value)/100,rotation:Number($('remotePlaceRot').value)});
 $('remotePlaceCenter').onclick=()=>command('place-center');
 $('remoteScope').onchange=e=>command('scope',{value:e.target.value});
-$('remoteReviewOpen').onclick=()=>{reviewOpen=true;$('remoteReview').hidden=false;renderReview();$('remoteReview').scrollIntoView({block:'start'});};
+$('remoteReviewOpen').onclick=()=>{reviewOpen=true;$('remoteReview').hidden=false;renderReview();$('remoteReview').scrollIntoView?.({block:'start'});};
 $('remoteReviewOk').onclick=async()=>{if(job()?.review&&!(await command('review-ok')))return;reviewOpen=false;$('remoteReview').hidden=true;showTab('tabControl');};
 $('remoteSave').onclick=async()=>{const r=await ask('Guardar en biblioteca',state?.name||'Trabajo',true);if(r)await command('save',{name:r.value,cloud:r.cloud});};
 $('remoteImport').onchange=async()=>{const file=$('remoteImport').files?.[0];$('remoteImport').value='';if(file)await sendFile(file);};
@@ -4200,22 +4201,63 @@ function ask(title,value,cloud=false){return new Promise(resolve=>{const d=$('re
 /* ---------- Pesta\xF1as ---------- */
 function showTab(id){for(const t of ['tabControl','tabJobs','tabLibrary'])$(t).hidden=t!==id;for(const b of document.querySelectorAll('.rm-nav button')){b.classList.toggle('active',b.dataset.tab===id);b.setAttribute('aria-current',b.dataset.tab===id?'page':'false');}if(id==='tabLibrary'&&!library&&open())command('lib-list');window.scrollTo?.(0,0);}
 for(const b of document.querySelectorAll('.rm-nav button'))b.onclick=()=>showTab(b.dataset.tab);
-/* ---------- Emparejamiento (sin cambios de protocolo) ---------- */
+/* ---------- Emparejamiento persistente ---------- */
+// El celular guarda la credencial del QR (solo en este navegador) y se reconecta solo cuando la
+// computadora vuelve a publicar su oferta: al encender la pantalla, volver a la app o recargar.
+const LINK_KEY='lzbox-remote-link-v1';
+let memoryLink=null;// si el navegador no permite guardar, el enlace dura mientras la p\xE1gina siga abierta
+function saved(){try{const v=memoryLink||JSON.parse(globalThis.localStorage?.getItem(LINK_KEY)||'null');return v&&/^[0-9a-f-]{36}$/i.test(v.session)&&/^[a-f0-9]{64}$/.test(v.secret)&&/^[0-9a-f-]{36}$/i.test(v.claim)?v:null;}catch{return null;}}
+function save(v){memoryLink=v||null;try{if(v)globalThis.localStorage?.setItem(LINK_KEY,JSON.stringify(v));else globalThis.localStorage?.removeItem(LINK_KEY);}catch{}}
+let reconnectTimer=null,connecting=false,wake=null;
+let pageClosed=false;
+function scheduleReconnect(ms=2500){clearTimeout(reconnectTimer);if(pageClosed)return;reconnectTimer=setTimeout(()=>{if(!pageClosed&&!open()&&document.visibilityState!=='hidden')connectSaved();},ms);}
+async function requestWake(){try{if(!wake&&navigator.wakeLock&&document.visibilityState==='visible'){wake=await navigator.wakeLock.request('screen');wake.addEventListener?.('release',()=>{wake=null;});}}catch{wake=null;}}
+function releaseWake(){try{wake?.release();}catch{}wake=null;}
+function attach(offer){
+ session=offer.session;peer=createPeer();const reader=new PeerMessageReader(),mine=peer;
+ peer.ondatachannel=event=>{const ch=event.channel;if(ch.label!=='lz-box-'+session){ch.close();return;}channel=ch;ch.onopen=()=>{$('remoteLinkState').textContent='Enlazado';status('Esperando el estado de la computadora\u2026');requestWake();};ch.onclose=()=>{if(channel===ch)disconnected();};ch.onmessage=e=>{try{const message=reader.accept(e.data);if(message)receive(message);}catch{status('Estado recibido inv\xE1lido; vuelve a enlazar si no se recupera.');}};};
+ // \xABdisconnected\xBB puede ser pasajero: se espera antes de reconectar.
+ let lostTimer=null;peer.onconnectionstatechange=()=>{if(peer!==mine)return;const st=mine.connectionState;if(st==='failed')disconnected();else if(st==='disconnected'){clearTimeout(lostTimer);lostTimer=setTimeout(()=>{if(peer===mine&&mine.connectionState!=='connected')disconnected();},8000);}else if(st==='connected')clearTimeout(lostTimer);};
+ return peer;
+}
+async function connectSaved(){
+ const link=saved();if(!link||connecting||open())return;connecting=true;
+ try{
+  const offer=await pairingRequest('offer',{session:link.session,secret:link.secret,claim:link.claim});
+  const p=attach(offer);await p.setRemoteDescription({type:'offer',sdp:offer.sdp});
+  const sdp=await gatherDescription(p,'answer');
+  await pairingRequest('answer',{session:link.session,secret:link.secret,claim:link.claim,sdp});
+  status('Enlazando con la computadora\u2026');
+  // Si no abre en 20 s, se vuelve a intentar con una oferta nueva.
+  setTimeout(()=>{if(!pageClosed&&peer===p&&!open()){try{p.close();}catch{}peer=null;scheduleReconnect(500);}},20000);
+ }catch(e){
+  if(!state)status(/expir|revoc/i.test(e.message)?'Esperando a la computadora\u2026 Deja Box abierto en Operar m\xE1quina y ambos equipos en la misma red.':e.message);
+  scheduleReconnect(3000);
+ }finally{connecting=false;}
+}
 $('remotePair').onclick=async()=>{try{
- $('remotePair').disabled=true;const params=new URLSearchParams(location.hash.slice(1)),automatic=params.has('link');const reference=automatic?parsePairingLink(params.get('link')):null,claim=automatic?crypto.randomUUID():null;
- const offer=automatic?await pairingRequest('offer',{...reference,claim}):await decodePairing(params.get('pair'),'offer');
- if(automatic)status('Enlazando autom\xE1ticamente con tu computadora\u2026');
- session=offer.session;peer=createPeer();const reader=new PeerMessageReader();peer.ondatachannel=event=>{channel=event.channel;if(channel.label!=='lz-box-'+session){channel.close();return;}channel.onopen=()=>{$('remoteLinkState').textContent='Enlazado';status('Esperando el estado de la computadora\u2026');};channel.onclose=disconnected;channel.onmessage=e=>{try{const message=reader.accept(e.data);if(message)receive(message);}catch{status('Estado recibido inv\xE1lido; vuelve a enlazar si no se recupera.');}};};
- peer.onconnectionstatechange=()=>{if(['failed','disconnected'].includes(peer.connectionState))disconnected();};await peer.setRemoteDescription({type:'offer',sdp:offer.sdp});
- const sdp=await gatherDescription(peer,'answer');
- if(automatic){await pairingRequest('answer',{...reference,claim,sdp});status('Respuesta enviada autom\xE1ticamente. Esperando que la computadora complete el enlace\u2026');}
- else{$('remoteAnswer').closest('label').hidden=false;$('remoteCopy').hidden=false;$('remoteAnswer').value=await encodePairing({version:1,type:'answer',session,expires:offer.expires,sdp});$('remoteCopy').disabled=false;status('Este QR anterior requiere pegar la respuesta en la computadora. Genera un QR nuevo para enlazar autom\xE1ticamente.');}
- // El c\xF3digo de emparejamiento queda solo en memoria y se quita del historial.
+ $('remotePair').disabled=true;const params=new URLSearchParams(location.hash.slice(1)),automatic=params.has('link');
+ if(automatic){
+  const reference=parsePairingLink(params.get('link')),previous=saved();
+  save({...reference,claim:previous?.session===reference.session?previous.claim:crypto.randomUUID()});
+  // El c\xF3digo queda guardado solo en este celular y se quita del historial.
+  history.replaceState(null,'',location.pathname+location.search);
+  status('Enlazando autom\xE1ticamente con tu computadora\u2026');await connectSaved();return;
+ }
+ const offer=await decodePairing(params.get('pair'),'offer');
+ const p=attach(offer);await p.setRemoteDescription({type:'offer',sdp:offer.sdp});
+ const sdp=await gatherDescription(p,'answer');
+ $('remoteAnswer').closest('label').hidden=false;$('remoteCopy').hidden=false;$('remoteAnswer').value=await encodePairing({version:1,type:'answer',session,expires:offer.expires,sdp});$('remoteCopy').disabled=false;status('Este QR anterior requiere pegar la respuesta en la computadora. Genera un QR nuevo para enlazar autom\xE1ticamente.');
  history.replaceState(null,'',location.pathname+location.search);
 }catch(e){status(e.message);$('remotePair').disabled=false;}};
+$('remoteForget').onclick=()=>{save(null);clearTimeout(reconnectTimer);const c=channel;channel=null;state=null;try{c?.close();peer?.close();}catch{}peer=null;session=null;releaseWake();$('remoteMachine').hidden=true;$('remotePairing').hidden=false;$('remotePair').hidden=false;$('remotePair').disabled=false;$('remoteForgetRow').hidden=true;$('remoteLinkState').textContent='Sin enlace';status('Esta computadora se olvid\xF3 en este celular. Escanea un QR nuevo para volver a enlazar.');};
+$('remoteForget2').onclick=()=>$('remoteForget').onclick();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(open())requestWake();else if(saved())scheduleReconnect(200);}});
+window.addEventListener('online',()=>{if(saved()&&!open())scheduleReconnect(300);});
 $('remoteCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('remoteAnswer').value);status('Respuesta copiada. P\xE9gala en la computadora.');}catch{$('remoteAnswer').focus();$('remoteAnswer').select();status('Selecciona y copia la respuesta.');}};
-window.addEventListener('pagehide',()=>{channel?.close();peer?.close();});controls();
+window.addEventListener('pagehide',()=>{pageClosed=true;clearTimeout(reconnectTimer);releaseWake();channel?.close();peer?.close();});controls();
 if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidden=true;$('remoteAnswer').closest('label').hidden=true;$('remoteCopy').hidden=true;status('Conectando con tu computadora\u2026');$('remotePair').onclick();}
+else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;status('Celular emparejado. Conectando con la computadora\u2026');connectSaved();}
 `,type:"text/javascript; charset=utf-8",public:!0},"/box/remote.html":{body:`<!doctype html>
 <html lang="es">
 <head>
@@ -4239,6 +4281,7 @@ if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidd
   <button id="remotePair" type="button" class="rm-primary">Aceptar emparejamiento</button>
   <label hidden>Respuesta para pegar en la computadora<textarea id="remoteAnswer" rows="3" readonly></textarea></label>
   <button id="remoteCopy" type="button" disabled hidden>Copiar respuesta</button>
+  <p id="remoteForgetRow" class="rm-note" hidden>Este celular ya est\xE1 emparejado y se conecta solo cuando Box est\xE1 abierto en la computadora. <button type="button" id="remoteForget" class="rm-ghost">Olvidar esta computadora</button></p>
   <p class="rm-note">Sin la computadora encendida y con Box abierto, el celular no puede operar la m\xE1quina: un iPhone no puede conectarse por USB a la controladora.</p>
  </section>
 
@@ -4313,6 +4356,7 @@ if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidd
   </section>
  </section>
 
+ <p class="rm-note rm-persist" id="remotePersist" hidden>El celular queda emparejado: si se apaga la pantalla o cambias de app, se reconecta solo. <button type="button" id="remoteForget2" class="rm-ghost">Olvidar esta computadora</button></p>
  <p id="remoteStatus" role="status" aria-live="polite">El enlace funciona entre dispositivos en la misma red. No inicia movimientos al conectar.</p>
  <footer class="rm-footer">
   <button id="remoteStop" class="rm-stop" disabled>\u25A0 STOP</button>
@@ -4320,7 +4364,7 @@ if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidd
  </footer>
 </main>
 <dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> Tambi\xE9n en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
-<script type="module" src="remote-client.js?v=5"><\/script>
+<script type="module" src="remote-client.js?v=6"><\/script>
 </body>
 </html>
 `,type:"text/html; charset=utf-8",public:!0},"/box/renderer.js":{body:`import {StudioGPU} from './webgl-renderer.js?v=3.5';
@@ -7857,31 +7901,79 @@ function ready(fn){
 
 if(typeof document!=='undefined')ready(init);
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/workshop-remote.js":{body:`import qrcode from './vendor/qrcode.mjs';
-import {createPeer,gatherDescription,encodePairing,decodePairing,CommandGate,sendPeerMessage,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
+import {createPeer,gatherDescription,decodePairing,CommandGate,sendPeerMessage,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
 import {pairingRequest,pairingSecret} from './peer-signaling.js?v=1';
 
+/* Enlace con el celular (v62): el celular queda emparejado.
+   Tras escanear el QR una vez, la computadora recuerda ese celular. Si el enlace se cae
+   (pantalla apagada, cambio de app, Wi\u2011Fi, recarga de cualquiera de los dos), la computadora
+   vuelve a publicar una oferta con la misma credencial y el celular se reconecta solo.
+   Nunca se reenv\xEDa una orden. \xABOlvidar celular\xBB borra la credencial en ambos lados. */
+const DEVICE_KEY='lzbox-remote-device-v1';
 export function mountRemoteHost(app,machine,mount){
  const open=document.createElement('button');open.type='button';open.className='btn outline';open.textContent='Control desde celular';mount.append(open);
  const dialog=document.createElement('dialog');dialog.className='workshop-remote-dialog';dialog.setAttribute('aria-labelledby','peerTitle');
- dialog.innerHTML='<header class="dialog-header"><h2 id="peerTitle">Operar junto a la m\xE1quina</h2><button type="button" id="peerClose" class="btn quiet">Cerrar ventana</button></header><p>La computadora conserva el USB. Deja Box abierto y ambos dispositivos en la misma red local. No se abre ning\xFAn puerto ni se comparte el c\xF3digo USB.</p><ol><li>Genera el enlace y escanea el QR con el celular.</li><li>El celular mostrar\xE1 una respuesta: c\xF3piala y p\xE9gala aqu\xED una vez.</li><li>Cuando el enlace est\xE9 conectado, pulsa Ceder control.</li></ol><button type="button" id="peerGenerate" class="btn primary">Generar emparejamiento</button><div id="peerQR" class="workshop-peer-qr"></div><label>Enlace para el celular<input id="peerLink" readonly></label><label>Respuesta del celular<textarea id="peerAnswer" rows="3" spellcheck="false" autocomplete="off"></textarea></label><div class="workshop-inline-actions"><button type="button" id="peerAccept" class="btn outline">Aceptar respuesta</button><button type="button" id="peerGrant" class="btn primary" disabled>Ceder control al celular</button><button type="button" id="peerRevoke" class="btn outline" disabled>Recuperar control y cerrar enlace</button></div><p id="peerStatus" role="status">Sin enlace. La computadora tiene el control.</p>';
+ dialog.innerHTML='<header class="dialog-header"><h2 id="peerTitle">Operar junto a la m\xE1quina</h2><button type="button" id="peerClose" class="btn quiet">Cerrar ventana</button></header><p>La computadora conserva el USB. Deja Box abierto y ambos dispositivos en la misma red local. No se abre ning\xFAn puerto ni se comparte el c\xF3digo USB.</p><ol><li>Genera el QR y escan\xE9alo con el celular (solo la primera vez).</li><li>El celular queda emparejado: si se apaga la pantalla o cambias de app, se reconecta solo.</li><li>Para dejar de usarlo pulsa \xABOlvidar celular\xBB.</li></ol><button type="button" id="peerGenerate" class="btn primary">Emparejar celular con QR</button><div id="peerQR" class="workshop-peer-qr"></div><label>Enlace para el celular<input id="peerLink" readonly></label><label>Respuesta del celular<textarea id="peerAnswer" rows="3" spellcheck="false" autocomplete="off"></textarea></label><div class="workshop-inline-actions"><button type="button" id="peerAccept" class="btn outline">Aceptar respuesta</button><button type="button" id="peerGrant" class="btn primary" disabled>Ceder control al celular</button><button type="button" id="peerRevoke" class="btn outline" disabled>Olvidar celular y recuperar control</button></div><p id="peerStatus" role="status">Sin celular emparejado. La computadora tiene el control.</p>';
  document.body.append(dialog);const $=id=>dialog.querySelector('#'+id);
- let peer=null,channel=null,session=null,expires=0,gate=null,deadline=null,publishTimer=null,lastPublish=0,lastPreview='',answerTimer=null,pairGeneration=0,upload=null;
- const instructions=dialog.querySelector('ol');instructions.innerHTML='<li>Genera el QR y escan\xE9alo con el celular.</li><li>Espera: las pantallas completan el enlace autom\xE1ticamente.</li><li>Al conectar, este celular recibe el control de movimientos autom\xE1ticamente.</li>';
+ const storage=(()=>{try{return document.defaultView.localStorage;}catch{return null;}})();
+ const readDevice=()=>{try{const v=JSON.parse(storage?.getItem(DEVICE_KEY)||'null');return v&&/^[0-9a-f-]{36}$/i.test(v.session)&&/^[a-f0-9]{64}$/.test(v.secret)?v:null;}catch{return null;}};
+ const writeDevice=v=>{try{if(v)storage?.setItem(DEVICE_KEY,JSON.stringify(v));else storage?.removeItem(DEVICE_KEY);}catch{}};
+ let device=readDevice(),peer=null,channel=null,gate=null,publishTimer=null,lastPublish=0,lastPreview='',answerTimer=null,listenTimer=null,lostTimer=null,generation=0,upload=null,stopped=false;
+ const session=()=>device?.session||null;
  $('peerGrant').hidden=true;$('peerAnswer').closest('label').hidden=true;$('peerAccept').hidden=true;
- const status=message=>{$('peerStatus').textContent=message;};
- function revoke(message='Enlace cerrado. La computadora tiene el control.'){
-  const previous=session;++pairGeneration;clearTimeout(answerTimer);answerTimer=null;
+ const status=message=>{$('peerStatus').textContent=message;open.dataset.link=channel?.readyState==='open'?'on':device?'wait':'off';open.textContent=channel?.readyState==='open'?'Celular conectado':device?'Celular \xB7 reconectando\u2026':'Control desde celular';};
+ /** Cierra el enlace actual sin olvidar el celular. */
+ function teardown(){
+  ++generation;clearTimeout(answerTimer);clearTimeout(listenTimer);clearTimeout(lostTimer);answerTimer=listenTimer=lostTimer=null;
+  gate?.close();gate=null;clearInterval(publishTimer);publishTimer=null;
+  const old=channel;channel=null;if(old){old.onclose=null;old.close();}const p=peer;peer=null;if(p){p.onconnectionstatechange=null;p.close();}lastPreview='';
+  try{machine.setRemoteOwner(false);}catch{}
+ }
+ /** Enlace perdido: la computadora recupera el control y espera al mismo celular. */
+ function lost(message){
+  if(stopped)return;teardown();$('peerQR').replaceChildren();
+  if(!device){status(message||'Enlace cerrado. La computadora tiene el control.');return;}
+  status((message||'Enlace con el celular interrumpido.')+' La computadora recuper\xF3 el control y espera que el celular se reconecte solo; no se reenvi\xF3 ninguna orden.');
+  listenTimer=setTimeout(listen,1500);
+ }
+ /** Olvidar el celular: se borra la credencial y la oferta pendiente. */
+ function revoke(message='Celular olvidado. La computadora tiene el control.'){
+  const previous=session();teardown();device=null;writeDevice(null);
   if(previous)pairingRequest('remove',{session:previous}).catch(()=>{});
-  gate?.close();machine.setRemoteOwner(false);clearTimeout(deadline);clearInterval(publishTimer);publishTimer=null;
-  const oldChannel=channel;channel=null;oldChannel?.close();peer?.close();peer=null;session=null;lastPreview='';
-  $('peerGrant').disabled=true;$('peerRevoke').disabled=true;$('peerQR').replaceChildren();$('peerLink').value='';$('peerAnswer').value='';status(message);
+  $('peerRevoke').disabled=true;$('peerQR').replaceChildren();$('peerLink').value='';$('peerAnswer').value='';status(message);
  }
  function publish(force=false){
-  if(channel?.readyState!=='open'||!session||channel.bufferedAmount>256000)return;
+  if(channel?.readyState!=='open'||!session()||channel.bufferedAmount>256000)return;
+  // Cuando la m\xE1quina queda libre, el celular enlazado vuelve a tener el control de movimientos.
+  if(!machine.remoteOwner&&!machine.busy&&machine.machine)try{machine.setRemoteOwner(true);}catch{}
   if(!force&&Date.now()-lastPublish<350)return;lastPublish=Date.now();
-  try{const snapshot=machine.snapshot(),preview=snapshot.preview;try{snapshot.job=app.jobStudio?.snapshot();}catch{}snapshot.preview=preview===lastPreview?undefined:preview;sendPeerMessage(channel,{type:'state',session,...snapshot});lastPreview=preview;}catch(e){status('No se pudo sincronizar: '+e.message);}
+  try{const snapshot=machine.snapshot(),preview=snapshot.preview;try{snapshot.job=app.jobStudio?.snapshot();}catch{}snapshot.preview=preview===lastPreview?undefined:preview;sendPeerMessage(channel,{type:'state',session:session(),...snapshot});lastPreview=preview;}catch(e){status('No se pudo sincronizar: '+e.message);}
  }
-/** El celular consulta la biblioteca de esta computadora (y de la cuenta, si hay sesi\xF3n). */
+ /** Publica una oferta con la credencial del celular emparejado y espera su respuesta. */
+ async function listen(){
+  if(!device||stopped)return;teardown();const mine=generation;
+  try{
+   peer=createPeer();channel=peer.createDataChannel('lz-box-'+device.session,{ordered:true});
+   gate=new CommandGate(async(action,args)=>{if(channel?.readyState!=='open')throw Error('Enlace desconectado.');await machine.remoteCommand(action,args);});
+   channel.onopen=()=>{if(mine!==generation)return;clearTimeout(answerTimer);clearTimeout(listenTimer);
+    try{machine.setRemoteOwner(true);}catch{}
+    $('peerRevoke').disabled=false;$('peerQR').replaceChildren();
+    status(machine.remoteOwner?'Celular conectado con control de movimientos. Stop sigue disponible en la computadora.':'Celular conectado. Recibir\xE1 el control de movimientos cuando la m\xE1quina quede libre.');
+    publish(true);publishLibrary();publishTimer=setInterval(()=>publish(),700);};
+   channel.onmessage=async event=>{if(typeof event.data!=='string'||event.data.length>UPLOAD_CHUNK+2000)return;try{const message=JSON.parse(event.data);if(message.session!==session())return;if(message.type==='upload'){await receiveUpload(message);return;}if(message.type==='ping'){channel.send(JSON.stringify({type:'pong',session:session()}));return;}if(event.data.length>4096)return;const reply=await gate.handle(message);if(channel?.readyState==='open')channel.send(JSON.stringify(reply));publish(true);}catch(e){status(e.message);}};
+   channel.onclose=()=>{if(mine===generation)lost('El celular se desconect\xF3.');};
+   // \xABdisconnected\xBB suele ser pasajero (pantalla que se aten\xFAa): se espera antes de darlo por perdido.
+   peer.onconnectionstatechange=()=>{if(mine!==generation||!peer)return;const s=peer.connectionState;if(s==='failed')lost('Enlace perdido.');else if(s==='disconnected'){clearTimeout(lostTimer);lostTimer=setTimeout(()=>{if(mine===generation&&peer?.connectionState!=='connected')lost('Enlace perdido.');},8000);}else if(s==='connected')clearTimeout(lostTimer);};
+   const sdp=await gatherDescription(peer,'offer');if(mine!==generation)return;
+   let created;for(let attempt=0;;attempt++){try{created=await pairingRequest('create',{session:device.session,secret:device.secret,sdp});break;}catch(e){if(attempt>=3||!/Espera dos/.test(e.message))throw e;await new Promise(r=>setTimeout(r,2100));if(mine!==generation)return;}}
+   if(mine!==generation)return;
+   if(channel?.readyState!=='open')status(open.dataset.link==='on'?'':'Esperando al celular emparejado\u2026 Abre la p\xE1gina del control en el celular; se conecta solo.');
+   const expires=created.expires||Date.now()+300000;
+   const waitAnswer=async()=>{if(mine!==generation||!peer)return;if(Date.now()>expires-15000){listen();return;}try{const result=await pairingRequest('poll',{session:device.session});if(mine!==generation)return;if(result.answer){await peer.setRemoteDescription({type:'answer',sdp:result.answer});status('Celular detectado. Completando enlace local\u2026');return;}}catch(e){if(mine!==generation)return;if(/expir|revoc/i.test(e.message)){listen();return;}status(e.message);}answerTimer=setTimeout(waitAnswer,1200);};
+   waitAnswer();
+  }catch(e){if(mine!==generation)return;status(e.message+' Se reintentar\xE1 en unos segundos.');listenTimer=setTimeout(listen,8000);}
+ }
+ /** El celular consulta la biblioteca de esta computadora (y de la cuenta, si hay sesi\xF3n). */
  function libraryItems(){
   const studio=app.jobStudio,out=[];
   const thumb=t=>typeof t==='string'&&t.length<60000&&/^data:image\\/(png|jpeg|webp);base64,/.test(t)?t:null;
@@ -7890,11 +7982,10 @@ export function mountRemoteHost(app,machine,mount){
   for(const t of app.workshop?.boxTrash?.()||[])out.push({scope:'box',id:t.item.id,kind:t.item.kind,name:t.item.name||t.item.state?.name,dims:'',ops:[],where:'browser',synced:false,deleted:true,updated:t.deletedAt,thumb:null});
   return {cloud:studio?.library.cloudState||'unknown',cloudMessage:studio?.library.cloudMessage||'',items:out.sort((a,b)=>String(b.updated).localeCompare(String(a.updated))).slice(0,200)};
  }
- function publishLibrary(){if(channel?.readyState!=='open'||!session)return;try{sendPeerMessage(channel,{type:'library',session,...libraryItems()});}catch(e){status('No se pudo enviar la biblioteca: '+e.message);}}
+ function publishLibrary(){if(channel?.readyState!=='open'||!session())return;try{sendPeerMessage(channel,{type:'library',session:session(),...libraryItems()});}catch(e){status('No se pudo enviar la biblioteca: '+e.message);}}
  async function receiveUpload(m){
   const reply=(ok,error='')=>{if(channel?.readyState==='open')channel.send(JSON.stringify({type:'upload-reply',upload:m.upload,ok,error}));};
   if(typeof m.upload!=='string'||m.upload.length>80||!Number.isInteger(m.index)||!Number.isInteger(m.count)||m.count<1||m.count>Math.ceil(UPLOAD_MAX/UPLOAD_CHUNK)||typeof m.data!=='string'||m.data.length>UPLOAD_CHUNK)return reply(false,'Fragmento inv\xE1lido.');
-  if(machine.remoteOwner===false)return reply(false,'La computadora conserva el control.');
   if(m.index===0){if(typeof m.name!=='string'||!['image/svg+xml','image/png','image/jpeg'].includes(m.mime))return reply(false,'Formato no compatible. Usa SVG, PNG o JPG.');upload={id:m.upload,count:m.count,parts:[],name:m.name.slice(0,120),mime:m.mime,started:Date.now()};}
   if(!upload||upload.id!==m.upload||upload.parts.length!==m.index||Date.now()-upload.started>120000){upload=null;return reply(false,'Transferencia incompleta. Vuelve a enviar el archivo.');}
   upload.parts.push(m.data);if(upload.parts.length<upload.count)return;
@@ -7903,29 +7994,25 @@ export function mountRemoteHost(app,machine,mount){
   catch(e){reply(false,e.message);}
  }
  open.onclick=()=>dialog.showModal();$('peerClose').onclick=()=>dialog.close();
+ /** Primer emparejamiento: el QR lleva la credencial que el celular guardar\xE1. */
  $('peerGenerate').onclick=async()=>{
-  if(machine.busy)return status('Espera a que termine la operaci\xF3n antes de emparejar.');
   $('peerGenerate').disabled=true;
-  try{revoke();const generation=pairGeneration;peer=createPeer();session=crypto.randomUUID();expires=Date.now()+300000;channel=peer.createDataChannel('lz-box-'+session,{ordered:true});
-   gate=new CommandGate(async(action,args)=>{if(channel?.readyState!=='open')throw Error('Enlace desconectado.');await machine.remoteCommand(action,args);});
-   channel.onopen=()=>{try{machine.setRemoteOwner(true);clearTimeout(deadline);$('peerRevoke').disabled=false;status('Celular enlazado con control de movimientos. Puedes recuperar el control aqu\xED.');publish(true);publishLibrary();publishTimer=setInterval(()=>publish(),700);}catch(e){revoke(e.message);}};
-   channel.onmessage=async event=>{if(typeof event.data!=='string'||event.data.length>UPLOAD_CHUNK+2000)return;try{const message=JSON.parse(event.data);if(message.session!==session)return;if(message.type==='upload'){await receiveUpload(message);return;}if(event.data.length>4096)return;const reply=await gate.handle(message);if(channel?.readyState==='open')channel.send(JSON.stringify(reply));publish(true);}catch(e){status(e.message);}};
-   channel.onclose=()=>{if(channel)revoke('El celular se desconect\xF3. La computadora recuper\xF3 el control; no se reenvi\xF3 ninguna orden.');};
-   peer.onconnectionstatechange=()=>{if(peer&&['failed','disconnected'].includes(peer.connectionState))revoke('Enlace perdido. La computadora recuper\xF3 el control.');};
-   status('Preparando enlace cifrado en la red local\u2026');const sdp=await gatherDescription(peer,'offer');if(generation!==pairGeneration)return;
-   const secret=pairingSecret(),created=await pairingRequest('create',{session,secret,sdp});if(generation!==pairGeneration){pairingRequest('remove',{session:created.session}).catch(()=>{});return;}expires=created.expires;
-   const link=new URL('./remote.html',document.location.href);link.hash='link='+session+'.'+secret;$('peerLink').value=link.href;
+  try{
+   const previous=session();teardown();if(previous)await pairingRequest('remove',{session:previous}).catch(()=>{});
+   device={session:crypto.randomUUID(),secret:pairingSecret()};writeDevice(device);
+   const link=new URL('./remote.html',document.location.href);link.hash='link='+device.session+'.'+device.secret;$('peerLink').value=link.href;
    const qr=qrcode(0,'L');qr.addData(link.href);qr.make();$('peerQR').innerHTML=qr.createSvgTag({cellSize:3,margin:4,scalable:true});
-   status('Escanea el QR. La conexi\xF3n se completar\xE1 autom\xE1ticamente; el celular recibir\xE1 el control al conectar.');deadline=setTimeout(()=>revoke('El QR expir\xF3. Genera otro para enlazar.'),Math.max(0,expires-Date.now()));
-   async function waitAnswer(){if(generation!==pairGeneration||!peer||Date.now()>expires)return;try{const result=await pairingRequest('poll',{session});if(generation!==pairGeneration)return;if(result.answer){await peer.setRemoteDescription({type:'answer',sdp:result.answer});status('Celular detectado. Completando enlace local\u2026');return;}}catch(e){if(generation===pairGeneration)status(e.message);}if(generation===pairGeneration)answerTimer=setTimeout(waitAnswer,1000);}
-   waitAnswer();
-  }catch(e){revoke(e.message);}finally{$('peerGenerate').disabled=false;}
+   $('peerRevoke').disabled=false;await listen();
+   status('Escanea el QR. El celular queda emparejado y se reconectar\xE1 solo; el QR solo hace falta la primera vez.');
+  }catch(e){status(e.message);}finally{$('peerGenerate').disabled=false;}
  };
- $('peerAccept').onclick=async()=>{try{if(!peer||Date.now()>expires)throw Error('Genera un emparejamiento nuevo.');const answer=await decodePairing($('peerAnswer').value.trim(),'answer');if(answer.session!==session||answer.expires!==expires)throw Error('La respuesta pertenece a otro emparejamiento.');await peer.setRemoteDescription({type:'answer',sdp:answer.sdp});status('Respuesta aceptada. Esperando conexi\xF3n local\u2026');}catch(e){status(e.message);}};
- $('peerGrant').onclick=()=>{try{if(channel?.readyState!=='open')throw Error('No hay un celular conectado.');machine.setRemoteOwner(true);$('peerGrant').disabled=true;status('Control de movimientos: celular. Stop sigue disponible en la computadora.');publish(true);}catch(e){status(e.message);}};
+ $('peerAccept').onclick=async()=>{try{if(!peer)throw Error('Genera un emparejamiento nuevo.');const answer=await decodePairing($('peerAnswer').value.trim(),'answer');if(answer.session!==session())throw Error('La respuesta pertenece a otro emparejamiento.');await peer.setRemoteDescription({type:'answer',sdp:answer.sdp});status('Respuesta aceptada. Esperando conexi\xF3n local\u2026');}catch(e){status(e.message);}};
+ $('peerGrant').onclick=()=>{try{if(channel?.readyState!=='open')throw Error('No hay un celular conectado.');machine.setRemoteOwner(true);publish(true);}catch(e){status(e.message);}};
  $('peerRevoke').onclick=()=>revoke();
- document.defaultView.addEventListener('pagehide',()=>revoke());
- return {publish,publishLibrary,revoke,open:()=>dialog.showModal()};
+ // Al cerrar o recargar Box no se olvida el celular: solo se cierra este enlace.
+ document.defaultView.addEventListener('pagehide',()=>{stopped=true;teardown();});
+ if(device){$('peerRevoke').disabled=false;status('Celular emparejado. Esperando que se conecte\u2026');listen();}else status('Sin celular emparejado. La computadora tiene el control.');
+ return {publish,publishLibrary,revoke,forget:revoke,open:()=>dialog.showModal(),get connected(){return channel?.readyState==='open';}};
 }
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/workshop-store.js":{body:`export const WORKSHOP_KEY='lzbox-workshop-v1';
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -7955,7 +8042,7 @@ import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
 import {mountK40} from './k40-control.js?v=14';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=5';
+import {mountRemoteHost} from './workshop-remote.js?v=6';
 import {mountJobStudio} from './job-studio.js?v=4';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};

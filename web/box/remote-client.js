@@ -23,7 +23,8 @@ function controls(){
  $('remoteImport').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);
  $('remoteLibRefresh').disabled=!open();
 }
-function disconnected(){state=null;awaiting=false;$('remoteLinkState').textContent='Enlace perdido';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado.'));}pending.clear();for(const u of uploads.values())u.reject(Error('Enlace desconectado.'));uploads.clear();controls();status('Vuelve a enlazar desde la computadora. No se repetirá ninguna orden.');}
+function disconnected(){if(!session&&!state)return;const was=!!state;state=null;awaiting=false;$('remoteLinkState').textContent='Reconectando…';for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Enlace desconectado. La orden no se reenvió.'));}pending.clear();for(const u of uploads.values())u.reject(Error('Enlace desconectado.'));uploads.clear();releaseWake();const c=channel,pr=peer;channel=null;peer=null;if(c){c.onclose=null;try{c.close();}catch{}}if(pr){pr.onconnectionstatechange=null;try{pr.close();}catch{}}controls();
+ if(saved()){status((was?'Se perdió el enlace. ':'')+'Reconectando con la computadora… No se repetirá ninguna orden.');scheduleReconnect(1500);}else status('Vuelve a enlazar desde la computadora. No se repetirá ninguna orden.');}
 // Solo se acepta el subconjunto de SVG que genera Box; nunca marcado arbitrario.
 function safePreview(markup){
  const svg=markup?new DOMParser().parseFromString(markup,'image/svg+xml').documentElement:null;
@@ -38,7 +39,7 @@ function receive(message){
  if(message.session!==session)return;
  if(message.type==='library'){library=message;renderLibrary();return;}
  if(message.type!=='state')return;
- state=message;$('remotePairing').hidden=true;$('remoteMachine').hidden=false;$('remoteLinkState').textContent='Enlace local cifrado';
+ state=message;$('remotePairing').hidden=true;$('remoteMachine').hidden=false;$('remotePersist').hidden=!saved();$('remoteLinkState').textContent='Enlace local cifrado';
  const label=stateLabel(message);$('remoteMachineState').textContent=(message.connected?'Puente conectado · K40 · ':'')+label;$('remoteLed').dataset.state=message.connected?(['error','unknown'].includes(message.state)?'error':message.busy?'busy':'ok'):'off';
  $('remoteOwner').textContent=message.owner==='phone'?'Control de movimientos: este celular.':'La computadora tiene el control; puedes consultar y pedir Stop.';
  $('remoteJobName').textContent=message.name;
@@ -107,7 +108,7 @@ for(const b of document.querySelectorAll('[data-source]'))b.onclick=()=>command(
 $('remotePlaceApply').onclick=()=>command('place',{x:Number($('remotePlaceX').value),y:Number($('remotePlaceY').value),scale:Number($('remotePlaceScale').value)/100,rotation:Number($('remotePlaceRot').value)});
 $('remotePlaceCenter').onclick=()=>command('place-center');
 $('remoteScope').onchange=e=>command('scope',{value:e.target.value});
-$('remoteReviewOpen').onclick=()=>{reviewOpen=true;$('remoteReview').hidden=false;renderReview();$('remoteReview').scrollIntoView({block:'start'});};
+$('remoteReviewOpen').onclick=()=>{reviewOpen=true;$('remoteReview').hidden=false;renderReview();$('remoteReview').scrollIntoView?.({block:'start'});};
 $('remoteReviewOk').onclick=async()=>{if(job()?.review&&!(await command('review-ok')))return;reviewOpen=false;$('remoteReview').hidden=true;showTab('tabControl');};
 $('remoteSave').onclick=async()=>{const r=await ask('Guardar en biblioteca',state?.name||'Trabajo',true);if(r)await command('save',{name:r.value,cloud:r.cloud});};
 $('remoteImport').onchange=async()=>{const file=$('remoteImport').files?.[0];$('remoteImport').value='';if(file)await sendFile(file);};
@@ -160,19 +161,60 @@ function ask(title,value,cloud=false){return new Promise(resolve=>{const d=$('re
 /* ---------- Pestañas ---------- */
 function showTab(id){for(const t of ['tabControl','tabJobs','tabLibrary'])$(t).hidden=t!==id;for(const b of document.querySelectorAll('.rm-nav button')){b.classList.toggle('active',b.dataset.tab===id);b.setAttribute('aria-current',b.dataset.tab===id?'page':'false');}if(id==='tabLibrary'&&!library&&open())command('lib-list');window.scrollTo?.(0,0);}
 for(const b of document.querySelectorAll('.rm-nav button'))b.onclick=()=>showTab(b.dataset.tab);
-/* ---------- Emparejamiento (sin cambios de protocolo) ---------- */
+/* ---------- Emparejamiento persistente ---------- */
+// El celular guarda la credencial del QR (solo en este navegador) y se reconecta solo cuando la
+// computadora vuelve a publicar su oferta: al encender la pantalla, volver a la app o recargar.
+const LINK_KEY='lzbox-remote-link-v1';
+let memoryLink=null;// si el navegador no permite guardar, el enlace dura mientras la página siga abierta
+function saved(){try{const v=memoryLink||JSON.parse(globalThis.localStorage?.getItem(LINK_KEY)||'null');return v&&/^[0-9a-f-]{36}$/i.test(v.session)&&/^[a-f0-9]{64}$/.test(v.secret)&&/^[0-9a-f-]{36}$/i.test(v.claim)?v:null;}catch{return null;}}
+function save(v){memoryLink=v||null;try{if(v)globalThis.localStorage?.setItem(LINK_KEY,JSON.stringify(v));else globalThis.localStorage?.removeItem(LINK_KEY);}catch{}}
+let reconnectTimer=null,connecting=false,wake=null;
+let pageClosed=false;
+function scheduleReconnect(ms=2500){clearTimeout(reconnectTimer);if(pageClosed)return;reconnectTimer=setTimeout(()=>{if(!pageClosed&&!open()&&document.visibilityState!=='hidden')connectSaved();},ms);}
+async function requestWake(){try{if(!wake&&navigator.wakeLock&&document.visibilityState==='visible'){wake=await navigator.wakeLock.request('screen');wake.addEventListener?.('release',()=>{wake=null;});}}catch{wake=null;}}
+function releaseWake(){try{wake?.release();}catch{}wake=null;}
+function attach(offer){
+ session=offer.session;peer=createPeer();const reader=new PeerMessageReader(),mine=peer;
+ peer.ondatachannel=event=>{const ch=event.channel;if(ch.label!=='lz-box-'+session){ch.close();return;}channel=ch;ch.onopen=()=>{$('remoteLinkState').textContent='Enlazado';status('Esperando el estado de la computadora…');requestWake();};ch.onclose=()=>{if(channel===ch)disconnected();};ch.onmessage=e=>{try{const message=reader.accept(e.data);if(message)receive(message);}catch{status('Estado recibido inválido; vuelve a enlazar si no se recupera.');}};};
+ // «disconnected» puede ser pasajero: se espera antes de reconectar.
+ let lostTimer=null;peer.onconnectionstatechange=()=>{if(peer!==mine)return;const st=mine.connectionState;if(st==='failed')disconnected();else if(st==='disconnected'){clearTimeout(lostTimer);lostTimer=setTimeout(()=>{if(peer===mine&&mine.connectionState!=='connected')disconnected();},8000);}else if(st==='connected')clearTimeout(lostTimer);};
+ return peer;
+}
+async function connectSaved(){
+ const link=saved();if(!link||connecting||open())return;connecting=true;
+ try{
+  const offer=await pairingRequest('offer',{session:link.session,secret:link.secret,claim:link.claim});
+  const p=attach(offer);await p.setRemoteDescription({type:'offer',sdp:offer.sdp});
+  const sdp=await gatherDescription(p,'answer');
+  await pairingRequest('answer',{session:link.session,secret:link.secret,claim:link.claim,sdp});
+  status('Enlazando con la computadora…');
+  // Si no abre en 20 s, se vuelve a intentar con una oferta nueva.
+  setTimeout(()=>{if(!pageClosed&&peer===p&&!open()){try{p.close();}catch{}peer=null;scheduleReconnect(500);}},20000);
+ }catch(e){
+  if(!state)status(/expir|revoc/i.test(e.message)?'Esperando a la computadora… Deja Box abierto en Operar máquina y ambos equipos en la misma red.':e.message);
+  scheduleReconnect(3000);
+ }finally{connecting=false;}
+}
 $('remotePair').onclick=async()=>{try{
- $('remotePair').disabled=true;const params=new URLSearchParams(location.hash.slice(1)),automatic=params.has('link');const reference=automatic?parsePairingLink(params.get('link')):null,claim=automatic?crypto.randomUUID():null;
- const offer=automatic?await pairingRequest('offer',{...reference,claim}):await decodePairing(params.get('pair'),'offer');
- if(automatic)status('Enlazando automáticamente con tu computadora…');
- session=offer.session;peer=createPeer();const reader=new PeerMessageReader();peer.ondatachannel=event=>{channel=event.channel;if(channel.label!=='lz-box-'+session){channel.close();return;}channel.onopen=()=>{$('remoteLinkState').textContent='Enlazado';status('Esperando el estado de la computadora…');};channel.onclose=disconnected;channel.onmessage=e=>{try{const message=reader.accept(e.data);if(message)receive(message);}catch{status('Estado recibido inválido; vuelve a enlazar si no se recupera.');}};};
- peer.onconnectionstatechange=()=>{if(['failed','disconnected'].includes(peer.connectionState))disconnected();};await peer.setRemoteDescription({type:'offer',sdp:offer.sdp});
- const sdp=await gatherDescription(peer,'answer');
- if(automatic){await pairingRequest('answer',{...reference,claim,sdp});status('Respuesta enviada automáticamente. Esperando que la computadora complete el enlace…');}
- else{$('remoteAnswer').closest('label').hidden=false;$('remoteCopy').hidden=false;$('remoteAnswer').value=await encodePairing({version:1,type:'answer',session,expires:offer.expires,sdp});$('remoteCopy').disabled=false;status('Este QR anterior requiere pegar la respuesta en la computadora. Genera un QR nuevo para enlazar automáticamente.');}
- // El código de emparejamiento queda solo en memoria y se quita del historial.
+ $('remotePair').disabled=true;const params=new URLSearchParams(location.hash.slice(1)),automatic=params.has('link');
+ if(automatic){
+  const reference=parsePairingLink(params.get('link')),previous=saved();
+  save({...reference,claim:previous?.session===reference.session?previous.claim:crypto.randomUUID()});
+  // El código queda guardado solo en este celular y se quita del historial.
+  history.replaceState(null,'',location.pathname+location.search);
+  status('Enlazando automáticamente con tu computadora…');await connectSaved();return;
+ }
+ const offer=await decodePairing(params.get('pair'),'offer');
+ const p=attach(offer);await p.setRemoteDescription({type:'offer',sdp:offer.sdp});
+ const sdp=await gatherDescription(p,'answer');
+ $('remoteAnswer').closest('label').hidden=false;$('remoteCopy').hidden=false;$('remoteAnswer').value=await encodePairing({version:1,type:'answer',session,expires:offer.expires,sdp});$('remoteCopy').disabled=false;status('Este QR anterior requiere pegar la respuesta en la computadora. Genera un QR nuevo para enlazar automáticamente.');
  history.replaceState(null,'',location.pathname+location.search);
 }catch(e){status(e.message);$('remotePair').disabled=false;}};
+$('remoteForget').onclick=()=>{save(null);clearTimeout(reconnectTimer);const c=channel;channel=null;state=null;try{c?.close();peer?.close();}catch{}peer=null;session=null;releaseWake();$('remoteMachine').hidden=true;$('remotePairing').hidden=false;$('remotePair').hidden=false;$('remotePair').disabled=false;$('remoteForgetRow').hidden=true;$('remoteLinkState').textContent='Sin enlace';status('Esta computadora se olvidó en este celular. Escanea un QR nuevo para volver a enlazar.');};
+$('remoteForget2').onclick=()=>$('remoteForget').onclick();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(open())requestWake();else if(saved())scheduleReconnect(200);}});
+window.addEventListener('online',()=>{if(saved()&&!open())scheduleReconnect(300);});
 $('remoteCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('remoteAnswer').value);status('Respuesta copiada. Pégala en la computadora.');}catch{$('remoteAnswer').focus();$('remoteAnswer').select();status('Selecciona y copia la respuesta.');}};
-window.addEventListener('pagehide',()=>{channel?.close();peer?.close();});controls();
+window.addEventListener('pagehide',()=>{pageClosed=true;clearTimeout(reconnectTimer);releaseWake();channel?.close();peer?.close();});controls();
 if(new URLSearchParams(location.hash.slice(1)).has('link')){$('remotePair').hidden=true;$('remoteAnswer').closest('label').hidden=true;$('remoteCopy').hidden=true;status('Conectando con tu computadora…');$('remotePair').onclick();}
+else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;status('Celular emparejado. Conectando con la computadora…');connectSaved();}

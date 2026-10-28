@@ -4,7 +4,7 @@ import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
 import {mountK40} from './k40-control.js?v=14';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=5';
+import {mountRemoteHost} from './workshop-remote.js?v=6';
 import {mountJobStudio} from './job-studio.js?v=4';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
