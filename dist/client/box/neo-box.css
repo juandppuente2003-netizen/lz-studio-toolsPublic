@@ -582,3 +582,26 @@ html body.workshop .neo-operate .k40-continue{background:linear-gradient(180deg,
 html body.workshop .neo-operate .k40-continue[hidden]{display:none!important}
 .js-op-power-row{align-items:end}.js-op-pw-note{font-size:11.5px;color:#b9a6ff;padding-bottom:10px}
 .js-op-pause{font-size:12px}
+
+/* v62.3 · Cama más grande: menos franjas alrededor de la vista. */
+html body.workshop .neo-op-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+html body.workshop .neo-op-tools .btn{min-height:38px;font-size:12px}
+html body.workshop .neo-op-tools button:last-child{display:none}
+html body.workshop .neo-bed-card summary{cursor:pointer;font-weight:600;font-size:13px}
+html body.workshop .neo-bed-card .k40-fields{grid-template-columns:1fr 1fr}
+@media (min-width:1281px) and (min-height:620px){
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan{padding:10px 12px}
+ html body.workshop .neo-operate .js-center-bar{margin-bottom:8px}
+ html body.workshop .neo-operate .js-center-tab{min-height:34px}
+ html body.workshop .neo-operate .js-stage>.k40-preview{padding:4px!important}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.k40-summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:4px 0 0}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.js-bed-note{display:none}
+ html body.workshop .neo-operate .k40-console{padding:8px 14px;margin-top:8px}
+ html body.workshop .neo-operate .k40-run-actions .btn{min-height:44px}
+}
+@media (min-width:1281px) and (min-height:620px){
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan{overflow:hidden}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.js-stage{flex:1 1 0;min-height:240px;overflow:hidden}
+ html body.workshop .neo-operate .js-stage>.k40-preview{flex:1 1 0;height:100%!important}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.k40-summary{flex:none}
+}

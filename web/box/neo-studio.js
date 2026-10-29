@@ -554,6 +554,14 @@ function operate(app) {
   // Centro: plano con encabezado y medidas.
   // Tarjeta M2/M3 al final de la columna derecha: se configura una vez, no estorba al mover el cabezal.
   if (board) right.append(board);
+  // Más alto para la cama: las medidas de cama pasan a la columna derecha y los botones de guardar
+  // preparación/plantilla al final de la columna izquierda (el celular ya está sobre la cama).
+  const bedDetails = find('.k40-bed');
+  if (bedDetails) { bedDetails.classList.add('neo-op-card', 'neo-bed-card'); bedDetails.open = false; right.append(bedDetails); }
+  const tools = operator.querySelector('.workshop-operator-tools');
+  if (tools && studio) { tools.classList.add('neo-op-tools'); left.append(tools); }
+  const stopNote = find('.k40-stop-note');
+  if (stopNote) { stopNote.classList.add('neo-visually-hidden'); for (const id of ['k40Stop', 'k40Cancel']) $(id)?.setAttribute('aria-describedby', 'k40StopNoteText'); stopNote.id = 'k40StopNoteText'; }
   const canvas = find('.k40-canvas-panel');
   canvas?.classList.add('neo-op-card', 'neo-op-plan');
   // Alto disponible para el espacio de trabajo (debajo de las cabeceras).
