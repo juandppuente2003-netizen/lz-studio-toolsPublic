@@ -10,7 +10,7 @@ function example(extra={}){
  const state={...defaults,...extra},panels=generate(state),packed=arrange(panels,state);
  return {state,panels,packed,valid:true};
 }
-test('17 models × 3 layouts produce M2 snapshots for every sheet',()=>{
+test('18 models × 3 layouts produce M2 snapshots for every sheet',()=>{
  let combinations=0;
  for(const model of Object.keys(modelInfo))for(const layoutMode of ['rows','compact','shared']){
   const app=example({...modelPresets[model],model,layoutMode});
@@ -19,7 +19,7 @@ test('17 models × 3 layouts produce M2 snapshots for every sheet',()=>{
    assert.ok(job.paths.every(p=>p.points.every(([x,y])=>x>=0&&y>=0&&x<=400&&y<=400)));
    let outer=false;for(const p of job.paths){if(p.role==='outer')outer=true;else assert.equal(outer,false);}
   }combinations++;
- }assert.equal(combinations,51);
+ }assert.equal(combinations,54);
 });
 test('overlap, outside, unplaced and invalid model block sending',()=>{
  const app=example(),positions=freeze(app.packed),[a,b]=app.panels;
@@ -168,4 +168,20 @@ test('v62: archivo importado — sin envíos automáticos, trabajo armado solo a
   problem='';features=features.filter(f=>f!=='operations-v2');$('k40Disconnect').click();await settle();$('k40Connect').click();await settle();await settle();app.machineControl.refresh(true);
   assert.equal($('k40Run').disabled,true);assert.match($('k40Status').textContent,/0\.7\.\d/);
  }finally{dom.window.close();Object.assign(globalThis,previous);}
+});
+test('altar de muertos: 2–7 niveles, ranuras cerradas por pieza, retablo opcional y validación',()=>{
+ const base={...defaults,...modelPresets.altar,model:'altar'};
+ for(const extra of [{},{levels:2},{levels:4,height:260,depth:240,archRise:90},{archRise:0},{decoration:false,altarPhoto:false},{levels:7,height:385,depth:330,width:330,archRise:0,sheetW:600,sheetH:600}]){
+  const s={...base,...extra},parts=generate(s),N=s.levels,left=parts.find(p=>p.id==='left'),members=parts.filter(p=>!['left','right'].includes(p.id));
+  assert.equal(members.length,2*N+1);
+  const tabCount=members.reduce((n,p)=>n+(p.p.filter(([x,y])=>Math.abs(x)<1e-9&&y<s.height-1e-6).length/2),0);
+  assert.equal(left.jointHoles.length,tabCount,'una ranura por pestaña');
+  assert.ok(members.every(p=>p.connections.includes('left')&&p.connections.includes('right')));
+  const back=parts.find(p=>p.id==='back');assert.equal(back.h>s.height,s.archRise>0);
+  if(extra.decoration===false&&extra.altarPhoto===false)assert.equal(back.holes.length,0);
+  if(!extra.sheetW){const app=example(s);assert.ok(prepareK40Job(app,{sheet:0}).paths.length);}
+ }
+ assert.throws(()=>generate({...base,levels:8}),/2 a 7 niveles/);
+ assert.throws(()=>generate({...base,measure:'inner'}),/exteriores/);
+ assert.throws(()=>generate({...base,levels:7}),/fondo|alto/);
 });

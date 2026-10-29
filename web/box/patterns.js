@@ -1,7 +1,7 @@
 import {materialWeb} from './models.js?v=3.5';
 import {ringDistance} from './structure.js?v=3.5';
 export const patterns=['legacy','diamond','quatrefoil','petals','arches'];
-export const patternedModels=['bridge','caddy','petal','floral','bag','drawer','heart'];
+export const patternedModels=['bridge','caddy','petal','floral','bag','drawer','heart','altar'];
 const inside=(r,[x,y])=>{let hit=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const a=r[i],b=r[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])hit=!hit;}return hit;};
 const bounds=r=>[Math.min(...r.map(p=>p[0])),Math.min(...r.map(p=>p[1])),Math.max(...r.map(p=>p[0])),Math.max(...r.map(p=>p[1]))];
 function fits(p,h,m){if(!inside(p.p,h[0])||ringDistance(p.p,h)<m-1e-5)return false;const a=bounds(h);for(const old of p.holes){const b=bounds(old);if(Math.hypot(Math.max(0,a[0]-b[2],b[0]-a[2]),Math.max(0,a[1]-b[3],b[1]-a[3]))>=m)continue;if(inside(old,h[0])||inside(h,old[0])||ringDistance(old,h)<m-1e-5)return false;}return true;}
