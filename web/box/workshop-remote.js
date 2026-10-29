@@ -1,5 +1,5 @@
 import qrcode from './vendor/qrcode.mjs';
-import {createPeer,gatherDescription,decodePairing,CommandGate,sendPeerMessage,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
+import {createPeer,gatherDescription,decodePairing,CommandGate,sendPeerMessage,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=4';
 import {pairingRequest,pairingSecret} from './peer-signaling.js?v=1';
 
 /* Enlace con el celular (v62): el celular queda emparejado.

@@ -1,8 +1,8 @@
-import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
+import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=4';
 import {pairingRequest,parsePairingLink} from './peer-signaling.js?v=1';
 // Celular: Control / Trabajos / Biblioteca. La computadora conserva el USB y ejecuta cada orden;
 // este celular solo envía órdenes explícitas (una por pulsación) y nunca reintenta en silencio.
-const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false,library=null,libFilter='all',reviewOpen=false;const pending=new Map(),uploads=new Map();let parametersDirty=false;
+const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false,library=null,libFilter='all',reviewOpen=false;const pending=new Map(),uploads=new Map();let parametersDirty=false,lastAwaitAlert=null;
 const status=message=>{$('remoteStatus').textContent=message;};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 const fmt=(n,d=1)=>Number.isFinite(n)?(Math.round(n*10**d)/10**d).toLocaleString('es-MX',{maximumFractionDigits:d}):'—';
@@ -17,6 +17,7 @@ function controls(){
  $('remoteFrame').disabled=!idle||!(state?.canFrame??state?.canRun);$('remoteCut').disabled=!idle||!state?.canRun;
  $('remoteStop').disabled=!state?.canPause||!open();$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||!open();
  $('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);
+ $('remoteAwait').hidden=state?.state!=='awaiting';$('remoteContinue').disabled=!owner||!state?.canContinue||awaiting||!open();
  for(const b of document.querySelectorAll('[data-origin]')){b.disabled=!idle||(b.dataset.origin==='current'&&!state?.hasPosition);b.setAttribute('aria-pressed',String(state?.origin===b.dataset.origin));}
  for(const b of document.querySelectorAll('[data-source]')){b.disabled=!idle;b.setAttribute('aria-pressed',String((job()?.source||state?.source)===b.dataset.source));}
  for(const n of document.querySelectorAll('#tabJobs input,#tabJobs select,#tabJobs button:not([data-source]):not([data-origin]),#tabLibrary .rm-lib button'))n.disabled=!idle;
@@ -32,7 +33,7 @@ function safePreview(markup){
  const ok=n=>tags.has(n.localName)&&[...n.attributes].every(a=>attributes.has(a.name)&&!/[<>]/.test(a.value)&&(a.name!=='href'||(n.localName==='image'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(a.value))));
  return svg?.localName==='svg'&&[svg,...svg.querySelectorAll('*')].every(ok)?svg:null;
 }
-const stateLabel=s=>{const map={pulsing:'Pulso láser',sending:'Ejecutando',sent:'Datos enviados · esperando fin',pausing:'Solicitando pausa',paused:'En pausa',resuming:'Reanudando',cancelling:'Cancelando',recovering:'Liberando USB',error:'Revisar USB',unknown:'Sin respuesta'};if(s.preparing)return 'Preparando';if(map[s.state])return map[s.state];if(!s.connected)return 'Máquina desconectada';if(s.finished==='finished')return 'Terminado';if(s.finished==='cancelled')return 'Cancelado';return 'Lista';};
+const stateLabel=s=>{const map={awaiting:'Esperando que continúes',continuing:'Continuando',pulsing:'Pulso láser',sending:'Ejecutando',sent:'Datos enviados · esperando fin',pausing:'Solicitando pausa',paused:'En pausa',resuming:'Reanudando',cancelling:'Cancelando',recovering:'Liberando USB',error:'Revisar USB',unknown:'Sin respuesta'};if(s.preparing)return 'Preparando';if(map[s.state])return map[s.state];if(!s.connected)return 'Máquina desconectada';if(s.finished==='finished')return 'Terminado';if(s.finished==='cancelled')return 'Cancelado';return 'Lista';};
 function receive(message){
  if(message.type==='reply'){const p=pending.get(message.id);if(p){clearTimeout(p.timer);pending.delete(message.id);message.ok?p.resolve():p.reject(Error(message.error));}return;}
  if(message.type==='upload-reply'){const u=uploads.get(message.upload);if(u){uploads.delete(message.upload);message.ok?u.resolve():u.reject(Error(message.error||'No se pudo importar.'));}return;}
@@ -52,6 +53,7 @@ function receive(message){
  if(!parametersDirty&&document.activeElement!==$('remoteSpeed'))$('remoteSpeed').value=message.settings?.speed||10;if(!parametersDirty&&document.activeElement!==$('remotePasses'))$('remotePasses').value=message.settings?.passes||1;
  $('remoteTime').textContent=message.estimatedSeconds?`Transcurrido ${fmtTime(message.elapsedSeconds||0)} · restante estimado ${fmtTime(Math.max(0,message.estimatedSeconds-(message.elapsedSeconds||0)))}${message.elapsedSeconds>=message.estimatedSeconds?' · esperando confirmación de la placa':''}`:j?.source==='import'&&j.seconds?`Tiempo estimado: ${fmtTime(j.seconds)} (aproximado)`:'';
  $('remoteOriginNote').textContent=message.origin==='current'?'El diseño empieza en la posición actual del cabezal.':'El envío hace Home y coloca el diseño según la cama.';
+ if(message.state==='awaiting'){const n=message.parts?.names?.[message.parts.index+1];$('remoteAwaitText').textContent=message.message;$('remoteContinue').textContent=n?`Continuar con «${n}»`:'Continuar';if(lastAwaitAlert!==message.parts?.index){lastAwaitAlert=message.parts?.index;try{navigator.vibrate?.([200,100,200]);}catch{}}}else lastAwaitAlert=null;
  renderJob();status(message.message);controls();
 }
 function renderJob(){
@@ -66,10 +68,12 @@ function renderJob(){
   ops.replaceChildren();$('remoteOpCount').textContent=j?.ops?`(${j.ops.length})`:'';
   for(const op of j?.ops||[]){
    const card=document.createElement('article');card.className='rm-op'+(op.enabled?'':' is-off')+(op.empty?' is-empty':'');card.dataset.type=op.type;
-   card.innerHTML=`<label class="rm-op-head"><input type="checkbox" ${op.enabled?'checked':''} aria-label="Activar ${esc(op.name)}"><span class="rm-op-icon" aria-hidden="true"></span><strong>${esc(op.name)}</strong></label><div class="rm-fields"><label>Velocidad · mm/s<input type="number" class="rm-op-speed" min="${op.range[0]}" max="${op.range[1]}" value="${op.speed}" inputmode="decimal"></label><label>Pasadas<input type="number" class="rm-op-passes" min="1" max="10" step="1" value="${op.passes}" inputmode="numeric"></label></div><small>${op.empty?'Sin elementos asignados':'≈ '+fmtTime(op.seconds)} · Potencia: ajustar en la máquina.</small>`;
+   card.innerHTML=`<label class="rm-op-head"><input type="checkbox" ${op.enabled?'checked':''} aria-label="Activar ${esc(op.name)}"><span class="rm-op-icon" aria-hidden="true"></span><strong>${esc(op.name)}</strong></label><div class="rm-fields"><label>Velocidad · mm/s<input type="number" class="rm-op-speed" min="${op.range[0]}" max="${op.range[1]}" value="${op.speed}" inputmode="decimal"></label><label>Pasadas<input type="number" class="rm-op-passes" min="1" max="10" step="1" value="${op.passes}" inputmode="numeric"></label></div>${j.board==='M3'?`<div class="rm-fields"><label>Potencia · %<input type="number" class="rm-op-power" min="1" max="100" value="${op.power??''}" inputmode="numeric"></label></div>`:''}${op.index>0?`<label class="rm-check"><input type="checkbox" class="rm-op-pause" ${op.pause?'checked':''}> Pausar antes y preguntar</label>`:''}<small>${op.empty?'Sin elementos asignados':'≈ '+fmtTime(op.seconds)} · ${j.board==='M3'?'Potencia por USB (M3).':'Potencia: perilla del panel (M2).'}</small>`;
    card.querySelector('input[type=checkbox]').onchange=e=>command('op',{id:op.id,enabled:e.target.checked});
    card.querySelector('.rm-op-speed').onchange=e=>command('op',{id:op.id,speed:Number(e.target.value)});
    card.querySelector('.rm-op-passes').onchange=e=>command('op',{id:op.id,passes:Number(e.target.value)});
+   card.querySelector('.rm-op-power')?.addEventListener('change',e=>command('op',{id:op.id,power:Number(e.target.value)}));
+   card.querySelector('.rm-op-pause')?.addEventListener('change',e=>command('op',{id:op.id,pauseBefore:e.target.checked}));
    ops.append(card);
   }
  }
@@ -96,7 +100,7 @@ async function command(action,args={}){
 }
 /* ---------- Control ---------- */
 for(const [id,x,y] of [['remoteUp',0,-1],['remoteLeft',-1,0],['remoteRight',1,0],['remoteDown',0,1]])$(id).onclick=()=>command('jog',{dx:x*Number($('remoteStep').value),dy:y*Number($('remoteStep').value)});
-for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteUnlock','unlock'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
+for(const [id,action] of [['remoteContinue','continue'],['remotePulse','pulse'],['remoteHome','home'],['remoteUnlock','unlock'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
 const steps=$('remoteSteps');for(const o of $('remoteStep').options){const b=document.createElement('button');b.type='button';b.textContent=o.value;b.onclick=()=>{$('remoteStep').value=o.value;paintSteps();};steps.append(b);}
 function paintSteps(){for(const b of steps.children)b.setAttribute('aria-pressed',String(b.textContent===$('remoteStep').value));}paintSteps();
 for(const b of document.querySelectorAll('[data-origin]'))b.onclick=()=>command('origin',{value:b.dataset.origin});

@@ -1050,7 +1050,7 @@ export function coupon(s){\r
 <link rel="stylesheet" href="k40-control.css?v=5">
 <link rel="stylesheet" href="workshop.css?v=5">
 <link rel="stylesheet" href="../lz-appbar.css?v=60">
-<link rel="stylesheet" href="neo-box.css?v=66">
+<link rel="stylesheet" href="neo-box.css?v=68">
 <style>body.box-booting{visibility:hidden}body.box-booting .lz-appbar{visibility:visible}body.box-booting .box-loading{visibility:visible;position:fixed;inset:60px 0 0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#030405;color:#f3f7fc;font:15px system-ui,sans-serif}.box-loading strong{font-size:20px}.box-loading a{color:#2ee6ff}.box-loading:before{content:"";width:38px;height:38px;border-radius:50%;border:3px solid #18202b;border-top-color:#2ee6ff;animation:lzspin .8s linear infinite}@keyframes lzspin{to{transform:rotate(360deg)}}</style></head>
 <body class="box-booting"><div class="box-loading" role="status"><strong>LZ Box Studio</strong><span>Preparando tu espacio de trabajo\u2026</span><a href="index.html">Volver a cargar</a></div>
 <header class="lz-appbar lz-top-nav" aria-label="LZ Studio Tools navegaci\xF3n"><a class="lz-logo" href="../index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name"><b>LZ</b> STUDIO TOOLS</span></a><nav class="lz-mainnav" aria-label="Secciones de LZ Studio Tools"><a class="lz-nav-link" href="../index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg><span>Inicio</span></a><a class="lz-nav-link" href="../dtf.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Herramientas DTF</span></a><a class="lz-nav-link active" aria-current="page" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg><span>LZ Box Studio</span></a></nav><div class="lz-appbar-actions"><a class="lz-help" href="#ayuda" onclick="document.getElementById('helpBtn')?.click();return false;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg><span>Ayuda</span></a><a class="account-link" href="../account.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="lz-acc-label">Mi cuenta</span></a></div></header>
@@ -1097,7 +1097,7 @@ export function coupon(s){\r
 <dialog id="saveDialog"><div class="dialog-header"><h2>Guardar dise\xF1o</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><label class="field-title" for="designName">Nombre del dise\xF1o</label><input id="designName" maxlength="80" placeholder="Ej. Caja para regalo"><p class="hint">Se guarda en este navegador. Exporta un respaldo para conservarlo en otro dispositivo.</p><button id="confirmSave" class="btn primary wide">Guardar dise\xF1o</button><button id="saveCopy" type="button" class="btn outline wide">Guardar como copia nueva</button></dialog>
 <dialog id="projectsDialog"><div class="dialog-header"><div><span class="eyebrow">TU MESA DE TRABAJO</span><h2>Mis dise\xF1os</h2></div><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><div id="projectSearchMount" class="project-search-mount"></div><div id="projectsList"></div><div class="backup-actions"><button id="newBtn" class="btn outline">Nuevo dise\xF1o</button><button id="backupBtn" class="btn outline">Exportar respaldo JSON</button><button id="importBtn" class="btn outline">Importar dise\xF1o</button><input type="file" id="importFile" accept=".json,application/json" hidden></div><p class="hint">Guardados en este navegador, sin sincronizaci\xF3n entre dispositivos.</p></dialog>
 <dialog id="helpDialog"><div class="dialog-header"><h2>De la idea a tu primera caja</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><ol class="help-steps"><li><strong>Elige el modelo y las medidas.</strong><p>Las exteriores incluyen el MDF. Las interiores corresponden al espacio \xFAtil de la caja armada.</p></li><li><strong>Mide tu material.</strong><p>Selecciona 2, 2.5, 3, 4, 5 o 6 mm, o escribe el espesor real entre 1 y 20 mm. Los encastres se regeneran con cada cambio.</p></li><li><strong>Calibra el encaje.</strong><p>El kerf es el ancho total que elimina tu l\xE1ser. La holgura agrega espacio entre dientes. Descarga la probeta, corta y ajusta estos valores antes de producir.</p></li><li><strong>Revisa y exporta.</strong><p>Gira el modelo, separa las piezas y revisa las hojas de corte. Exporta SVG o DXF en mm a escala 1:1.</p></li></ol><div class="export-note shortcuts"><strong>Controles y atajos</strong><p>Arrastrar: girar \xB7 Bot\xF3n derecho, rueda presionada o May\xFAs + arrastrar: desplazar \xB7 Rueda: zoom \xB7 Doble clic: encuadrar.</p><p><kbd>Ctrl</kbd>+<kbd>Z</kbd> deshacer \xB7 <kbd>Ctrl</kbd>+<kbd>May\xFAs</kbd>+<kbd>Z</kbd> o <kbd>Ctrl</kbd>+<kbd>Y</kbd> rehacer \xB7 <kbd>Ctrl</kbd>+<kbd>S</kbd> guardar \xB7 <kbd>F</kbd> encuadrar \xB7 <kbd>1</kbd>\u2013<kbd>7</kbd> vistas (perspectiva, frente, posterior, izquierda, derecha, superior, inferior) \xB7 <kbd>H</kbd> ocultar pieza \xB7 <kbd>I</kbd> aislar \xB7 <kbd>May\xFAs</kbd>+<kbd>H</kbd> mostrar todas \xB7 <kbd>M</kbd> medidas \xB7 <kbd>C</kbd> compartimentos \xB7 <kbd>E</kbd> formas \xB7 <kbd>P</kbd> plano / 3D \xB7 <kbd>Esc</kbd> cerrar panel.</p><p>En el plano de corte, con \xABEditar distribuci\xF3n\xBB: arrastra piezas, <kbd>R</kbd> gira 90\xB0 y las flechas ajustan 1 mm (May\xFAs: 10 mm).</p></div><div class="export-note"><strong>Sobre esta versi\xF3n</strong><p>Diecisiete modelos, edici\xF3n directa en 3D, formas de corte y PNG. Incluye caja normal, abatible, corrediza, charola, huacal, canasta con arco, canasta con asa doble, estuche con divisiones, portador con asa ovalada y canasta de perfil curvo. Todos los modelos se dise\xF1an para ensamble sin pegamento. La abatible usa pivotes integrados y la corrediza, gu\xEDas capturadas por los laterales y tirador integral de MDF. El 3D permite revisar la forma y la apertura; realiza una prueba de corte y armado antes de producir. Las referencias muestran la forma, sin incluir sus grabados.</p></div><button class="btn primary wide" data-close>Empezar a crear</button></dialog>
-<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=67"><\/script><script type="module" src="neo-studio.js?v=66"><\/script></body></html>
+<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=68"><\/script><script type="module" src="neo-studio.js?v=68"><\/script></body></html>
 `,type:"text/html; charset=utf-8",public:!1},"/box/internal-joints.js":{body:`import {frame,rect,materialWeb} from './models.js?v=3.5';
 /* Tenons on horizontal panels and side ends; closed receivers on all walls. */
 function spans(L,s){const m=materialWeb(s),fit=+s.clearance,margin=m+fit,length=L-2*margin;if(length<m)throw Error('Aumenta la medida: las ranuras interiores necesitan margen y pesta\xF1as resistentes.');let n=Math.max(1,Math.round(length/(+s.finger)));n=Math.min(n,Math.floor(length/(m+fit)));if(n%2===0)n--;n=Math.max(n,1);return Array.from({length:(n+1)/2},(_,k)=>[margin+2*k*length/n,margin+(2*k+1)*length/n]);}
@@ -1300,9 +1300,9 @@ import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=2';
 export const K40_PROTOCOL_V2 = 'lz-k40-m2/v2';
 export const NATIVE_MM = 0.0254;
 export const OP_TYPES = {
-  raster: {label: 'Grabado imagen', short: 'Imagen', color: '#e8eef5', speed: [10, 400], defaultSpeed: 200, icon: 'image'},
-  engrave: {label: 'Grabado vectorial', short: 'Vectorial', color: '#ff4d6d', speed: [1, 100], defaultSpeed: 60, icon: 'pen'},
-  cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, icon: 'scissors'},
+  raster: {label: 'Grabado imagen', short: 'Imagen', color: '#e8eef5', speed: [10, 400], defaultSpeed: 200, defaultPower: 25, icon: 'image'},
+  engrave: {label: 'Grabado vectorial', short: 'Vectorial', color: '#ff4d6d', speed: [1, 100], defaultSpeed: 60, defaultPower: 30, icon: 'pen'},
+  cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, defaultPower: 70, icon: 'scissors'},
 };
 export const RESOLUTIONS = [2, 3, 4, 5, 6, 8].map((step) => ({step, mm: +(step * NATIVE_MM).toFixed(4), dpi: Math.round(1000 / step)}));
 const RED = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return false; const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16); return r >= 150 && g <= 110 && b <= 110 && r - Math.max(g, b) >= 80; };
@@ -1312,6 +1312,8 @@ export function makeOperation(type, extra = {}) {
   const t = OP_TYPES[type];
   if (!t) throw Error('Tipo de operaci\xF3n desconocido.');
   return {id: extra.id || \`\${type}-\${Date.now().toString(36)}-\${++opSerial}\`, type, name: extra.name || t.label, enabled: extra.enabled ?? true, speed: extra.speed ?? t.defaultSpeed, passes: extra.passes ?? 1,
+    // M3: % de la potencia m\xE1xima. pauseBefore: null = autom\xE1tico (M2 pausa entre operaciones para cambiar la perilla).
+    power: extra.power ?? t.defaultPower, pauseBefore: typeof extra.pauseBefore === 'boolean' ? extra.pauseBefore : null,
     ...(type === 'raster' ? {step: extra.step ?? 4, dither: extra.dither ?? 'auto', invert: !!extra.invert, bidirectional: extra.bidirectional ?? true} : {})};
 }
 
@@ -1578,8 +1580,15 @@ export async function renderRaster(area, op, {document: doc = globalThis.documen
 }
 
 /** Trabajo v2 listo para el conector (raster ya convertido a PNG de 1 bit). */
-export async function buildJobV2({design, placement, plan, bed, name}, analysis, renders) {
-  const operations = [];
+/**
+ * \xBFSe pausa antes de esta operaci\xF3n? Autom\xE1tico: en la M2, antes del corte que sigue a los grabados
+ * (para subir la perilla); en la M3 nunca, porque la potencia va por USB. El usuario puede cambiarlo.
+ */
+export function pausesBefore(op, index, board = 'M2', prev = null) { return index > 0 && (typeof op.pauseBefore === 'boolean' ? op.pauseBefore : board === 'M2' && op.type === 'cut' && prev?.type !== 'cut'); }
+
+export async function buildJobV2({design, placement, plan, bed, name, profile = {board: 'M2'}}, analysis, renders) {
+  const operations = [], m3 = profile.board === 'M3';
+  let previous = null;
   for (const o of analysis.ops) {
     if (!o.op.enabled || o.empty) continue;
     if (o.op.type === 'raster') {
@@ -1587,11 +1596,18 @@ export async function buildJobV2({design, placement, plan, bed, name}, analysis,
       if (!r) throw Error(\`\${o.op.name}: falta preparar la imagen.\`);
       if (!r.sweep.burnPixels) continue;
       const png = await encodePNG1(r.bits, r.widthPx, r.heightPx);
-      operations.push({type: 'raster', name: o.op.name, speed: o.op.speed, passes: o.op.passes, raster: {x: f4(o.data.area.x), y: f4(o.data.area.y), step: o.op.step, width: r.widthPx, height: r.heightPx, png: base64(png), bidirectional: o.op.bidirectional !== false}});
-    } else operations.push({type: 'vector', name: o.op.name, speed: o.op.speed, passes: o.op.passes, paths: o.data.paths});
+      operations.push({type: 'raster', name: o.op.name, speed: o.op.speed, passes: o.op.passes, ...extras(o.op, operations.length, previous), raster: {x: f4(o.data.area.x), y: f4(o.data.area.y), step: o.op.step, width: r.widthPx, height: r.heightPx, png: base64(png), bidirectional: o.op.bidirectional !== false}});
+    } else operations.push({type: 'vector', name: o.op.name, speed: o.op.speed, passes: o.op.passes, ...extras(o.op, operations.length, previous), paths: o.data.paths});
+    previous = o.op;
+  }
+  function extras(op, index, prev) {
+    const out = {};
+    if (m3) { const p = Number(op.power); if (!(p >= 1 && p <= 100)) throw Error(\`\${op.name}: potencia entre 1 y 100 %.\`); out.power = Math.round(p); }
+    if (pausesBefore(op, index, profile.board, prev)) out.pauseBefore = true;
+    return out;
   }
   if (!operations.length) throw Error('No hay nada que grabar o cortar con las operaciones activas.');
-  return {protocol: K40_PROTOCOL_V2, board: 'M2', bed: {...bed}, name: String(name || design.name || 'Trabajo').slice(0, 80), operations};
+  return {protocol: K40_PROTOCOL_V2, board: m3 ? 'M3' : 'M2', ...(m3 ? {maxPower: Math.round(profile.maxPower)} : {}), bed: {...bed}, name: String(name || design.name || 'Trabajo').slice(0, 80), operations};
 }
 
 /* ------------------------------------------------------------ vista previa */
@@ -1668,7 +1684,7 @@ export function bitsPreviewURL(render, {document: doc = globalThis.document, max
    pesta\xF1a o abrir un trabajo guardado solo actualiza la vista. El env\xEDo lo inicia
    siempre el bot\xF3n de la barra de acciones (o el celular con el control). */
 import {importSVG, imageDesign, mergeDesigns, nextOffset, apply} from './svg-import.js?v=3';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=5';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix, pausesBefore} from './job-ops.js?v=6';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -2052,6 +2068,19 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       fields.querySelector('.js-op-speed').onchange = (e) => { patchOperation(op.id, {speed: Number(e.target.value)}); update(); };
       fields.querySelector('.js-op-passes').onchange = (e) => { patchOperation(op.id, {passes: Number(e.target.value)}); update(); };
       card.append(head, fields);
+      const board = machine.profile?.board || 'M2';
+      if (board === 'M3') {
+        const pw = el('div', 'js-op-fields js-op-power-row');
+        pw.innerHTML = \`<label>Potencia \xB7 % del m\xE1ximo<input class="js-op-pw" type="number" min="1" max="100" step="1" value="\${op.power ?? OP_TYPES[op.type].defaultPower}"></label><span class="js-op-pw-note">\u2248 \${Math.round((op.power ?? OP_TYPES[op.type].defaultPower) * (machine.profile.maxPower || 30) / 100)} % real del tubo</span>\`;
+        pw.querySelector('.js-op-pw').onchange = (e) => { const v = Number(e.target.value); if (v >= 1 && v <= 100) patchOperation(op.id, {power: Math.round(v)}); renderStructure(); update(); };
+        card.append(pw);
+      }
+      if (index > 0) {
+        const pause = el('label', 'js-check js-op-pause');
+        pause.innerHTML = \`<input type="checkbox"\${pausesBefore(op, index, board, ops[index - 1]) ? ' checked' : ''}><span>Pausar antes y preguntar para continuar\${board === 'M2' ? ' (cambia la perilla de potencia)' : ''}</span>\`;
+        pause.querySelector('input').onchange = (e) => { patchOperation(op.id, {pauseBefore: e.target.checked}); update(); };
+        card.append(pause);
+      }
       if (op.type === 'raster') {
         const extra = el('div', 'js-op-fields');
         extra.innerHTML = \`<label>Resoluci\xF3n<select class="js-op-step">\${RESOLUTIONS.map((r) => \`<option value="\${r.step}"\${r.step === op.step ? ' selected' : ''}>\${r.mm.toFixed(2)} mm (\${r.dpi} ppp)</option>\`).join('')}</select></label><label>Tratamiento<select class="js-op-dither"><option value="auto">Colores s\xF3lidos (logotipos)</option><option value="threshold">Umbral por brillo</option><option value="floyd">Tonos \xB7 difusi\xF3n (fotos)</option></select></label>\`;
@@ -2184,13 +2213,19 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
     support(features) {
-      if (features.includes('operations-v2') && features.includes('raster-1bit')) return {ok: true};
+      const profile = machine.profile || {board: 'M2'};
+      if (profile.board === 'M3' && !features.includes('m3-pwm')) return {ok: false, message: 'La M3 con potencia por USB requiere el conector 0.7.2 (enlace en Detalles de conexi\xF3n).'};
+      if (features.includes('operations-v2') && features.includes('raster-1bit')) {
+        const sent = scoped(analyze());
+        if (sent.some((o, i) => pausesBefore(o.op, i, profile.board, sent[i - 1]?.op)) && !features.includes('operation-pauses')) return {ok: false, message: 'La pausa entre operaciones requiere el conector 0.7.2. Inst\xE1lalo, o desmarca \xABPausar antes\xBB y env\xEDa cada operaci\xF3n por separado.'};
+        return {ok: true};
+      }
       const a = analyze(), active = scoped(a);
       if (active.length === 1 && active[0].op.type !== 'raster') return {ok: true, legacy: true};
-      return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operaci\xF3n vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.1 (enlace en Detalles de conexi\xF3n), o desactiva las dem\xE1s operaciones.'};
+      return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operaci\xF3n vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.2 (enlace en Detalles de conexi\xF3n), o desactiva las dem\xE1s operaciones.'};
     },
     /** Trabajo para el conector. Solo se llama al pulsar Recorrer marco o Iniciar. */
-    async buildJob({bed, features, origin}) {
+    async buildJob({bed, features, origin, profile = machine.profile || {board: 'M2'}}) {
       const support = source.support(features); if (!support.ok) throw Error(support.message);
       if (state.review) throw Error(problemText(analysis));
       await ensureRenders();
@@ -2198,12 +2233,12 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const subset = scoped(a); if (!subset.length) throw Error('La operaci\xF3n elegida para enviar no tiene elementos.');
       const partial = state.sendScope !== 'all';
       if (support.legacy) {
-        if (partial && origin === 'current') throw Error('Con el conector 0.6.4, enviar una sola operaci\xF3n desde la posici\xF3n actual la desplazar\xEDa. Usa origen Home o actualiza a 0.7.1.');
+        if (partial && origin === 'current') throw Error('Con el conector 0.6.4, enviar una sola operaci\xF3n desde la posici\xF3n actual la desplazar\xEDa. Usa origen Home o actualiza a 0.7.2.');
         const o = subset[0];
         return {protocol: K40_V1, board: 'M2', name: source.name(), bed: {...bed}, speed: o.op.speed, passes: o.op.passes, paths: o.data.paths};
       }
       const view = partial ? {...a, ops: a.ops.map((o) => subset.includes(o) ? o : {...o, op: {...o.op, enabled: false}})} : a;
-      const job = await buildJobV2({design: state.design, placement: state.placement, plan: state.plan, bed, name: source.name()}, view, renders);
+      const job = await buildJobV2({design: state.design, placement: state.placement, plan: state.plan, bed, name: source.name(), profile}, view, renders);
       // Esquina del trabajo completo: as\xED cada operaci\xF3n enviada por separado cae en su lugar.
       if (partial) job.anchor = [Math.max(0, Math.round(a.bounds.x * 1e4) / 1e4), Math.max(0, Math.round(a.bounds.y * 1e4) / 1e4)];
       return job;
@@ -2343,7 +2378,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       placement: state.placement, bounds: a?.bounds || null, sendScope: state.sendScope, review: state.review, dirty: state.dirty, savedWhere: state.savedWhere, cloud: library.cloudState,
       issues: (state.design?.issues || []).filter((i) => i.level !== 'info').map((i) => i.message).slice(0, 6),
       problems: a?.problems || [], warnings: a?.warnings || [], seconds: a?.seconds || 0,
-      ops: (a?.ops || []).map((o) => ({id: o.op.id, type: o.op.type, name: o.op.name, enabled: o.op.enabled, speed: o.op.speed, passes: o.op.passes, step: o.op.step, empty: o.empty, seconds: o.seconds, range: OP_TYPES[o.op.type].speed}))};
+      board: machine.profile?.board || 'M2', ops: (a?.ops || []).map((o, i) => ({id: o.op.id, type: o.op.type, name: o.op.name, enabled: o.op.enabled, speed: o.op.speed, passes: o.op.passes, power: o.op.power, pause: pausesBefore(o.op, i, machine.profile?.board || 'M2', a.ops[i - 1]?.op), index: i, step: o.op.step, empty: o.empty, seconds: o.seconds, range: OP_TYPES[o.op.type].speed}))};
   }
   async function remote(action, args = {}) {
     const num = (v) => Number(v);
@@ -2354,6 +2389,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
         const change = {};
         if ('enabled' in args) change.enabled = !!args.enabled;
         if ('speed' in args) { const [lo, hi] = OP_TYPES[op.type].speed; if (!(num(args.speed) >= lo && num(args.speed) <= hi)) throw Error(\`Velocidad entre \${lo} y \${hi} mm/s.\`); change.speed = num(args.speed); }
+        if ('power' in args) { if (!(num(args.power) >= 1 && num(args.power) <= 100)) throw Error('Potencia entre 1 y 100 %.'); change.power = Math.round(num(args.power)); }
+        if ('pauseBefore' in args) change.pauseBefore = !!args.pauseBefore;
         if ('passes' in args) { if (!Number.isInteger(num(args.passes)) || num(args.passes) < 1 || num(args.passes) > 10) throw Error('Pasadas enteras entre 1 y 10.'); change.passes = num(args.passes); }
         patchOperation(op.id, change); renderStructure(); update(); return;
       }
@@ -2403,7 +2440,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   machine.setSource(source);
   library.onChange(() => { app.workshop?.refreshLibrary?.(); app.workshopRemote?.publishLibrary?.(); });
   library.refresh().catch(() => {});
-  const api = {source, state, library, setSource, importFile, openSaved, save, snapshot, remote, receiveFile, ui: {sourceBar, panel, centerBar, zoomBar, orderPanel, bedNote}, update, get analysis() { return analysis; }};
+  const api = {profileChanged: () => { renderStructure(); update(); }, source, state, library, setSource, importFile, openSaved, save, snapshot, remote, receiveFile, ui: {sourceBar, panel, centerBar, zoomBar, orderPanel, bedNote}, update, get analysis() { return analysis; }};
   app.jobStudio = api;
   let initial = 'box'; try { initial = app.readStorage?.('lzbox-job-source', 'box') === 'import' ? 'import' : 'box'; } catch {}
   setSource(initial, {silent: true}); setCenter('preview');
@@ -2413,7 +2450,10 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/k40-control.js":{body:`import {prepareK40Job,k40Preview,placeK40Job,K40_PROTOCOL} from './k40-job.js?v=2';
 import {registeredJob,referencePoints} from './registration.js?v=1';
 const ADDRESS='http://127.0.0.1:17840',PAIRING_KEY='lzbox-k40-pairing-v1';
-const PENDING=['pulsing','sending','sent','pausing','paused','resuming','cancelling','recovering','error'];
+const PENDING=['pulsing','sending','sent','pausing','paused','resuming','cancelling','recovering','error','awaiting','continuing'];
+const PROFILE_KEY='lzbox-k40-board-v1';
+/** Tarjeta de la m\xE1quina. M2: potencia del panel. M3: potencia por operaci\xF3n (PWM), con l\xEDmite del tubo. */
+export function readProfile(storage){try{const v=JSON.parse(storage?.getItem(PROFILE_KEY)||'null');if(v&&['M2','M3'].includes(v.board)){const max=Number(v.maxPower);return {board:v.board,maxPower:Number.isFinite(max)&&max>=1&&max<=100?max:30,boxPower:Number.isFinite(Number(v.boxPower))?Math.min(100,Math.max(1,Number(v.boxPower))):70};}}catch{}return {board:'M2',maxPower:30,boxPower:70};}
 export function mountK40(app,options={}){
  if(app.machineControl)return app.machineControl;
  const launch=document.createElement('button');launch.type='button';launch.className='btn outline';launch.id='k40Open';launch.textContent='Controlar mi K40';document.querySelector('.export-actions')?.append(launch);
@@ -2422,12 +2462,12 @@ export function mountK40(app,options={}){
  dialog.innerHTML=\`<header class="k40-header"><div class="k40-brand"><span class="k40-monogram">LZ</span><div><h2 id="k40Title">Control de corte <span>M2 Nano</span></h2><p>BOX STUDIO / TALLER</p></div></div><div class="k40-header-actions"><span class="k40-badge" id="k40Mode">Sin conectar</span><button type="button" class="icon-btn" id="k40Close" aria-label="Cerrar panel">\xD7</button></div></header>
  <div class="k40-layout"><section class="k40-canvas-panel" aria-label="Vista del trabajo"><div class="k40-section-heading"><div><span class="k40-kicker">PLANO DE CORTE</span><h3>\xC1rea de trabajo</h3></div><label>Hoja<select id="k40Sheet"></select></label><button type="button" class="btn outline" id="k40Arrange">Acomodar piezas</button></div><div id="k40Preview" class="k40-preview"></div><div class="k40-legend"><span><i class="k40-inner"></i>Interiores</span><span><i class="k40-outer"></i>Contornos</span><span>Medidas en mm \xB7 kerf conservado</span></div><p id="k40Summary" class="k40-summary"></p>
  <details class="k40-bed"><summary>Medidas de cama y desplazamiento</summary><div class="k40-fields"><label>Ancho \xB7 mm<input id="k40Width" type="number" min="50" max="2500" value="400"></label><label>Alto \xB7 mm<input id="k40Height" type="number" min="50" max="2500" value="400"></label><label>Desplazar X \xB7 mm<input id="k40X" type="number" min="0" step="0.1" value="0"></label><label>Desplazar Y \xB7 mm<input id="k40Y" type="number" min="0" step="0.1" value="0"></label></div><p class="k40-note">Las medidas deben coincidir con las del conector. En origen actual, el contorno del dise\xF1o se alinea al cabezal.</p></details></section>
- <section class="k40-controls" aria-label="Controles de m\xE1quina"><details class="k40-pairing" id="k40BridgePanel" open><summary>Conexi\xF3n USB</summary><p class="k40-note">Inicio autom\xE1tico con Windows. El c\xF3digo se guarda en esta computadora. <a id="k40ConnectorLink" href="https://raw.githubusercontent.com/juandppuente2003-netizen/lz-studio-toolsPublic/main/connectors/k40/LZ-K40-Windows.zip?v=0.7.1" target="_blank" rel="noopener">Conector 0.7.1 para Windows</a> (grabado de imagen, trabajos combinados y desbloquear riel; 0.6.4 sigue funcionando para cortes).</p><label for="k40Token">C\xF3digo del conector</label><div class="k40-connect-row"><input id="k40Token" type="password" autocomplete="off" spellcheck="false"><button type="button" id="k40Connect" class="btn outline">Conectar</button></div><label class="k40-confirm"><input id="k40Remember" type="checkbox" checked>Recordar esta computadora</label><div class="k40-actions"><button type="button" id="k40Disconnect" class="btn quiet" disabled>Liberar USB para Sagaon</button><button type="button" id="k40Forget" class="btn quiet">Olvidar c\xF3digo</button></div></details>
+ <section class="k40-controls" aria-label="Controles de m\xE1quina"><details class="k40-pairing" id="k40BridgePanel" open><summary>Conexi\xF3n USB</summary><p class="k40-note">Inicio autom\xE1tico con Windows. El c\xF3digo se guarda en esta computadora. <a id="k40ConnectorLink" href="https://raw.githubusercontent.com/juandppuente2003-netizen/lz-studio-toolsPublic/main/connectors/k40/LZ-K40-Windows.zip?v=0.7.2" target="_blank" rel="noopener">Conector 0.7.2 para Windows</a> (grabado de imagen, trabajos combinados, pausa entre operaciones, M3 y desbloquear riel; 0.6.4 sigue funcionando para cortes).</p><label for="k40Token">C\xF3digo del conector</label><div class="k40-connect-row"><input id="k40Token" type="password" autocomplete="off" spellcheck="false"><button type="button" id="k40Connect" class="btn outline">Conectar</button></div><label class="k40-confirm"><input id="k40Remember" type="checkbox" checked>Recordar esta computadora</label><div class="k40-actions"><button type="button" id="k40Disconnect" class="btn quiet" disabled>Liberar USB para Sagaon</button><button type="button" id="k40Forget" class="btn quiet">Olvidar c\xF3digo</button></div></details>
  <section class="k40-jog-panel"><div class="k40-section-heading"><h3>Mover cabezal</h3><span id="k40Position" class="k40-position">Sin referencia</span></div><div class="k40-motion-layout"><div class="k40-jog-pad"><button type="button" id="k40Up" class="k40-jog" aria-label="Mover hacia arriba">\u2191</button><button type="button" id="k40Left" class="k40-jog" aria-label="Mover hacia la izquierda">\u2190</button><button type="button" id="k40Home" class="k40-home" title="Ir a la esquina superior izquierda">Home</button><button type="button" id="k40Right" class="k40-jog" aria-label="Mover hacia la derecha">\u2192</button><button type="button" id="k40Down" class="k40-jog" aria-label="Mover hacia abajo">\u2193</button></div><div><label for="k40Step">Paso \xB7 mm</label><select id="k40Step"><option>0.1</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select><button type="button" id="k40UsePosition" class="btn outline wide">Usar esta posici\xF3n como origen</button><button type="button" id="k40Unlock" class="btn outline wide" title="Libera los motores para mover el cabezal a mano. Despu\xE9s haz Home.">Desbloquear riel</button></div></div><p class="k40-note">Un clic = un movimiento. Haz Home una vez al conectar. Posici\xF3n estimada; si mueves el cabezal a mano, libera USB y vuelve a establecer Home.</p></section>
  <section class="k40-job-settings"><h3>Preparar hoja</h3><label for="k40Origin">Origen del trabajo</label><select id="k40Origin"><option value="home">Desde Home \xB7 esquina superior izquierda</option><option value="current">Desde la posici\xF3n actual \xB7 sin volver a Home</option></select><p id="k40OriginNote" class="k40-note"></p><div class="k40-fields"><label>Velocidad \xB7 mm/s<input id="k40Speed" type="number" min="1" max="100" step="0.1" value="10"></label><label>Pasadas<input id="k40Passes" type="number" min="1" max="10" step="1" value="1"></label></div></section>
 
- <p class="k40-note">Potencia: aj\xFAstala en el panel f\xEDsico de la M2.</p></section></div>
- <footer class="k40-console"><div class="k40-feedback"><span id="k40State" class="k40-state">DESCONECTADA</span><div id="k40Status" class="k40-status" role="status" aria-live="polite">Conecta el conector local para continuar.</div><progress id="k40Progress" class="k40-progress" max="100" value="0" aria-label="Datos enviados a la controladora" hidden></progress><button type="button" id="k40Recover" class="btn outline" hidden>Restablecer conexi\xF3n USB</button><button type="button" id="k40Reconnect" class="btn outline" hidden>Reconectar M2</button></div><div class="k40-run-actions"><button type="button" id="k40Frame" class="btn outline" disabled>Recorrer marco</button><button type="button" id="k40Run" class="btn primary" disabled>Iniciar corte</button><button type="button" id="k40Stop" class="btn k40-stop" disabled><span>\u2161</span> STOP / PAUSA</button></div><section id="k40PausePanel" class="k40-pause-panel" aria-labelledby="k40PauseTitle" hidden><div><h3 id="k40PauseTitle">Pausa del trabajo</h3><p id="k40PauseNote">Esperando a la controladora\u2026</p></div><button type="button" id="k40Resume" class="btn primary" disabled>Reanudar trabajo</button><button type="button" id="k40Cancel" class="btn k40-terminate" disabled>Cancelar trabajo</button></section><p class="k40-stop-note">Pausar pide a la M2 detenerse conservando la cola para reanudar. Stop descarta el trabajo y conserva el USB; despu\xE9s haz Home. La M2 puede terminar lo ya almacenado antes de aceptar la orden: ante movimiento inesperado usa el paro f\xEDsico.</p></footer>\`;
+ <section class="k40-board" aria-labelledby="k40BoardTitle"><h3 id="k40BoardTitle">Tarjeta de la m\xE1quina</h3><div class="k40-board-choice" role="group" aria-label="Tarjeta"><button type="button" data-board="M2">M2 Nano</button><button type="button" data-board="M3">M3 Nano</button></div><p class="k40-note" id="k40BoardNote"></p><label id="k40MaxPowerRow">Potencia m\xE1xima del tubo \xB7 %<input id="k40MaxPower" type="number" min="1" max="100" step="1" value="30"></label><label id="k40BoxPowerRow">Potencia de corte para dise\xF1os Box \xB7 %<input id="k40BoxPower" type="number" min="1" max="100" step="1" value="70"></label></section><p class="k40-note">Potencia: aj\xFAstala en el panel f\xEDsico de la M2.</p></section></div>
+ <footer class="k40-console"><div class="k40-feedback"><span id="k40State" class="k40-state">DESCONECTADA</span><div id="k40Status" class="k40-status" role="status" aria-live="polite">Conecta el conector local para continuar.</div><progress id="k40Progress" class="k40-progress" max="100" value="0" aria-label="Datos enviados a la controladora" hidden></progress><button type="button" id="k40Recover" class="btn outline" hidden>Restablecer conexi\xF3n USB</button><button type="button" id="k40Reconnect" class="btn outline" hidden>Reconectar M2</button></div><div class="k40-run-actions"><button type="button" id="k40Frame" class="btn outline" disabled>Recorrer marco</button><button type="button" id="k40Run" class="btn primary" disabled>Iniciar corte</button><button type="button" id="k40Continue" class="btn primary k40-continue" hidden>Continuar</button><button type="button" id="k40Stop" class="btn k40-stop" disabled><span>\u2161</span> STOP / PAUSA</button></div><section id="k40PausePanel" class="k40-pause-panel" aria-labelledby="k40PauseTitle" hidden><div><h3 id="k40PauseTitle">Pausa del trabajo</h3><p id="k40PauseNote">Esperando a la controladora\u2026</p></div><button type="button" id="k40Resume" class="btn primary" disabled>Reanudar trabajo</button><button type="button" id="k40Cancel" class="btn k40-terminate" disabled>Cancelar trabajo</button></section><p class="k40-stop-note">Pausar pide a la M2 detenerse conservando la cola para reanudar. Stop descarta el trabajo y conserva el USB; despu\xE9s haz Home. La M2 puede terminar lo ya almacenado antes de aceptar la orden: ante movimiento inesperado usa el paro f\xEDsico.</p></footer>\`;
  (options.host||document.body).append(dialog);
  const targetPanel=document.createElement('div');targetPanel.className='k40-fields';targetPanel.innerHTML='<button type="button" class="btn outline" id="k40Pulse">Pulso l\xE1ser \xB7 50 ms</button><p id="k40Time" role="status">Tiempo estimado: sin trabajo activo.</p><label>Destino X \xB7 mm<input id="k40TargetX" type="number" min="0" step="0.1" value="0"></label><label>Destino Y \xB7 mm<input id="k40TargetY" type="number" min="0" step="0.1" value="0"></label><button type="button" class="btn outline" id="k40Goto">Ir a punto</button><button type="button" class="btn outline" id="k40Pick">Elegir punto en el plano</button><p>Elige un punto en el plano y pulsa Ir a punto para mover el cabezal sin emisi\xF3n.</p>';
  dialog.querySelector('.k40-jog-panel').append(targetPanel);
@@ -2447,13 +2487,17 @@ export function mountK40(app,options={}){
   $('k40Pulse').disabled=!machine?.features?.includes('timed-pulse')||!hasPosition()||requesting||active||remoteOwner;
   const idle=!!machine&&!requesting&&!active&&!remoteOwner,ready=idle&&!!job&&previewOK;
   $('k40Run').disabled=!ready;$('k40Frame').disabled=!ready;
-  $('k40Stop').disabled=!active||controlBusy||['pausing','paused','resuming','cancelling','recovering','error','unknown'].includes(lastState);
+  $('k40Stop').disabled=!active||controlBusy||['pausing','paused','resuming','cancelling','recovering','error','unknown','awaiting','continuing'].includes(lastState);
+  $('k40Continue').hidden=lastState!=='awaiting';$('k40Continue').disabled=lastState!=='awaiting'||controlBusy||remoteOwner;
+  const parts=machine?.parts;$('k40Continue').textContent=parts&&parts.names?.[parts.index+1]?\`Continuar con \xAB\${parts.names[parts.index+1]}\xBB\`:'Continuar';
+  for(const b of dialog.querySelectorAll('[data-board]')){b.setAttribute('aria-pressed',String(profile.board===b.dataset.board));b.disabled=active||requesting;}
+  $('k40MaxPower').disabled=$('k40BoxPower').disabled=active||requesting;
   $('k40PausePanel').hidden=!active||!['pausing','paused','resuming','error','unknown'].includes(lastState);
   $('k40Resume').disabled=lastState!=='paused'||controlBusy||remoteOwner;
   $('k40Cancel').disabled=!active||controlBusy||['cancelling','recovering'].includes(lastState);
   $('k40Recover').hidden=!['error','unknown'].includes(lastState);$('k40Recover').disabled=controlBusy;
   $('k40Reconnect').hidden=active||!!machine||!verifiedToken;$('k40Reconnect').disabled=requesting;
-  $('k40State').textContent=preparing?'PREPARANDO':({pulsing:'PULSO L\xC1SER',sending:'EJECUTANDO \xB7 ENVIANDO DATOS',sent:'DATOS ENVIADOS \xB7 ESPERANDO FIN',pausing:'SOLICITANDO PAUSA',paused:'EN PAUSA',resuming:'REANUDANDO',cancelling:'CANCELANDO',recovering:'LIBERANDO USB',error:'REVISAR USB',unknown:'SIN RESPUESTA'})[lastState]||(machine?(finished==='finished'?'TERMINADO':finished==='simulated'?'SIMULACI\xD3N TERMINADA':finished==='cancelled'?'CANCELADO':machine.operationAccepted?'ORDEN ACEPTADA':'LISTA'):'DESCONECTADA');
+  $('k40State').textContent=preparing?'PREPARANDO':({pulsing:'PULSO L\xC1SER',sending:'EJECUTANDO \xB7 ENVIANDO DATOS',sent:'DATOS ENVIADOS \xB7 ESPERANDO FIN',pausing:'SOLICITANDO PAUSA',awaiting:'ESPERANDO CONTINUAR',continuing:'CONTINUANDO',paused:'EN PAUSA',resuming:'REANUDANDO',cancelling:'CANCELANDO',recovering:'LIBERANDO USB',error:'REVISAR USB',unknown:'SIN RESPUESTA'})[lastState]||(machine?(finished==='finished'?'TERMINADO':finished==='simulated'?'SIMULACI\xD3N TERMINADA':finished==='cancelled'?'CANCELADO':machine.operationAccepted?'ORDEN ACEPTADA':'LISTA'):'DESCONECTADA');
   $('k40State').dataset.state=preparing?'preparing':lastState||(machine&&finished?finished:'idle');
   $('k40PauseNote').textContent=lastState==='paused'?'La M2 acept\xF3 la pausa. Conservamos la cola para continuar.':lastState==='resuming'?'Esperando aceptaci\xF3n de reanudaci\xF3n\u2026':lastState==='pausing'?'Pausa solicitada. Puede seguir ejecutando datos almacenados mientras la acepta.':'No se conoce el estado f\xEDsico. Cancela o restablece USB; usa el paro f\xEDsico si contin\xFAa.';
   inputs.forEach(id=>$(id).disabled=active||requesting);$('k40Step').disabled=active||requesting;
@@ -2517,6 +2561,15 @@ export function mountK40(app,options={}){
   let response;try{response=await fetch(ADDRESS+path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(path==='/prepare'?180000:12000),cache:'no-store'});}catch{throw Error('No se pudo comunicar con el conector. Comprueba que est\xE9 iniciado y permite el acceso a la red local si Chrome lo solicita.');}
   const result=await response.json();if(!response.ok)throw Error(response.status===401?'El c\xF3digo no es v\xE1lido. Copia el c\xF3digo permanente desde Abrir conector.':result.error||'El conector rechaz\xF3 la solicitud.');return result;
  }
+ const storageRef=(()=>{try{return document.defaultView.localStorage;}catch{return null;}})();
+ let profile=readProfile(storageRef);
+ function paintProfile(){
+  $('k40MaxPower').value=profile.maxPower;$('k40BoxPower').value=profile.boxPower;
+  const m3=profile.board==='M3';$('k40MaxPowerRow').hidden=!m3;$('k40BoxPowerRow').hidden=!m3;
+  $('k40BoardNote').textContent=m3?'M3 Nano: la potencia de cada operaci\xF3n se env\xEDa por USB (PWM al pin IN de la fuente) y es un porcentaje de la potencia m\xE1xima. Requiere tener el PWM de la M3 cableado al IN; verifica con el amper\xEDmetro que el m\xE1ximo no supere la corriente de tu tubo.':'M2 Nano: la potencia se ajusta en la perilla del panel. Para grabar y cortar con potencias distintas, el trabajo se pausa entre operaciones para que cambies la perilla.';
+  dialog.querySelector('.k40-controls > p.k40-note')&&(dialog.querySelector('.k40-controls > p.k40-note').hidden=m3);
+ }
+ function setProfile(change){if(active||requesting)return;profile={...profile,...change};try{storageRef?.setItem(PROFILE_KEY,JSON.stringify(profile));}catch{}paintProfile();refresh(false);options.onProfile?.(profile);}
  function savedCode(){try{return document.defaultView.localStorage.getItem(PAIRING_KEY)||'';}catch{return '';}}
  function forgetCode(){try{document.defaultView.localStorage.removeItem(PAIRING_KEY);}catch{}}
  function rememberCode(){
@@ -2544,7 +2597,8 @@ export function mountK40(app,options={}){
   catch(e){status(e.message,true);return false;}finally{requesting=false;buttons();}
  }
  function consume(s){
-  if(clockStart&&['paused','idle','error'].includes(s.state)){clockSpent+=(Date.now()-clockStart)/1000;clockStart=0;}if(s.state==='sending'&&lastState==='resuming'&&clockTotal)clockStart=Date.now();updateClock();
+  if(clockStart&&['paused','idle','error','awaiting'].includes(s.state)){clockSpent+=(Date.now()-clockStart)/1000;clockStart=0;}if(s.state==='sending'&&['resuming','continuing','awaiting'].includes(lastState)&&clockTotal)clockStart=Date.now();
+  if(s.state==='awaiting'&&lastState!=='awaiting')notifyOperator();updateClock();
   if(machine)machine={...machine,...s};lastState=s.state;
   if(PENDING.includes(s.state))active=true;
   if(s.state==='idle'&&active&&s.outcome?.operation==='cut')finished=s.outcome.result==='cancelled'?'cancelled':s.outcome.result==='simulated'?'simulated':'finished';
@@ -2566,8 +2620,10 @@ export function mountK40(app,options={}){
   let generation;requesting=true;preparing=true;finished=null;buttons();status('Preparando instrucciones M2\u2026');
   try{
    const origin=$('k40Origin').value;let wire=job;
-   if(job.imported){status(mode==='frame'?'Preparando el marco del trabajo\u2026':'Preparando operaciones: rasterizando im\xE1genes y optimizando trayectorias\u2026');wire=await source.buildJob({bed:machine.bed,features:machine.features||[],mode,origin});activePreview=currentView?.compact||'';activeName=source.name();}
-   else{activePreview=k40Preview(currentView||job);activeName=app.state.name;}
+   if(job.imported){status(mode==='frame'?'Preparando el marco del trabajo\u2026':'Preparando operaciones: rasterizando im\xE1genes y optimizando trayectorias\u2026');wire=await source.buildJob({bed:machine.bed,features:machine.features||[],mode,origin,profile});activePreview=currentView?.compact||'';activeName=source.name();}
+   else{activePreview=k40Preview(currentView||job);activeName=app.state.name;
+    // M3: el dise\xF1o Box se env\xEDa con su potencia por USB (si no, la M3 disparar\xEDa con el PWM que tuviera).
+    if(profile.board==='M3'){if(!machine.features?.includes('m3-pwm'))throw Error('La M3 con potencia por USB requiere el conector 0.7.2.');if(origin==='aligned')throw Error('Con la M3, usa origen Home o Posici\xF3n actual (la alineaci\xF3n por puntos es solo para M2 por ahora).');wire={protocol:'lz-k40-m2/v2',board:'M3',maxPower:profile.maxPower,bed:{...job.bed},name:job.name,operations:[{type:'vector',name:'Corte',speed:job.speed,passes:job.passes,power:profile.boxPower,paths:job.paths}]};}}
    if(mode==='cut'){clockTotal=job.summary.minimumCutSeconds;clockSpent=0;clockStart=Date.now();}else{clockStart=0;clockTotal=0;}updateClock();
    const prepared=await api('/prepare',{job:wire,mode,origin,...(origin==='aligned'?{registration:{pairs,mode:$('k40RegistrationMode').value,session:registrationSession}}:{})});if(!prepared.id)throw Error('El conector no prepar\xF3 un trabajo v\xE1lido.');
    preparing=false;active=true;lastState=null;generation=++epoch;buttons();let result=await api('/run',{id:prepared.id,confirmed:true});if(generation!==epoch)return;
@@ -2601,8 +2657,11 @@ export function mountK40(app,options={}){
 
  for(const [id,x,y] of [['k40Up',0,-1],['k40Left',-1,0],['k40Right',1,0],['k40Down',0,1]])$(id).onclick=()=>motion('jog',x*Number($('k40Step').value),y*Number($('k40Step').value));
  $('k40UsePosition').onclick=()=>{if(remoteOwner||active||requesting||!hasPosition())return;$('k40Origin').value='current';refresh();};
+ /** Aviso al terminar una parte: tono corto (la p\xE1gina ya tuvo interacci\xF3n del usuario). */
+ function notifyOperator(){try{const AC=document.defaultView.AudioContext||document.defaultView.webkitAudioContext;if(!AC)return;const ctx=new AC(),o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;g.gain.value=0.12;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+0.35);setTimeout(()=>ctx.close(),800);}catch{}}
  async function control(action,fromRemote=false){
-  if(action==='resume'&&remoteOwner!==fromRemote)return;
+  if((action==='resume'||action==='continue')&&remoteOwner!==fromRemote)return;
+  if(action==='continue'&&lastState!=='awaiting')return;
   if(!active||controlBusy)return;
   if(action==='recover'&&lastState==='unknown'){
    controlBusy=true;++epoch;buttons();
@@ -2610,13 +2669,17 @@ export function mountK40(app,options={}){
    catch(e){status(e.message,true);}finally{controlBusy=false;buttons();}
    return;
   }
-  controlBusy=true;const generation=++epoch;stopPolling();lastState=({pause:'pausing',resume:'resuming',cancel:'cancelling',recover:'recovering'})[action];buttons();
-  status(({pause:'Solicitando pausa\u2026',resume:'Solicitando reanudaci\xF3n\u2026',cancel:'Cancelando trabajo\u2026',recover:'Restableciendo sesi\xF3n USB\u2026'})[action]);
+  controlBusy=true;const generation=++epoch;stopPolling();lastState=({pause:'pausing',resume:'resuming',cancel:'cancelling',recover:'recovering',continue:'continuing'})[action];buttons();
+  status(({pause:'Solicitando pausa\u2026',resume:'Solicitando reanudaci\xF3n\u2026',cancel:'Cancelando trabajo\u2026',recover:'Restableciendo sesi\xF3n USB\u2026',continue:'Enviando la siguiente parte\u2026'})[action]);
   try{const result=await api('/'+action,{confirmed:true});if(generation!==epoch)return;consume(result);if(active&&result.state!=='error')startPolling();}
   catch(e){lastState='unknown';if(machine)machine.position=null;status(e.message+' Usa el paro f\xEDsico si contin\xFAa.',true);}
   finally{controlBusy=false;buttons();}
  }
- $('k40Stop').onclick=()=>control('pause');$('k40Resume').onclick=()=>control('resume');$('k40Cancel').onclick=()=>control('cancel');$('k40Recover').onclick=()=>control('recover');$('k40Reconnect').onclick=connect;
+ $('k40Stop').onclick=()=>control('pause');$('k40Continue').onclick=()=>control('continue');$('k40Resume').onclick=()=>control('resume');$('k40Cancel').onclick=()=>control('cancel');$('k40Recover').onclick=()=>control('recover');$('k40Reconnect').onclick=connect;
+ for(const b of dialog.querySelectorAll('[data-board]'))b.onclick=()=>setProfile({board:b.dataset.board});
+ $('k40MaxPower').onchange=()=>{const v=Number($('k40MaxPower').value);if(v>=1&&v<=100)setProfile({maxPower:Math.round(v)});else paintProfile();};
+ $('k40BoxPower').onchange=()=>{const v=Number($('k40BoxPower').value);if(v>=1&&v<=100)setProfile({boxPower:Math.round(v)});else paintProfile();};
+ paintProfile();
  $('k40Remember').onchange=()=>{if(!$('k40Remember').checked)forgetCode();else rememberCode();};
  $('k40Forget').onclick=async()=>{if(machine&&!await disconnect())return;forgetCode();$('k40Remember').checked=false;$('k40Token').value='';verifiedToken='';status('C\xF3digo olvidado en este navegador.');};
  inputs.forEach(id=>$(id).addEventListener('input',()=>{refresh();}));
@@ -2642,13 +2705,13 @@ export function mountK40(app,options={}){
  $('k40ClearRegistration').onclick=()=>{clearRegistration();refresh();};$('k40RegistrationMode').onchange=()=>{if($('k40Origin').value==='aligned')$('k40Origin').value='home';renderRegistration();refresh(false);};
  app.onUpdate(()=>{if((dialog.open||options.host)&&!active&&!requesting){const selected=$('k40Sheet').value;$('k40Sheet').replaceChildren(...Array.from({length:app.packed?.count||1},(_,i)=>{const o=document.createElement('option');o.value=i;o.textContent='Hoja '+(i+1);return o;}));$('k40Sheet').value=String(Math.min(Number(selected)||0,(app.packed?.count||1)-1));refresh(false);}});
  const settings=()=>({sheet:Number($('k40Sheet').value)||0,speed:Number($('k40Speed').value),passes:Number($('k40Passes').value),bedWidth:Number($('k40Width').value),bedHeight:Number($('k40Height').value),offsetX:Number($('k40X').value),offsetY:Number($('k40Y').value),origin:$('k40Origin').value});
- const controller={dialog,refresh,open,setSource(value){source=value;},get finishedState(){return finished;},get busy(){return active||requesting||controlBusy;},get machine(){return machine;},get settings(){return settings();},get job(){return job;},get message(){return $('k40Status').textContent;},get stateLabel(){return $('k40State').textContent;},get canPause(){return !$('k40Stop').disabled;},get referenceDesignPoints(){return pairs.map(p=>[...p.design]);},pause:()=>control('pause'),
+ const controller={dialog,refresh,open,get profile(){return {...profile};},continue:()=>control('continue'),setSource(value){source=value;},get finishedState(){return finished;},get busy(){return active||requesting||controlBusy;},get machine(){return machine;},get settings(){return settings();},get job(){return job;},get message(){return $('k40Status').textContent;},get stateLabel(){return $('k40State').textContent;},get canPause(){return !$('k40Stop').disabled;},get referenceDesignPoints(){return pairs.map(p=>[...p.design]);},pause:()=>control('pause'),
   restoreSettings(value={}){if(active||requesting)throw Error('Hay una operaci\xF3n activa.');for(const [key,id] of [['sheet','k40Sheet'],['speed','k40Speed'],['passes','k40Passes'],['bedWidth','k40Width'],['bedHeight','k40Height'],['offsetX','k40X'],['offsetY','k40Y']])if(Number.isFinite(Number(value[key])))$(id).value=value[key];$('k40Origin').value=value.origin==='current'?'current':'home';clearRegistration('La preparaci\xF3n cargada requiere verificar el origen f\xEDsico.');refresh(false);},
   restoreReferencePoints(points){clearRegistration('Plantilla cargada: registra de nuevo las posiciones f\xEDsicas.');referenceDesign=points.filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).map(p=>[...p]);refresh(false);},
   setRemoteOwner(value){if(value&&(active||requesting||!machine))throw Error('Conecta la m\xE1quina y espera a que quede lista antes de ceder el control.');remoteOwner=!!value;if(value&&hasPosition()&&$('k40Origin').value==='aligned'){$('k40Origin').value='current';refresh(false);}buttons();},
   get remoteOwner(){return remoteOwner;},
-  snapshot(){return {state:lastState||'idle',label:$('k40State').textContent,message:$('k40Status').textContent,position:machine?.position||null,connected:!!machine?.connected,busy:active||requesting,owner:remoteOwner?'phone':'desktop',canPause:!$('k40Stop').disabled,canResume:lastState==='paused',canUnlock:!!machine?.features?.includes('unlock-rail')&&!active&&!requesting,railUnlocked:!!machine?.railUnlocked,canPulse:!!machine?.features?.includes('timed-pulse')&&hasPosition()&&!active&&!requesting,canRun:!!machine&&!active&&!requesting&&!!job&&previewOK,hasPosition:hasPosition(),elapsedSeconds:Math.floor(clockSpent+(clockStart?(Date.now()-clockStart)/1000:0)),estimatedSeconds:clockTotal,preview:active&&activePreview?activePreview:source?.isActive()?(currentView?.compact||''):currentView?k40Preview(currentView):'',name:active&&activeName?activeName:source?.isActive()?source.name():app.state.name,settings:settings(),origin:$('k40Origin').value,source:source?.isActive()?'import':'box',finished,preparing,dataSent:lastState==='sent',canFrame:!!machine&&!active&&!requesting&&!!job&&previewOK,problem:previewOK?'':$('k40Status').dataset.error==='true'?$('k40Status').textContent:''};},
-  async remoteCommand(action,args={}){if(['pause','cancel'].includes(action)){await control(action,true);return;}if(!remoteOwner)throw Error('La computadora conserva el control.');if(['home','jog','frame','cut'].includes(action)&&(active||requesting||controlBusy))throw Error('Espera a que termine la operaci\xF3n anterior.');if(action==='pulse'){if(active||requesting||controlBusy||!machine?.features?.includes('timed-pulse'))throw Error('Actualiza el conector a 0.6.4 y espera a que quede libre.');requesting=true;buttons();try{consume(await api('/pulse',{milliseconds:50,confirmed:true}));startPolling();}finally{requesting=false;buttons();}}else if(action==='home')await motion('home',0,0,true);else if(action==='unlock'){if(!machine?.features?.includes('unlock-rail'))throw Error('Desbloquear riel requiere el conector 0.7.1.');await motion('unlock',0,0,true);}else if(action==='jog'){const dx=Number(args.dx),dy=Number(args.dy);if(!Number.isFinite(dx)||!Number.isFinite(dy)||Math.max(Math.abs(dx),Math.abs(dy))>50)throw Error('Movimiento inv\xE1lido.');await motion('jog',dx,dy,true);}else if(action==='frame'||action==='cut')await run(action,true);else if(action==='settings'){if(active||requesting)throw Error('Espera a que termine el trabajo.');const speed=Number(args.speed),passes=Number(args.passes);if(!Number.isFinite(speed)||speed<1||speed>100||!Number.isInteger(passes)||passes<1||passes>10)throw Error('Velocidad 1\u2013100 mm/s; pasadas 1\u201310.');$('k40Speed').value=speed;$('k40Passes').value=passes;refresh(false);}else if(action==='resume')await control('resume',true);else if(action==='origin'){if(active||requesting)throw Error('Espera a que termine la operaci\xF3n.');if(!['home','current'].includes(args.value))throw Error('Origen inv\xE1lido.');$('k40Origin').value=args.value;refresh(false);}else if(options.remoteExtra){if(active||requesting||controlBusy)throw Error('Espera a que termine la operaci\xF3n.');await options.remoteExtra(action,args);refresh(false);}else throw Error('Acci\xF3n remota no permitida.');}
+  snapshot(){return {state:lastState||'idle',label:$('k40State').textContent,message:$('k40Status').textContent,position:machine?.position||null,connected:!!machine?.connected,busy:active||requesting,owner:remoteOwner?'phone':'desktop',canPause:!$('k40Stop').disabled,canResume:lastState==='paused',board:profile.board,maxPower:profile.maxPower,canContinue:lastState==='awaiting',parts:machine?.parts||null,canUnlock:!!machine?.features?.includes('unlock-rail')&&!active&&!requesting,railUnlocked:!!machine?.railUnlocked,canPulse:!!machine?.features?.includes('timed-pulse')&&hasPosition()&&!active&&!requesting,canRun:!!machine&&!active&&!requesting&&!!job&&previewOK,hasPosition:hasPosition(),elapsedSeconds:Math.floor(clockSpent+(clockStart?(Date.now()-clockStart)/1000:0)),estimatedSeconds:clockTotal,preview:active&&activePreview?activePreview:source?.isActive()?(currentView?.compact||''):currentView?k40Preview(currentView):'',name:active&&activeName?activeName:source?.isActive()?source.name():app.state.name,settings:settings(),origin:$('k40Origin').value,source:source?.isActive()?'import':'box',finished,preparing,dataSent:lastState==='sent',canFrame:!!machine&&!active&&!requesting&&!!job&&previewOK,problem:previewOK?'':$('k40Status').dataset.error==='true'?$('k40Status').textContent:''};},
+  async remoteCommand(action,args={}){if(['pause','cancel'].includes(action)){await control(action,true);return;}if(!remoteOwner)throw Error('La computadora conserva el control.');if(['home','jog','frame','cut'].includes(action)&&(active||requesting||controlBusy))throw Error('Espera a que termine la operaci\xF3n anterior.');if(action==='pulse'){if(active||requesting||controlBusy||!machine?.features?.includes('timed-pulse'))throw Error('Actualiza el conector a 0.6.4 y espera a que quede libre.');requesting=true;buttons();try{consume(await api('/pulse',{milliseconds:50,confirmed:true}));startPolling();}finally{requesting=false;buttons();}}else if(action==='home')await motion('home',0,0,true);else if(action==='unlock'){if(!machine?.features?.includes('unlock-rail'))throw Error('Desbloquear riel requiere el conector 0.7.1.');await motion('unlock',0,0,true);}else if(action==='jog'){const dx=Number(args.dx),dy=Number(args.dy);if(!Number.isFinite(dx)||!Number.isFinite(dy)||Math.max(Math.abs(dx),Math.abs(dy))>50)throw Error('Movimiento inv\xE1lido.');await motion('jog',dx,dy,true);}else if(action==='frame'||action==='cut')await run(action,true);else if(action==='settings'){if(active||requesting)throw Error('Espera a que termine el trabajo.');const speed=Number(args.speed),passes=Number(args.passes);if(!Number.isFinite(speed)||speed<1||speed>100||!Number.isInteger(passes)||passes<1||passes>10)throw Error('Velocidad 1\u2013100 mm/s; pasadas 1\u201310.');$('k40Speed').value=speed;$('k40Passes').value=passes;refresh(false);}else if(action==='resume')await control('resume',true);else if(action==='continue')await control('continue',true);else if(action==='origin'){if(active||requesting)throw Error('Espera a que termine la operaci\xF3n.');if(!['home','current'].includes(args.value))throw Error('Origen inv\xE1lido.');$('k40Origin').value=args.value;refresh(false);}else if(options.remoteExtra){if(active||requesting||controlBusy)throw Error('Espera a que termine la operaci\xF3n.');await options.remoteExtra(action,args);refresh(false);}else throw Error('Acci\xF3n remota no permitida.');}
  };
  app.machineControl=controller;
  if(options.host)open();
@@ -3526,6 +3589,8 @@ function operate(app) {
   // Columna derecha: mover cabezal.
   const right = el('div', 'neo-op-right');
   right.append(usbCard);
+  const board = find('.k40-board');
+  if (board) { board.classList.add('neo-op-card'); right.append(board); }
   // Las columnas entran al documento antes de mover nodos: as\xED getElementById los sigue encontrando.
   const layout = find('.k40-layout');
   layout?.prepend(left);
@@ -3594,6 +3659,8 @@ function operate(app) {
   }
 
   // Centro: plano con encabezado y medidas.
+  // Tarjeta M2/M3 al final de la columna derecha: se configura una vez, no estorba al mover el cabezal.
+  if (board) right.append(board);
   const canvas = find('.k40-canvas-panel');
   canvas?.classList.add('neo-op-card', 'neo-op-plan');
   // Alto disponible para el espacio de trabajo (debajo de las cabeceras).
@@ -3699,10 +3766,11 @@ function machineStrip(app) {
   const recover = mirror('k40Recover', 'Restablecer USB', 'usb', 'neo-strip-recover');
   const cancel = mirror('k40Cancel', 'Cancelar trabajo', 'stop', 'outline neo-strip-cancel');
   const resume = mirror('k40Resume', 'Reanudar', 'play', 'primary neo-strip-resume');
-  (stop || view)?.before(resume, recover, cancel);
+  const proceed = mirror('k40Continue', 'Continuar', 'play', 'primary neo-strip-resume');
+  (stop || view)?.before(proceed, resume, recover, cancel);
   if (view) { view.classList.add('neo-strip-view'); view.insertAdjacentHTML('afterbegin', icon('target')); }
 
-  const titles = {error: 'Revisa la conexi\xF3n USB', unknown: 'La m\xE1quina no responde', paused: 'Trabajo en pausa', pausing: 'Solicitando pausa', resuming: 'Reanudando', cancelling: 'Cancelando trabajo', recovering: 'Liberando USB', sending: 'Cortando', sent: 'Terminando corte', pulsing: 'Pulso l\xE1ser'};
+  const titles = {awaiting: 'Esperando que contin\xFAes', continuing: 'Continuando', error: 'Revisa la conexi\xF3n USB', unknown: 'La m\xE1quina no responde', paused: 'Trabajo en pausa', pausing: 'Solicitando pausa', resuming: 'Reanudando', cancelling: 'Cancelando trabajo', recovering: 'Liberando USB', sending: 'Cortando', sent: 'Terminando corte', pulsing: 'Pulso l\xE1ser'};
   const paint = () => {
     const machine = app.machineControl;
     const state = machine?.snapshot?.().state || 'idle';
@@ -3713,11 +3781,12 @@ function machineStrip(app) {
     title.textContent = titles[state] || 'Trabajo de m\xE1quina activo';
     // El mensaje original repite la etiqueta del estado (\xABREVISAR USB \xB7 \u2026\xBB): se muestra sin ella.
     detail.textContent = (machine?.message || message.textContent || '').replace(/^[A-Z\xC1\xC9\xCD\xD3\xDA\xD1 ]+ \xB7 /, '');
-    lead.innerHTML = icon(alert ? 'alert' : state === 'paused' ? 'pause' : 'laser');
-    for (const b of [recover, cancel, resume]) {
+    lead.innerHTML = icon(alert ? 'alert' : ['paused', 'awaiting'].includes(state) ? 'pause' : 'laser');
+    strip.classList.toggle('is-paused', ['paused', 'pausing', 'awaiting'].includes(state));
+    for (const b of [recover, cancel, resume, proceed]) {
       const source = $(b.dataset.mirror);
       // La secci\xF3n de m\xE1quina est\xE1 oculta en las otras pesta\xF1as: solo cuenta el panel de pausa.
-      const usable = !!source && !source.hidden && !source.disabled && !source.closest('#k40PausePanel')?.hidden;
+      const usable = !!source && !source.hidden && !source.disabled && (source.id === 'k40Continue' || !source.closest('#k40PausePanel')?.hidden);
       b.hidden = !usable;
     }
     // STOP solo se muestra cuando realmente puede pedir la pausa.
@@ -3727,7 +3796,7 @@ function machineStrip(app) {
   watch(strip, {attributes: true, attributeFilter: ['hidden']});
   watch(message, {childList: true, characterData: true, subtree: true});
   watch($('k40State'), {childList: true, characterData: true, subtree: true});
-  for (const id of ['k40Recover', 'k40Cancel', 'k40Resume', 'k40Stop', 'k40PausePanel']) watch($(id), {attributes: true, attributeFilter: ['hidden', 'disabled']});
+  for (const id of ['k40Recover', 'k40Cancel', 'k40Resume', 'k40Stop', 'k40PausePanel', 'k40Continue']) watch($(id), {attributes: true, attributeFilter: ['hidden', 'disabled']});
   if (stop) watch(stop, {attributes: true, attributeFilter: ['disabled']});
   paint();
 }
@@ -3758,7 +3827,7 @@ export function parsePairingLink(code){
  const [session,secret]=code.split('.');return {session,secret};
 }
 `,type:"text/javascript; charset=utf-8",public:!0},"/box/peer-transport.js":{body:`// Encrypted peer-to-peer transport. No relay, signaling service or USB token.
-export const REMOTE_ACTIONS=new Set(['settings','pulse','home','unlock','jog','frame','cut','pause','resume','cancel','origin','source','op','op-move','op-order','scope','place','place-center','review-ok','save','lib-list','lib-open','lib-duplicate','lib-rename','lib-delete','lib-restore']);
+export const REMOTE_ACTIONS=new Set(['settings','pulse','home','unlock','jog','frame','cut','pause','resume','continue','cancel','origin','source','op','op-move','op-order','scope','place','place-center','review-ok','save','lib-list','lib-open','lib-duplicate','lib-rename','lib-delete','lib-restore']);
 // Archivos del celular: fragmentos de 12 000 caracteres, hasta 11 MB codificados (8 MB de archivo).
 export const UPLOAD_CHUNK=12000,UPLOAD_MAX=11200000;
 export async function encodePairing(value){
@@ -4155,11 +4224,11 @@ export function referencePoints(job){
  const points=job.paths.flatMap(p=>p.points),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),xm=(x0+x1)/2,ym=(y0+y1)/2;
  return [[x0,y0],[xm,y0],[x1,y0],[x1,ym],[x1,y1],[xm,y1],[x0,y1],[x0,ym]];
 }
-`,type:"text/javascript; charset=utf-8",public:!1},"/box/remote-client.js":{body:`import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
+`,type:"text/javascript; charset=utf-8",public:!1},"/box/remote-client.js":{body:`import {createPeer,gatherDescription,encodePairing,decodePairing,PeerMessageReader,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=4';
 import {pairingRequest,parsePairingLink} from './peer-signaling.js?v=1';
 // Celular: Control / Trabajos / Biblioteca. La computadora conserva el USB y ejecuta cada orden;
 // este celular solo env\xEDa \xF3rdenes expl\xEDcitas (una por pulsaci\xF3n) y nunca reintenta en silencio.
-const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false,library=null,libFilter='all',reviewOpen=false;const pending=new Map(),uploads=new Map();let parametersDirty=false;
+const $=id=>document.getElementById(id);let peer=null,channel=null,session=null,state=null,seq=0,awaiting=false,library=null,libFilter='all',reviewOpen=false;const pending=new Map(),uploads=new Map();let parametersDirty=false,lastAwaitAlert=null;
 const status=message=>{$('remoteStatus').textContent=message;};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 const fmt=(n,d=1)=>Number.isFinite(n)?(Math.round(n*10**d)/10**d).toLocaleString('es-MX',{maximumFractionDigits:d}):'\u2014';
@@ -4174,6 +4243,7 @@ function controls(){
  $('remoteFrame').disabled=!idle||!(state?.canFrame??state?.canRun);$('remoteCut').disabled=!idle||!state?.canRun;
  $('remoteStop').disabled=!state?.canPause||!open();$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||!open();
  $('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);
+ $('remoteAwait').hidden=state?.state!=='awaiting';$('remoteContinue').disabled=!owner||!state?.canContinue||awaiting||!open();
  for(const b of document.querySelectorAll('[data-origin]')){b.disabled=!idle||(b.dataset.origin==='current'&&!state?.hasPosition);b.setAttribute('aria-pressed',String(state?.origin===b.dataset.origin));}
  for(const b of document.querySelectorAll('[data-source]')){b.disabled=!idle;b.setAttribute('aria-pressed',String((job()?.source||state?.source)===b.dataset.source));}
  for(const n of document.querySelectorAll('#tabJobs input,#tabJobs select,#tabJobs button:not([data-source]):not([data-origin]),#tabLibrary .rm-lib button'))n.disabled=!idle;
@@ -4189,7 +4259,7 @@ function safePreview(markup){
  const ok=n=>tags.has(n.localName)&&[...n.attributes].every(a=>attributes.has(a.name)&&!/[<>]/.test(a.value)&&(a.name!=='href'||(n.localName==='image'&&/^data:image\\/png;base64,[A-Za-z0-9+/=]+$/.test(a.value))));
  return svg?.localName==='svg'&&[svg,...svg.querySelectorAll('*')].every(ok)?svg:null;
 }
-const stateLabel=s=>{const map={pulsing:'Pulso l\xE1ser',sending:'Ejecutando',sent:'Datos enviados \xB7 esperando fin',pausing:'Solicitando pausa',paused:'En pausa',resuming:'Reanudando',cancelling:'Cancelando',recovering:'Liberando USB',error:'Revisar USB',unknown:'Sin respuesta'};if(s.preparing)return 'Preparando';if(map[s.state])return map[s.state];if(!s.connected)return 'M\xE1quina desconectada';if(s.finished==='finished')return 'Terminado';if(s.finished==='cancelled')return 'Cancelado';return 'Lista';};
+const stateLabel=s=>{const map={awaiting:'Esperando que contin\xFAes',continuing:'Continuando',pulsing:'Pulso l\xE1ser',sending:'Ejecutando',sent:'Datos enviados \xB7 esperando fin',pausing:'Solicitando pausa',paused:'En pausa',resuming:'Reanudando',cancelling:'Cancelando',recovering:'Liberando USB',error:'Revisar USB',unknown:'Sin respuesta'};if(s.preparing)return 'Preparando';if(map[s.state])return map[s.state];if(!s.connected)return 'M\xE1quina desconectada';if(s.finished==='finished')return 'Terminado';if(s.finished==='cancelled')return 'Cancelado';return 'Lista';};
 function receive(message){
  if(message.type==='reply'){const p=pending.get(message.id);if(p){clearTimeout(p.timer);pending.delete(message.id);message.ok?p.resolve():p.reject(Error(message.error));}return;}
  if(message.type==='upload-reply'){const u=uploads.get(message.upload);if(u){uploads.delete(message.upload);message.ok?u.resolve():u.reject(Error(message.error||'No se pudo importar.'));}return;}
@@ -4209,6 +4279,7 @@ function receive(message){
  if(!parametersDirty&&document.activeElement!==$('remoteSpeed'))$('remoteSpeed').value=message.settings?.speed||10;if(!parametersDirty&&document.activeElement!==$('remotePasses'))$('remotePasses').value=message.settings?.passes||1;
  $('remoteTime').textContent=message.estimatedSeconds?\`Transcurrido \${fmtTime(message.elapsedSeconds||0)} \xB7 restante estimado \${fmtTime(Math.max(0,message.estimatedSeconds-(message.elapsedSeconds||0)))}\${message.elapsedSeconds>=message.estimatedSeconds?' \xB7 esperando confirmaci\xF3n de la placa':''}\`:j?.source==='import'&&j.seconds?\`Tiempo estimado: \${fmtTime(j.seconds)} (aproximado)\`:'';
  $('remoteOriginNote').textContent=message.origin==='current'?'El dise\xF1o empieza en la posici\xF3n actual del cabezal.':'El env\xEDo hace Home y coloca el dise\xF1o seg\xFAn la cama.';
+ if(message.state==='awaiting'){const n=message.parts?.names?.[message.parts.index+1];$('remoteAwaitText').textContent=message.message;$('remoteContinue').textContent=n?\`Continuar con \xAB\${n}\xBB\`:'Continuar';if(lastAwaitAlert!==message.parts?.index){lastAwaitAlert=message.parts?.index;try{navigator.vibrate?.([200,100,200]);}catch{}}}else lastAwaitAlert=null;
  renderJob();status(message.message);controls();
 }
 function renderJob(){
@@ -4223,10 +4294,12 @@ function renderJob(){
   ops.replaceChildren();$('remoteOpCount').textContent=j?.ops?\`(\${j.ops.length})\`:'';
   for(const op of j?.ops||[]){
    const card=document.createElement('article');card.className='rm-op'+(op.enabled?'':' is-off')+(op.empty?' is-empty':'');card.dataset.type=op.type;
-   card.innerHTML=\`<label class="rm-op-head"><input type="checkbox" \${op.enabled?'checked':''} aria-label="Activar \${esc(op.name)}"><span class="rm-op-icon" aria-hidden="true"></span><strong>\${esc(op.name)}</strong></label><div class="rm-fields"><label>Velocidad \xB7 mm/s<input type="number" class="rm-op-speed" min="\${op.range[0]}" max="\${op.range[1]}" value="\${op.speed}" inputmode="decimal"></label><label>Pasadas<input type="number" class="rm-op-passes" min="1" max="10" step="1" value="\${op.passes}" inputmode="numeric"></label></div><small>\${op.empty?'Sin elementos asignados':'\u2248 '+fmtTime(op.seconds)} \xB7 Potencia: ajustar en la m\xE1quina.</small>\`;
+   card.innerHTML=\`<label class="rm-op-head"><input type="checkbox" \${op.enabled?'checked':''} aria-label="Activar \${esc(op.name)}"><span class="rm-op-icon" aria-hidden="true"></span><strong>\${esc(op.name)}</strong></label><div class="rm-fields"><label>Velocidad \xB7 mm/s<input type="number" class="rm-op-speed" min="\${op.range[0]}" max="\${op.range[1]}" value="\${op.speed}" inputmode="decimal"></label><label>Pasadas<input type="number" class="rm-op-passes" min="1" max="10" step="1" value="\${op.passes}" inputmode="numeric"></label></div>\${j.board==='M3'?\`<div class="rm-fields"><label>Potencia \xB7 %<input type="number" class="rm-op-power" min="1" max="100" value="\${op.power??''}" inputmode="numeric"></label></div>\`:''}\${op.index>0?\`<label class="rm-check"><input type="checkbox" class="rm-op-pause" \${op.pause?'checked':''}> Pausar antes y preguntar</label>\`:''}<small>\${op.empty?'Sin elementos asignados':'\u2248 '+fmtTime(op.seconds)} \xB7 \${j.board==='M3'?'Potencia por USB (M3).':'Potencia: perilla del panel (M2).'}</small>\`;
    card.querySelector('input[type=checkbox]').onchange=e=>command('op',{id:op.id,enabled:e.target.checked});
    card.querySelector('.rm-op-speed').onchange=e=>command('op',{id:op.id,speed:Number(e.target.value)});
    card.querySelector('.rm-op-passes').onchange=e=>command('op',{id:op.id,passes:Number(e.target.value)});
+   card.querySelector('.rm-op-power')?.addEventListener('change',e=>command('op',{id:op.id,power:Number(e.target.value)}));
+   card.querySelector('.rm-op-pause')?.addEventListener('change',e=>command('op',{id:op.id,pauseBefore:e.target.checked}));
    ops.append(card);
   }
  }
@@ -4253,7 +4326,7 @@ async function command(action,args={}){
 }
 /* ---------- Control ---------- */
 for(const [id,x,y] of [['remoteUp',0,-1],['remoteLeft',-1,0],['remoteRight',1,0],['remoteDown',0,1]])$(id).onclick=()=>command('jog',{dx:x*Number($('remoteStep').value),dy:y*Number($('remoteStep').value)});
-for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteUnlock','unlock'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
+for(const [id,action] of [['remoteContinue','continue'],['remotePulse','pulse'],['remoteHome','home'],['remoteUnlock','unlock'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
 const steps=$('remoteSteps');for(const o of $('remoteStep').options){const b=document.createElement('button');b.type='button';b.textContent=o.value;b.onclick=()=>{$('remoteStep').value=o.value;paintSteps();};steps.append(b);}
 function paintSteps(){for(const b of steps.children)b.setAttribute('aria-pressed',String(b.textContent===$('remoteStep').value));}paintSteps();
 for(const b of document.querySelectorAll('[data-origin]'))b.onclick=()=>command('origin',{value:b.dataset.origin});
@@ -4386,7 +4459,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#06090d">
 <title>LZ Box \xB7 Control de taller</title>
-<link rel="stylesheet" href="remote.css?v=6">
+<link rel="stylesheet" href="remote.css?v=7">
 </head>
 <body>
 <main class="remote-shell">
@@ -4429,6 +4502,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
    <button id="remotePulse" class="rm-pulse" disabled>Pulso l\xE1ser \xB7 50 ms</button>
    <p class="rm-note">Potencia: la del panel de la m\xE1quina. El pulso lo temporiza la computadora por USB.</p>
    <div class="remote-run"><button id="remoteFrame">Recorrer marco</button><button id="remoteCut" class="rm-primary">Iniciar trabajo</button></div>
+   <div id="remoteAwait" class="rm-await" hidden><p id="remoteAwaitText">Operaci\xF3n terminada. Ajusta la potencia y pulsa Continuar.</p><button id="remoteContinue" type="button" class="rm-primary">Continuar</button></div>
    <div id="remotePaused" class="rm-paused" hidden><p>Trabajo en pausa o sin confirmar.</p><button id="remoteResume" class="rm-primary">Reanudar</button><button id="remoteCancel" class="rm-danger-outline">Cancelar trabajo</button></div>
   </section>
 
@@ -4485,7 +4559,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
  </footer>
 </main>
 <dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> Tambi\xE9n en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
-<script type="module" src="remote-client.js?v=8"><\/script>
+<script type="module" src="remote-client.js?v=9"><\/script>
 </body>
 </html>
 `,type:"text/html; charset=utf-8",public:!0},"/box/renderer.js":{body:`import {StudioGPU} from './webgl-renderer.js?v=3.5';
@@ -8056,7 +8130,7 @@ function ready(fn){
 
 if(typeof document!=='undefined')ready(init);
 `,type:"text/javascript; charset=utf-8",public:!1},"/box/workshop-remote.js":{body:`import qrcode from './vendor/qrcode.mjs';
-import {createPeer,gatherDescription,decodePairing,CommandGate,sendPeerMessage,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=3';
+import {createPeer,gatherDescription,decodePairing,CommandGate,sendPeerMessage,UPLOAD_CHUNK,UPLOAD_MAX} from './peer-transport.js?v=4';
 import {pairingRequest,pairingSecret} from './peer-signaling.js?v=1';
 
 /* Enlace con el celular (v62): el celular queda emparejado.
@@ -8195,10 +8269,10 @@ export function filterWorkshop(items,{query='',kind='all',model='all'}={}){
 import {optimizeSheet} from './cut-optimizer.js?v=3.5';
 import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
-import {mountK40} from './k40-control.js?v=17';
+import {mountK40} from './k40-control.js?v=18';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=8';
-import {mountJobStudio} from './job-studio.js?v=7';
+import {mountRemoteHost} from './workshop-remote.js?v=9';
+import {mountJobStudio} from './job-studio.js?v=8';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};
@@ -8241,7 +8315,7 @@ export function mountWorkshop(app){
  const globalMachine=el('div','workshop-machine-strip');globalMachine.hidden=true;globalMachine.innerHTML='<span id="workshopMachineMessage"></span>';
  const globalStop=button('\u2161 STOP / PAUSA',()=>app.machineControl?.pause(),'btn workshop-stop');globalMachine.append(globalStop,button('Ver trabajo',()=>show('operate'),'btn outline'));tools.after(globalMachine);
  let saveKind='prepared',renaming=null,current='design',filter={query:'',kind:'all',model:'all'},lastSelected=null,remote=null;
- const machine=mountK40(app,{host:operator,onArrange:()=>show('prepare'),onChange:()=>updateMachine(),onSave:(kind)=>savePreparation(kind),remoteExtra:(action,args)=>app.jobStudio?.remote(action,args)});
+ const machine=mountK40(app,{host:operator,onArrange:()=>show('prepare'),onChange:()=>updateMachine(),onSave:(kind)=>savePreparation(kind),remoteExtra:(action,args)=>app.jobStudio?.remote(action,args),onProfile:()=>{app.jobStudio?.profileChanged();remote?.publish(true);}});
  app.machineControl=machine;
  const prepareActions=el('div','workshop-prepare-actions');prepareActions.append(button('Guardar preparaci\xF3n',()=>savePreparation('prepared')),button('Guardar plantilla',()=>savePreparation('template')),button('Posicionar y cortar',()=>show('operate'),'btn primary'));$('workshopPrepareExport').append(prepareActions);
  const operatorTools=el('div','workshop-operator-tools');operatorTools.append(button('Guardar preparaci\xF3n',()=>savePreparation('prepared')),button('Guardar plantilla',()=>savePreparation('template')));operator.prepend(operatorTools);

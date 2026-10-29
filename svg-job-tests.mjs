@@ -215,3 +215,20 @@ test('varios archivos: se combinan, se acomodan sin encimarse y comparten capas 
   assert.equal(an.ops.find((o) => o.op.type === 'cut').data.paths.length, 2);
   assert.equal(mergeDesigns([{design: a, offset: [0, 0]}]).elements[0].id, a.elements[0].id, 'un archivo queda igual');
 });
+
+test('M2 pausa antes del corte; M3 envía potencia por operación sin pausas', async () => {
+  const {pausesBefore} = await import('./web/box/job-ops.js');
+  const d = load(`<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="60mm" viewBox="0 0 100 60">
+    <rect x="1" y="1" width="98" height="58" stroke="red" fill="none"/><path d="M10 30H90" stroke="#000" fill="none"/><rect x="40" y="20" width="20" height="20" fill="#000"/></svg>`);
+  const plan = defaultPlan(d), placement = {x: 0, y: 0, scale: 1, rotation: 0}, analysis = analyzePlan(d, placement, plan, BED);
+  const raster = analysis.ops.find((o) => o.op.type === 'raster'), {widthPx, heightPx} = raster.data.pixels, bits = new Uint8Array(widthPx * heightPx).fill(1);
+  const renders = new Map([[raster.op.id, {bits, widthPx, heightPx, sweep: sweepStats(bits, widthPx, heightPx, 0.1016)}]]);
+  const m2 = await buildJobV2({design: d, placement, plan, bed: BED, profile: {board: 'M2'}}, analysis, renders);
+  assert.equal(m2.board, 'M2'); assert.deepEqual(m2.operations.map((o) => !!o.pauseBefore), [false, false, true]);
+  assert.ok(m2.operations.every((o) => o.power === undefined), 'la M2 no envía potencia');
+  const m3 = await buildJobV2({design: d, placement, plan, bed: BED, profile: {board: 'M3', maxPower: 55}}, analysis, renders);
+  assert.equal(m3.board, 'M3'); assert.equal(m3.maxPower, 55); assert.deepEqual(m3.operations.map((o) => o.power), [25, 30, 70]);
+  assert.ok(m3.operations.every((o) => !o.pauseBefore));
+  plan.operations[1].pauseBefore = true;   // elegido a mano
+  assert.equal(pausesBefore(plan.operations[1], 1, 'M3', plan.operations[0]), true);
+});

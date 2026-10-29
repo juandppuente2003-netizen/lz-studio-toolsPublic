@@ -482,6 +482,8 @@ function operate(app) {
   // Columna derecha: mover cabezal.
   const right = el('div', 'neo-op-right');
   right.append(usbCard);
+  const board = find('.k40-board');
+  if (board) { board.classList.add('neo-op-card'); right.append(board); }
   // Las columnas entran al documento antes de mover nodos: así getElementById los sigue encontrando.
   const layout = find('.k40-layout');
   layout?.prepend(left);
@@ -550,6 +552,8 @@ function operate(app) {
   }
 
   // Centro: plano con encabezado y medidas.
+  // Tarjeta M2/M3 al final de la columna derecha: se configura una vez, no estorba al mover el cabezal.
+  if (board) right.append(board);
   const canvas = find('.k40-canvas-panel');
   canvas?.classList.add('neo-op-card', 'neo-op-plan');
   // Alto disponible para el espacio de trabajo (debajo de las cabeceras).
@@ -655,10 +659,11 @@ function machineStrip(app) {
   const recover = mirror('k40Recover', 'Restablecer USB', 'usb', 'neo-strip-recover');
   const cancel = mirror('k40Cancel', 'Cancelar trabajo', 'stop', 'outline neo-strip-cancel');
   const resume = mirror('k40Resume', 'Reanudar', 'play', 'primary neo-strip-resume');
-  (stop || view)?.before(resume, recover, cancel);
+  const proceed = mirror('k40Continue', 'Continuar', 'play', 'primary neo-strip-resume');
+  (stop || view)?.before(proceed, resume, recover, cancel);
   if (view) { view.classList.add('neo-strip-view'); view.insertAdjacentHTML('afterbegin', icon('target')); }
 
-  const titles = {error: 'Revisa la conexión USB', unknown: 'La máquina no responde', paused: 'Trabajo en pausa', pausing: 'Solicitando pausa', resuming: 'Reanudando', cancelling: 'Cancelando trabajo', recovering: 'Liberando USB', sending: 'Cortando', sent: 'Terminando corte', pulsing: 'Pulso láser'};
+  const titles = {awaiting: 'Esperando que continúes', continuing: 'Continuando', error: 'Revisa la conexión USB', unknown: 'La máquina no responde', paused: 'Trabajo en pausa', pausing: 'Solicitando pausa', resuming: 'Reanudando', cancelling: 'Cancelando trabajo', recovering: 'Liberando USB', sending: 'Cortando', sent: 'Terminando corte', pulsing: 'Pulso láser'};
   const paint = () => {
     const machine = app.machineControl;
     const state = machine?.snapshot?.().state || 'idle';
@@ -669,11 +674,12 @@ function machineStrip(app) {
     title.textContent = titles[state] || 'Trabajo de máquina activo';
     // El mensaje original repite la etiqueta del estado («REVISAR USB · …»): se muestra sin ella.
     detail.textContent = (machine?.message || message.textContent || '').replace(/^[A-ZÁÉÍÓÚÑ ]+ · /, '');
-    lead.innerHTML = icon(alert ? 'alert' : state === 'paused' ? 'pause' : 'laser');
-    for (const b of [recover, cancel, resume]) {
+    lead.innerHTML = icon(alert ? 'alert' : ['paused', 'awaiting'].includes(state) ? 'pause' : 'laser');
+    strip.classList.toggle('is-paused', ['paused', 'pausing', 'awaiting'].includes(state));
+    for (const b of [recover, cancel, resume, proceed]) {
       const source = $(b.dataset.mirror);
       // La sección de máquina está oculta en las otras pestañas: solo cuenta el panel de pausa.
-      const usable = !!source && !source.hidden && !source.disabled && !source.closest('#k40PausePanel')?.hidden;
+      const usable = !!source && !source.hidden && !source.disabled && (source.id === 'k40Continue' || !source.closest('#k40PausePanel')?.hidden);
       b.hidden = !usable;
     }
     // STOP solo se muestra cuando realmente puede pedir la pausa.
@@ -683,7 +689,7 @@ function machineStrip(app) {
   watch(strip, {attributes: true, attributeFilter: ['hidden']});
   watch(message, {childList: true, characterData: true, subtree: true});
   watch($('k40State'), {childList: true, characterData: true, subtree: true});
-  for (const id of ['k40Recover', 'k40Cancel', 'k40Resume', 'k40Stop', 'k40PausePanel']) watch($(id), {attributes: true, attributeFilter: ['hidden', 'disabled']});
+  for (const id of ['k40Recover', 'k40Cancel', 'k40Resume', 'k40Stop', 'k40PausePanel', 'k40Continue']) watch($(id), {attributes: true, attributeFilter: ['hidden', 'disabled']});
   if (stop) watch(stop, {attributes: true, attributeFilter: ['disabled']});
   paint();
 }

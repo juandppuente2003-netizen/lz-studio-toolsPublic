@@ -2,10 +2,10 @@ import {freeze} from './layout-plus.js?v=3.5';
 import {optimizeSheet} from './cut-optimizer.js?v=3.5';
 import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
-import {mountK40} from './k40-control.js?v=17';
+import {mountK40} from './k40-control.js?v=18';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=8';
-import {mountJobStudio} from './job-studio.js?v=7';
+import {mountRemoteHost} from './workshop-remote.js?v=9';
+import {mountJobStudio} from './job-studio.js?v=8';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};
@@ -48,7 +48,7 @@ export function mountWorkshop(app){
  const globalMachine=el('div','workshop-machine-strip');globalMachine.hidden=true;globalMachine.innerHTML='<span id="workshopMachineMessage"></span>';
  const globalStop=button('Ⅱ STOP / PAUSA',()=>app.machineControl?.pause(),'btn workshop-stop');globalMachine.append(globalStop,button('Ver trabajo',()=>show('operate'),'btn outline'));tools.after(globalMachine);
  let saveKind='prepared',renaming=null,current='design',filter={query:'',kind:'all',model:'all'},lastSelected=null,remote=null;
- const machine=mountK40(app,{host:operator,onArrange:()=>show('prepare'),onChange:()=>updateMachine(),onSave:(kind)=>savePreparation(kind),remoteExtra:(action,args)=>app.jobStudio?.remote(action,args)});
+ const machine=mountK40(app,{host:operator,onArrange:()=>show('prepare'),onChange:()=>updateMachine(),onSave:(kind)=>savePreparation(kind),remoteExtra:(action,args)=>app.jobStudio?.remote(action,args),onProfile:()=>{app.jobStudio?.profileChanged();remote?.publish(true);}});
  app.machineControl=machine;
  const prepareActions=el('div','workshop-prepare-actions');prepareActions.append(button('Guardar preparación',()=>savePreparation('prepared')),button('Guardar plantilla',()=>savePreparation('template')),button('Posicionar y cortar',()=>show('operate'),'btn primary'));$('workshopPrepareExport').append(prepareActions);
  const operatorTools=el('div','workshop-operator-tools');operatorTools.append(button('Guardar preparación',()=>savePreparation('prepared')),button('Guardar plantilla',()=>savePreparation('template')));operator.prepend(operatorTools);

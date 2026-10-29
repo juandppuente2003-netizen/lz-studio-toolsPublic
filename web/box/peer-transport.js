@@ -1,5 +1,5 @@
 // Encrypted peer-to-peer transport. No relay, signaling service or USB token.
-export const REMOTE_ACTIONS=new Set(['settings','pulse','home','unlock','jog','frame','cut','pause','resume','cancel','origin','source','op','op-move','op-order','scope','place','place-center','review-ok','save','lib-list','lib-open','lib-duplicate','lib-rename','lib-delete','lib-restore']);
+export const REMOTE_ACTIONS=new Set(['settings','pulse','home','unlock','jog','frame','cut','pause','resume','continue','cancel','origin','source','op','op-move','op-order','scope','place','place-center','review-ok','save','lib-list','lib-open','lib-duplicate','lib-rename','lib-delete','lib-restore']);
 // Archivos del celular: fragmentos de 12 000 caracteres, hasta 11 MB codificados (8 MB de archivo).
 export const UPLOAD_CHUNK=12000,UPLOAD_MAX=11200000;
 export async function encodePairing(value){

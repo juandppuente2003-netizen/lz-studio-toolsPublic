@@ -14,9 +14,9 @@ import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=2';
 export const K40_PROTOCOL_V2 = 'lz-k40-m2/v2';
 export const NATIVE_MM = 0.0254;
 export const OP_TYPES = {
-  raster: {label: 'Grabado imagen', short: 'Imagen', color: '#e8eef5', speed: [10, 400], defaultSpeed: 200, icon: 'image'},
-  engrave: {label: 'Grabado vectorial', short: 'Vectorial', color: '#ff4d6d', speed: [1, 100], defaultSpeed: 60, icon: 'pen'},
-  cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, icon: 'scissors'},
+  raster: {label: 'Grabado imagen', short: 'Imagen', color: '#e8eef5', speed: [10, 400], defaultSpeed: 200, defaultPower: 25, icon: 'image'},
+  engrave: {label: 'Grabado vectorial', short: 'Vectorial', color: '#ff4d6d', speed: [1, 100], defaultSpeed: 60, defaultPower: 30, icon: 'pen'},
+  cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, defaultPower: 70, icon: 'scissors'},
 };
 export const RESOLUTIONS = [2, 3, 4, 5, 6, 8].map((step) => ({step, mm: +(step * NATIVE_MM).toFixed(4), dpi: Math.round(1000 / step)}));
 const RED = (c) => { if (!/^#[0-9a-f]{6}$/.test(c || '')) return false; const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16); return r >= 150 && g <= 110 && b <= 110 && r - Math.max(g, b) >= 80; };
@@ -26,6 +26,8 @@ export function makeOperation(type, extra = {}) {
   const t = OP_TYPES[type];
   if (!t) throw Error('Tipo de operación desconocido.');
   return {id: extra.id || `${type}-${Date.now().toString(36)}-${++opSerial}`, type, name: extra.name || t.label, enabled: extra.enabled ?? true, speed: extra.speed ?? t.defaultSpeed, passes: extra.passes ?? 1,
+    // M3: % de la potencia máxima. pauseBefore: null = automático (M2 pausa entre operaciones para cambiar la perilla).
+    power: extra.power ?? t.defaultPower, pauseBefore: typeof extra.pauseBefore === 'boolean' ? extra.pauseBefore : null,
     ...(type === 'raster' ? {step: extra.step ?? 4, dither: extra.dither ?? 'auto', invert: !!extra.invert, bidirectional: extra.bidirectional ?? true} : {})};
 }
 
@@ -292,8 +294,15 @@ export async function renderRaster(area, op, {document: doc = globalThis.documen
 }
 
 /** Trabajo v2 listo para el conector (raster ya convertido a PNG de 1 bit). */
-export async function buildJobV2({design, placement, plan, bed, name}, analysis, renders) {
-  const operations = [];
+/**
+ * ¿Se pausa antes de esta operación? Automático: en la M2, antes del corte que sigue a los grabados
+ * (para subir la perilla); en la M3 nunca, porque la potencia va por USB. El usuario puede cambiarlo.
+ */
+export function pausesBefore(op, index, board = 'M2', prev = null) { return index > 0 && (typeof op.pauseBefore === 'boolean' ? op.pauseBefore : board === 'M2' && op.type === 'cut' && prev?.type !== 'cut'); }
+
+export async function buildJobV2({design, placement, plan, bed, name, profile = {board: 'M2'}}, analysis, renders) {
+  const operations = [], m3 = profile.board === 'M3';
+  let previous = null;
   for (const o of analysis.ops) {
     if (!o.op.enabled || o.empty) continue;
     if (o.op.type === 'raster') {
@@ -301,11 +310,18 @@ export async function buildJobV2({design, placement, plan, bed, name}, analysis,
       if (!r) throw Error(`${o.op.name}: falta preparar la imagen.`);
       if (!r.sweep.burnPixels) continue;
       const png = await encodePNG1(r.bits, r.widthPx, r.heightPx);
-      operations.push({type: 'raster', name: o.op.name, speed: o.op.speed, passes: o.op.passes, raster: {x: f4(o.data.area.x), y: f4(o.data.area.y), step: o.op.step, width: r.widthPx, height: r.heightPx, png: base64(png), bidirectional: o.op.bidirectional !== false}});
-    } else operations.push({type: 'vector', name: o.op.name, speed: o.op.speed, passes: o.op.passes, paths: o.data.paths});
+      operations.push({type: 'raster', name: o.op.name, speed: o.op.speed, passes: o.op.passes, ...extras(o.op, operations.length, previous), raster: {x: f4(o.data.area.x), y: f4(o.data.area.y), step: o.op.step, width: r.widthPx, height: r.heightPx, png: base64(png), bidirectional: o.op.bidirectional !== false}});
+    } else operations.push({type: 'vector', name: o.op.name, speed: o.op.speed, passes: o.op.passes, ...extras(o.op, operations.length, previous), paths: o.data.paths});
+    previous = o.op;
+  }
+  function extras(op, index, prev) {
+    const out = {};
+    if (m3) { const p = Number(op.power); if (!(p >= 1 && p <= 100)) throw Error(`${op.name}: potencia entre 1 y 100 %.`); out.power = Math.round(p); }
+    if (pausesBefore(op, index, profile.board, prev)) out.pauseBefore = true;
+    return out;
   }
   if (!operations.length) throw Error('No hay nada que grabar o cortar con las operaciones activas.');
-  return {protocol: K40_PROTOCOL_V2, board: 'M2', bed: {...bed}, name: String(name || design.name || 'Trabajo').slice(0, 80), operations};
+  return {protocol: K40_PROTOCOL_V2, board: m3 ? 'M3' : 'M2', ...(m3 ? {maxPower: Math.round(profile.maxPower)} : {}), bed: {...bed}, name: String(name || design.name || 'Trabajo').slice(0, 80), operations};
 }
 
 /* ------------------------------------------------------------ vista previa */

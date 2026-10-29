@@ -21,7 +21,7 @@ from registration import register_job
 from operations import PROTOCOL_V2, validate_job_v2, bounds_v2, place_v2, summary_v2
 
 PROTOCOL = 'lz-k40-m2/v1'
-BRIDGE_VERSION = '0.7.1'
+BRIDGE_VERSION = '0.7.2'
 ENGINE_VERSION = '0.9.9100'
 MAX_BODY = 6_000_000
 DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com',
@@ -125,6 +125,22 @@ class _PauseRequested(Exception):
     """Yield an unsent packet without discarding it or replaying a sent one."""
 
 
+class _Capture:
+    """Salida de compilación. len()=0 porque nada está pendiente de enviar mientras se compila
+    (MeerK40t espera a que su cola se vacíe antes de un código de potencia AT del M3)."""
+    def __init__(self):
+        self.data = bytearray()
+
+    def write(self, value):
+        self.data += value
+
+    def __len__(self):
+        return 0
+
+    def getvalue(self):
+        return bytes(self.data)
+
+
 class M2Engine:
     """Compile using MeerK40t's real M2 driver. Compilation never opens USB."""
     def __init__(self, bed):
@@ -223,7 +239,8 @@ class M2Engine:
         from meerk40t.lihuiyu.driver import LihuiyuDriver
         from meerk40t.core.cutcode.linecut import LineCut
         from meerk40t.core.units import UNITS_PER_MM
-        driver, output = LihuiyuDriver(self.device), io.BytesIO()
+        self.configure_board(job)
+        driver, output = LihuiyuDriver(self.device), _Capture()
         driver.out_pipe = output
         origin = job.get('_start', [0, 0])
         if job.get('_home', True):
@@ -267,14 +284,42 @@ class M2Engine:
             driver.move_abs(origin[0] * UNITS_PER_MM, origin[1] * UNITS_PER_MM)
         return output.getvalue()
 
+    def configure_board(self, job):
+        """M2: potencia del panel (sin PWM). M3: potencia por operación (PWM al pin IN de la fuente),
+        limitada por la potencia máxima. Se fija en cada compilación: nunca queda de un trabajo anterior."""
+        m3 = job.get('board') == 'M3'
+        self.device.board = 'M3' if m3 else 'M2'
+        self.device.supports_pwm = m3
+        self.device.power_scale = int(round(job.get('maxPower', 30))) if m3 else 100
+
+    def compile_segments(self, job, mode):
+        """Partes del trabajo. Una operación con pauseBefore inicia una parte nueva: la máquina
+        termina la anterior, vuelve al origen y espera Continuar (para cambiar la potencia en la M2)."""
+        if mode != 'cut' or job.get('protocol') != PROTOCOL_V2:
+            return [self.compile(job, mode)]
+        groups = []
+        for op in job['operations']:
+            if not groups or op.get('pauseBefore'):
+                groups.append([])
+            groups[-1].append(op)
+        segments = []
+        for index, ops in enumerate(groups):
+            part = dict(job, operations=ops)
+            if index:
+                part['_home'] = False   # empieza donde terminó la anterior: en el origen del trabajo
+            segments.append(self.compile(part, 'cut'))
+        return segments
+
     def _compile_operations(self, driver, job):
         """Operations run in the order received; each keeps its speed and passes."""
         from meerk40t.core.cutcode.linecut import LineCut
         from meerk40t.core.cutcode.rastercut import RasterCut
         from meerk40t.core.units import UNITS_PER_MM
+        # M3: % de la potencia máxima (0–1000 en MeerK40t). M2: 1000 = disparo continuo, potencia del panel.
+        power = (lambda op: op.get('power', 100) * 10) if job.get('board') == 'M3' else (lambda op: 1000)
         for op in job['operations']:
             if op['type'] == 'vector':
-                settings = {'speed': op['speed'], 'power': 1000,
+                settings = {'speed': op['speed'], 'power': power(op),
                             'raster_step_x': 0, 'raster_step_y': 0}
                 for _ in range(op['passes']):
                     for path in op['paths']:
@@ -290,7 +335,7 @@ class M2Engine:
             else:
                 r = op['raster']
                 # Horizontal on/off sweeps, one row every `step` native units.
-                settings = {'speed': op['speed'], 'power': 1000,
+                settings = {'speed': op['speed'], 'power': power(op),
                             'raster_step_x': 0, 'raster_step_y': r['step']}
                 ox, oy = [int(round(v)) for v in self.device.view.position(r['x'] * UNITS_PER_MM, r['y'] * UNITS_PER_MM)]
                 for _ in range(op['passes']):
@@ -303,7 +348,8 @@ class M2Engine:
     def compile_motion(self, start, target, home=False, unlock=False):
         from meerk40t.lihuiyu.driver import LihuiyuDriver
         from meerk40t.core.units import UNITS_PER_MM
-        driver, output = LihuiyuDriver(self.device), io.BytesIO()
+        self.configure_board({})
+        driver, output = LihuiyuDriver(self.device), _Capture()
         driver.out_pipe = output
         if unlock:
             # Libera los motores (IS2P) para mover el cabezal a mano. Sin láser ni movimiento.
@@ -502,12 +548,14 @@ class Bridge:
         self.pulse_abort = threading.Event()
         # Last finished operation as reported by the controller: finished/cancelled.
         self.outcome = None
+        self.segments, self.segment, self.segment_names = [], 0, []
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome', 'unlock-rail'],
-                'jobProtocols': [PROTOCOL, PROTOCOL_V2], 'rasterPower': 'on-off',
+                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome', 'unlock-rail', 'operation-pauses', 'm3-pwm'],
+                'jobProtocols': [PROTOCOL, PROTOCOL_V2], 'rasterPower': 'on-off', 'boards': ['M2', 'M3'],
+                'parts': {'index': self.segment, 'count': len(self.segments), 'names': self.segment_names} if len(self.segments) > 1 else None,
                 'outcome': self.outcome,
                 'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog', 'goto', 'frame') and self.position is not None,
                 'railUnlocked': self.operation == 'unlock' and self.position is None,
@@ -568,16 +616,24 @@ class Bridge:
                 job = validate_job(placed, self.bed)
             job['_start'], job['_home'] = start, origin == 'home'
             self.pending_position, self.operation = start, mode
-            payload = self.get_engine().compile(job, mode)
-            if not payload:
+            segments = self.get_engine().compile_segments(job, mode)
+            if not segments or not all(segments):
                 raise ValueError('El motor no generó instrucciones.')
-            self.job, self.payload = job, payload
-            self.id = hashlib.sha256(payload + secrets.token_bytes(32)).hexdigest()
+            payload = segments[0]
+            self.job, self.payload, self.segments, self.segment = job, payload, segments, 0
+            names = []
+            if v2 and mode == 'cut':
+                for op in job['operations']:
+                    if not names or op.get('pauseBefore'):
+                        names.append([])
+                    names[-1].append(op['name'])
+            self.segment_names = [' + '.join(n) for n in names] or [job.get('name', 'Trabajo')]
+            self.id = hashlib.sha256(b''.join(segments) + secrets.token_bytes(32)).hexdigest()
             self.expires = time.monotonic() + 300
             self.state = 'prepared'
             self.outcome = None
             extra = {'operations': summary_v2(job)} if v2 else {}
-            return {'id': self.id, 'bytes': len(payload), 'mode': mode, **extra, **self.info()}
+            return {'id': self.id, 'bytes': sum(map(len, segments)), 'partCount': len(segments), 'mode': mode, **extra, **self.info()}
 
     def run(self, job_id, confirmed):
         with self.lock:
@@ -588,7 +644,11 @@ class Bridge:
                 raise ValueError('El trabajo preparado expiró. Prepáralo nuevamente.')
             self.state = 'sending'
             if self.simulation:
-                self.state, self.message = 'simulated', 'Simulación completada: instrucciones M2 generadas, sin conexión USB ni movimiento.'
+                if len(self.segments) > 1:
+                    self.state = 'awaiting'
+                    self.message = self._awaiting_message(simulated=True)
+                else:
+                    self.state, self.message = 'simulated', 'Simulación completada: instrucciones M2 generadas, sin conexión USB ni movimiento.'
             else:
                 try:
                     engine = self.get_engine()
@@ -600,6 +660,40 @@ class Bridge:
                     self.state, self.message = 'error', 'Falló el envío. Verifica físicamente la máquina; no se reintentará este trabajo automáticamente.'
                     raise
             self.position = None  # Unknown until completion/explicit acknowledgement.
+        return self.status()
+
+    def _awaiting_message(self, simulated=False):
+        done, following = self.segment_names[self.segment], self.segment_names[self.segment + 1]
+        prefix = 'Simulación: ' if simulated else ''
+        return f'{prefix}«{done}» terminado. Ajusta la potencia en el panel para «{following}» y pulsa Continuar. El cabezal está en el origen del trabajo.'
+
+    def continue_job(self, confirmed):
+        """Envía la siguiente parte tras la pausa para cambiar la potencia. Nunca se envía sola."""
+        with self.lock:
+            if confirmed is not True or self.state != 'awaiting' or self.segment + 1 >= len(self.segments):
+                raise ValueError('No hay una parte del trabajo esperando para continuar.')
+            self.segment += 1
+            self.payload = self.segments[self.segment]
+            last = self.segment + 1 >= len(self.segments)
+            if self.simulation:
+                if last:
+                    self.state, self.position, self.pending_position = 'idle', self.pending_position, None
+                    self.outcome = {'operation': 'cut', 'result': 'simulated'}
+                    self.message = 'Simulación completada: todas las partes calculadas, sin USB ni movimiento.'
+                else:
+                    self.message = self._awaiting_message(simulated=True)
+                return self.status()
+            engine = self.get_engine()
+            if not engine.connected():
+                self.state, self.message = 'error', 'La conexión USB se perdió. No se envió la siguiente parte.'
+                raise ConnectionError(self.message)
+            self.state, self.position = 'sending', None
+            try:
+                engine.send(self.payload)
+                self.message = f'Continuando con «{self.segment_names[self.segment]}».'
+            except Exception:
+                self.state, self.message = 'error', 'Falló el envío de la siguiente parte. Verifica la máquina.'
+                raise
         return self.status()
 
     def pulse(self, milliseconds=50, confirmed=False):
@@ -720,7 +814,11 @@ class Bridge:
                 rapid = self.operation in ('home', 'jog', 'goto', 'frame', 'unlock')
                 finished = probe.rapid_ready() if rapid else probe.finished()
                 with self.lock:
-                    if finished and self.engine is probe and self.state == 'sent':
+                    if finished and self.engine is probe and self.state == 'sent' and self.operation == 'cut' and self.segment + 1 < len(self.segments):
+                        # Parte terminada: el cabezal volvió al origen y espera Continuar.
+                        self.position, self.state = self.pending_position, 'awaiting'
+                        self.message = self._awaiting_message()
+                    elif finished and self.engine is probe and self.state == 'sent':
                         self.position, self.pending_position, self.state = self.pending_position, None, 'idle'
                         self.outcome = {'operation': self.operation, 'result': 'finished'}
                         self.message = ('Orden de movimiento aceptada. Posición estimada por instrucciones; puedes enviar la siguiente orden. No es una medición de parada física.' if rapid else 'Operación terminada según la controladora. Lista para continuar.')
@@ -832,6 +930,13 @@ class Bridge:
             if self.state in ('cancelling', 'recovering'):
                 return self.status()
             if self.state == 'idle':
+                return self.status()
+            if self.state == 'awaiting':
+                # Nada se está ejecutando: la parte anterior terminó en el origen. Se conserva la posición.
+                self.state, self.id, self.payload, self.job, self.segments = 'idle', None, b'', None, []
+                self.pending_position = None
+                self.outcome = {'operation': 'cut', 'result': 'cancelled'}
+                self.message = 'Trabajo cancelado entre operaciones. La máquina estaba detenida en el origen; no hace falta Home.'
                 return self.status()
             self.position, self.pending_position = None, None
             self.state, self.control_started = 'cancelling', time.monotonic()
@@ -970,6 +1075,8 @@ def make_server(bridge, token, origins, port=17840):
                     result = bridge.resume()
                 elif self.path == '/recover':
                     result = bridge.recover()
+                elif self.path == '/continue':
+                    result = bridge.continue_job(data.get('confirmed'))
                 elif self.path == '/acknowledge':
                     result = bridge.acknowledge(data.get('confirmed'))
                 else:

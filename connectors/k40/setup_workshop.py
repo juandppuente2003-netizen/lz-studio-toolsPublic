@@ -9,7 +9,7 @@ import sys
 import time
 from urllib.request import Request, urlopen
 
-VERSION = '0.7.1'
+VERSION = '0.7.2'
 SITE = 'https://www.lzstudiotools.com/box/index.html?celular=1'
 
 

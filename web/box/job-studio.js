@@ -6,7 +6,7 @@
    pestaña o abrir un trabajo guardado solo actualiza la vista. El envío lo inicia
    siempre el botón de la barra de acciones (o el celular con el control). */
 import {importSVG, imageDesign, mergeDesigns, nextOffset, apply} from './svg-import.js?v=3';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=5';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix, pausesBefore} from './job-ops.js?v=6';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -390,6 +390,19 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       fields.querySelector('.js-op-speed').onchange = (e) => { patchOperation(op.id, {speed: Number(e.target.value)}); update(); };
       fields.querySelector('.js-op-passes').onchange = (e) => { patchOperation(op.id, {passes: Number(e.target.value)}); update(); };
       card.append(head, fields);
+      const board = machine.profile?.board || 'M2';
+      if (board === 'M3') {
+        const pw = el('div', 'js-op-fields js-op-power-row');
+        pw.innerHTML = `<label>Potencia · % del máximo<input class="js-op-pw" type="number" min="1" max="100" step="1" value="${op.power ?? OP_TYPES[op.type].defaultPower}"></label><span class="js-op-pw-note">≈ ${Math.round((op.power ?? OP_TYPES[op.type].defaultPower) * (machine.profile.maxPower || 30) / 100)} % real del tubo</span>`;
+        pw.querySelector('.js-op-pw').onchange = (e) => { const v = Number(e.target.value); if (v >= 1 && v <= 100) patchOperation(op.id, {power: Math.round(v)}); renderStructure(); update(); };
+        card.append(pw);
+      }
+      if (index > 0) {
+        const pause = el('label', 'js-check js-op-pause');
+        pause.innerHTML = `<input type="checkbox"${pausesBefore(op, index, board, ops[index - 1]) ? ' checked' : ''}><span>Pausar antes y preguntar para continuar${board === 'M2' ? ' (cambia la perilla de potencia)' : ''}</span>`;
+        pause.querySelector('input').onchange = (e) => { patchOperation(op.id, {pauseBefore: e.target.checked}); update(); };
+        card.append(pause);
+      }
       if (op.type === 'raster') {
         const extra = el('div', 'js-op-fields');
         extra.innerHTML = `<label>Resolución<select class="js-op-step">${RESOLUTIONS.map((r) => `<option value="${r.step}"${r.step === op.step ? ' selected' : ''}>${r.mm.toFixed(2)} mm (${r.dpi} ppp)</option>`).join('')}</select></label><label>Tratamiento<select class="js-op-dither"><option value="auto">Colores sólidos (logotipos)</option><option value="threshold">Umbral por brillo</option><option value="floyd">Tonos · difusión (fotos)</option></select></label>`;
@@ -522,13 +535,19 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
     support(features) {
-      if (features.includes('operations-v2') && features.includes('raster-1bit')) return {ok: true};
+      const profile = machine.profile || {board: 'M2'};
+      if (profile.board === 'M3' && !features.includes('m3-pwm')) return {ok: false, message: 'La M3 con potencia por USB requiere el conector 0.7.2 (enlace en Detalles de conexión).'};
+      if (features.includes('operations-v2') && features.includes('raster-1bit')) {
+        const sent = scoped(analyze());
+        if (sent.some((o, i) => pausesBefore(o.op, i, profile.board, sent[i - 1]?.op)) && !features.includes('operation-pauses')) return {ok: false, message: 'La pausa entre operaciones requiere el conector 0.7.2. Instálalo, o desmarca «Pausar antes» y envía cada operación por separado.'};
+        return {ok: true};
+      }
       const a = analyze(), active = scoped(a);
       if (active.length === 1 && active[0].op.type !== 'raster') return {ok: true, legacy: true};
-      return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operación vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.1 (enlace en Detalles de conexión), o desactiva las demás operaciones.'};
+      return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operación vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.2 (enlace en Detalles de conexión), o desactiva las demás operaciones.'};
     },
     /** Trabajo para el conector. Solo se llama al pulsar Recorrer marco o Iniciar. */
-    async buildJob({bed, features, origin}) {
+    async buildJob({bed, features, origin, profile = machine.profile || {board: 'M2'}}) {
       const support = source.support(features); if (!support.ok) throw Error(support.message);
       if (state.review) throw Error(problemText(analysis));
       await ensureRenders();
@@ -536,12 +555,12 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const subset = scoped(a); if (!subset.length) throw Error('La operación elegida para enviar no tiene elementos.');
       const partial = state.sendScope !== 'all';
       if (support.legacy) {
-        if (partial && origin === 'current') throw Error('Con el conector 0.6.4, enviar una sola operación desde la posición actual la desplazaría. Usa origen Home o actualiza a 0.7.1.');
+        if (partial && origin === 'current') throw Error('Con el conector 0.6.4, enviar una sola operación desde la posición actual la desplazaría. Usa origen Home o actualiza a 0.7.2.');
         const o = subset[0];
         return {protocol: K40_V1, board: 'M2', name: source.name(), bed: {...bed}, speed: o.op.speed, passes: o.op.passes, paths: o.data.paths};
       }
       const view = partial ? {...a, ops: a.ops.map((o) => subset.includes(o) ? o : {...o, op: {...o.op, enabled: false}})} : a;
-      const job = await buildJobV2({design: state.design, placement: state.placement, plan: state.plan, bed, name: source.name()}, view, renders);
+      const job = await buildJobV2({design: state.design, placement: state.placement, plan: state.plan, bed, name: source.name(), profile}, view, renders);
       // Esquina del trabajo completo: así cada operación enviada por separado cae en su lugar.
       if (partial) job.anchor = [Math.max(0, Math.round(a.bounds.x * 1e4) / 1e4), Math.max(0, Math.round(a.bounds.y * 1e4) / 1e4)];
       return job;
@@ -681,7 +700,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       placement: state.placement, bounds: a?.bounds || null, sendScope: state.sendScope, review: state.review, dirty: state.dirty, savedWhere: state.savedWhere, cloud: library.cloudState,
       issues: (state.design?.issues || []).filter((i) => i.level !== 'info').map((i) => i.message).slice(0, 6),
       problems: a?.problems || [], warnings: a?.warnings || [], seconds: a?.seconds || 0,
-      ops: (a?.ops || []).map((o) => ({id: o.op.id, type: o.op.type, name: o.op.name, enabled: o.op.enabled, speed: o.op.speed, passes: o.op.passes, step: o.op.step, empty: o.empty, seconds: o.seconds, range: OP_TYPES[o.op.type].speed}))};
+      board: machine.profile?.board || 'M2', ops: (a?.ops || []).map((o, i) => ({id: o.op.id, type: o.op.type, name: o.op.name, enabled: o.op.enabled, speed: o.op.speed, passes: o.op.passes, power: o.op.power, pause: pausesBefore(o.op, i, machine.profile?.board || 'M2', a.ops[i - 1]?.op), index: i, step: o.op.step, empty: o.empty, seconds: o.seconds, range: OP_TYPES[o.op.type].speed}))};
   }
   async function remote(action, args = {}) {
     const num = (v) => Number(v);
@@ -692,6 +711,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
         const change = {};
         if ('enabled' in args) change.enabled = !!args.enabled;
         if ('speed' in args) { const [lo, hi] = OP_TYPES[op.type].speed; if (!(num(args.speed) >= lo && num(args.speed) <= hi)) throw Error(`Velocidad entre ${lo} y ${hi} mm/s.`); change.speed = num(args.speed); }
+        if ('power' in args) { if (!(num(args.power) >= 1 && num(args.power) <= 100)) throw Error('Potencia entre 1 y 100 %.'); change.power = Math.round(num(args.power)); }
+        if ('pauseBefore' in args) change.pauseBefore = !!args.pauseBefore;
         if ('passes' in args) { if (!Number.isInteger(num(args.passes)) || num(args.passes) < 1 || num(args.passes) > 10) throw Error('Pasadas enteras entre 1 y 10.'); change.passes = num(args.passes); }
         patchOperation(op.id, change); renderStructure(); update(); return;
       }
@@ -741,7 +762,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   machine.setSource(source);
   library.onChange(() => { app.workshop?.refreshLibrary?.(); app.workshopRemote?.publishLibrary?.(); });
   library.refresh().catch(() => {});
-  const api = {source, state, library, setSource, importFile, openSaved, save, snapshot, remote, receiveFile, ui: {sourceBar, panel, centerBar, zoomBar, orderPanel, bedNote}, update, get analysis() { return analysis; }};
+  const api = {profileChanged: () => { renderStructure(); update(); }, source, state, library, setSource, importFile, openSaved, save, snapshot, remote, receiveFile, ui: {sourceBar, panel, centerBar, zoomBar, orderPanel, bedNote}, update, get analysis() { return analysis; }};
   app.jobStudio = api;
   let initial = 'box'; try { initial = app.readStorage?.('lzbox-job-source', 'box') === 'import' ? 'import' : 'box'; } catch {}
   setSource(initial, {silent: true}); setCenter('preview');

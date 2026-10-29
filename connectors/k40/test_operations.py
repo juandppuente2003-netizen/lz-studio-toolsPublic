@@ -250,3 +250,90 @@ class UnlockRailTests(unittest.TestCase):
             b.motion('jog', 5, 0, confirmed=True)
         with self.assertRaises(ValueError):
             b.motion('unlock', confirmed=False)
+
+
+class PowerAndPauseTests(unittest.TestCase):
+    def m3(self):
+        job = combined(); job['board'] = 'M3'; job['maxPower'] = 60
+        for op, pw in zip(job['operations'], (20, 30, 80)):
+            op['power'] = pw
+        return job
+
+    def test_m3_sends_pwm_power_per_operation_scaled_by_maximum(self):
+        job = validate_job_v2(self.m3(), BED)
+        job['_start'], job['_home'] = [0, 0], True
+        engine = M2Engine(BED)
+        try:
+            data = engine.compile(job, 'cut')
+            import re
+            values = [data[m.start() + 3] * 254 + data[m.start() + 4] for m in re.finditer(b'AT1', data)]
+            # % de operación × 10 × máximo 60 % → 20 %→120, 30 %→180, 80 %→480 (de 1000)
+            for expected in (120, 180, 480):
+                self.assertIn(expected, values)
+            v2 = combined(); v2['operations'] = v2['operations'][2:]
+            plain = validate_job_v2(v2, BED); plain['_start'], plain['_home'] = [0, 0], True
+            self.assertNotIn(b'AT1', engine.compile(plain, 'cut'))   # M2: nunca códigos de potencia
+        finally:
+            engine.close()
+
+    def test_m2_rejects_software_power_and_m3_requires_limits(self):
+        job = combined(); job['operations'][0]['power'] = 50
+        with self.assertRaises(ValueError):
+            validate_job_v2(job, BED)
+        job = self.m3(); del job['maxPower']
+        with self.assertRaises(ValueError):
+            validate_job_v2(job, BED)
+        job = self.m3(); job['operations'][1]['power'] = 120
+        with self.assertRaises(ValueError):
+            validate_job_v2(job, BED)
+
+    def test_real_compiler_splits_parts_at_pauses_and_second_part_starts_without_home(self):
+        job = combined(); job['operations'][2]['pauseBefore'] = True
+        job = validate_job_v2(job, BED); job['_start'], job['_home'] = [0, 0], True
+        engine = M2Engine(BED)
+        try:
+            parts = engine.compile_segments(job, 'cut')
+        finally:
+            engine.close()
+        self.assertEqual(len(parts), 2)
+        self.assertTrue(parts[0].startswith(b'IPP'))          # la primera parte hace Home
+        self.assertFalse(parts[1].startswith(b'IPP'))         # la segunda empieza en el origen, sin Home
+        self.assertIn(b'D', parts[1])
+
+    def test_pause_between_operations_waits_for_continue_and_cancel_keeps_position(self):
+        job = combined(); job['operations'][2]['pauseBefore'] = True
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); b.motion('home', confirmed=True); b.engine.left = 0; b.status()
+        prepared = b.prepare(job, 'cut')
+        self.assertEqual(prepared['partCount'], 2)
+        b.engine.left = 50; b.run(prepared['id'], True)
+        self.assertEqual(len(b.engine.sent), 2)                       # Home + parte 1
+        b.engine.left = 0
+        status = b.status()
+        self.assertEqual(status['state'], 'awaiting')
+        self.assertIn('Corte', status['message']); self.assertEqual(status['position'], [0, 0])
+        self.assertEqual(len(b.engine.sent), 2, 'no continúa solo')
+        with self.assertRaises(ValueError):
+            b.continue_job(False)
+        b.engine.left = 50
+        self.assertEqual(b.continue_job(True)['state'], 'sending')
+        self.assertEqual(b.engine.sent[-1], b'IPP\nM2-test-part-1')
+        with self.assertRaises(ValueError):
+            b.continue_job(True)                                       # sin envíos duplicados
+        b.engine.left = 0
+        final = b.status()
+        self.assertEqual(final['state'], 'idle'); self.assertEqual(final['outcome']['result'], 'finished')
+        # Cancelar mientras espera: nada corre, se conserva la posición conocida.
+        prepared = b.prepare(job, 'cut'); b.engine.left = 50; b.run(prepared['id'], True); b.engine.left = 0; b.status()
+        cancelled = b.cancel()
+        self.assertEqual(cancelled['state'], 'idle'); self.assertEqual(cancelled['position'], [0, 0])
+        self.assertEqual(cancelled['outcome']['result'], 'cancelled')
+
+    def test_simulated_parts(self):
+        job = combined(); job['operations'][1]['pauseBefore'] = True; job['operations'][2]['pauseBefore'] = True
+        b = Bridge(BED, simulation=True, engine_factory=FakeEngine); b.connect()
+        prepared = b.prepare(job, 'cut')
+        self.assertEqual(b.run(prepared['id'], True)['state'], 'awaiting')
+        self.assertEqual(b.continue_job(True)['state'], 'awaiting')
+        done = b.continue_job(True)
+        self.assertEqual(done['state'], 'idle'); self.assertEqual(done['outcome']['result'], 'simulated')

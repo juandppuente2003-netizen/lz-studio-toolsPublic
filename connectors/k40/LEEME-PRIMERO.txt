@@ -1,3 +1,11 @@
+ACTUALIZACION 0.7.2
+Nuevo: pausa entre operaciones. En la M2 el trabajo graba, se detiene en el
+origen y pregunta "Continuar con Corte": cambias la perilla y pulsas Continuar
+(en la PC o en el celular). No se repite nada ni hay que volver a enviar.
+Nuevo: tarjeta M3 Nano. La potencia de cada operacion se envia por USB (PWM al
+pin IN de la fuente) y es un porcentaje de la "potencia maxima del tubo".
+Solo elige M3 si tu tarjeta lo es y tiene el PWM cableado; revisa los mA.
+
 ACTUALIZACION 0.7.1
 Nuevo: Desbloquear riel desde Box (PC y celular) para mover el cabezal a mano.
 Despues de desbloquear haz Home: la posicion ya no se conoce.

@@ -104,3 +104,6 @@ button:disabled,.rm-import.is-disabled{opacity:.42;cursor:not-allowed}
 [hidden]{display:none!important}
 .rm-steps{flex-wrap:nowrap}.rm-steps button{min-width:0;padding:6px 2px;font-size:13px}
 .rm-unlock{width:100%;margin-top:10px}
+.rm-await{border:1px solid #1b6b80;background:#06202a;border-radius:14px;padding:12px;margin-top:10px;display:grid;gap:10px}
+.rm-await p{margin:0;color:#bff3ff}
+.rm-await button{min-height:54px;font-size:16px}

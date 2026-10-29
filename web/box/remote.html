@@ -6,7 +6,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#06090d">
 <title>LZ Box · Control de taller</title>
-<link rel="stylesheet" href="remote.css?v=6">
+<link rel="stylesheet" href="remote.css?v=7">
 </head>
 <body>
 <main class="remote-shell">
@@ -49,6 +49,7 @@
    <button id="remotePulse" class="rm-pulse" disabled>Pulso láser · 50 ms</button>
    <p class="rm-note">Potencia: la del panel de la máquina. El pulso lo temporiza la computadora por USB.</p>
    <div class="remote-run"><button id="remoteFrame">Recorrer marco</button><button id="remoteCut" class="rm-primary">Iniciar trabajo</button></div>
+   <div id="remoteAwait" class="rm-await" hidden><p id="remoteAwaitText">Operación terminada. Ajusta la potencia y pulsa Continuar.</p><button id="remoteContinue" type="button" class="rm-primary">Continuar</button></div>
    <div id="remotePaused" class="rm-paused" hidden><p>Trabajo en pausa o sin confirmar.</p><button id="remoteResume" class="rm-primary">Reanudar</button><button id="remoteCancel" class="rm-danger-outline">Cancelar trabajo</button></div>
   </section>
 
@@ -105,6 +106,6 @@
  </footer>
 </main>
 <dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> También en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
-<script type="module" src="remote-client.js?v=8"></script>
+<script type="module" src="remote-client.js?v=9"></script>
 </body>
 </html>

@@ -125,8 +125,12 @@ def _raster(raw, bed, label):
 
 
 def validate_job_v2(raw, bed):
-    if not isinstance(raw, dict) or raw.get('protocol') != PROTOCOL_V2 or raw.get('board') != 'M2':
-        raise ValueError('Trabajo incompatible. Se requiere M2.')
+    if not isinstance(raw, dict) or raw.get('protocol') != PROTOCOL_V2 or raw.get('board') not in ('M2', 'M3'):
+        raise ValueError('Trabajo incompatible. Se requiere una tarjeta M2 o M3 Nano.')
+    board = raw['board']
+    max_power = None
+    if board == 'M3':
+        max_power = _numeric(raw.get('maxPower'), 1, 100, 'Potencia máxima del tubo %')
     if raw.get('bed') != bed:
         raise ValueError('El área de trabajo no coincide con la configurada en el conector.')
     operations = raw.get('operations')
@@ -140,6 +144,16 @@ def validate_job_v2(raw, bed):
         kind = op.get('type')
         passes = _passes(op.get('passes'), label)
         name = str(op.get('name') or label)[:60]
+        extra = {}
+        if board == 'M3':
+            extra['power'] = _numeric(op.get('power'), 1, 100, f'{label} · potencia %')
+        elif op.get('power') is not None:
+            raise ValueError('La M2 no controla la potencia por USB: se ajusta en el panel.')
+        pause = op.get('pauseBefore', False)
+        if type(pause) is not bool:
+            raise ValueError(f'{label}: pausa inválida.')
+        if pause and index > 0:
+            extra['pauseBefore'] = True
         if kind == 'vector':
             speed = _numeric(op.get('speed'), *VECTOR_SPEED, f'{label} · velocidad mm/s')
             paths, length = _vector_paths(op.get('paths'), bed, label)
@@ -150,14 +164,15 @@ def validate_job_v2(raw, bed):
             if total_length > 500000:
                 raise ValueError('El recorrido supera el límite de esta versión.')
             cleaned.append({'type': 'vector', 'name': name, 'speed': speed,
-                            'passes': passes, 'paths': paths})
+                            'passes': passes, 'paths': paths, **extra})
         elif kind == 'raster':
             speed = _numeric(op.get('speed'), *RASTER_SPEED, f'{label} · velocidad mm/s')
             cleaned.append({'type': 'raster', 'name': name, 'speed': speed,
-                            'passes': passes, 'raster': _raster(op.get('raster'), bed, label)})
+                            'passes': passes, 'raster': _raster(op.get('raster'), bed, label), **extra})
         else:
             raise ValueError(f'{label}: tipo no compatible.')
-    job = {'protocol': PROTOCOL_V2, 'board': 'M2', 'bed': dict(bed),
+    job = {'protocol': PROTOCOL_V2, 'board': board, 'bed': dict(bed),
+           **({'maxPower': max_power} if board == 'M3' else {}),
            'name': str(raw.get('name', 'Trabajo'))[:80], 'operations': cleaned}
     # Ancla opcional: al enviar operaciones por separado (para cambiar la potencia en
     # el panel entre ellas), todas se colocan respecto a la esquina del trabajo completo.

@@ -27,12 +27,12 @@ def build():
         assert package.testzip() is None
         assert len(package.namelist()) == len(FILES)
         bridge = package.read('LZ-K40-Windows/bridge.py')
-        assert b"BRIDGE_VERSION = '0.7.1'" in bridge
+        assert b"BRIDGE_VERSION = '0.7.2'" in bridge
         assert b"'bridgeVersion': '0.6" not in bridge, 'Versiones mezcladas en bridge.py'
-        assert b"VERSION = '0.7.1'" in package.read('LZ-K40-Windows/setup_workshop.py')
+        assert b"VERSION = '0.7.2'" in package.read('LZ-K40-Windows/setup_workshop.py')
     checksum = hashlib.sha256(archive.read_bytes()).hexdigest()
     (folder / 'LZ-K40-Windows.sha256').write_text(checksum + '  ' + archive.name + '\n', encoding='utf-8')
-    print(f'{archive.name}: {archive.stat().st_size} bytes, 0.7.1, CRC and SHA-256 OK')
+    print(f'{archive.name}: {archive.stat().st_size} bytes, 0.7.2, CRC and SHA-256 OK')
 
 
 if __name__ == '__main__':
