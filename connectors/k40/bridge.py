@@ -21,7 +21,7 @@ from registration import register_job
 from operations import PROTOCOL_V2, validate_job_v2, bounds_v2, place_v2, summary_v2
 
 PROTOCOL = 'lz-k40-m2/v1'
-BRIDGE_VERSION = '0.7.2'
+BRIDGE_VERSION = '0.7.3'
 ENGINE_VERSION = '0.9.9100'
 MAX_BODY = 6_000_000
 DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com',
@@ -413,8 +413,16 @@ class M2Engine:
             self.device.controller.update_status()
             status = self.device.controller._status
             self.last_controller_status = status[1] if status and len(status) > 1 else None
-            accepted = (0xCE, 0xEC, 0xCC) if allow_ready else (0xEC, 0xCC)
-            return bool(status and len(status) > 1 and status[1] in accepted)
+            if allow_ready:
+                return bool(status and len(status) > 1 and status[1] in (0xCE, 0xEC, 0xCC))
+            # Fin de trabajo: el último bloque de grabado/corte termina con «FNSE-», y la controladora
+            # de MeerK40t espera a que la placa indique fin (bit 0x02 en 0) antes de soltar el resto de
+            # la cola (el regreso al origen). Con la cola vacía y la controladora fuera de «wait», la
+            # emisión ya terminó; la placa puede quedarse en OK (0xCE) tras el movimiento rápido final.
+            if self.device.controller.state == 'wait':
+                return False
+            ready = (0xCE, 0xEC, 0xCC) if getattr(self, 'waits_for_finish', False) else (0xEC, 0xCC)
+            return bool(status and len(status) > 1 and status[1] in ready)
         except (_StopRequested, _PauseRequested):
             return False
         except ConnectionError:
@@ -448,6 +456,9 @@ class M2Engine:
         self._guard_connection(connection)
 
     def send(self, data):
+        # Solo los datos con un bloque de emisión terminado en «FNSE-» hacen que la controladora
+        # espere el fin real de la placa; únicamente entonces OK (0xCE) cuenta como trabajo terminado.
+        self.waits_for_finish = b'-\n' in data
         self.device.controller.write(data)
 
     def remaining(self):
@@ -549,16 +560,22 @@ class Bridge:
         # Last finished operation as reported by the controller: finished/cancelled.
         self.outcome = None
         self.segments, self.segment, self.segment_names = [], 0, []
+        # Tras desbloquear el riel y mover el cabezal a mano: el punto físico sirve de origen
+        # (sin coordenadas absolutas) hasta hacer Home, cancelar o perder USB.
+        self.manual_origin = False
+        self.sent_since = 0
 
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome', 'unlock-rail', 'operation-pauses', 'm3-pwm'],
+                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome', 'unlock-rail', 'operation-pauses', 'm3-pwm', 'manual-origin', 'continue-when-sent'],
                 'jobProtocols': [PROTOCOL, PROTOCOL_V2], 'rasterPower': 'on-off', 'boards': ['M2', 'M3'],
                 'parts': {'index': self.segment, 'count': len(self.segments), 'names': self.segment_names} if len(self.segments) > 1 else None,
                 'outcome': self.outcome,
                 'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog', 'goto', 'frame') and self.position is not None,
-                'railUnlocked': self.operation == 'unlock' and self.position is None,
+                'railUnlocked': self.manual_origin and self.position is None,
+                'manualOrigin': self.manual_origin and self.position is None,
+                'canContinue': self.state == 'awaiting' or (self.state == 'sent' and self.operation == 'cut' and self.segment + 1 < len(self.segments)),
                 'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
                 'controllerStatus': getattr(self.engine, 'last_controller_status', None),
@@ -597,25 +614,28 @@ class Bridge:
             start = [0, 0]
             if v2 and origin == 'aligned':
                 raise ValueError('La alineación por puntos solo está disponible para diseños Box. Usa Home u origen actual.')
+            manual = origin == 'current' and self.position is None and self.manual_origin
             if v2 and origin == 'current':
-                if self.position is None:
+                if self.position is None and not manual:
                     raise ValueError('Haz Home una vez para establecer la posición antes de usar el origen actual.')
-                start = list(self.position)
+                # Punto manual: coordenadas relativas a donde quedó el cabezal (0,0 = ese punto).
+                start = [0, 0] if manual else list(self.position)
                 job = place_v2(job, start, self.bed)
             elif origin == 'aligned':
                 start = list(self.position) if self.position is not None else [0, 0]
                 job = validate_job(register_job(job, registration, self.session_id, self.position), self.bed)
             elif origin == 'current':
-                if self.position is None:
+                if self.position is None and not manual:
                     raise ValueError('Haz Home una vez para establecer la posición antes de usar el origen actual.')
-                start = list(self.position)
+                start = [0, 0] if manual else list(self.position)
                 minimum = [min(p[axis] for path in job['paths'] for p in path['points']) for axis in (0, 1)]
                 placed = copy.deepcopy(job)
                 for path in placed['paths']:
                     path['points'] = [[round(p[axis] - minimum[axis] + start[axis], 6) for axis in (0, 1)] for p in path['points']]
                 job = validate_job(placed, self.bed)
             job['_start'], job['_home'] = start, origin == 'home'
-            self.pending_position, self.operation = start, mode
+            # Con punto manual la posición sigue sin coordenadas absolutas al terminar.
+            self.pending_position, self.operation = (None if manual else start), mode
             segments = self.get_engine().compile_segments(job, mode)
             if not segments or not all(segments):
                 raise ValueError('El motor no generó instrucciones.')
@@ -670,8 +690,11 @@ class Bridge:
     def continue_job(self, confirmed):
         """Envía la siguiente parte tras la pausa para cambiar la potencia. Nunca se envía sola."""
         with self.lock:
-            if confirmed is not True or self.state != 'awaiting' or self.segment + 1 >= len(self.segments):
+            waiting = self.state == 'awaiting' or (self.state == 'sent' and self.operation == 'cut')
+            if confirmed is not True or not waiting or self.segment + 1 >= len(self.segments):
                 raise ValueError('No hay una parte del trabajo esperando para continuar.')
+            # Desde «sent» (la placa no avisó el fin): la siguiente parte se encola detrás de la anterior;
+            # la controladora la ejecuta solo cuando termine lo ya recibido.
             self.segment += 1
             self.payload = self.segments[self.segment]
             last = self.segment + 1 >= len(self.segments)
@@ -736,21 +759,23 @@ class Bridge:
                 self.payload, self.id, self.job = payload, None, None
                 # Al soltar los motores la posición deja de ser conocida: hay que hacer Home después.
                 self.operation, self.pending_position, self.position = 'unlock', None, None
+                self.manual_origin = True
                 self.state = 'sending'
                 if self.simulation:
                     self.state = 'idle'
-                    self.message = 'Simulación: riel desbloqueado, sin USB. Haz Home antes de trabajar.'
+                    self.message = 'Simulación: riel desbloqueado, sin USB. Mueve el cabezal y usa «Posición actual», o haz Home.'
                 else:
                     try:
                         self.engine.send(payload)
-                        self.message = 'Riel desbloqueado: puedes mover el cabezal a mano. Haz Home antes de trabajar.'
+                        self.message = 'Riel desbloqueado: mueve el cabezal a mano y usa «Posición actual» como origen, o haz Home.'
                     except Exception:
-                        self.state = 'error'
+                        self.state, self.manual_origin = 'error', False
                         self.message = 'No se pudo desbloquear el riel. Verifica el USB.'
                         raise
                 return self.status()
             if action == 'home':
                 start, target = [0, 0], [0, 0]
+                self.manual_origin = False
             elif action == 'goto':
                 if self.position is None:
                     raise ValueError('Haz Home una vez para establecer la posición.')
@@ -804,9 +829,14 @@ class Bridge:
                 if self.engine.failed():
                     self.state, self.message = 'error', 'Se perdió la comunicación USB. Verifica la máquina; no reinicies el trabajo automáticamente.'
                 elif remaining == 0:
-                    self.state, self.message = 'sent', 'Datos enviados. Esperando fin de la controladora; el panel quedará listo automáticamente.'
+                    self.state, self.sent_since = 'sent', time.monotonic()
+                    if self.operation == 'cut' and self.segment + 1 < len(self.segments):
+                        self.message = (f'Datos de «{self.segment_names[self.segment]}» enviados. Al terminar se pedirá Continuar. '
+                                        'Si la máquina ya se detuvo y no aparece, ajusta la potencia y pulsa Continuar.')
+                    else:
+                        self.message = 'Datos enviados. Esperando fin de la controladora; el panel quedará listo automáticamente.'
             if self.state == 'error':
-                self.position, self.pending_position = None, None
+                self.position, self.pending_position, self.manual_origin = None, None, False
             if self.state == 'sent' and self.operation in ('home', 'jog', 'goto', 'frame', 'cut', 'unlock'):
                 probe = self.engine
         if probe is not None:
@@ -850,6 +880,7 @@ class Bridge:
                     if not self.simulation:
                         self.engine.rearm()
                     self.state, self.id, self.payload, self.job = 'idle', None, b'', None
+                    self.manual_origin = False
                     self.outcome = {'operation': self.operation, 'result': 'cancelled'}
                     self.message = 'Cancelado. USB conservado; haz Home para volver a referenciar. El trabajo anterior no se puede reanudar.'
                 elif self.engine.usb_failed or not self.engine.connected() or time.monotonic() - self.control_started > 15:
@@ -896,7 +927,7 @@ class Bridge:
         engine = self.engine
         self.state, self.message = 'recovering', 'Liberando la sesión USB…'
         self.id, self.payload, self.job = None, b'', None
-        self.position, self.pending_position = None, None
+        self.position, self.pending_position, self.manual_origin = None, None, False
         def cleanup():
             try:
                 if engine:
@@ -974,7 +1005,7 @@ class Bridge:
                 self.engine.close()
                 self.engine = None
             self.id, self.payload, self.job = None, b'', None
-            self.position, self.pending_position = None, None
+            self.position, self.pending_position, self.manual_origin = None, None, False
             self.session_id = None
             self.state, self.message = 'idle', 'USB liberado. Puedes usar Sagaon/K40 Whisperer.'
             return self.status()

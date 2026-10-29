@@ -1,3 +1,11 @@
+ACTUALIZACION 0.7.3
+Corregido: la pausa entre grabado y corte ya no se queda en "esperando fin".
+Si la placa no avisa el fin, aparece Continuar en cuanto se enviaron los datos:
+cuando la maquina se detenga, cambia la perilla y pulsa Continuar.
+Nuevo: despues de Desbloquear riel puedes mover el cabezal a mano y usar
+"Posicion actual" como origen, sin ir a Home. Ese punto es la esquina superior
+izquierda del diseno; el conector no conoce los limites: recorre el marco antes.
+
 ACTUALIZACION 0.7.2
 Nuevo: pausa entre operaciones. En la M2 el trabajo graba, se detiene en el
 origen y pregunta "Continuar con Corte": cambias la perilla y pulsas Continuar

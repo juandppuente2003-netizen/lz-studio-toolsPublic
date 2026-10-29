@@ -17,8 +17,8 @@ function controls(){
  $('remoteFrame').disabled=!idle||!(state?.canFrame??state?.canRun);$('remoteCut').disabled=!idle||!state?.canRun;
  $('remoteStop').disabled=!state?.canPause||!open();$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||!open();
  $('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);
- $('remoteAwait').hidden=state?.state!=='awaiting';$('remoteContinue').disabled=!owner||!state?.canContinue||awaiting||!open();
- for(const b of document.querySelectorAll('[data-origin]')){b.disabled=!idle||(b.dataset.origin==='current'&&!state?.hasPosition);b.setAttribute('aria-pressed',String(state?.origin===b.dataset.origin));}
+ $('remoteAwait').hidden=!state?.canContinue;$('remoteContinue').disabled=!owner||!state?.canContinue||awaiting||!open();
+ for(const b of document.querySelectorAll('[data-origin]')){b.disabled=!idle||(b.dataset.origin==='current'&&!(state?.canUseCurrent??state?.hasPosition));b.setAttribute('aria-pressed',String(state?.origin===b.dataset.origin));}
  for(const b of document.querySelectorAll('[data-source]')){b.disabled=!idle;b.setAttribute('aria-pressed',String((job()?.source||state?.source)===b.dataset.source));}
  for(const n of document.querySelectorAll('#tabJobs input,#tabJobs select,#tabJobs button:not([data-source]):not([data-origin]),#tabLibrary .rm-lib button'))n.disabled=!idle;
  $('remoteImport').disabled=$('remoteAdd').disabled=!idle;$('remoteImportLabel').classList.toggle('is-disabled',!idle);$('remoteAddLabel').classList.toggle('is-disabled',!idle);
@@ -45,15 +45,15 @@ function receive(message){
  $('remoteOwner').textContent=message.owner==='phone'?'Control de movimientos: este celular.':'La computadora tiene el control; puedes consultar y pedir Stop.';
  $('remoteJobName').textContent=message.name;
  const j=job();$('remoteJobMeta').textContent=j?.source==='import'&&j.file?`${j.objects} objetos · ${fmt(j.bounds?.width)} × ${fmt(j.bounds?.height)} mm`:'Diseño Box · corte';
- $('remotePosition').innerHTML=Array.isArray(message.position)?`<span>X <b>${message.position[0].toFixed(2)}</b></span><span>Y <b>${message.position[1].toFixed(2)}</b></span>`:message.railUnlocked?'Riel libre · mueve a mano y luego haz Home':'Sin referencia · haz Home';
+ $('remotePosition').innerHTML=Array.isArray(message.position)?`<span>X <b>${message.position[0].toFixed(2)}</b></span><span>Y <b>${message.position[1].toFixed(2)}</b></span>`:message.manualOrigin?'Riel libre · el cabezal es el origen (Posición actual)':message.railUnlocked?'Riel libre · mueve a mano y luego haz Home':'Sin referencia · haz Home';
  if(message.preview!==undefined){const svg=safePreview(message.preview);$('remotePreview').replaceChildren(...(svg?[document.importNode(svg,true)]:[]));const copy=svg?document.importNode(svg,true):null;$('remoteJobPreview').replaceChildren(...(copy?[copy]:[]));}
  // Estado listo / problema
  const ready=!message.busy&&message.canRun,title=message.busy?label:ready?'Lista para enviar':message.connected?'Revisa el trabajo':'Conecta la máquina en la computadora';
  $('remoteReadyTitle').textContent=title;$('remoteReadyText').textContent=message.busy?message.message:ready?'Recorre el marco para comprobar la colocación antes de iniciar.':(message.problem||message.message||'');$('remoteReady').dataset.state=message.busy?'busy':ready?'ok':'warn';
  if(!parametersDirty&&document.activeElement!==$('remoteSpeed'))$('remoteSpeed').value=message.settings?.speed||10;if(!parametersDirty&&document.activeElement!==$('remotePasses'))$('remotePasses').value=message.settings?.passes||1;
  $('remoteTime').textContent=message.estimatedSeconds?`Transcurrido ${fmtTime(message.elapsedSeconds||0)} · restante estimado ${fmtTime(Math.max(0,message.estimatedSeconds-(message.elapsedSeconds||0)))}${message.elapsedSeconds>=message.estimatedSeconds?' · esperando confirmación de la placa':''}`:j?.source==='import'&&j.seconds?`Tiempo estimado: ${fmtTime(j.seconds)} (aproximado)`:'';
- $('remoteOriginNote').textContent=message.origin==='current'?'El diseño empieza en la posición actual del cabezal.':'El envío hace Home y coloca el diseño según la cama.';
- if(message.state==='awaiting'){const n=message.parts?.names?.[message.parts.index+1];$('remoteAwaitText').textContent=message.message;$('remoteContinue').textContent=n?`Continuar con «${n}»`:'Continuar';if(lastAwaitAlert!==message.parts?.index){lastAwaitAlert=message.parts?.index;try{navigator.vibrate?.([200,100,200]);}catch{}}}else lastAwaitAlert=null;
+ $('remoteOriginNote').textContent=message.origin==='current'&&message.manualOrigin?'Punto manual: el diseño empieza donde dejaste el cabezal. Recorre el marco antes: no se conocen los límites desde ahí.':message.origin==='current'?'El diseño empieza en la posición actual del cabezal.':'El envío hace Home y coloca el diseño según la cama.';
+ if(message.canContinue){const n=message.parts?.names?.[message.parts.index+1];$('remoteAwaitText').textContent=message.message;$('remoteContinue').textContent=n?`Continuar con «${n}»`:'Continuar';if(message.state==='awaiting'&&lastAwaitAlert!==message.parts?.index){lastAwaitAlert=message.parts?.index;try{navigator.vibrate?.([200,100,200]);}catch{}}}else lastAwaitAlert=null;
  renderJob();status(message.message);controls();
 }
 function renderJob(){

@@ -337,3 +337,95 @@ class PowerAndPauseTests(unittest.TestCase):
         self.assertEqual(b.continue_job(True)['state'], 'awaiting')
         done = b.continue_job(True)
         self.assertEqual(done['state'], 'idle'); self.assertEqual(done['outcome']['result'], 'simulated')
+
+
+class FieldFixes073Tests(unittest.TestCase):
+    """0.7.3: la pausa no se queda en «sent» y el punto manual tras desbloquear el riel."""
+
+    def paused_job(self):
+        job = combined(); job['operations'][2]['pauseBefore'] = True
+        return job
+
+    def test_continue_is_offered_when_board_never_reports_finish(self):
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); b.motion('home', confirmed=True); b.engine.left = 0; b.status()
+        prepared = b.prepare(self.paused_job(), 'cut')
+        b.engine.left = 50; b.run(prepared['id'], True)
+        b.engine.left, b.engine.done = 0, False          # datos enviados, la placa no avisa el fin
+        status = b.status()
+        self.assertEqual(status['state'], 'sent')
+        self.assertTrue(status['canContinue'])
+        self.assertIn('Continuar', status['message'])
+        sent = len(b.engine.sent)
+        b.engine.left = 50
+        self.assertEqual(b.continue_job(True)['state'], 'sending')
+        self.assertEqual(len(b.engine.sent), sent + 1)
+        self.assertEqual(b.engine.sent[-1], b'IPP\nM2-test-part-1')
+        b.engine.left, b.engine.done = 0, True
+        self.assertFalse(b.status()['canContinue'])     # última parte: nada más que continuar
+        self.assertEqual(b.status()['state'], 'idle')
+
+    def test_single_part_job_never_offers_continue(self):
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); b.motion('home', confirmed=True); b.engine.left = 0; b.status()
+        prepared = b.prepare(combined(), 'cut')
+        b.engine.left = 50; b.run(prepared['id'], True); b.engine.left, b.engine.done = 0, False
+        self.assertFalse(b.status()['canContinue'])
+        with self.assertRaises(ValueError):
+            b.continue_job(True)
+
+    def test_manual_origin_after_unlock_runs_from_head_without_home(self):
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect()
+        with self.assertRaises(ValueError):
+            b.prepare(combined(), 'cut', 'current')        # sin Home ni desbloqueo: no hay origen
+        b.engine.left = 10; b.motion('unlock', confirmed=True); b.engine.left = 0
+        status = b.status()
+        self.assertTrue(status['manualOrigin']); self.assertIsNone(status['position'])
+        prepared = b.prepare(combined(), 'frame', 'current')
+        self.assertFalse(b.job['_home'])
+        self.assertEqual(b.job['_start'], [0, 0])
+        x0, y0, _, _ = bounds_v2(b.job)
+        self.assertAlmostEqual(x0, 0); self.assertAlmostEqual(y0, 0)   # el diseño empieza en el cabezal
+        b.engine.left = 10; b.run(prepared['id'], True); b.engine.left = 0
+        done = b.status()
+        self.assertEqual(done['state'], 'idle')
+        self.assertIsNone(done['position'])               # sigue sin coordenadas absolutas
+        self.assertTrue(done['manualOrigin'])             # se puede repetir desde el mismo punto
+        with self.assertRaises(ValueError):
+            b.motion('jog', 5, 0, confirmed=True)
+        b.engine.left = 10; b.motion('home', confirmed=True); b.engine.left = 0
+        homed = b.status()
+        self.assertEqual(homed['position'], [0, 0]); self.assertFalse(homed['manualOrigin'])
+
+    def test_real_compiler_manual_origin_does_not_home(self):
+        job = validate_job_v2(combined(), BED)
+        job = place_v2(job, [0, 0], BED); job['_start'], job['_home'] = [0, 0], False
+        engine = M2Engine(BED)
+        try:
+            data = engine.compile(job, 'cut')
+        finally:
+            engine.close()
+        self.assertFalse(data.startswith(b'IPP'))
+        self.assertIn(b'FNSE-\n', data)                     # la controladora espera el fin de la emisión
+
+    def test_completion_accepts_ready_status_only_after_controller_wait(self):
+        engine = M2Engine(BED)
+        try:
+            controller = engine.device.controller
+            engine.remaining = lambda: 0
+            engine.failed = lambda: False
+            controller.update_status = lambda: None
+            controller._status = [255, 0xCE, 0, 0, 0, 1]
+            controller.state = 'idle'
+            engine.waits_for_finish = False                # sin bloque «FNSE-»: OK no prueba el fin
+            self.assertFalse(engine.finished())
+            engine.waits_for_finish = True
+            self.assertTrue(engine.finished())
+            controller.state = 'wait'                      # aún esperando el fin del bloque «FNSE-»
+            self.assertFalse(engine.finished())
+            controller.state = 'idle'; controller._status = [255, 0xEE, 0, 0, 0, 1]   # ocupada
+            self.assertFalse(engine.finished())
+        finally:
+            controller.state = 'idle'
+            engine.close()
