@@ -224,3 +224,29 @@ class InstallerIdentityTests(unittest.TestCase):
             self.assertTrue(value['ready'])
         finally:
             server.shutdown(); server.server_close()
+
+
+class UnlockRailTests(unittest.TestCase):
+    def test_unlock_rail_frees_motors_without_laser_and_requires_home(self):
+        engine = M2Engine(BED)
+        try:
+            data = engine.compile_motion(None, None, unlock=True)
+            self.assertIn(b'IS2P', data)
+            self.assertNotIn(b'D', data)
+        finally:
+            engine.close()
+        b = Bridge(BED, simulation=False, engine_factory=FakeEngine)
+        b.connect(); b.motion('home', confirmed=True); b.engine.left = 0; b.status()
+        self.assertEqual(b.position, [0, 0])
+        b.engine.left = 10
+        self.assertEqual(b.motion('unlock', confirmed=True)['state'], 'sending')
+        self.assertEqual(b.engine.sent[-1], b'IS2P\n')
+        b.engine.left = 0
+        status = b.status()
+        self.assertEqual(status['state'], 'idle')
+        self.assertIsNone(status['position'])           # posición desconocida: Home obligatorio
+        self.assertTrue(status['railUnlocked'])
+        with self.assertRaises(ValueError):
+            b.motion('jog', 5, 0, confirmed=True)
+        with self.assertRaises(ValueError):
+            b.motion('unlock', confirmed=False)

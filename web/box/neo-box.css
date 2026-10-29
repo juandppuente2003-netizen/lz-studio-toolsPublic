@@ -537,3 +537,36 @@ html body.workshop .neo-operate [hidden],html body.workshop .neo-operate[hidden]
 .js-pieces li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.js-pieces small{color:#8ea2b3;font-variant-numeric:tabular-nums}
 .js-piece-del{width:28px;height:28px;border:0;border-radius:7px;background:transparent;color:#8ea2b3;font-size:18px;cursor:pointer}.js-piece-del:hover{color:#ff8ea2;background:#1a0f14}
 .js-add-files{width:100%;margin-top:8px;min-height:38px;font-size:12.5px}
+
+/* v62.1 · Operar máquina ocupa exactamente la pantalla: columnas con su propio desplazamiento,
+   cama al centro y barra de acciones siempre visible abajo (sin huecos ni scroll de toda la página). */
+@media (min-width:1281px) and (min-height:620px){
+ html body.workshop[data-workshop-space=operate] .workshop-operator{display:flex;flex-direction:column;height:calc(100dvh - var(--op-top,140px));min-height:560px;box-sizing:border-box;padding-bottom:10px}
+ html body.workshop[data-workshop-space=operate] .workshop-operator-tools{flex:none}
+ html body.workshop[data-workshop-space=operate] .workshop-operator>.k40-dialog.neo-operate{flex:1 1 auto;min-height:0;display:flex!important;flex-direction:column}
+ html body.workshop .neo-operate .k40-layout{flex:1 1 auto;min-height:0;grid-template-rows:minmax(0,1fr);align-items:stretch}
+ html body.workshop .neo-operate .neo-op-left,html body.workshop .neo-operate .neo-op-right{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:4px;scrollbar-width:thin;scrollbar-color:#2b3a4b transparent}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan{display:flex;flex-direction:column;min-height:0;overflow-y:auto;scrollbar-width:thin}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.k40-preview{flex:1 1 auto;height:auto!important;min-height:260px!important}
+ html body.workshop .neo-operate .js-order{flex:1 1 auto;min-height:260px;overflow:auto}
+ html body.workshop .neo-operate .k40-console{flex:none;margin-top:10px;padding:10px 16px}
+ html body.workshop .neo-operate .k40-stop-note{font-size:11px}
+}
+html body[data-job-source=import] .neo-operate .k40-preview{touch-action:none}
+.k40-preview.is-panning{cursor:move!important}
+.js-move-mode{display:grid;gap:3px;margin-top:4px;padding-top:6px;border-top:1px solid #1c2531}
+.js-move-mode[hidden]{display:none}
+.js-move-btn{width:36px;min-height:28px;border:0;border-radius:7px;background:transparent;color:#a9b6c6;font:600 10.5px inherit;cursor:pointer}
+.js-move-btn[aria-pressed=true]{background:#14202b;color:#2ee6ff}
+.js-stage{position:relative;display:flex;flex-direction:column;min-height:0}
+.js-stage[hidden]{display:none}
+.js-stage>.k40-preview{flex:1 1 auto}
+.js-stage>.js-zoom{position:absolute;top:10px;right:10px;margin:0}
+.js-move-btn{width:44px}
+html body[data-job-source=import] .neo-operate .k40-canvas-panel>.k40-section-heading{display:none}
+@media (min-width:1281px) and (min-height:620px){
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.js-stage{flex:1 1 auto;min-height:280px}
+ html body.workshop .neo-operate .js-stage>.k40-preview{height:auto!important;min-height:0!important}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.k40-summary{font-size:11px;margin:6px 0 0}
+ html body.workshop .neo-operate .k40-canvas-panel.neo-op-plan>.js-bed-note{margin-top:4px}
+}

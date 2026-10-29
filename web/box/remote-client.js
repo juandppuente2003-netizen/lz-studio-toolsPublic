@@ -13,7 +13,7 @@ function controls(){
  const owner=state?.owner==='phone',idle=owner&&!state?.busy&&!awaiting&&open();
  for(const id of ['remoteUp','remoteLeft','remoteRight','remoteDown'])$(id).disabled=!idle||!state?.hasPosition;
  for(const id of ['remoteSettings','remoteSpeed','remotePasses'])$(id).disabled=!idle;
- $('remoteHome').disabled=!idle;$('remotePulse').disabled=!idle||!state?.canPulse;
+ $('remoteHome').disabled=!idle;$('remoteUnlock').disabled=!idle||!state?.canUnlock;$('remotePulse').disabled=!idle||!state?.canPulse;
  $('remoteFrame').disabled=!idle||!(state?.canFrame??state?.canRun);$('remoteCut').disabled=!idle||!state?.canRun;
  $('remoteStop').disabled=!state?.canPause||!open();$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||!open();
  $('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);
@@ -44,7 +44,7 @@ function receive(message){
  $('remoteOwner').textContent=message.owner==='phone'?'Control de movimientos: este celular.':'La computadora tiene el control; puedes consultar y pedir Stop.';
  $('remoteJobName').textContent=message.name;
  const j=job();$('remoteJobMeta').textContent=j?.source==='import'&&j.file?`${j.objects} objetos · ${fmt(j.bounds?.width)} × ${fmt(j.bounds?.height)} mm`:'Diseño Box · corte';
- $('remotePosition').innerHTML=Array.isArray(message.position)?`<span>X <b>${message.position[0].toFixed(2)}</b></span><span>Y <b>${message.position[1].toFixed(2)}</b></span>`:'Sin referencia · haz Home';
+ $('remotePosition').innerHTML=Array.isArray(message.position)?`<span>X <b>${message.position[0].toFixed(2)}</b></span><span>Y <b>${message.position[1].toFixed(2)}</b></span>`:message.railUnlocked?'Riel libre · mueve a mano y luego haz Home':'Sin referencia · haz Home';
  if(message.preview!==undefined){const svg=safePreview(message.preview);$('remotePreview').replaceChildren(...(svg?[document.importNode(svg,true)]:[]));const copy=svg?document.importNode(svg,true):null;$('remoteJobPreview').replaceChildren(...(copy?[copy]:[]));}
  // Estado listo / problema
  const ready=!message.busy&&message.canRun,title=message.busy?label:ready?'Lista para enviar':message.connected?'Revisa el trabajo':'Conecta la máquina en la computadora';
@@ -96,7 +96,7 @@ async function command(action,args={}){
 }
 /* ---------- Control ---------- */
 for(const [id,x,y] of [['remoteUp',0,-1],['remoteLeft',-1,0],['remoteRight',1,0],['remoteDown',0,1]])$(id).onclick=()=>command('jog',{dx:x*Number($('remoteStep').value),dy:y*Number($('remoteStep').value)});
-for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
+for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteUnlock','unlock'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
 const steps=$('remoteSteps');for(const o of $('remoteStep').options){const b=document.createElement('button');b.type='button';b.textContent=o.value;b.onclick=()=>{$('remoteStep').value=o.value;paintSteps();};steps.append(b);}
 function paintSteps(){for(const b of steps.children)b.setAttribute('aria-pressed',String(b.textContent===$('remoteStep').value));}paintSteps();
 for(const b of document.querySelectorAll('[data-origin]'))b.onclick=()=>command('origin',{value:b.dataset.origin});

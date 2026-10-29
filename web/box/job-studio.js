@@ -6,7 +6,7 @@
    pestaña o abrir un trabajo guardado solo actualiza la vista. El envío lo inicia
    siempre el botón de la barra de acciones (o el celular con el control). */
 import {importSVG, imageDesign, mergeDesigns, nextOffset, apply} from './svg-import.js?v=3';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=4';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=5';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -37,7 +37,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   if (app.jobStudio) return app.jobStudio;
   const dialog = machine.dialog, $ = (id) => document.getElementById(id);
   const state = {pieces: [], sendScope: 'all', source: 'box', design: null, file: null, unitOverride: 'auto', plan: null, placement: {x: 0, y: 0, scale: 1, rotation: 0}, libraryId: null, libraryCloud: null, created: null, savedWhere: null, savedAt: null, dirty: false, review: false};
-  let analysis = null, analysisKey = '', renders = new Map(), previews = new Map(), renderTimer = null, renderToken = 0, zoom = 1, saveDraftTimer = null;
+  let analysis = null, analysisKey = '', renders = new Map(), previews = new Map(), renderTimer = null, renderToken = 0, zoom = 1, viewCenter = null, moveMode = 'all', pan = null, saveDraftTimer = null;
 
   /* ------------------------------------------------------------ DOM */
   const sourceBar = el('div', 'js-source'); sourceBar.setAttribute('role', 'tablist'); sourceBar.setAttribute('aria-label', 'Fuente del trabajo');
@@ -69,7 +69,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
    <div class="js-place-grid"><label>X · mm<input class="js-x" type="number" step="0.1"></label><label>Y · mm<input class="js-y" type="number" step="0.1"></label>
    <label>Ancho · mm<input class="js-w" type="number" step="0.1" min="0.1"></label><label>Alto · mm<input class="js-h" type="number" step="0.1" min="0.1"></label>
    <label>Escala · %<input class="js-scale" type="number" step="0.1" min="1" max="1000"></label><label>Giro · °<input class="js-rot" type="number" step="0.5"></label></div>
-   <div class="js-place-actions"></div><p class="js-hint">Escala proporcional: ancho y alto cambian juntos. Arrastra sobre la cama para mover; con varios archivos, arrastra cada uno por separado (X, Y, escala y giro aplican al conjunto).</p>`;
+   <div class="js-place-actions"></div><p class="js-hint">Arrastra el diseño en la cama para moverlo (todos los vectores juntos). Rueda del mouse: zoom; arrastra fuera del diseño para desplazar la vista. Con varios archivos, «Pieza» o Alt + arrastrar mueve solo uno.</p>`;
   const placeActions = place.querySelector('.js-place-actions');
   const rotL = btn('', () => setPlacement({rotation: norm(state.placement.rotation - 90)}), 'btn quiet js-icon-btn'); rotL.innerHTML = svgIcon('rotL'); rotL.title = 'Girar 90° a la izquierda'; rotL.setAttribute('aria-label', rotL.title);
   const rotR = btn('', () => setPlacement({rotation: norm(state.placement.rotation + 90)}), 'btn quiet js-icon-btn'); rotR.innerHTML = svgIcon('rotR'); rotR.title = 'Girar 90° a la derecha'; rotR.setAttribute('aria-label', rotR.title);
@@ -103,7 +103,13 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   centerBar.append(tabs, legend);
   const zoomBar = el('div', 'js-zoom'); zoomBar.setAttribute('aria-label', 'Zoom de la vista');
   const zoomBtn = (name, label, fn) => { const b = btn('', fn, 'js-zoom-btn'); b.innerHTML = name === '1:1' ? '<b>1:1</b>' : svgIcon(name); b.title = label; b.setAttribute('aria-label', label); return b; };
-  zoomBar.append(zoomBtn('zoomIn', 'Acercar', () => setZoom(zoom * 1.25)), zoomBtn('zoomOut', 'Alejar', () => setZoom(zoom / 1.25)), zoomBtn('fit', 'Ajustar a la vista', () => setZoom(1)), zoomBtn('1:1', 'Tamaño real aproximado (96 ppp)', () => realSize()));
+  zoomBar.append(zoomBtn('zoomIn', 'Acercar (o rueda del mouse)', () => setZoom(zoom * 1.25)), zoomBtn('zoomOut', 'Alejar', () => setZoom(zoom / 1.25)), zoomBtn('fit', 'Ver toda la cama', () => { viewCenter = null; setZoom(1); }), zoomBtn('1:1', 'Tamaño real aproximado (96 ppp)', () => realSize()));
+  // Con varios archivos: mover todo junto (predeterminado) o una pieza. Alt + arrastrar también mueve una sola.
+  const moveSeg = el('div', 'js-move-mode'); moveSeg.setAttribute('role', 'group'); moveSeg.setAttribute('aria-label', 'Qué se mueve al arrastrar');
+  const moveAll = btn('Todo', () => { moveMode = 'all'; paintMove(); }, 'js-move-btn'), moveOne = btn('Pieza', () => { moveMode = 'piece'; paintMove(); }, 'js-move-btn');
+  moveAll.title = 'Arrastrar mueve todos los vectores juntos'; moveOne.title = 'Arrastrar mueve solo el archivo bajo el puntero (también con Alt)';
+  moveSeg.append(moveAll, moveOne); zoomBar.append(moveSeg);
+  const paintMove = () => { moveAll.setAttribute('aria-pressed', String(moveMode === 'all')); moveOne.setAttribute('aria-pressed', String(moveMode === 'piece')); moveSeg.hidden = state.pieces.length < 2; };
   const orderPanel = el('section', 'js-order'); orderPanel.hidden = true;
   const bedNote = el('p', 'js-bed-note');
 
@@ -120,7 +126,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   const layout = dialog.querySelector('.k40-layout');
   const host = el('div', 'js-host'); host.append(sourceBar, panel); layout?.prepend(host);
   const previewEl = $('k40Preview');
-  previewEl.before(centerBar); previewEl.after(orderPanel, bedNote); previewEl.parentElement.insertBefore(zoomBar, previewEl);
+  // La cama y su barra de zoom van en un mismo contenedor: la barra queda sobre la cama, no sobre los botones.
+  const stage = el('div', 'js-stage'); previewEl.before(centerBar, stage); stage.append(previewEl, zoomBar); stage.after(orderPanel, bedNote);
 
   /* ------------------------------------------------------------ fuente */
   function setSource(value, {silent = false} = {}) {
@@ -141,7 +148,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const order = which === 'order' && state.source === 'import';
     tabPreview.classList.toggle('active', !order); tabOrder.classList.toggle('active', order);
     tabPreview.setAttribute('aria-selected', String(!order)); tabOrder.setAttribute('aria-selected', String(order));
-    previewEl.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order || state.source !== 'import';
+    previewEl.hidden = order; stage.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order || state.source !== 'import';
     if (order) renderOrder();
   }
   opsCard.querySelector('.js-to-order').onclick = () => setCenter('order');
@@ -292,10 +299,12 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     if (state.source !== 'import' || !state.design || machine.busy || machine.remoteOwner || $('k40Pick')?.textContent.includes('Selecciona')) return;
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
     const p = toBed(svg, e), b = placedBounds(state.design, state.placement);
-    if (p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height) return;
-    // Con varios archivos se arrastra el que está bajo el puntero; los demás no se mueven.
+    const outside = p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height;
+    // Fuera del diseño (o con el botón central): desplazar la vista acercada.
+    if (outside || e.button === 1) { if (zoom > 1.001) { const vb = svg.viewBox.baseVal; pan = {x: e.clientX, y: e.clientY, center: [vb.x + vb.width / 2, vb.y + vb.height / 2], k: vb.width / svg.getBoundingClientRect().width}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-panning'); e.preventDefault(); } return; }
+    // Por omisión se mueven todos los vectores juntos; en modo «Pieza» (o con Alt) solo el archivo bajo el puntero.
     let piece = null;
-    if (state.pieces.length > 1) {
+    if (state.pieces.length > 1 && (moveMode === 'piece' || e.altKey)) {
       const m = placementMatrix(state.design, state.placement);
       const boxOf = (pc) => { const c = [[pc.bbox.x, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y + pc.bbox.height], [pc.bbox.x, pc.bbox.y + pc.bbox.height]].map((q) => apply(m, q)); return {x0: Math.min(...c.map((q) => q[0])), x1: Math.max(...c.map((q) => q[0])), y0: Math.min(...c.map((q) => q[1])), y1: Math.max(...c.map((q) => q[1]))}; };
       const hit = [...state.design.pieces].reverse().find((pc) => { const r = boxOf(pc); return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1; });
@@ -305,6 +314,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   });
   // La vista se redibuja en cada movimiento: se usa siempre el SVG actual (el anterior ya no está en pantalla).
   previewEl.addEventListener('pointermove', (e) => {
+    if (pan) { viewCenter = [pan.center[0] - (e.clientX - pan.x) * pan.k, pan.center[1] - (e.clientY - pan.y) * pan.k]; machine.refresh(false); return; }
     if (!drag) return;
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
     if (drag.piece) {
@@ -322,10 +332,20 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const x = clamp(b.x + p.x - drag.start.x, b.width, bed.width), y = clamp(b.y + p.y - drag.start.y, b.height, bed.height);
     setPlacement({x: drag.origin.x + x - b.x, y: drag.origin.y + y - b.y}, {silent: true}); updateLight();
   });
-  const endDrag = () => { if (!drag) return; const moved = drag.piece; drag = null; previewEl.classList.remove('is-dragging'); if (moved) renderStructure(); update(); scheduleDraft(); };
+  const endDrag = () => { if (pan) { pan = null; previewEl.classList.remove('is-panning'); return; } if (!drag) return; const moved = drag.piece; drag = null; previewEl.classList.remove('is-dragging'); if (moved) renderStructure(); update(); scheduleDraft(); };
   previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
   function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
-  function setZoom(z) { zoom = Math.max(1, Math.min(12, z)); machine.refresh(false); }
+  function setZoom(z, center) { zoom = Math.max(1, Math.min(20, z)); if (center) viewCenter = center; if (zoom <= 1.001) viewCenter = null; machine.refresh(false); }
+  // Rueda del mouse: acerca o aleja manteniendo fijo el punto bajo el puntero.
+  previewEl.addEventListener('wheel', (e) => {
+    if (state.source !== 'import' || !state.design) return;
+    const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
+    e.preventDefault();
+    const p = toBed(svg, e), vb = svg.viewBox.baseVal, fx = (p.x - vb.x) / vb.width, fy = (p.y - vb.y) / vb.height;
+    const next = Math.max(1, Math.min(20, zoom * Math.exp(-e.deltaY * 0.0018)));
+    const bed = currentBed(), w = (bed.width + 20) / next, h = (bed.height + 20) / next;
+    setZoom(next, [p.x - fx * w + w / 2, p.y - fy * h + h / 2]);
+  }, {passive: false});
   function realSize() { const bed = currentBed(), w = (previewEl.clientWidth || 600) - 28; setZoom((bed.width + 20) / 25.4 * 96 / w); }
 
   /* ------------------------------------------------------------ operaciones */
@@ -498,7 +518,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const seconds = active.reduce((s, o) => s + o.seconds, 0);
       const b = a.bounds;
       const summary = `${state.pieces.length > 1 ? state.pieces.length + ' archivos' : state.file.name} · ${fmt(b.width)} × ${fmt(b.height)} mm en X ${fmt(b.x)} · Y ${fmt(b.y)} · ${state.sendScope === 'all' ? `${active.length} ${active.length === 1 ? 'operación activa' : 'operaciones activas'}` : `se enviará solo «${active[0]?.op.name || '—'}»`}. Tiempo estimado: ${fmtTime(seconds)}. SVG importado: se corta sobre la línea, sin compensar kerf.`;
-      const b0 = a.bounds, center = [b0.x + b0.width / 2, b0.y + b0.height / 2];
+      const b0 = a.bounds, center = viewCenter || [b0.x + b0.width / 2, b0.y + b0.height / 2];
       return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
     support(features) {
@@ -564,7 +584,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   function update() {
     const has = !!state.design;
     fileCard.querySelector('.js-file-name').textContent = state.file?.name || 'Sin archivo';
-    pieceList.hidden = state.pieces.length < 2; addButton.hidden = !has;
+    pieceList.hidden = state.pieces.length < 2; addButton.hidden = !has; paintMove();
     if (state.pieces.length > 1 && pieceList.childElementCount !== state.pieces.length + 0 || pieceList.dataset.key !== state.pieces.map((p) => p.source.name).join('|')) {
       pieceList.dataset.key = state.pieces.map((p) => p.source.name).join('|');
       pieceList.replaceChildren(...(state.pieces.length > 1 ? state.pieces.map((p, i) => { const li = el('li'); li.append(el('span', '', p.source.name), el('small', '', `${fmt(p.design.bbox.width)} × ${fmt(p.design.bbox.height)} mm`)); const x = btn('×', () => removePiece(i), 'js-piece-del'); x.setAttribute('aria-label', 'Quitar ' + p.source.name); x.title = 'Quitar este archivo'; li.append(x); return li; }) : []));

@@ -309,13 +309,15 @@ export async function buildJobV2({design, placement, plan, bed, name}, analysis,
 }
 
 /* ------------------------------------------------------------ vista previa */
-const ruler = (bed) => {
+const ruler = (bed, k = 1) => {
+  // k = 1/zoom: reglas y textos mantienen su tamaño en pantalla al acercar; con zoom alto se marca cada milímetro.
   let s = '';
-  const major = bed.width > 600 ? 100 : 50;
-  for (let x = 0; x <= bed.width + 1e-6; x += 10) s += `<path d="M${x} 0V${x % major === 0 ? -6 : -3}" stroke="currentColor" stroke-width="0.4" opacity="0.6"/>`;
-  for (let y = 0; y <= bed.height + 1e-6; y += 10) s += `<path d="M0 ${y}H${y % major === 0 ? -6 : -3}" stroke="currentColor" stroke-width="0.4" opacity="0.6"/>`;
-  for (let x = 0; x <= bed.width + 1e-6; x += major) s += `<text x="${x}" y="-9" font-size="6" text-anchor="middle" fill="currentColor" opacity="0.75">${x}</text>`;
-  for (let y = major; y <= bed.height + 1e-6; y += major) s += `<text x="-9" y="${y + 2}" font-size="6" text-anchor="end" fill="currentColor" opacity="0.75">${y}</text>`;
+  const major = bed.width > 600 ? 100 : k < 0.25 ? 10 : 50, minor = k < 0.3 ? 1 : 10;
+  const tick = (len) => f4(len * k);
+  for (let x = 0; x <= bed.width + 1e-6; x += minor) s += `<path d="M${x} 0V${-(x % major === 0 ? 6 : x % 10 === 0 ? 4 : 2) * k}" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.6"/>`;
+  for (let y = 0; y <= bed.height + 1e-6; y += minor) s += `<path d="M0 ${y}H${-(y % major === 0 ? 6 : y % 10 === 0 ? 4 : 2) * k}" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.6"/>`;
+  for (let x = 0; x <= bed.width + 1e-6; x += major) s += `<text x="${x}" y="${tick(-9)}" font-size="${tick(6)}" text-anchor="middle" fill="currentColor" opacity="0.75">${x}</text>`;
+  for (let y = major; y <= bed.height + 1e-6; y += major) s += `<text x="${tick(-9)}" y="${f4(y + 2 * k)}" font-size="${tick(6)}" text-anchor="end" fill="currentColor" opacity="0.75">${y}</text>`;
   return s;
 };
 /**
@@ -323,38 +325,40 @@ const ruler = (bed) => {
  * etiquetas permitidas por el visor del celular (svg, rect, path, circle, image).
  */
 export function planPreview({bed, analysis, rasterPreviews = new Map(), position = null, compact = false, zoom = 1, center = null}) {
-  const pad = compact ? 0 : 16;
+  const pad = compact ? 0 : 16, k = compact ? 1 : 1 / Math.max(1, zoom);
+  // Escritorio: grosor de línea fijo en pantalla (no engorda al acercar). Celular: atributos simples.
+  const sw = (mm, px) => compact ? `stroke-width="${mm}"` : `stroke-width="${px}" vector-effect="non-scaling-stroke"`;
   let vb = compact ? `0 0 ${bed.width} ${bed.height}` : `${-pad} ${-pad} ${bed.width + pad + 4} ${bed.height + pad + 4}`;
   if (!compact && zoom > 1.001) {
-    // Acercar = recortar la vista alrededor del diseño (sin barras de desplazamiento).
     const w = (bed.width + pad + 4) / zoom, h = (bed.height + pad + 4) / zoom, c = center || [bed.width / 2, bed.height / 2];
     const x = Math.min(Math.max(c[0] - w / 2, -pad), bed.width + 4 - w), y = Math.min(Math.max(c[1] - h / 2, -pad), bed.height + 4 - h);
     vb = `${f4(x)} ${f4(y)} ${f4(w)} ${f4(h)}`;
   }
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" role="img" aria-label="Cama de ${bed.width} por ${bed.height} mm con el trabajo colocado">`;
   if (!compact) {
-    s += `<defs><pattern id="lzgrid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="currentColor" stroke-width="0.15" opacity="0.35"/></pattern></defs>`;
-    s += `<rect width="${bed.width}" height="${bed.height}" fill="url(#lzgrid)"/>` + ruler(bed);
+    const g = k < 0.3 ? 1 : 10;
+    s += `<defs><pattern id="lzgrid" width="${g}" height="${g}" patternUnits="userSpaceOnUse"><path d="M${g} 0H0V${g}" fill="none" stroke="currentColor" stroke-width="${f4(0.15 * g / 10 * (k < 0.3 ? 4 : 1))}" opacity="0.35"/></pattern></defs>`;
+    s += `<rect width="${bed.width}" height="${bed.height}" fill="url(#lzgrid)"/>` + ruler(bed, k);
   }
-  s += `<rect width="${bed.width}" height="${bed.height}" fill="none" stroke="currentColor" stroke-width="0.6"/>`;
+  s += `<rect width="${bed.width}" height="${bed.height}" fill="none" stroke="currentColor" ${sw(0.6, 1.2)}/>`;
   for (const o of analysis.ops) {
     if (!o.op.enabled || o.empty) continue;
     if (o.op.type === 'raster') {
       const a = o.data.area, href = rasterPreviews.get(o.op.id);
       if (href && /^data:image\/png;base64,/.test(href)) s += `<image href="${href}" x="${f4(a.x)}" y="${f4(a.y)}" width="${f4(a.width)}" height="${f4(a.height)}" preserveAspectRatio="none" opacity="0.92"/>`;
-      s += `<rect x="${f4(a.x)}" y="${f4(a.y)}" width="${f4(a.width)}" height="${f4(a.height)}" fill="${href ? 'none' : OP_TYPES.raster.color}" fill-opacity="0.12" stroke="${OP_TYPES.raster.color}" stroke-width="0.4" stroke-dasharray="2 1.5"/>`;
+      s += `<rect x="${f4(a.x)}" y="${f4(a.y)}" width="${f4(a.width)}" height="${f4(a.height)}" fill="${href ? 'none' : OP_TYPES.raster.color}" fill-opacity="0.12" stroke="${OP_TYPES.raster.color}" ${sw(0.4, 1)} stroke-dasharray="${f4(2 * k)} ${f4(1.5 * k)}"/>`;
     } else {
       const color = OP_TYPES[o.op.type].color;
-      s += o.data.paths.map((p) => `<path d="M${p.points.map((q) => q.map(f4).join(' ')).join('L')}${p.closed ? 'Z' : ''}" fill="none" stroke="${color}" stroke-width="${o.op.type === 'cut' ? 0.6 : 0.45}"/>`).join('');
+      s += o.data.paths.map((p) => `<path d="M${p.points.map((q) => q.map(f4).join(' ')).join('L')}${p.closed ? 'Z' : ''}" fill="none" stroke="${color}" ${o.op.type === 'cut' ? sw(0.6, 1.6) : sw(0.45, 1.3)}/>`).join('');
     }
   }
   const b = analysis.bounds;
   if (b.width > 0) {
     const bad = !analysis.check.ok;
-    s += `<rect x="${f4(b.x)}" y="${f4(b.y)}" width="${f4(b.width)}" height="${f4(b.height)}" fill="${bad ? '#ff3b5c' : 'none'}" fill-opacity="${bad ? 0.12 : 0}" stroke="${bad ? '#ff3b5c' : '#9b7bff'}" stroke-width="0.5" stroke-dasharray="3 2"/>`;
-    if (!compact) s += `<text x="${f4(b.x + b.width / 2)}" y="${f4(b.y < 12 ? b.y + b.height + 7 : b.y - 2.5)}" font-size="5.5" text-anchor="middle" fill="${bad ? '#ff3b5c' : '#b9a6ff'}">${b.width.toFixed(1)} × ${b.height.toFixed(1)} mm · X ${(Math.abs(b.x) < 0.05 ? 0 : b.x).toFixed(1)} Y ${(Math.abs(b.y) < 0.05 ? 0 : b.y).toFixed(1)}</text>`;
+    s += `<rect x="${f4(b.x)}" y="${f4(b.y)}" width="${f4(b.width)}" height="${f4(b.height)}" fill="${bad ? '#ff3b5c' : 'none'}" fill-opacity="${bad ? 0.12 : 0}" stroke="${bad ? '#ff3b5c' : '#9b7bff'}" ${sw(0.5, 1.2)} stroke-dasharray="${f4(3 * k)} ${f4(2 * k)}"/>`;
+    if (!compact) s += `<text x="${f4(b.x + b.width / 2)}" y="${f4(b.y < 12 * k ? b.y + b.height + 7 * k : b.y - 2.5 * k)}" font-size="${f4(5.5 * k)}" text-anchor="middle" fill="${bad ? '#ff3b5c' : '#b9a6ff'}">${b.width.toFixed(1)} × ${b.height.toFixed(1)} mm · X ${(Math.abs(b.x) < 0.05 ? 0 : b.x).toFixed(1)} Y ${(Math.abs(b.y) < 0.05 ? 0 : b.y).toFixed(1)}</text>`;
   }
-  if (Array.isArray(position)) s += `<circle cx="${f4(position[0])}" cy="${f4(position[1])}" r="2.2" fill="#ff3b5c" stroke="#fff" stroke-width="0.7"/>`;
+  if (Array.isArray(position)) s += `<circle cx="${f4(position[0])}" cy="${f4(position[1])}" r="${f4(2.2 * k)}" fill="#ff3b5c" stroke="#fff" ${sw(0.7, 1.4)}/>`;
   return s + '</svg>';
 }
 

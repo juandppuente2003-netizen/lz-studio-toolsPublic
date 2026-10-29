@@ -543,6 +543,7 @@ function operate(app) {
     }
     withIcon($('k40Home'), 'home');
     withIcon($('k40UsePosition'), 'target');
+    withIcon($('k40Unlock'), 'move');
     withIcon($('k40Goto'), 'target');
     withIcon($('k40Pick'), 'cursor');
     withIcon($('k40Pulse'), 'laser');
@@ -551,6 +552,10 @@ function operate(app) {
   // Centro: plano con encabezado y medidas.
   const canvas = find('.k40-canvas-panel');
   canvas?.classList.add('neo-op-card', 'neo-op-plan');
+  // Alto disponible para el espacio de trabajo (debajo de las cabeceras).
+  const fitHeight = () => { if (operator.hidden) return; const top = operator.getBoundingClientRect().top + window.scrollY; document.body.style.setProperty('--op-top', Math.max(0, Math.round(top)) + 'px'); };
+  new MutationObserver(() => { if (!operator.hidden) { window.scrollTo(0, 0); requestAnimationFrame(fitHeight); } }).observe(operator, {attributes: true, attributeFilter: ['hidden']});
+  window.addEventListener('resize', fitHeight); requestAnimationFrame(fitHeight);
   if (studio) {
     openPhone.className = 'btn outline neo-phone-open'; openPhone.innerHTML = icon('phone') + '<span>Control desde celular</span>';
     studio.ui.centerBar.append(openPhone);

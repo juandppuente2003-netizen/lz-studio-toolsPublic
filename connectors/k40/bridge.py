@@ -300,11 +300,15 @@ class M2Engine:
                     driver.plot_start()
             driver.rapid_mode()
 
-    def compile_motion(self, start, target, home=False):
+    def compile_motion(self, start, target, home=False, unlock=False):
         from meerk40t.lihuiyu.driver import LihuiyuDriver
         from meerk40t.core.units import UNITS_PER_MM
         driver, output = LihuiyuDriver(self.device), io.BytesIO()
         driver.out_pipe = output
+        if unlock:
+            # Libera los motores (IS2P) para mover el cabezal a mano. Sin láser ni movimiento.
+            driver.unlock_rail()
+            return output.getvalue()
         if home:
             driver.home()
         else:
@@ -502,10 +506,11 @@ class Bridge:
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome'],
+                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome', 'unlock-rail'],
                 'jobProtocols': [PROTOCOL, PROTOCOL_V2], 'rasterPower': 'on-off',
                 'outcome': self.outcome,
                 'operationAccepted': self.state == 'idle' and self.operation in ('home', 'jog', 'goto', 'frame') and self.position is not None,
+                'railUnlocked': self.operation == 'unlock' and self.position is None,
                 'sessionId': self.session_id,
                 'position': self.position, 'positionEstimated': True, 'operation': self.operation,
                 'controllerStatus': getattr(self.engine, 'last_controller_status', None),
@@ -630,6 +635,26 @@ class Bridge:
             if not self.engine or (not self.simulation and not self.engine.connected()):
                 self.position = None
                 raise ConnectionError('Conecta la M2 antes de moverla.')
+            if action == 'unlock':
+                payload = self.engine.compile_motion(None, None, unlock=True)
+                if not payload or b'D' in payload:
+                    raise ValueError('No se generó una orden válida para desbloquear el riel.')
+                self.payload, self.id, self.job = payload, None, None
+                # Al soltar los motores la posición deja de ser conocida: hay que hacer Home después.
+                self.operation, self.pending_position, self.position = 'unlock', None, None
+                self.state = 'sending'
+                if self.simulation:
+                    self.state = 'idle'
+                    self.message = 'Simulación: riel desbloqueado, sin USB. Haz Home antes de trabajar.'
+                else:
+                    try:
+                        self.engine.send(payload)
+                        self.message = 'Riel desbloqueado: puedes mover el cabezal a mano. Haz Home antes de trabajar.'
+                    except Exception:
+                        self.state = 'error'
+                        self.message = 'No se pudo desbloquear el riel. Verifica el USB.'
+                        raise
+                return self.status()
             if action == 'home':
                 start, target = [0, 0], [0, 0]
             elif action == 'goto':
@@ -688,11 +713,11 @@ class Bridge:
                     self.state, self.message = 'sent', 'Datos enviados. Esperando fin de la controladora; el panel quedará listo automáticamente.'
             if self.state == 'error':
                 self.position, self.pending_position = None, None
-            if self.state == 'sent' and self.operation in ('home', 'jog', 'goto', 'frame', 'cut'):
+            if self.state == 'sent' and self.operation in ('home', 'jog', 'goto', 'frame', 'cut', 'unlock'):
                 probe = self.engine
         if probe is not None:
             try:
-                rapid = self.operation in ('home', 'jog', 'goto', 'frame')
+                rapid = self.operation in ('home', 'jog', 'goto', 'frame', 'unlock')
                 finished = probe.rapid_ready() if rapid else probe.finished()
                 with self.lock:
                     if finished and self.engine is probe and self.state == 'sent':

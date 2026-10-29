@@ -22,7 +22,7 @@ class FakeEngine:
         self.sent = []; self.done = True; self.left = 50; self.lost = False; self.closed = False
         self.usb_failed = False; self.paused = False; self.resumed = False; self.reset_done = False
     def compile(self, job, mode): return b'IPP\nM2-test-bytes'
-    def compile_motion(self, start, target, home=False): return b'IPP\n' if home else b'IBaS1P\n'
+    def compile_motion(self, start, target, home=False, unlock=False): return b'IS2P\n' if unlock else b'IPP\n' if home else b'IBaS1P\n'
     def finished(self): return self.done and not self.lost and self.left == 0
     def rapid_ready(self): return self.finished()
     def connect(self): pass

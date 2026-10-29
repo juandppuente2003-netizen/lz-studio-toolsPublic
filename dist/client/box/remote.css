@@ -103,3 +103,4 @@ button:disabled,.rm-import.is-disabled{opacity:.42;cursor:not-allowed}
 @media (max-width:380px){.rm-grid2{grid-template-columns:1fr}.rm-lib-card{grid-template-columns:72px 1fr}.rm-thumb{width:72px;height:64px}}
 [hidden]{display:none!important}
 .rm-steps{flex-wrap:nowrap}.rm-steps button{min-width:0;padding:6px 2px;font-size:13px}
+.rm-unlock{width:100%;margin-top:10px}

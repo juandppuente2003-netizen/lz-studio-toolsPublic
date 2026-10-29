@@ -1050,7 +1050,7 @@ export function coupon(s){\r
 <link rel="stylesheet" href="k40-control.css?v=5">
 <link rel="stylesheet" href="workshop.css?v=5">
 <link rel="stylesheet" href="../lz-appbar.css?v=60">
-<link rel="stylesheet" href="neo-box.css?v=64">
+<link rel="stylesheet" href="neo-box.css?v=66">
 <style>body.box-booting{visibility:hidden}body.box-booting .lz-appbar{visibility:visible}body.box-booting .box-loading{visibility:visible;position:fixed;inset:60px 0 0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#030405;color:#f3f7fc;font:15px system-ui,sans-serif}.box-loading strong{font-size:20px}.box-loading a{color:#2ee6ff}.box-loading:before{content:"";width:38px;height:38px;border-radius:50%;border:3px solid #18202b;border-top-color:#2ee6ff;animation:lzspin .8s linear infinite}@keyframes lzspin{to{transform:rotate(360deg)}}</style></head>
 <body class="box-booting"><div class="box-loading" role="status"><strong>LZ Box Studio</strong><span>Preparando tu espacio de trabajo\u2026</span><a href="index.html">Volver a cargar</a></div>
 <header class="lz-appbar lz-top-nav" aria-label="LZ Studio Tools navegaci\xF3n"><a class="lz-logo" href="../index.html" aria-label="LZ Studio Tools inicio"><span class="brand-name"><b>LZ</b> STUDIO TOOLS</span></a><nav class="lz-mainnav" aria-label="Secciones de LZ Studio Tools"><a class="lz-nav-link" href="../index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg><span>Inicio</span></a><a class="lz-nav-link" href="../dtf.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Herramientas DTF</span></a><a class="lz-nav-link active" aria-current="page" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg><span>LZ Box Studio</span></a></nav><div class="lz-appbar-actions"><a class="lz-help" href="#ayuda" onclick="document.getElementById('helpBtn')?.click();return false;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg><span>Ayuda</span></a><a class="account-link" href="../account.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="lz-acc-label">Mi cuenta</span></a></div></header>
@@ -1097,7 +1097,7 @@ export function coupon(s){\r
 <dialog id="saveDialog"><div class="dialog-header"><h2>Guardar dise\xF1o</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><label class="field-title" for="designName">Nombre del dise\xF1o</label><input id="designName" maxlength="80" placeholder="Ej. Caja para regalo"><p class="hint">Se guarda en este navegador. Exporta un respaldo para conservarlo en otro dispositivo.</p><button id="confirmSave" class="btn primary wide">Guardar dise\xF1o</button><button id="saveCopy" type="button" class="btn outline wide">Guardar como copia nueva</button></dialog>
 <dialog id="projectsDialog"><div class="dialog-header"><div><span class="eyebrow">TU MESA DE TRABAJO</span><h2>Mis dise\xF1os</h2></div><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><div id="projectSearchMount" class="project-search-mount"></div><div id="projectsList"></div><div class="backup-actions"><button id="newBtn" class="btn outline">Nuevo dise\xF1o</button><button id="backupBtn" class="btn outline">Exportar respaldo JSON</button><button id="importBtn" class="btn outline">Importar dise\xF1o</button><input type="file" id="importFile" accept=".json,application/json" hidden></div><p class="hint">Guardados en este navegador, sin sincronizaci\xF3n entre dispositivos.</p></dialog>
 <dialog id="helpDialog"><div class="dialog-header"><h2>De la idea a tu primera caja</h2><button class="icon-btn" data-close aria-label="Cerrar">\xD7</button></div><ol class="help-steps"><li><strong>Elige el modelo y las medidas.</strong><p>Las exteriores incluyen el MDF. Las interiores corresponden al espacio \xFAtil de la caja armada.</p></li><li><strong>Mide tu material.</strong><p>Selecciona 2, 2.5, 3, 4, 5 o 6 mm, o escribe el espesor real entre 1 y 20 mm. Los encastres se regeneran con cada cambio.</p></li><li><strong>Calibra el encaje.</strong><p>El kerf es el ancho total que elimina tu l\xE1ser. La holgura agrega espacio entre dientes. Descarga la probeta, corta y ajusta estos valores antes de producir.</p></li><li><strong>Revisa y exporta.</strong><p>Gira el modelo, separa las piezas y revisa las hojas de corte. Exporta SVG o DXF en mm a escala 1:1.</p></li></ol><div class="export-note shortcuts"><strong>Controles y atajos</strong><p>Arrastrar: girar \xB7 Bot\xF3n derecho, rueda presionada o May\xFAs + arrastrar: desplazar \xB7 Rueda: zoom \xB7 Doble clic: encuadrar.</p><p><kbd>Ctrl</kbd>+<kbd>Z</kbd> deshacer \xB7 <kbd>Ctrl</kbd>+<kbd>May\xFAs</kbd>+<kbd>Z</kbd> o <kbd>Ctrl</kbd>+<kbd>Y</kbd> rehacer \xB7 <kbd>Ctrl</kbd>+<kbd>S</kbd> guardar \xB7 <kbd>F</kbd> encuadrar \xB7 <kbd>1</kbd>\u2013<kbd>7</kbd> vistas (perspectiva, frente, posterior, izquierda, derecha, superior, inferior) \xB7 <kbd>H</kbd> ocultar pieza \xB7 <kbd>I</kbd> aislar \xB7 <kbd>May\xFAs</kbd>+<kbd>H</kbd> mostrar todas \xB7 <kbd>M</kbd> medidas \xB7 <kbd>C</kbd> compartimentos \xB7 <kbd>E</kbd> formas \xB7 <kbd>P</kbd> plano / 3D \xB7 <kbd>Esc</kbd> cerrar panel.</p><p>En el plano de corte, con \xABEditar distribuci\xF3n\xBB: arrastra piezas, <kbd>R</kbd> gira 90\xB0 y las flechas ajustan 1 mm (May\xFAs: 10 mm).</p></div><div class="export-note"><strong>Sobre esta versi\xF3n</strong><p>Diecisiete modelos, edici\xF3n directa en 3D, formas de corte y PNG. Incluye caja normal, abatible, corrediza, charola, huacal, canasta con arco, canasta con asa doble, estuche con divisiones, portador con asa ovalada y canasta de perfil curvo. Todos los modelos se dise\xF1an para ensamble sin pegamento. La abatible usa pivotes integrados y la corrediza, gu\xEDas capturadas por los laterales y tirador integral de MDF. El 3D permite revisar la forma y la apertura; realiza una prueba de corte y armado antes de producir. Las referencias muestran la forma, sin incluir sus grabados.</p></div><button class="btn primary wide" data-close>Empezar a crear</button></dialog>
-<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=65"><\/script><script type="module" src="neo-studio.js?v=62"><\/script></body></html>
+<script type="module" src="app.js?v=3.6"><\/script><script type="module" src="studio-plus.js?v=3.5"><\/script><script type="module" src="workflow-plus.js?v=3.5"><\/script><script type="module" src="workshop.js?v=66"><\/script><script type="module" src="neo-studio.js?v=66"><\/script></body></html>
 `,type:"text/html; charset=utf-8",public:!1},"/box/internal-joints.js":{body:`import {frame,rect,materialWeb} from './models.js?v=3.5';
 /* Tenons on horizontal panels and side ends; closed receivers on all walls. */
 function spans(L,s){const m=materialWeb(s),fit=+s.clearance,margin=m+fit,length=L-2*margin;if(length<m)throw Error('Aumenta la medida: las ranuras interiores necesitan margen y pesta\xF1as resistentes.');let n=Math.max(1,Math.round(length/(+s.finger)));n=Math.min(n,Math.floor(length/(m+fit)));if(n%2===0)n--;n=Math.max(n,1);return Array.from({length:(n+1)/2},(_,k)=>[margin+2*k*length/n,margin+(2*k+1)*length/n]);}
@@ -1595,13 +1595,15 @@ export async function buildJobV2({design, placement, plan, bed, name}, analysis,
 }
 
 /* ------------------------------------------------------------ vista previa */
-const ruler = (bed) => {
+const ruler = (bed, k = 1) => {
+  // k = 1/zoom: reglas y textos mantienen su tama\xF1o en pantalla al acercar; con zoom alto se marca cada mil\xEDmetro.
   let s = '';
-  const major = bed.width > 600 ? 100 : 50;
-  for (let x = 0; x <= bed.width + 1e-6; x += 10) s += \`<path d="M\${x} 0V\${x % major === 0 ? -6 : -3}" stroke="currentColor" stroke-width="0.4" opacity="0.6"/>\`;
-  for (let y = 0; y <= bed.height + 1e-6; y += 10) s += \`<path d="M0 \${y}H\${y % major === 0 ? -6 : -3}" stroke="currentColor" stroke-width="0.4" opacity="0.6"/>\`;
-  for (let x = 0; x <= bed.width + 1e-6; x += major) s += \`<text x="\${x}" y="-9" font-size="6" text-anchor="middle" fill="currentColor" opacity="0.75">\${x}</text>\`;
-  for (let y = major; y <= bed.height + 1e-6; y += major) s += \`<text x="-9" y="\${y + 2}" font-size="6" text-anchor="end" fill="currentColor" opacity="0.75">\${y}</text>\`;
+  const major = bed.width > 600 ? 100 : k < 0.25 ? 10 : 50, minor = k < 0.3 ? 1 : 10;
+  const tick = (len) => f4(len * k);
+  for (let x = 0; x <= bed.width + 1e-6; x += minor) s += \`<path d="M\${x} 0V\${-(x % major === 0 ? 6 : x % 10 === 0 ? 4 : 2) * k}" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.6"/>\`;
+  for (let y = 0; y <= bed.height + 1e-6; y += minor) s += \`<path d="M0 \${y}H\${-(y % major === 0 ? 6 : y % 10 === 0 ? 4 : 2) * k}" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" opacity="0.6"/>\`;
+  for (let x = 0; x <= bed.width + 1e-6; x += major) s += \`<text x="\${x}" y="\${tick(-9)}" font-size="\${tick(6)}" text-anchor="middle" fill="currentColor" opacity="0.75">\${x}</text>\`;
+  for (let y = major; y <= bed.height + 1e-6; y += major) s += \`<text x="\${tick(-9)}" y="\${f4(y + 2 * k)}" font-size="\${tick(6)}" text-anchor="end" fill="currentColor" opacity="0.75">\${y}</text>\`;
   return s;
 };
 /**
@@ -1609,38 +1611,40 @@ const ruler = (bed) => {
  * etiquetas permitidas por el visor del celular (svg, rect, path, circle, image).
  */
 export function planPreview({bed, analysis, rasterPreviews = new Map(), position = null, compact = false, zoom = 1, center = null}) {
-  const pad = compact ? 0 : 16;
+  const pad = compact ? 0 : 16, k = compact ? 1 : 1 / Math.max(1, zoom);
+  // Escritorio: grosor de l\xEDnea fijo en pantalla (no engorda al acercar). Celular: atributos simples.
+  const sw = (mm, px) => compact ? \`stroke-width="\${mm}"\` : \`stroke-width="\${px}" vector-effect="non-scaling-stroke"\`;
   let vb = compact ? \`0 0 \${bed.width} \${bed.height}\` : \`\${-pad} \${-pad} \${bed.width + pad + 4} \${bed.height + pad + 4}\`;
   if (!compact && zoom > 1.001) {
-    // Acercar = recortar la vista alrededor del dise\xF1o (sin barras de desplazamiento).
     const w = (bed.width + pad + 4) / zoom, h = (bed.height + pad + 4) / zoom, c = center || [bed.width / 2, bed.height / 2];
     const x = Math.min(Math.max(c[0] - w / 2, -pad), bed.width + 4 - w), y = Math.min(Math.max(c[1] - h / 2, -pad), bed.height + 4 - h);
     vb = \`\${f4(x)} \${f4(y)} \${f4(w)} \${f4(h)}\`;
   }
   let s = \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="\${vb}" role="img" aria-label="Cama de \${bed.width} por \${bed.height} mm con el trabajo colocado">\`;
   if (!compact) {
-    s += \`<defs><pattern id="lzgrid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="currentColor" stroke-width="0.15" opacity="0.35"/></pattern></defs>\`;
-    s += \`<rect width="\${bed.width}" height="\${bed.height}" fill="url(#lzgrid)"/>\` + ruler(bed);
+    const g = k < 0.3 ? 1 : 10;
+    s += \`<defs><pattern id="lzgrid" width="\${g}" height="\${g}" patternUnits="userSpaceOnUse"><path d="M\${g} 0H0V\${g}" fill="none" stroke="currentColor" stroke-width="\${f4(0.15 * g / 10 * (k < 0.3 ? 4 : 1))}" opacity="0.35"/></pattern></defs>\`;
+    s += \`<rect width="\${bed.width}" height="\${bed.height}" fill="url(#lzgrid)"/>\` + ruler(bed, k);
   }
-  s += \`<rect width="\${bed.width}" height="\${bed.height}" fill="none" stroke="currentColor" stroke-width="0.6"/>\`;
+  s += \`<rect width="\${bed.width}" height="\${bed.height}" fill="none" stroke="currentColor" \${sw(0.6, 1.2)}/>\`;
   for (const o of analysis.ops) {
     if (!o.op.enabled || o.empty) continue;
     if (o.op.type === 'raster') {
       const a = o.data.area, href = rasterPreviews.get(o.op.id);
       if (href && /^data:image\\/png;base64,/.test(href)) s += \`<image href="\${href}" x="\${f4(a.x)}" y="\${f4(a.y)}" width="\${f4(a.width)}" height="\${f4(a.height)}" preserveAspectRatio="none" opacity="0.92"/>\`;
-      s += \`<rect x="\${f4(a.x)}" y="\${f4(a.y)}" width="\${f4(a.width)}" height="\${f4(a.height)}" fill="\${href ? 'none' : OP_TYPES.raster.color}" fill-opacity="0.12" stroke="\${OP_TYPES.raster.color}" stroke-width="0.4" stroke-dasharray="2 1.5"/>\`;
+      s += \`<rect x="\${f4(a.x)}" y="\${f4(a.y)}" width="\${f4(a.width)}" height="\${f4(a.height)}" fill="\${href ? 'none' : OP_TYPES.raster.color}" fill-opacity="0.12" stroke="\${OP_TYPES.raster.color}" \${sw(0.4, 1)} stroke-dasharray="\${f4(2 * k)} \${f4(1.5 * k)}"/>\`;
     } else {
       const color = OP_TYPES[o.op.type].color;
-      s += o.data.paths.map((p) => \`<path d="M\${p.points.map((q) => q.map(f4).join(' ')).join('L')}\${p.closed ? 'Z' : ''}" fill="none" stroke="\${color}" stroke-width="\${o.op.type === 'cut' ? 0.6 : 0.45}"/>\`).join('');
+      s += o.data.paths.map((p) => \`<path d="M\${p.points.map((q) => q.map(f4).join(' ')).join('L')}\${p.closed ? 'Z' : ''}" fill="none" stroke="\${color}" \${o.op.type === 'cut' ? sw(0.6, 1.6) : sw(0.45, 1.3)}/>\`).join('');
     }
   }
   const b = analysis.bounds;
   if (b.width > 0) {
     const bad = !analysis.check.ok;
-    s += \`<rect x="\${f4(b.x)}" y="\${f4(b.y)}" width="\${f4(b.width)}" height="\${f4(b.height)}" fill="\${bad ? '#ff3b5c' : 'none'}" fill-opacity="\${bad ? 0.12 : 0}" stroke="\${bad ? '#ff3b5c' : '#9b7bff'}" stroke-width="0.5" stroke-dasharray="3 2"/>\`;
-    if (!compact) s += \`<text x="\${f4(b.x + b.width / 2)}" y="\${f4(b.y < 12 ? b.y + b.height + 7 : b.y - 2.5)}" font-size="5.5" text-anchor="middle" fill="\${bad ? '#ff3b5c' : '#b9a6ff'}">\${b.width.toFixed(1)} \xD7 \${b.height.toFixed(1)} mm \xB7 X \${(Math.abs(b.x) < 0.05 ? 0 : b.x).toFixed(1)} Y \${(Math.abs(b.y) < 0.05 ? 0 : b.y).toFixed(1)}</text>\`;
+    s += \`<rect x="\${f4(b.x)}" y="\${f4(b.y)}" width="\${f4(b.width)}" height="\${f4(b.height)}" fill="\${bad ? '#ff3b5c' : 'none'}" fill-opacity="\${bad ? 0.12 : 0}" stroke="\${bad ? '#ff3b5c' : '#9b7bff'}" \${sw(0.5, 1.2)} stroke-dasharray="\${f4(3 * k)} \${f4(2 * k)}"/>\`;
+    if (!compact) s += \`<text x="\${f4(b.x + b.width / 2)}" y="\${f4(b.y < 12 * k ? b.y + b.height + 7 * k : b.y - 2.5 * k)}" font-size="\${f4(5.5 * k)}" text-anchor="middle" fill="\${bad ? '#ff3b5c' : '#b9a6ff'}">\${b.width.toFixed(1)} \xD7 \${b.height.toFixed(1)} mm \xB7 X \${(Math.abs(b.x) < 0.05 ? 0 : b.x).toFixed(1)} Y \${(Math.abs(b.y) < 0.05 ? 0 : b.y).toFixed(1)}</text>\`;
   }
-  if (Array.isArray(position)) s += \`<circle cx="\${f4(position[0])}" cy="\${f4(position[1])}" r="2.2" fill="#ff3b5c" stroke="#fff" stroke-width="0.7"/>\`;
+  if (Array.isArray(position)) s += \`<circle cx="\${f4(position[0])}" cy="\${f4(position[1])}" r="\${f4(2.2 * k)}" fill="#ff3b5c" stroke="#fff" \${sw(0.7, 1.4)}/>\`;
   return s + '</svg>';
 }
 
@@ -1664,7 +1668,7 @@ export function bitsPreviewURL(render, {document: doc = globalThis.document, max
    pesta\xF1a o abrir un trabajo guardado solo actualiza la vista. El env\xEDo lo inicia
    siempre el bot\xF3n de la barra de acciones (o el celular con el control). */
 import {importSVG, imageDesign, mergeDesigns, nextOffset, apply} from './svg-import.js?v=3';
-import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=4';
+import {OP_TYPES, RESOLUTIONS, NATIVE_MM, makeOperation, defaultPlan, assignLayerDefault, compatibleTypes, analyzePlan, planPreview, renderRaster, buildJobV2, bitsPreviewURL, placedBounds, placementMatrix} from './job-ops.js?v=5';
 import {JobLibrary, makeJobItem, localPut, localGet} from './job-library.js?v=1';
 
 const K40_V1 = 'lz-k40-m2/v1';
@@ -1695,7 +1699,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   if (app.jobStudio) return app.jobStudio;
   const dialog = machine.dialog, $ = (id) => document.getElementById(id);
   const state = {pieces: [], sendScope: 'all', source: 'box', design: null, file: null, unitOverride: 'auto', plan: null, placement: {x: 0, y: 0, scale: 1, rotation: 0}, libraryId: null, libraryCloud: null, created: null, savedWhere: null, savedAt: null, dirty: false, review: false};
-  let analysis = null, analysisKey = '', renders = new Map(), previews = new Map(), renderTimer = null, renderToken = 0, zoom = 1, saveDraftTimer = null;
+  let analysis = null, analysisKey = '', renders = new Map(), previews = new Map(), renderTimer = null, renderToken = 0, zoom = 1, viewCenter = null, moveMode = 'all', pan = null, saveDraftTimer = null;
 
   /* ------------------------------------------------------------ DOM */
   const sourceBar = el('div', 'js-source'); sourceBar.setAttribute('role', 'tablist'); sourceBar.setAttribute('aria-label', 'Fuente del trabajo');
@@ -1727,7 +1731,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
    <div class="js-place-grid"><label>X \xB7 mm<input class="js-x" type="number" step="0.1"></label><label>Y \xB7 mm<input class="js-y" type="number" step="0.1"></label>
    <label>Ancho \xB7 mm<input class="js-w" type="number" step="0.1" min="0.1"></label><label>Alto \xB7 mm<input class="js-h" type="number" step="0.1" min="0.1"></label>
    <label>Escala \xB7 %<input class="js-scale" type="number" step="0.1" min="1" max="1000"></label><label>Giro \xB7 \xB0<input class="js-rot" type="number" step="0.5"></label></div>
-   <div class="js-place-actions"></div><p class="js-hint">Escala proporcional: ancho y alto cambian juntos. Arrastra sobre la cama para mover; con varios archivos, arrastra cada uno por separado (X, Y, escala y giro aplican al conjunto).</p>\`;
+   <div class="js-place-actions"></div><p class="js-hint">Arrastra el dise\xF1o en la cama para moverlo (todos los vectores juntos). Rueda del mouse: zoom; arrastra fuera del dise\xF1o para desplazar la vista. Con varios archivos, \xABPieza\xBB o Alt + arrastrar mueve solo uno.</p>\`;
   const placeActions = place.querySelector('.js-place-actions');
   const rotL = btn('', () => setPlacement({rotation: norm(state.placement.rotation - 90)}), 'btn quiet js-icon-btn'); rotL.innerHTML = svgIcon('rotL'); rotL.title = 'Girar 90\xB0 a la izquierda'; rotL.setAttribute('aria-label', rotL.title);
   const rotR = btn('', () => setPlacement({rotation: norm(state.placement.rotation + 90)}), 'btn quiet js-icon-btn'); rotR.innerHTML = svgIcon('rotR'); rotR.title = 'Girar 90\xB0 a la derecha'; rotR.setAttribute('aria-label', rotR.title);
@@ -1761,7 +1765,13 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   centerBar.append(tabs, legend);
   const zoomBar = el('div', 'js-zoom'); zoomBar.setAttribute('aria-label', 'Zoom de la vista');
   const zoomBtn = (name, label, fn) => { const b = btn('', fn, 'js-zoom-btn'); b.innerHTML = name === '1:1' ? '<b>1:1</b>' : svgIcon(name); b.title = label; b.setAttribute('aria-label', label); return b; };
-  zoomBar.append(zoomBtn('zoomIn', 'Acercar', () => setZoom(zoom * 1.25)), zoomBtn('zoomOut', 'Alejar', () => setZoom(zoom / 1.25)), zoomBtn('fit', 'Ajustar a la vista', () => setZoom(1)), zoomBtn('1:1', 'Tama\xF1o real aproximado (96 ppp)', () => realSize()));
+  zoomBar.append(zoomBtn('zoomIn', 'Acercar (o rueda del mouse)', () => setZoom(zoom * 1.25)), zoomBtn('zoomOut', 'Alejar', () => setZoom(zoom / 1.25)), zoomBtn('fit', 'Ver toda la cama', () => { viewCenter = null; setZoom(1); }), zoomBtn('1:1', 'Tama\xF1o real aproximado (96 ppp)', () => realSize()));
+  // Con varios archivos: mover todo junto (predeterminado) o una pieza. Alt + arrastrar tambi\xE9n mueve una sola.
+  const moveSeg = el('div', 'js-move-mode'); moveSeg.setAttribute('role', 'group'); moveSeg.setAttribute('aria-label', 'Qu\xE9 se mueve al arrastrar');
+  const moveAll = btn('Todo', () => { moveMode = 'all'; paintMove(); }, 'js-move-btn'), moveOne = btn('Pieza', () => { moveMode = 'piece'; paintMove(); }, 'js-move-btn');
+  moveAll.title = 'Arrastrar mueve todos los vectores juntos'; moveOne.title = 'Arrastrar mueve solo el archivo bajo el puntero (tambi\xE9n con Alt)';
+  moveSeg.append(moveAll, moveOne); zoomBar.append(moveSeg);
+  const paintMove = () => { moveAll.setAttribute('aria-pressed', String(moveMode === 'all')); moveOne.setAttribute('aria-pressed', String(moveMode === 'piece')); moveSeg.hidden = state.pieces.length < 2; };
   const orderPanel = el('section', 'js-order'); orderPanel.hidden = true;
   const bedNote = el('p', 'js-bed-note');
 
@@ -1778,7 +1788,8 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   const layout = dialog.querySelector('.k40-layout');
   const host = el('div', 'js-host'); host.append(sourceBar, panel); layout?.prepend(host);
   const previewEl = $('k40Preview');
-  previewEl.before(centerBar); previewEl.after(orderPanel, bedNote); previewEl.parentElement.insertBefore(zoomBar, previewEl);
+  // La cama y su barra de zoom van en un mismo contenedor: la barra queda sobre la cama, no sobre los botones.
+  const stage = el('div', 'js-stage'); previewEl.before(centerBar, stage); stage.append(previewEl, zoomBar); stage.after(orderPanel, bedNote);
 
   /* ------------------------------------------------------------ fuente */
   function setSource(value, {silent = false} = {}) {
@@ -1799,7 +1810,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const order = which === 'order' && state.source === 'import';
     tabPreview.classList.toggle('active', !order); tabOrder.classList.toggle('active', order);
     tabPreview.setAttribute('aria-selected', String(!order)); tabOrder.setAttribute('aria-selected', String(order));
-    previewEl.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order || state.source !== 'import';
+    previewEl.hidden = order; stage.hidden = order; orderPanel.hidden = !order; zoomBar.hidden = order || state.source !== 'import';
     if (order) renderOrder();
   }
   opsCard.querySelector('.js-to-order').onclick = () => setCenter('order');
@@ -1950,10 +1961,12 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     if (state.source !== 'import' || !state.design || machine.busy || machine.remoteOwner || $('k40Pick')?.textContent.includes('Selecciona')) return;
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
     const p = toBed(svg, e), b = placedBounds(state.design, state.placement);
-    if (p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height) return;
-    // Con varios archivos se arrastra el que est\xE1 bajo el puntero; los dem\xE1s no se mueven.
+    const outside = p.x < b.x || p.y < b.y || p.x > b.x + b.width || p.y > b.y + b.height;
+    // Fuera del dise\xF1o (o con el bot\xF3n central): desplazar la vista acercada.
+    if (outside || e.button === 1) { if (zoom > 1.001) { const vb = svg.viewBox.baseVal; pan = {x: e.clientX, y: e.clientY, center: [vb.x + vb.width / 2, vb.y + vb.height / 2], k: vb.width / svg.getBoundingClientRect().width}; previewEl.setPointerCapture(e.pointerId); previewEl.classList.add('is-panning'); e.preventDefault(); } return; }
+    // Por omisi\xF3n se mueven todos los vectores juntos; en modo \xABPieza\xBB (o con Alt) solo el archivo bajo el puntero.
     let piece = null;
-    if (state.pieces.length > 1) {
+    if (state.pieces.length > 1 && (moveMode === 'piece' || e.altKey)) {
       const m = placementMatrix(state.design, state.placement);
       const boxOf = (pc) => { const c = [[pc.bbox.x, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y], [pc.bbox.x + pc.bbox.width, pc.bbox.y + pc.bbox.height], [pc.bbox.x, pc.bbox.y + pc.bbox.height]].map((q) => apply(m, q)); return {x0: Math.min(...c.map((q) => q[0])), x1: Math.max(...c.map((q) => q[0])), y0: Math.min(...c.map((q) => q[1])), y1: Math.max(...c.map((q) => q[1]))}; };
       const hit = [...state.design.pieces].reverse().find((pc) => { const r = boxOf(pc); return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1; });
@@ -1963,6 +1976,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   });
   // La vista se redibuja en cada movimiento: se usa siempre el SVG actual (el anterior ya no est\xE1 en pantalla).
   previewEl.addEventListener('pointermove', (e) => {
+    if (pan) { viewCenter = [pan.center[0] - (e.clientX - pan.x) * pan.k, pan.center[1] - (e.clientY - pan.y) * pan.k]; machine.refresh(false); return; }
     if (!drag) return;
     const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
     if (drag.piece) {
@@ -1980,10 +1994,20 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
     const x = clamp(b.x + p.x - drag.start.x, b.width, bed.width), y = clamp(b.y + p.y - drag.start.y, b.height, bed.height);
     setPlacement({x: drag.origin.x + x - b.x, y: drag.origin.y + y - b.y}, {silent: true}); updateLight();
   });
-  const endDrag = () => { if (!drag) return; const moved = drag.piece; drag = null; previewEl.classList.remove('is-dragging'); if (moved) renderStructure(); update(); scheduleDraft(); };
+  const endDrag = () => { if (pan) { pan = null; previewEl.classList.remove('is-panning'); return; } if (!drag) return; const moved = drag.piece; drag = null; previewEl.classList.remove('is-dragging'); if (moved) renderStructure(); update(); scheduleDraft(); };
   previewEl.addEventListener('pointerup', endDrag); previewEl.addEventListener('pointercancel', endDrag);
   function toBed(svg, e) { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return {x: q.x, y: q.y}; }
-  function setZoom(z) { zoom = Math.max(1, Math.min(12, z)); machine.refresh(false); }
+  function setZoom(z, center) { zoom = Math.max(1, Math.min(20, z)); if (center) viewCenter = center; if (zoom <= 1.001) viewCenter = null; machine.refresh(false); }
+  // Rueda del mouse: acerca o aleja manteniendo fijo el punto bajo el puntero.
+  previewEl.addEventListener('wheel', (e) => {
+    if (state.source !== 'import' || !state.design) return;
+    const svg = previewEl.querySelector('svg'); if (!svg?.getScreenCTM()) return;
+    e.preventDefault();
+    const p = toBed(svg, e), vb = svg.viewBox.baseVal, fx = (p.x - vb.x) / vb.width, fy = (p.y - vb.y) / vb.height;
+    const next = Math.max(1, Math.min(20, zoom * Math.exp(-e.deltaY * 0.0018)));
+    const bed = currentBed(), w = (bed.width + 20) / next, h = (bed.height + 20) / next;
+    setZoom(next, [p.x - fx * w + w / 2, p.y - fy * h + h / 2]);
+  }, {passive: false});
   function realSize() { const bed = currentBed(), w = (previewEl.clientWidth || 600) - 28; setZoom((bed.width + 20) / 25.4 * 96 / w); }
 
   /* ------------------------------------------------------------ operaciones */
@@ -2156,7 +2180,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const seconds = active.reduce((s, o) => s + o.seconds, 0);
       const b = a.bounds;
       const summary = \`\${state.pieces.length > 1 ? state.pieces.length + ' archivos' : state.file.name} \xB7 \${fmt(b.width)} \xD7 \${fmt(b.height)} mm en X \${fmt(b.x)} \xB7 Y \${fmt(b.y)} \xB7 \${state.sendScope === 'all' ? \`\${active.length} \${active.length === 1 ? 'operaci\xF3n activa' : 'operaciones activas'}\` : \`se enviar\xE1 solo \xAB\${active[0]?.op.name || '\u2014'}\xBB\`}. Tiempo estimado: \${fmtTime(seconds)}. SVG importado: se corta sobre la l\xEDnea, sin compensar kerf.\`;
-      const b0 = a.bounds, center = [b0.x + b0.width / 2, b0.y + b0.height / 2];
+      const b0 = a.bounds, center = viewCenter || [b0.x + b0.width / 2, b0.y + b0.height / 2];
       return {preview: planPreview({bed, analysis: a, rasterPreviews: previews, position, zoom, center}), compact: planPreview({bed, analysis: a, rasterPreviews: previews, position, compact: true}), summary, seconds, problem: problemText(a)};
     },
     support(features) {
@@ -2222,7 +2246,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
   function update() {
     const has = !!state.design;
     fileCard.querySelector('.js-file-name').textContent = state.file?.name || 'Sin archivo';
-    pieceList.hidden = state.pieces.length < 2; addButton.hidden = !has;
+    pieceList.hidden = state.pieces.length < 2; addButton.hidden = !has; paintMove();
     if (state.pieces.length > 1 && pieceList.childElementCount !== state.pieces.length + 0 || pieceList.dataset.key !== state.pieces.map((p) => p.source.name).join('|')) {
       pieceList.dataset.key = state.pieces.map((p) => p.source.name).join('|');
       pieceList.replaceChildren(...(state.pieces.length > 1 ? state.pieces.map((p, i) => { const li = el('li'); li.append(el('span', '', p.source.name), el('small', '', \`\${fmt(p.design.bbox.width)} \xD7 \${fmt(p.design.bbox.height)} mm\`)); const x = btn('\xD7', () => removePiece(i), 'js-piece-del'); x.setAttribute('aria-label', 'Quitar ' + p.source.name); x.title = 'Quitar este archivo'; li.append(x); return li; }) : []));
@@ -2399,7 +2423,7 @@ export function mountK40(app,options={}){
  <div class="k40-layout"><section class="k40-canvas-panel" aria-label="Vista del trabajo"><div class="k40-section-heading"><div><span class="k40-kicker">PLANO DE CORTE</span><h3>\xC1rea de trabajo</h3></div><label>Hoja<select id="k40Sheet"></select></label><button type="button" class="btn outline" id="k40Arrange">Acomodar piezas</button></div><div id="k40Preview" class="k40-preview"></div><div class="k40-legend"><span><i class="k40-inner"></i>Interiores</span><span><i class="k40-outer"></i>Contornos</span><span>Medidas en mm \xB7 kerf conservado</span></div><p id="k40Summary" class="k40-summary"></p>
  <details class="k40-bed"><summary>Medidas de cama y desplazamiento</summary><div class="k40-fields"><label>Ancho \xB7 mm<input id="k40Width" type="number" min="50" max="2500" value="400"></label><label>Alto \xB7 mm<input id="k40Height" type="number" min="50" max="2500" value="400"></label><label>Desplazar X \xB7 mm<input id="k40X" type="number" min="0" step="0.1" value="0"></label><label>Desplazar Y \xB7 mm<input id="k40Y" type="number" min="0" step="0.1" value="0"></label></div><p class="k40-note">Las medidas deben coincidir con las del conector. En origen actual, el contorno del dise\xF1o se alinea al cabezal.</p></details></section>
  <section class="k40-controls" aria-label="Controles de m\xE1quina"><details class="k40-pairing" id="k40BridgePanel" open><summary>Conexi\xF3n USB</summary><p class="k40-note">Inicio autom\xE1tico con Windows. El c\xF3digo se guarda en esta computadora. <a id="k40ConnectorLink" href="https://raw.githubusercontent.com/juandppuente2003-netizen/lz-studio-toolsPublic/main/connectors/k40/LZ-K40-Windows.zip?v=0.7.0" target="_blank" rel="noopener">Conector 0.7.0 para Windows</a> (grabado de imagen y trabajos combinados; 0.6.4 sigue funcionando para cortes).</p><label for="k40Token">C\xF3digo del conector</label><div class="k40-connect-row"><input id="k40Token" type="password" autocomplete="off" spellcheck="false"><button type="button" id="k40Connect" class="btn outline">Conectar</button></div><label class="k40-confirm"><input id="k40Remember" type="checkbox" checked>Recordar esta computadora</label><div class="k40-actions"><button type="button" id="k40Disconnect" class="btn quiet" disabled>Liberar USB para Sagaon</button><button type="button" id="k40Forget" class="btn quiet">Olvidar c\xF3digo</button></div></details>
- <section class="k40-jog-panel"><div class="k40-section-heading"><h3>Mover cabezal</h3><span id="k40Position" class="k40-position">Sin referencia</span></div><div class="k40-motion-layout"><div class="k40-jog-pad"><button type="button" id="k40Up" class="k40-jog" aria-label="Mover hacia arriba">\u2191</button><button type="button" id="k40Left" class="k40-jog" aria-label="Mover hacia la izquierda">\u2190</button><button type="button" id="k40Home" class="k40-home" title="Ir a la esquina superior izquierda">Home</button><button type="button" id="k40Right" class="k40-jog" aria-label="Mover hacia la derecha">\u2192</button><button type="button" id="k40Down" class="k40-jog" aria-label="Mover hacia abajo">\u2193</button></div><div><label for="k40Step">Paso \xB7 mm</label><select id="k40Step"><option>0.1</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select><button type="button" id="k40UsePosition" class="btn outline wide">Usar esta posici\xF3n como origen</button></div></div><p class="k40-note">Un clic = un movimiento. Haz Home una vez al conectar. Posici\xF3n estimada; si mueves el cabezal a mano, libera USB y vuelve a establecer Home.</p></section>
+ <section class="k40-jog-panel"><div class="k40-section-heading"><h3>Mover cabezal</h3><span id="k40Position" class="k40-position">Sin referencia</span></div><div class="k40-motion-layout"><div class="k40-jog-pad"><button type="button" id="k40Up" class="k40-jog" aria-label="Mover hacia arriba">\u2191</button><button type="button" id="k40Left" class="k40-jog" aria-label="Mover hacia la izquierda">\u2190</button><button type="button" id="k40Home" class="k40-home" title="Ir a la esquina superior izquierda">Home</button><button type="button" id="k40Right" class="k40-jog" aria-label="Mover hacia la derecha">\u2192</button><button type="button" id="k40Down" class="k40-jog" aria-label="Mover hacia abajo">\u2193</button></div><div><label for="k40Step">Paso \xB7 mm</label><select id="k40Step"><option>0.1</option><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select><button type="button" id="k40UsePosition" class="btn outline wide">Usar esta posici\xF3n como origen</button><button type="button" id="k40Unlock" class="btn outline wide" title="Libera los motores para mover el cabezal a mano. Despu\xE9s haz Home.">Desbloquear riel</button></div></div><p class="k40-note">Un clic = un movimiento. Haz Home una vez al conectar. Posici\xF3n estimada; si mueves el cabezal a mano, libera USB y vuelve a establecer Home.</p></section>
  <section class="k40-job-settings"><h3>Preparar hoja</h3><label for="k40Origin">Origen del trabajo</label><select id="k40Origin"><option value="home">Desde Home \xB7 esquina superior izquierda</option><option value="current">Desde la posici\xF3n actual \xB7 sin volver a Home</option></select><p id="k40OriginNote" class="k40-note"></p><div class="k40-fields"><label>Velocidad \xB7 mm/s<input id="k40Speed" type="number" min="1" max="100" step="0.1" value="10"></label><label>Pasadas<input id="k40Passes" type="number" min="1" max="10" step="1" value="1"></label></div></section>
 
  <p class="k40-note">Potencia: aj\xFAstala en el panel f\xEDsico de la M2.</p></section></div>
@@ -2437,7 +2461,8 @@ export function mountK40(app,options={}){
   $('k40Arrange').disabled=active||requesting;$('k40Disconnect').disabled=!idle;$('k40Remember').disabled=active||requesting;$('k40Forget').disabled=active||requesting;
   for(const id of ['k40Goto','k40Pick','k40TargetX','k40TargetY'])$(id).disabled=!idle||!hasPosition();$('k40Home').disabled=!idle;motionIds.forEach(id=>$(id).disabled=!idle||!hasPosition());
   $('k40UsePosition').disabled=!idle||!hasPosition();
-  $('k40Position').textContent=hasPosition()?\`X \${machine.position[0].toFixed(2)} \xB7 Y \${machine.position[1].toFixed(2)} mm \xB7 estimada\`:'Sin referencia';
+  $('k40Unlock').disabled=!idle||!machine?.features?.includes('unlock-rail');$('k40Unlock').title=machine&&!machine.features?.includes('unlock-rail')?'Requiere el conector 0.7.0.':'Libera los motores para mover el cabezal a mano. Despu\xE9s haz Home.';
+  $('k40Position').textContent=hasPosition()?\`X \${machine.position[0].toFixed(2)} \xB7 Y \${machine.position[1].toFixed(2)} mm \xB7 estimada\`:machine?.railUnlocked?'Riel libre \xB7 haz Home':'Sin referencia';
   $('k40CapturePoint').disabled=!idle||!hasPosition()||!job||!machine?.sessionId;
   $('k40ApplyRegistration').disabled=!idle||!pairs.length;
   $('k40ClearRegistration').disabled=active||requesting||remoteOwner;
@@ -2552,7 +2577,7 @@ export function mountK40(app,options={}){
  }
  async function motion(action,dx=0,dy=0,fromRemote=false){
   if(remoteOwner!==fromRemote||!machine||requesting||active)return;
-  requesting=true;active=true;lastState=null;finished=null;const generation=++epoch;buttons();status(action==='home'?'Solicitando Home\u2026':'Solicitando movimiento\u2026');
+  requesting=true;active=true;lastState=null;finished=null;const generation=++epoch;buttons();status(action==='home'?'Solicitando Home\u2026':action==='unlock'?'Desbloqueando riel\u2026':'Solicitando movimiento\u2026');
   try{const result=await api('/motion',{action,dx,dy,confirmed:true});if(generation!==epoch)return;consume(result);if(active)startPolling();}
   catch(e){if(generation!==epoch)return;await poll();if(!active)status(e.message,true);else{lastState='unknown';status(e.message+' Verifica la m\xE1quina antes de continuar.',true);}}
   finally{requesting=false;buttons();}
@@ -2560,6 +2585,7 @@ export function mountK40(app,options={}){
  $('k40Connect').onclick=connect;$('k40Disconnect').onclick=disconnect;$('k40Run').onclick=()=>run('cut');$('k40Frame').onclick=()=>run('frame');
  $('k40Pulse').onclick=()=>pulse();
  $('k40Home').onclick=()=>motion('home');
+ $('k40Unlock').onclick=()=>motion('unlock');
  let picking=false;
  $('k40Goto').onclick=()=>motion('goto',Number($('k40TargetX').value),Number($('k40TargetY').value));
  $('k40Pick').onclick=()=>{picking=!picking;$('k40Pick').textContent=picking?'Selecciona un punto\u2026':'Elegir punto en el plano';};
@@ -2621,8 +2647,8 @@ export function mountK40(app,options={}){
   restoreReferencePoints(points){clearRegistration('Plantilla cargada: registra de nuevo las posiciones f\xEDsicas.');referenceDesign=points.filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).map(p=>[...p]);refresh(false);},
   setRemoteOwner(value){if(value&&(active||requesting||!machine))throw Error('Conecta la m\xE1quina y espera a que quede lista antes de ceder el control.');remoteOwner=!!value;if(value&&hasPosition()&&$('k40Origin').value==='aligned'){$('k40Origin').value='current';refresh(false);}buttons();},
   get remoteOwner(){return remoteOwner;},
-  snapshot(){return {state:lastState||'idle',label:$('k40State').textContent,message:$('k40Status').textContent,position:machine?.position||null,connected:!!machine?.connected,busy:active||requesting,owner:remoteOwner?'phone':'desktop',canPause:!$('k40Stop').disabled,canResume:lastState==='paused',canPulse:!!machine?.features?.includes('timed-pulse')&&hasPosition()&&!active&&!requesting,canRun:!!machine&&!active&&!requesting&&!!job&&previewOK,hasPosition:hasPosition(),elapsedSeconds:Math.floor(clockSpent+(clockStart?(Date.now()-clockStart)/1000:0)),estimatedSeconds:clockTotal,preview:active&&activePreview?activePreview:source?.isActive()?(currentView?.compact||''):currentView?k40Preview(currentView):'',name:active&&activeName?activeName:source?.isActive()?source.name():app.state.name,settings:settings(),origin:$('k40Origin').value,source:source?.isActive()?'import':'box',finished,preparing,dataSent:lastState==='sent',canFrame:!!machine&&!active&&!requesting&&!!job&&previewOK,problem:previewOK?'':$('k40Status').dataset.error==='true'?$('k40Status').textContent:''};},
-  async remoteCommand(action,args={}){if(['pause','cancel'].includes(action)){await control(action,true);return;}if(!remoteOwner)throw Error('La computadora conserva el control.');if(['home','jog','frame','cut'].includes(action)&&(active||requesting||controlBusy))throw Error('Espera a que termine la operaci\xF3n anterior.');if(action==='pulse'){if(active||requesting||controlBusy||!machine?.features?.includes('timed-pulse'))throw Error('Actualiza el conector a 0.6.4 y espera a que quede libre.');requesting=true;buttons();try{consume(await api('/pulse',{milliseconds:50,confirmed:true}));startPolling();}finally{requesting=false;buttons();}}else if(action==='home')await motion('home',0,0,true);else if(action==='jog'){const dx=Number(args.dx),dy=Number(args.dy);if(!Number.isFinite(dx)||!Number.isFinite(dy)||Math.max(Math.abs(dx),Math.abs(dy))>50)throw Error('Movimiento inv\xE1lido.');await motion('jog',dx,dy,true);}else if(action==='frame'||action==='cut')await run(action,true);else if(action==='settings'){if(active||requesting)throw Error('Espera a que termine el trabajo.');const speed=Number(args.speed),passes=Number(args.passes);if(!Number.isFinite(speed)||speed<1||speed>100||!Number.isInteger(passes)||passes<1||passes>10)throw Error('Velocidad 1\u2013100 mm/s; pasadas 1\u201310.');$('k40Speed').value=speed;$('k40Passes').value=passes;refresh(false);}else if(action==='resume')await control('resume',true);else if(action==='origin'){if(active||requesting)throw Error('Espera a que termine la operaci\xF3n.');if(!['home','current'].includes(args.value))throw Error('Origen inv\xE1lido.');$('k40Origin').value=args.value;refresh(false);}else if(options.remoteExtra){if(active||requesting||controlBusy)throw Error('Espera a que termine la operaci\xF3n.');await options.remoteExtra(action,args);refresh(false);}else throw Error('Acci\xF3n remota no permitida.');}
+  snapshot(){return {state:lastState||'idle',label:$('k40State').textContent,message:$('k40Status').textContent,position:machine?.position||null,connected:!!machine?.connected,busy:active||requesting,owner:remoteOwner?'phone':'desktop',canPause:!$('k40Stop').disabled,canResume:lastState==='paused',canUnlock:!!machine?.features?.includes('unlock-rail')&&!active&&!requesting,railUnlocked:!!machine?.railUnlocked,canPulse:!!machine?.features?.includes('timed-pulse')&&hasPosition()&&!active&&!requesting,canRun:!!machine&&!active&&!requesting&&!!job&&previewOK,hasPosition:hasPosition(),elapsedSeconds:Math.floor(clockSpent+(clockStart?(Date.now()-clockStart)/1000:0)),estimatedSeconds:clockTotal,preview:active&&activePreview?activePreview:source?.isActive()?(currentView?.compact||''):currentView?k40Preview(currentView):'',name:active&&activeName?activeName:source?.isActive()?source.name():app.state.name,settings:settings(),origin:$('k40Origin').value,source:source?.isActive()?'import':'box',finished,preparing,dataSent:lastState==='sent',canFrame:!!machine&&!active&&!requesting&&!!job&&previewOK,problem:previewOK?'':$('k40Status').dataset.error==='true'?$('k40Status').textContent:''};},
+  async remoteCommand(action,args={}){if(['pause','cancel'].includes(action)){await control(action,true);return;}if(!remoteOwner)throw Error('La computadora conserva el control.');if(['home','jog','frame','cut'].includes(action)&&(active||requesting||controlBusy))throw Error('Espera a que termine la operaci\xF3n anterior.');if(action==='pulse'){if(active||requesting||controlBusy||!machine?.features?.includes('timed-pulse'))throw Error('Actualiza el conector a 0.6.4 y espera a que quede libre.');requesting=true;buttons();try{consume(await api('/pulse',{milliseconds:50,confirmed:true}));startPolling();}finally{requesting=false;buttons();}}else if(action==='home')await motion('home',0,0,true);else if(action==='unlock'){if(!machine?.features?.includes('unlock-rail'))throw Error('Desbloquear riel requiere el conector 0.7.0.');await motion('unlock',0,0,true);}else if(action==='jog'){const dx=Number(args.dx),dy=Number(args.dy);if(!Number.isFinite(dx)||!Number.isFinite(dy)||Math.max(Math.abs(dx),Math.abs(dy))>50)throw Error('Movimiento inv\xE1lido.');await motion('jog',dx,dy,true);}else if(action==='frame'||action==='cut')await run(action,true);else if(action==='settings'){if(active||requesting)throw Error('Espera a que termine el trabajo.');const speed=Number(args.speed),passes=Number(args.passes);if(!Number.isFinite(speed)||speed<1||speed>100||!Number.isInteger(passes)||passes<1||passes>10)throw Error('Velocidad 1\u2013100 mm/s; pasadas 1\u201310.');$('k40Speed').value=speed;$('k40Passes').value=passes;refresh(false);}else if(action==='resume')await control('resume',true);else if(action==='origin'){if(active||requesting)throw Error('Espera a que termine la operaci\xF3n.');if(!['home','current'].includes(args.value))throw Error('Origen inv\xE1lido.');$('k40Origin').value=args.value;refresh(false);}else if(options.remoteExtra){if(active||requesting||controlBusy)throw Error('Espera a que termine la operaci\xF3n.');await options.remoteExtra(action,args);refresh(false);}else throw Error('Acci\xF3n remota no permitida.');}
  };
  app.machineControl=controller;
  if(options.host)open();
@@ -3561,6 +3587,7 @@ function operate(app) {
     }
     withIcon($('k40Home'), 'home');
     withIcon($('k40UsePosition'), 'target');
+    withIcon($('k40Unlock'), 'move');
     withIcon($('k40Goto'), 'target');
     withIcon($('k40Pick'), 'cursor');
     withIcon($('k40Pulse'), 'laser');
@@ -3569,6 +3596,10 @@ function operate(app) {
   // Centro: plano con encabezado y medidas.
   const canvas = find('.k40-canvas-panel');
   canvas?.classList.add('neo-op-card', 'neo-op-plan');
+  // Alto disponible para el espacio de trabajo (debajo de las cabeceras).
+  const fitHeight = () => { if (operator.hidden) return; const top = operator.getBoundingClientRect().top + window.scrollY; document.body.style.setProperty('--op-top', Math.max(0, Math.round(top)) + 'px'); };
+  new MutationObserver(() => { if (!operator.hidden) { window.scrollTo(0, 0); requestAnimationFrame(fitHeight); } }).observe(operator, {attributes: true, attributeFilter: ['hidden']});
+  window.addEventListener('resize', fitHeight); requestAnimationFrame(fitHeight);
   if (studio) {
     openPhone.className = 'btn outline neo-phone-open'; openPhone.innerHTML = icon('phone') + '<span>Control desde celular</span>';
     studio.ui.centerBar.append(openPhone);
@@ -3727,7 +3758,7 @@ export function parsePairingLink(code){
  const [session,secret]=code.split('.');return {session,secret};
 }
 `,type:"text/javascript; charset=utf-8",public:!0},"/box/peer-transport.js":{body:`// Encrypted peer-to-peer transport. No relay, signaling service or USB token.
-export const REMOTE_ACTIONS=new Set(['settings','pulse','home','jog','frame','cut','pause','resume','cancel','origin','source','op','op-move','op-order','scope','place','place-center','review-ok','save','lib-list','lib-open','lib-duplicate','lib-rename','lib-delete','lib-restore']);
+export const REMOTE_ACTIONS=new Set(['settings','pulse','home','unlock','jog','frame','cut','pause','resume','cancel','origin','source','op','op-move','op-order','scope','place','place-center','review-ok','save','lib-list','lib-open','lib-duplicate','lib-rename','lib-delete','lib-restore']);
 // Archivos del celular: fragmentos de 12 000 caracteres, hasta 11 MB codificados (8 MB de archivo).
 export const UPLOAD_CHUNK=12000,UPLOAD_MAX=11200000;
 export async function encodePairing(value){
@@ -4139,7 +4170,7 @@ function controls(){
  const owner=state?.owner==='phone',idle=owner&&!state?.busy&&!awaiting&&open();
  for(const id of ['remoteUp','remoteLeft','remoteRight','remoteDown'])$(id).disabled=!idle||!state?.hasPosition;
  for(const id of ['remoteSettings','remoteSpeed','remotePasses'])$(id).disabled=!idle;
- $('remoteHome').disabled=!idle;$('remotePulse').disabled=!idle||!state?.canPulse;
+ $('remoteHome').disabled=!idle;$('remoteUnlock').disabled=!idle||!state?.canUnlock;$('remotePulse').disabled=!idle||!state?.canPulse;
  $('remoteFrame').disabled=!idle||!(state?.canFrame??state?.canRun);$('remoteCut').disabled=!idle||!state?.canRun;
  $('remoteStop').disabled=!state?.canPause||!open();$('remoteResume').disabled=!owner||!state?.canResume||awaiting;$('remoteCancel').disabled=!state?.busy||!open();
  $('remotePaused').hidden=!['pausing','paused','resuming','error','unknown'].includes(state?.state);
@@ -4170,7 +4201,7 @@ function receive(message){
  $('remoteOwner').textContent=message.owner==='phone'?'Control de movimientos: este celular.':'La computadora tiene el control; puedes consultar y pedir Stop.';
  $('remoteJobName').textContent=message.name;
  const j=job();$('remoteJobMeta').textContent=j?.source==='import'&&j.file?\`\${j.objects} objetos \xB7 \${fmt(j.bounds?.width)} \xD7 \${fmt(j.bounds?.height)} mm\`:'Dise\xF1o Box \xB7 corte';
- $('remotePosition').innerHTML=Array.isArray(message.position)?\`<span>X <b>\${message.position[0].toFixed(2)}</b></span><span>Y <b>\${message.position[1].toFixed(2)}</b></span>\`:'Sin referencia \xB7 haz Home';
+ $('remotePosition').innerHTML=Array.isArray(message.position)?\`<span>X <b>\${message.position[0].toFixed(2)}</b></span><span>Y <b>\${message.position[1].toFixed(2)}</b></span>\`:message.railUnlocked?'Riel libre \xB7 mueve a mano y luego haz Home':'Sin referencia \xB7 haz Home';
  if(message.preview!==undefined){const svg=safePreview(message.preview);$('remotePreview').replaceChildren(...(svg?[document.importNode(svg,true)]:[]));const copy=svg?document.importNode(svg,true):null;$('remoteJobPreview').replaceChildren(...(copy?[copy]:[]));}
  // Estado listo / problema
  const ready=!message.busy&&message.canRun,title=message.busy?label:ready?'Lista para enviar':message.connected?'Revisa el trabajo':'Conecta la m\xE1quina en la computadora';
@@ -4222,7 +4253,7 @@ async function command(action,args={}){
 }
 /* ---------- Control ---------- */
 for(const [id,x,y] of [['remoteUp',0,-1],['remoteLeft',-1,0],['remoteRight',1,0],['remoteDown',0,1]])$(id).onclick=()=>command('jog',{dx:x*Number($('remoteStep').value),dy:y*Number($('remoteStep').value)});
-for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
+for(const [id,action] of [['remotePulse','pulse'],['remoteHome','home'],['remoteUnlock','unlock'],['remoteFrame','frame'],['remoteCut','cut'],['remoteStop','pause'],['remoteResume','resume'],['remoteCancel','cancel']])$(id).onclick=()=>command(action);
 const steps=$('remoteSteps');for(const o of $('remoteStep').options){const b=document.createElement('button');b.type='button';b.textContent=o.value;b.onclick=()=>{$('remoteStep').value=o.value;paintSteps();};steps.append(b);}
 function paintSteps(){for(const b of steps.children)b.setAttribute('aria-pressed',String(b.textContent===$('remoteStep').value));}paintSteps();
 for(const b of document.querySelectorAll('[data-origin]'))b.onclick=()=>command('origin',{value:b.dataset.origin});
@@ -4355,7 +4386,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#06090d">
 <title>LZ Box \xB7 Control de taller</title>
-<link rel="stylesheet" href="remote.css?v=5">
+<link rel="stylesheet" href="remote.css?v=6">
 </head>
 <body>
 <main class="remote-shell">
@@ -4394,6 +4425,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
    <div class="rm-card"><span>Origen del trabajo</span>
     <div class="rm-seg" role="group" aria-label="Origen"><button type="button" data-origin="home">Desde Home</button><button type="button" data-origin="current">Posici\xF3n actual</button></div>
     <small id="remoteOriginNote"></small></div>
+   <button id="remoteUnlock" type="button" class="rm-unlock" disabled>Desbloquear riel \xB7 mover a mano</button>
    <button id="remotePulse" class="rm-pulse" disabled>Pulso l\xE1ser \xB7 50 ms</button>
    <p class="rm-note">Potencia: la del panel de la m\xE1quina. El pulso lo temporiza la computadora por USB.</p>
    <div class="remote-run"><button id="remoteFrame">Recorrer marco</button><button id="remoteCut" class="rm-primary">Iniciar trabajo</button></div>
@@ -4453,7 +4485,7 @@ else if(saved()){$('remotePair').hidden=true;$('remoteForgetRow').hidden=false;s
  </footer>
 </main>
 <dialog id="remoteDialog" class="rm-dialog"><form method="dialog"><h2 id="remoteDialogTitle"></h2><label id="remoteDialogLabel">Nombre<input id="remoteDialogInput" maxlength="80"></label><label class="rm-check" id="remoteDialogCloudRow"><input type="checkbox" id="remoteDialogCloud" checked> Tambi\xE9n en mi cuenta</label><div class="rm-row"><button value="ok" class="rm-primary" id="remoteDialogOk">Aceptar</button><button value="cancel">Cancelar</button></div></form></dialog>
-<script type="module" src="remote-client.js?v=7"><\/script>
+<script type="module" src="remote-client.js?v=8"><\/script>
 </body>
 </html>
 `,type:"text/html; charset=utf-8",public:!0},"/box/renderer.js":{body:`import {StudioGPU} from './webgl-renderer.js?v=3.5';
@@ -8163,10 +8195,10 @@ export function filterWorkshop(items,{query='',kind='all',model='all'}={}){
 import {optimizeSheet} from './cut-optimizer.js?v=3.5';
 import {k40Preview} from './k40-job.js?v=2';
 import {modelInfo} from './models.js?v=3.5';
-import {mountK40} from './k40-control.js?v=15';
+import {mountK40} from './k40-control.js?v=16';
 import {readWorkshop,writeWorkshop,makeWorkshopItem,filterWorkshop} from './workshop-store.js?v=1';
-import {mountRemoteHost} from './workshop-remote.js?v=7';
-import {mountJobStudio} from './job-studio.js?v=5';
+import {mountRemoteHost} from './workshop-remote.js?v=8';
+import {mountJobStudio} from './job-studio.js?v=6';
 
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,fn,cls='btn outline')=>{const n=el('button',cls,text);n.type='button';n.onclick=fn;return n;};
