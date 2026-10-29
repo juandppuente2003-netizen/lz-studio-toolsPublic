@@ -1,3 +1,8 @@
+ACTUALIZACION 0.7.1
+Nuevo: Desbloquear riel desde Box (PC y celular) para mover el cabezal a mano.
+Despues de desbloquear haz Home: la posicion ya no se conoce.
+Corregido: el instalador reconoce la version nueva del conector.
+
 ACTUALIZACION 0.7.0 (version de revision)
 Nuevo: trabajos con varias operaciones (lz-k40-m2/v2): grabado de imagen,
 grabado vectorial y corte en un mismo envio, cada uno con su velocidad y

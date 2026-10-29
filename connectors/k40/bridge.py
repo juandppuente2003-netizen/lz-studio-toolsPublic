@@ -21,7 +21,7 @@ from registration import register_job
 from operations import PROTOCOL_V2, validate_job_v2, bounds_v2, place_v2, summary_v2
 
 PROTOCOL = 'lz-k40-m2/v1'
-BRIDGE_VERSION = '0.7.0'
+BRIDGE_VERSION = '0.7.1'
 ENGINE_VERSION = '0.9.9100'
 MAX_BODY = 6_000_000
 DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com',

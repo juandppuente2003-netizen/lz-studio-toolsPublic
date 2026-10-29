@@ -525,7 +525,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       if (features.includes('operations-v2') && features.includes('raster-1bit')) return {ok: true};
       const a = analyze(), active = scoped(a);
       if (active.length === 1 && active[0].op.type !== 'raster') return {ok: true, legacy: true};
-      return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operación vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.0 (enlace en Detalles de conexión), o desactiva las demás operaciones.'};
+      return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operación vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.1 (enlace en Detalles de conexión), o desactiva las demás operaciones.'};
     },
     /** Trabajo para el conector. Solo se llama al pulsar Recorrer marco o Iniciar. */
     async buildJob({bed, features, origin}) {
@@ -536,7 +536,7 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       const subset = scoped(a); if (!subset.length) throw Error('La operación elegida para enviar no tiene elementos.');
       const partial = state.sendScope !== 'all';
       if (support.legacy) {
-        if (partial && origin === 'current') throw Error('Con el conector 0.6.4, enviar una sola operación desde la posición actual la desplazaría. Usa origen Home o actualiza a 0.7.0.');
+        if (partial && origin === 'current') throw Error('Con el conector 0.6.4, enviar una sola operación desde la posición actual la desplazaría. Usa origen Home o actualiza a 0.7.1.');
         const o = subset[0];
         return {protocol: K40_V1, board: 'M2', name: source.name(), bed: {...bed}, speed: o.op.speed, passes: o.op.passes, paths: o.data.paths};
       }

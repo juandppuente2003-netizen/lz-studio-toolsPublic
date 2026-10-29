@@ -166,6 +166,6 @@ test('v62: archivo importado — sin envíos automáticos, trabajo armado solo a
   assert.equal($('k40State').textContent,'SIMULACIÓN TERMINADA');
   problem='El diseño sale de la cama.';app.machineControl.refresh(true);assert.equal($('k40Run').disabled,true);assert.equal($('k40Frame').disabled,true);
   problem='';features=features.filter(f=>f!=='operations-v2');$('k40Disconnect').click();await settle();$('k40Connect').click();await settle();await settle();app.machineControl.refresh(true);
-  assert.equal($('k40Run').disabled,true);assert.match($('k40Status').textContent,/0\.7\.0/);
+  assert.equal($('k40Run').disabled,true);assert.match($('k40Status').textContent,/0\.7\.\d/);
  }finally{dom.window.close();Object.assign(globalThis,previous);}
 });
