@@ -7,7 +7,7 @@ from urllib.request import Request, urlopen
 from bridge import PROTOCOL, pairing_path
 
 ORIGIN = 'https://www.lzstudiotools.com'
-VERSION = '0.7.3'
+VERSION = '0.7.4'
 
 
 def listening():

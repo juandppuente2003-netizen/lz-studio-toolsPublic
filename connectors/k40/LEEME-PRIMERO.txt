@@ -1,3 +1,7 @@
+ACTUALIZACION 0.7.4
+Nuevo: grabado hasta 500 mm/s (grabado de imagen y grabado vectorial).
+El corte sigue limitado a 100 mm/s desde Box.
+
 ACTUALIZACION 0.7.3
 Corregido: la pausa entre grabado y corte ya no se queda en "esperando fin".
 Si la placa no avisa el fin, aparece Continuar en cuanto se enviaron los datos:

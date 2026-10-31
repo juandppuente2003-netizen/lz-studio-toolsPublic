@@ -539,11 +539,12 @@ export function mountJobStudio(app, machine, {library = new JobLibrary()} = {}) 
       if (profile.board === 'M3' && !features.includes('m3-pwm')) return {ok: false, message: 'La M3 con potencia por USB requiere el conector 0.7.2 (enlace en Detalles de conexión).'};
       if (features.includes('operations-v2') && features.includes('raster-1bit')) {
         const sent = scoped(analyze());
+        if (!features.includes('engrave-500') && sent.some((o) => o.op.speed > (o.op.type === 'raster' ? 400 : 100))) return {ok: false, message: 'Grabar a más de ' + (sent.some((o) => o.op.type === 'raster' && o.op.speed > 400) ? '400' : '100') + ' mm/s requiere el conector 0.7.4 (enlace en Detalles de conexión). Instálalo o baja la velocidad.'};
         if (sent.some((o, i) => pausesBefore(o.op, i, profile.board, sent[i - 1]?.op)) && !features.includes('operation-pauses')) return {ok: false, message: 'La pausa entre operaciones requiere el conector 0.7.2. Instálalo, o desmarca «Pausar antes» y envía cada operación por separado.'};
         return {ok: true};
       }
       const a = analyze(), active = scoped(a);
-      if (active.length === 1 && active[0].op.type !== 'raster') return {ok: true, legacy: true};
+      if (active.length === 1 && active[0].op.type !== 'raster' && active[0].op.speed <= 100) return {ok: true, legacy: true};
       return {ok: false, message: 'Tu conector es 0.6.4: admite una sola operación vectorial. Para grabado de imagen y trabajos combinados instala el conector 0.7.2 (enlace en Detalles de conexión), o desactiva las demás operaciones.'};
     },
     /** Trabajo para el conector. Solo se llama al pulsar Recorrer marco o Iniciar. */

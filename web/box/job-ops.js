@@ -14,8 +14,8 @@ import {apply, mul, boundsOf, polylineLength} from './svg-import.js?v=2';
 export const K40_PROTOCOL_V2 = 'lz-k40-m2/v2';
 export const NATIVE_MM = 0.0254;
 export const OP_TYPES = {
-  raster: {label: 'Grabado imagen', short: 'Imagen', color: '#e8eef5', speed: [10, 400], defaultSpeed: 200, defaultPower: 25, icon: 'image'},
-  engrave: {label: 'Grabado vectorial', short: 'Vectorial', color: '#ff4d6d', speed: [1, 100], defaultSpeed: 60, defaultPower: 30, icon: 'pen'},
+  raster: {label: 'Grabado imagen', short: 'Imagen', color: '#e8eef5', speed: [10, 500], defaultSpeed: 200, defaultPower: 25, icon: 'image'},
+  engrave: {label: 'Grabado vectorial', short: 'Vectorial', color: '#ff4d6d', speed: [1, 500], defaultSpeed: 60, defaultPower: 30, icon: 'pen'},
   cut: {label: 'Corte', short: 'Corte', color: '#3aa0ff', speed: [1, 100], defaultSpeed: 10, defaultPower: 70, icon: 'scissors'},
 };
 export const RESOLUTIONS = [2, 3, 4, 5, 6, 8].map((step) => ({step, mm: +(step * NATIVE_MM).toFixed(4), dpi: Math.round(1000 / step)}));

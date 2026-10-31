@@ -21,7 +21,7 @@ from registration import register_job
 from operations import PROTOCOL_V2, validate_job_v2, bounds_v2, place_v2, summary_v2
 
 PROTOCOL = 'lz-k40-m2/v1'
-BRIDGE_VERSION = '0.7.3'
+BRIDGE_VERSION = '0.7.4'
 ENGINE_VERSION = '0.9.9100'
 MAX_BODY = 6_000_000
 DEFAULT_ORIGINS = {'https://www.lzstudiotools.com', 'https://lzstudiotools.com',
@@ -568,7 +568,7 @@ class Bridge:
     def info(self):
         return {'protocol': PROTOCOL, 'board': 'M2', 'bed': self.bed,
                 'simulation': self.simulation, 'powerControl': 'manual',
-                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome', 'unlock-rail', 'operation-pauses', 'm3-pwm', 'manual-origin', 'continue-when-sent'],
+                'bridgeVersion': BRIDGE_VERSION, 'features': ['persistent-pairing', 'disconnect', 'priority-stop', 'jog', 'current-origin', 'automatic-completion', 'pause-resume', 'automatic-cancel-recovery', 'rigid-registration', 'rapid-command-acceptance', 'rapid-frame-acceptance', 'timed-pulse', 'cancel-keeps-usb', 'operations-v2', 'raster-1bit', 'job-outcome', 'unlock-rail', 'operation-pauses', 'm3-pwm', 'manual-origin', 'continue-when-sent', 'engrave-500'],
                 'jobProtocols': [PROTOCOL, PROTOCOL_V2], 'rasterPower': 'on-off', 'boards': ['M2', 'M3'],
                 'parts': {'index': self.segment, 'count': len(self.segments), 'names': self.segment_names} if len(self.segments) > 1 else None,
                 'outcome': self.outcome,

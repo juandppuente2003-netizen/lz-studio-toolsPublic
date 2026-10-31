@@ -19,8 +19,8 @@ MAX_OPERATIONS = 12
 MAX_RASTER_PIXELS = 16_000_000
 MAX_RASTER_SIDE = 12_000
 MAX_RASTER_BYTES = 3_000_000
-VECTOR_SPEED = (1, 100)      # mm/s, same limits as v1.
-RASTER_SPEED = (10, 400)     # mm/s, typical M2 raster range.
+VECTOR_SPEED = (1, 500)      # mm/s: grabado vectorial hasta 500; Box limita el corte a 100.
+RASTER_SPEED = (10, 500)     # mm/s: máximo de grabado del láser del usuario.
 
 
 def _numeric(value, minimum, maximum, label):

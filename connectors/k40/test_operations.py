@@ -58,7 +58,7 @@ class ValidationTests(unittest.TestCase):
     def test_limits(self):
         cases = [
             lambda j: j['operations'][2].update(passes=1.5),
-            lambda j: j['operations'][2].update(speed=150),           # vector > 100 mm/s
+            lambda j: j['operations'][2].update(speed=550),           # vector > 500 mm/s
             lambda j: j['operations'][0].update(speed=5),             # raster < 10 mm/s
             lambda j: j['operations'][0]['raster'].update(step=0),
             lambda j: j['operations'][0]['raster'].update(width=61),  # declared size mismatch
@@ -429,3 +429,20 @@ class FieldFixes073Tests(unittest.TestCase):
         finally:
             controller.state = 'idle'
             engine.close()
+
+
+class EngraveSpeed074Tests(unittest.TestCase):
+    def test_engraving_up_to_500_mm_s(self):
+        job = combined()
+        for op in job['operations']:
+            op['speed'] = 500
+        clean = validate_job_v2(job, BED)
+        self.assertTrue(all(op['speed'] == 500 for op in clean['operations']))
+        for op in job['operations']:
+            bad = combined()
+            for o in bad['operations']:
+                if o['name'] == op['name']:
+                    o['speed'] = 501
+            with self.assertRaises(ValueError):
+                validate_job_v2(bad, BED)
+        self.assertIn('engrave-500', Bridge(BED, simulation=True).info()['features'])
