@@ -5,12 +5,15 @@ import {modelInfo,modelPresets} from './web/box/models.js';
 import {arrange,freeze} from './web/box/layout-plus.js';
 import {prepareK40Job,k40Preview,placeK40Job} from './web/box/k40-job.js';
 import {mountK40} from './web/box/k40-control.js';
+import {registerFont} from './web/box/text-shapes.js?v=1';
+import {readFileSync} from 'node:fs';
+for(const id of ['alfa-slab-one','pacifico','anton'])registerFont(id,readFileSync(new URL(`./web/box/fonts/${id}.woff`,import.meta.url)));
 
 function example(extra={}){
  const state={...defaults,...extra},panels=generate(state),packed=arrange(panels,state);
  return {state,panels,packed,valid:true};
 }
-test('18 models × 3 layouts produce M2 snapshots for every sheet',()=>{
+test('20 models × 3 layouts produce M2 snapshots for every sheet',()=>{
  let combinations=0;
  for(const model of Object.keys(modelInfo))for(const layoutMode of ['rows','compact','shared']){
   const app=example({...modelPresets[model],model,layoutMode});
@@ -19,7 +22,7 @@ test('18 models × 3 layouts produce M2 snapshots for every sheet',()=>{
    assert.ok(job.paths.every(p=>p.points.every(([x,y])=>x>=0&&y>=0&&x<=400&&y<=400)));
    let outer=false;for(const p of job.paths){if(p.role==='outer')outer=true;else assert.equal(outer,false);}
   }combinations++;
- }assert.equal(combinations,54);
+ }assert.equal(combinations,60);
 });
 test('overlap, outside, unplaced and invalid model block sending',()=>{
  const app=example(),positions=freeze(app.packed),[a,b]=app.panels;

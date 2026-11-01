@@ -90,7 +90,7 @@ export function mountK40(app,options={}){
    }
    $('k40OriginNote').textContent=isAligned?'Se aplica el registro rígido comprobado. Al terminar vuelve a la posición previa al envío; no ejecuta Home.':current&&manualOrigin()?'Punto manual: el contorno superior izquierdo empieza donde dejaste el cabezal. El conector no conoce los límites de la cama desde ahí: recorre el marco antes de cortar.':current?'El contorno superior izquierdo se alinea al cabezal. Al terminar vuelve a este origen; no ejecuta Home.':'El envío ejecuta Home y vuelve a esa esquina al terminar.';
    const s=job.summary;$('k40Summary').textContent=`Hoja ${job.sheet} · ${s.pieces} piezas · ${s.paths} trayectorias · ${(s.cutLengthMm/1000).toFixed(2)} m. Tiempo mínimo de corte: ${Math.ceil(s.minimumCutSeconds)} s, más movimientos y aceleraciones.`;
-   previewOK=true;if(announce&&!active)status(machine?'Lista. Usa las flechas, recorre el marco o envía la hoja.':'Plano listo. Conecta el conector local para continuar.');
+   previewOK=true;const engraved=app.packed?.panels?.some(p=>p.sheet===+$('k40Sheet').value&&p.engraveMatrix);if(announce&&!active)status(engraved?'Esta hoja tiene grabado: aquí solo se corta. Para grabar y cortar usa Exportar › «Grabar + cortar esta hoja en Operar máquina».':machine?'Lista. Usa las flechas, recorre el marco o envía la hoja.':'Plano listo. Conecta el conector local para continuar.',engraved);
   }catch(e){$('k40Preview').textContent=e.message;$('k40Summary').textContent='';if(announce&&!active)status(e.message,true);}
   buttons();
  }

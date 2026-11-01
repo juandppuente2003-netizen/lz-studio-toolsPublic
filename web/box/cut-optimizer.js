@@ -32,6 +32,7 @@ export function pathsFromItems(items){
  for(const p of items){
   out.push({points:p.points,closed:true,op:'cut',passes:1,parts:[p.id],role:'outer'});
   (p.holePoints||[]).forEach(r=>out.push({points:r,closed:true,op:'cut',passes:1,parts:[p.id],role:'hole'}));
+  (p.slitPoints||[]).forEach(r=>out.push({points:r,closed:false,op:'cut',passes:1,parts:[p.id],role:'hole'}));
  }
  return out;
 }

@@ -1,10 +1,12 @@
 import * as THREE from './vendor/three.module.min.js';
 // Geometry is built directly from the nominal cut contours. No visual bevels,
 // filled holes, or enlarged tenons: the drawing and assembled solid agree.
+/** Sólido que se dibuja: el contorno de corte, o el volumen real si la pieza se dobla (paredes flexibles). */
+export function renderShape(part,thickness){const s=part.solid;return s?{p:s.p,holes:s.holes||[],z0:+s.z0||0,depth:+s.depth||thickness}:{p:part.p,holes:part.holes||[],z0:0,depth:thickness};}
 export function panelGeometry(part,thickness){
- const shape=new THREE.Shape(part.p.map(p=>new THREE.Vector2(...p)));
- for(const hole of part.holes||[])shape.holes.push(new THREE.Path(hole.map(p=>new THREE.Vector2(...p))));
- const geometry=new THREE.ExtrudeGeometry(shape,{depth:thickness,steps:1,bevelEnabled:false,curveSegments:1});
+ const r=renderShape(part,thickness),shape=new THREE.Shape(r.p.map(p=>new THREE.Vector2(...p)));
+ for(const hole of r.holes)shape.holes.push(new THREE.Path(hole.map(p=>new THREE.Vector2(...p))));
+ const geometry=new THREE.ExtrudeGeometry(shape,{depth:r.depth,steps:1,bevelEnabled:false,curveSegments:1});if(r.z0)geometry.translate(0,0,r.z0);
  const uv=geometry.getAttribute('uv');for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)/160,uv.getY(i)/160);
  geometry.computeBoundingBox();return geometry;
 }

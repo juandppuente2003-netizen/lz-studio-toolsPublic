@@ -5,6 +5,7 @@
    Las posiciones manuales (state.placements) sustituyen a las automáticas
    y alimentan los mismos SVG/DXF: el plano que ves es el que se exporta. */
 import {layout,compensate} from './geometry.js?v=3.5';
+import {withMirror,placedExtras} from './engrave.js?v=1';
 
 export const sheetPresets=[
  {id:'lz400',label:'Láser LZ · 400 × 400',w:400,h:400},
@@ -21,9 +22,9 @@ export const netArea=p=>Math.max(0,area(p.p)-(p.holes||[]).reduce((a,h)=>a+area(
 function size(p,rot,k){return rot%180===0?[p.w+k,p.h+k]:[p.h+k,p.w+k];}
 /** Same transform family as geometry.layout (rot 90 = original «rot»). */
 export function place(p,x,y,rot,k){
- const tr=([a,b])=>rot===90?[x+b+k/2,y+p.w-a+k/2]:rot===180?[x+p.w-a+k/2,y+p.h-b+k/2]:rot===270?[x+p.h-b+k/2,y+a+k/2]:[x+a+k/2,y+b+k/2];
+ const tr=withMirror(p,([a,b])=>rot===90?[x+b+k/2,y+p.w-a+k/2]:rot===180?[x+p.w-a+k/2,y+p.h-b+k/2]:rot===270?[x+p.h-b+k/2,y+a+k/2]:[x+a+k/2,y+b+k/2]);
  const [bw,bh]=size(p,rot,k);
- return {...p,points:compensate(p.p,k/2,p.name).map(tr),holePoints:(p.holes||[]).map(h=>compensate(h,-k/2,p.name).map(tr)),x,y,bw,bh,rot:rot===90,rotation:rot};
+ return {...p,points:compensate(p.p,k/2,p.name).map(tr),holePoints:(p.holes||[]).map(h=>compensate(h,-k/2,p.name).map(tr)),...placedExtras(p,tr),x,y,bw,bh,rot:rot===90,rotation:rot};
 }
 
 function maxRects(items,W,H,g){
@@ -113,6 +114,16 @@ function firstFree(p,s,taken,count){
  * Returns {panels,count,unplaced,mode,manual}.
  */
 export function arrange(panels,s){
+ // Acrílico y MDF nunca comparten hoja: cada material se acomoda en sus propias hojas.
+ const materials=[...new Set(panels.map(p=>p.material||'mdf'))];
+ if(materials.length>1&&!(s.placements&&typeof s.placements==='object')){
+  let offset=0;const out=[],unplaced=[],sheetMaterials=[];let mode;
+  for(const mat of materials.sort((a,b)=>a==='mdf'?-1:b==='mdf'?1:0)){const r=arrangeOne(panels.filter(p=>(p.material||'mdf')===mat),{...s,extraSheets:0});mode=r.mode;for(const p of r.panels)out.push({...p,sheet:p.sheet+offset});unplaced.push(...r.unplaced);for(let i=0;i<r.count;i++)sheetMaterials.push(mat);offset+=r.count;}
+  return{panels:out,count:offset,unplaced,mode,manual:false,sheetMaterials};
+ }
+ return arrangeOne(panels,s);
+}
+function arrangeOne(panels,s){
  const k=+s.kerf,mode=['compact','shared'].includes(s.layoutMode)?s.layoutMode:'rows',manual=s.placements&&typeof s.placements==='object'?s.placements:null;
  if(mode==='rows'&&!manual){const packed=layout(panels,s);packed.panels.forEach(p=>p.rotation=p.rot?90:0);return{...packed,unplaced:[],mode,manual:false};}
  let base={},count=1,unplaced=[];

@@ -5,6 +5,7 @@ import {optimizeSheet} from './cut-optimizer.js?v=3.5';
    girar y cambiar de hoja las piezas. Las posiciones se guardan en
    state.placements y entran al historial de deshacer. */
 import {arrange,checkPacked,freeze,place,sheetPresets} from './layout-plus.js?v=3.5';
+import {engraveSVG} from './engrave.js?v=1';
 
 const esc=s=>String(s).replace(/[<&>"]/g,c=>({'<':'&lt;','&':'&amp;','>':'&gt;','"':'&quot;'}[c]));
 const r2=n=>Math.round(n*100)/100;
@@ -12,7 +13,7 @@ const r2=n=>Math.round(n*100)/100;
 export function sheetSVG(packed,s,sheet,{selected=null,status={},bed=null,uniqueCuts=false}={}){
  const items=packed.panels.filter(p=>p.sheet===sheet),fs=Math.max(4,+s.sheetW/70),g=+s.gap;
  const body=items.map(p=>{const d=[p.points,...(p.holePoints||[])].map(r=>'M'+r.map(v=>v.map(r2).join(' ')).join('L')+'Z').join('');const cls=['plan-piece',p.id===selected?'is-selected':'',status[p.id]||''].join(' ');const size=Math.min(fs,p.bw/Math.max(4,p.name.length)*1.6,p.bh*.3);
-  return `<g class="${cls}" data-piece="${esc(p.id)}"><rect class="plan-hit" x="${r2(p.x)}" y="${r2(p.y)}" width="${r2(p.bw)}" height="${r2(p.bh)}"/><path d="${d}" fill-rule="evenodd" ${uniqueCuts?'style="stroke:none"':''}/><text x="${r2(p.x+p.bw/2)}" y="${r2(p.y+p.bh/2+size*.35)}" font-size="${r2(size)}" text-anchor="middle">${esc(p.name)}</text></g>`;}).join('');
+  return `<g class="${cls}" data-piece="${esc(p.id)}"><rect class="plan-hit" x="${r2(p.x)}" y="${r2(p.y)}" width="${r2(p.bw)}" height="${r2(p.bh)}"/><path d="${d}" fill-rule="evenodd" ${uniqueCuts?'style="stroke:none"':''}/>${p.engraveMatrix?`<g class="plan-engrave" opacity=".55" style="pointer-events:none">${engraveSVG([p])}</g>`:''}${p.slitPoints?.length?`<path class="plan-slits" d="${p.slitPoints.map(l=>'M'+l.map(v=>v.map(r2).join(' ')).join('L')).join('')}" fill="none" stroke="currentColor" stroke-width=".25" opacity=".6" style="pointer-events:none"/>`:''}${p.material==='acrylic'?`<text class="plan-material" x="${r2(p.x+3)}" y="${r2(p.y+fs)}" font-size="${r2(fs*.8)}">ACRÍLICO</text>`:''}<text x="${r2(p.x+p.bw/2)}" y="${r2(p.y+p.bh/2+size*.35)}" font-size="${r2(size)}" text-anchor="middle">${esc(p.name)}</text></g>`;}).join('');
  const optimized=uniqueCuts?optimizeSheet(items,.01):null;
  const toolpaths=optimized?'<g class="plan-unique-cuts" style="pointer-events:none">'+optimized.paths.map(p=>`<path d="M${p.points.map(q=>q.join(' ')).join('L')}${p.closed?'Z':''}" fill="none" stroke="#86ccaa" stroke-width=".7"/>`).join('')+'</g>':'';
  const W=bed?Math.max(+s.sheetW,bed.width):+s.sheetW,H=bed?Math.max(+s.sheetH,bed.height):+s.sheetH,step=Math.max(10,Math.ceil(Math.max(W,H)/10/10)*10);
@@ -36,7 +37,7 @@ export class PlanEdit{
  render(packed,s,panels){
   this.check=checkPacked(packed,s,panels);const status={};for(const id of this.check.outside)status[id]='is-outside';for(const [a,b] of this.check.tight){status[a]||='is-tight';status[b]||='is-tight';}for(const [a,b] of this.check.overlaps){status[a]='is-overlap';status[b]='is-overlap';}
   if(this.selected&&!packed.panels.some(p=>p.id===this.selected))this.selected=null;
-  const sheets=[];for(let i=0;i<packed.count;i++){const wrap=document.createElement('div');wrap.className='sheet-wrap';wrap.innerHTML=sheetSVG(packed,s,i,{selected:this.selected,status,bed:this.api.bed?.(),uniqueCuts:this.uniqueCuts||s.layoutMode==='shared'});const u=this.check.sheets[i];const label=document.createElement('p');label.textContent=`Hoja ${i+1} · ${+s.sheetW} × ${+s.sheetH} mm · ${u?u.pieces:0} piezas · ${u?u.pct.toFixed(1):'0.0'}% aprovechado`;wrap.append(label);if(this.editing)this.bind(wrap,i,packed,s);sheets.push(wrap);}
+  const sheets=[];for(let i=0;i<packed.count;i++){const wrap=document.createElement('div');wrap.className='sheet-wrap';wrap.innerHTML=sheetSVG(packed,s,i,{selected:this.selected,status,bed:this.api.bed?.(),uniqueCuts:this.uniqueCuts||s.layoutMode==='shared'});const u=this.check.sheets[i];const label=document.createElement('p');label.textContent=`Hoja ${i+1}${packed.sheetMaterials?.[i]==='acrylic'?' · ACRÍLICO':packed.sheetMaterials?' · MDF':''} · ${+s.sheetW} × ${+s.sheetH} mm · ${u?u.pieces:0} piezas · ${u?u.pct.toFixed(1):'0.0'}% aprovechado`;wrap.append(label);if(this.editing)this.bind(wrap,i,packed,s);sheets.push(wrap);}
   this.refreshTools(packed,s);return sheets;
  }
  bind(wrap,sheet,packed,s){const svg=wrap.querySelector('svg');if(!svg)return;
