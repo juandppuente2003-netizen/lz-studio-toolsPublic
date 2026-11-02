@@ -1682,11 +1682,13 @@ export function vectorPaths(design, placement, operation, assignment) {
   } catch {
     // Sin optimizaci\xF3n verificable se env\xEDa el original: nunca se pierde un tramo.
     const length = raw.reduce((s, p) => s + polylineLength(p.points, p.closed), 0);
-    return {paths: raw.map(({points, closed, role}) => ({points, closed, role})), lengthMm: length, savedMm: 0, travelMm: travel(raw), optimized: false};
+    return {paths: raw.map(({points, closed, role}) => ({points, closed, role})).filter(usable), lengthMm: length, savedMm: 0, travelMm: travel(raw), optimized: false};
   }
-  const paths = result.paths.map(({points, closed, role}) => ({points, closed: !!closed, role: role === 'hole' ? 'hole' : 'outer'}));
+  // La optimizaci\xF3n puede dejar tramos sueltos m\xE1s cortos que un paso de la M2: no se cortan (el conector los rechaza).
+  const paths = result.paths.map(({points, closed, role}) => ({points, closed: !!closed, role: role === 'hole' ? 'hole' : 'outer'})).filter(usable);
   return {paths, lengthMm: result.stats.after, savedMm: Math.max(0, result.stats.before - result.stats.after), travelMm: result.stats.travelAfter ?? travel(paths), optimized: true};
 }
+function usable(p) { return p.points.length >= (p.closed ? 3 : 2) && polylineLength(p.points, p.closed) >= 2 * NATIVE_MM; }
 function travel(paths, at = [0, 0]) { let d = 0; for (const p of paths) { d += Math.hypot(p.points[0][0] - at[0], p.points[0][1] - at[1]); at = p.closed ? p.points[0] : p.points.at(-1); } return d; }
 
 /* ------------------------------------------------------------ raster */
@@ -1857,7 +1859,7 @@ export async function buildJobV2({design, placement, plan, bed, name, profile = 
       if (!r.sweep.burnPixels) continue;
       const png = await encodePNG1(r.bits, r.widthPx, r.heightPx);
       operations.push({type: 'raster', name: o.op.name, speed: o.op.speed, passes: o.op.passes, ...extras(o.op, operations.length, previous), raster: {x: f4(o.data.area.x), y: f4(o.data.area.y), step: o.op.step, width: r.widthPx, height: r.heightPx, png: base64(png), bidirectional: o.op.bidirectional !== false}});
-    } else operations.push({type: 'vector', name: o.op.name, speed: o.op.speed, passes: o.op.passes, ...extras(o.op, operations.length, previous), paths: o.data.paths});
+    } else operations.push({type: 'vector', name: o.op.name, speed: o.op.speed, passes: o.op.passes, ...extras(o.op, operations.length, previous), paths: o.data.paths.filter(usable)});
     previous = o.op;
   }
   function extras(op, index, prev) {
