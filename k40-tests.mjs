@@ -188,3 +188,18 @@ test('altar de muertos: 2–7 niveles, ranuras cerradas por pieza, retablo opcio
  assert.throws(()=>generate({...base,measure:'inner'}),/exteriores/);
  assert.throws(()=>generate({...base,levels:7}),/fondo|alto/);
 });
+test('Dibujar: formas, combinaciones, contorno, radio, matriz y SVG en mm',async()=>{
+ const G=await import('./web/box/draw-geometry.js?v=1');
+ const mk=(kind,params,m=G.I(),op='cut')=>({id:G.uid(),kind,params,m,op});
+ const a=mk('rect',{w:80,h:40,r:0}),b=mk('tri',{w:50,h:30},G.translate(15,35));
+ const u=G.combine([a,b],'union');assert.deepEqual(G.bbox([u]),{x:0,y:0,w:80,h:65});
+ assert.equal(G.combine([a,mk('ellipse',{w:20,h:20},G.translate(10,10))],'difference').params.shapes[0].holes.length,1);
+ assert.throws(()=>G.combine([a],'union'),/dos o más/);
+ const ringShape=G.outline(mk('ellipse',{w:60,h:60}),5,{ring:true});assert.equal(ringShape.params.shapes[0].holes.length,1);
+ const rounded=G.roundCorners(a,6);assert.ok(rounded.params.shapes[0].outer.length>4);
+ assert.equal(G.array([a],{rows:2,cols:3}).length,5);
+ const t=mk('text',{text:'Ana',font:'alfa-slab-one',size:20});assert.ok(Math.abs(G.bbox([t]).h-20)<1.5);
+ const svg=G.exportSVG([u,mk('rect',{w:10,h:10},G.translate(100,0),'engrave'),mk('polyline',{points:[[0,0],[5,5]]},G.I(),'line')]);
+ assert.match(svg,/width="110mm"/);assert.match(svg,/stroke="#ff0000"/);assert.match(svg,/fill="#000000"/);assert.match(svg,/stroke="#1f6bff"/);
+ const flipped={...a,m:G.scaleAt(-1,1,40,20)};assert.deepEqual(G.bbox([flipped]),G.bbox([a]));
+});
