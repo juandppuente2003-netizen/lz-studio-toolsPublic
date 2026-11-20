@@ -13,7 +13,7 @@ function example(extra={}){
  const state={...defaults,...extra},panels=generate(state),packed=arrange(panels,state);
  return {state,panels,packed,valid:true};
 }
-test('20 models × 3 layouts produce M2 snapshots for every sheet',()=>{
+test('21 models × 3 layouts produce M2 snapshots for every sheet',()=>{
  let combinations=0;
  for(const model of Object.keys(modelInfo))for(const layoutMode of ['rows','compact','shared']){
   const app=example({...modelPresets[model],model,layoutMode});
@@ -22,7 +22,7 @@ test('20 models × 3 layouts produce M2 snapshots for every sheet',()=>{
    assert.ok(job.paths.every(p=>p.points.every(([x,y])=>x>=0&&y>=0&&x<=400&&y<=400)));
    let outer=false;for(const p of job.paths){if(p.role==='outer')outer=true;else assert.equal(outer,false);}
   }combinations++;
- }assert.equal(combinations,60);
+ }assert.equal(combinations,63);
 });
 test('overlap, outside, unplaced and invalid model block sending',()=>{
  const app=example(),positions=freeze(app.packed),[a,b]=app.panels;
@@ -187,4 +187,14 @@ test('altar de muertos: 2–7 niveles, ranuras cerradas por pieza, retablo opcio
  assert.throws(()=>generate({...base,levels:8}),/2 a 7 niveles/);
  assert.throws(()=>generate({...base,measure:'inner'}),/exteriores/);
  assert.throws(()=>generate({...base,levels:7}),/fondo|alto/);
+});
+test('placa con base: ranura = espesor + holgura, pestaña capturada y validación',()=>{
+ const base={...defaults,...modelPresets.plaque,model:'plaque'};
+ for(const extra of [{},{thickness:5,clearance:.2,plaqueMargin:10,plaqueRadius:6},{plaqueMaterial:'mdf'}]){
+  const s={...base,...extra},parts=generate(s),b=parts.find(p=>p.id==='base'),p=parts.find(p=>p.id==='plaque'),slot=b.holes[0],ys=slot.map(v=>v[1]);
+  assert.equal(parts.length,2);assert.ok(Math.abs(Math.max(...ys)-Math.min(...ys)-(+s.thickness+ +s.clearance))<1e-9);
+  const tab=p.p.filter(([,y])=>y===0).map(([x])=>x),xs=slot.map(v=>v[0]);assert.ok(Math.abs((Math.max(...xs)-Math.min(...xs))-(Math.max(...tab)-Math.min(...tab))-(+s.clearance))<1e-9);
+  assert.equal(p.material,s.plaqueMaterial==='mdf'?undefined:'acrylic');
+ }
+ assert.throws(()=>generate({...base,depth:12}),/fondo|espesor/);
 });
