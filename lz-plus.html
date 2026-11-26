@@ -361,18 +361,21 @@ function img(src, alt, onFail) {
   return i;
 }
 // ---------- Servidor intermedio (lz-servidor.js en tu computadora) ----------
-let PROXY = null;
+let PROXY = null, PROXY_BASE = null, PROXY_FF = false;
 async function detectProxy() {
   const cands = [S.proxy, /^https?:$/.test(location.protocol) ? location.origin : null].filter(Boolean).map((x) => x.replace(/\/+$/, ''));
   for (const c of [...new Set(cands)]) {
     try {
       const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 2500);
       const r = await fetch(c + '/lz-proxy/ping', {signal: ctrl.signal}); clearTimeout(tm);
-      if (r.ok && (await r.json()).lzproxy) { PROXY = c + '/lz-proxy/p'; srcCache.clear(); built.vivo = false; return true; }
+      const j = r.ok ? await r.json() : {};
+      if (j.lzproxy) { PROXY = c + '/lz-proxy/p'; PROXY_BASE = c; PROXY_FF = !!j.ffmpeg; srcCache.clear(); built.vivo = false; return true; }
     } catch {}
   }
-  PROXY = null; return false;
+  PROXY = null; PROXY_BASE = null; PROXY_FF = false; return false;
 }
+// Video convertido por el intermediario (FFmpeg): v = 'copy' (rápido) o 'h264' (convierte la imagen)
+const ffUrl = (u, h, v, t) => PROXY_BASE + '/lz-proxy/mp4?u=' + encodeURIComponent(u) + (h.ref ? '&r=' + encodeURIComponent(h.ref) : '') + (h.ua ? '&a=' + encodeURIComponent(h.ua) : '') + '&v=' + v + (t ? '&t=' + Math.floor(t) : '');
 const px = (url, h = {}) => PROXY ? PROXY + '?u=' + encodeURIComponent(url) + (h.ref ? '&r=' + encodeURIComponent(h.ref) : '') + (h.ua ? '&a=' + encodeURIComponent(h.ua) : '') : url;
 const NO_CONN = () => PROXY || NATIVE ? 'El servidor no responde.' : 'El servidor no deja conectarse desde el navegador. Abre LZ-PLUS con el servidor intermedio (Ajustes → Servidor intermedio).';
 
@@ -1251,7 +1254,7 @@ function toggleFav(c) {
 // =====================================================================
 let hls = null, pvMode = null, curCh = null, liveList = [], osdT, hintT, fullPrevFocus = null;
 function stopPlayback() {
-  vodTry++; vodSess++;
+  vodTry++; vodSess++; vodFF = null;
   if (hls) { hls.destroy(); hls = null; }
   video.pause(); video.removeAttribute('src'); video.load();
   video.querySelectorAll('track').forEach((t) => t.remove());
@@ -1352,10 +1355,12 @@ function playerKey(e) {
     if (k === 'ArrowLeft' || k === 'ArrowRight') { showOsd(); return true; }
   } else if (pvMode === 'vod') {
     if (k === 'Enter' || k === ' ' || k === 'MediaPlayPause') { if (document.activeElement && document.activeElement.closest('.pv-top')) return false; video.paused ? video.play() : video.pause(); hint(video.paused ? '❚❚  Pausa' : '▶  Reproduciendo'); return true; }
+    if (vodFF && (k === 'ArrowLeft' || k === 'MediaRewind')) { ffSeek(-10); return true; }
+    if (vodFF && (k === 'ArrowRight' || k === 'MediaFastForward')) { ffSeek(30); return true; }
     if (k === 'ArrowLeft' || k === 'MediaRewind') { video.currentTime = Math.max(0, video.currentTime - 10); hint('◀◀  -10 s'); return true; }
     if (k === 'ArrowRight' || k === 'MediaFastForward') { video.currentTime += 10; hint('▶▶  +10 s'); return true; }
     if (k === 'ArrowUp') { focusEl($('pvList')); return true; }
-    if (k === 'ArrowDown') { const t = video.currentTime, d = video.duration; hint(fmt(t) + (isFinite(d) ? ' / ' + fmt(d) : '')); return true; }
+    if (k === 'ArrowDown') { const t = (vodFF ? vodFF.offset : 0) + video.currentTime, d = vodFF ? vodFF.dur : video.duration; hint(fmt(t) + (isFinite(d) ? ' / ' + fmt(d) : '')); return true; }
   } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(k)) return true;
   return false;
 }
@@ -1370,6 +1375,14 @@ function attemptsFor(s) {
   const out = [];
   if (PROXY) modes.forEach((m) => out.push({url: px(u, h), mode: m, proxied: true}));   // con intermediario primero: es lo más seguro
   if (!needsProxy) modes.forEach((m) => out.push({url: u, mode: m}));
+  if (PROXY_FF) {
+    const d = ((s.name || '') + ' ' + (s.title || '') + ' ' + (s.description || '')).toLowerCase();
+    const tough = /\.(mkv|avi|ts)(\?|$)/i.test(u) || /\bmkv\b|hevc|x265|h\.?265|ac-?3|e-?ac-?3|ddp|dd\+|dts|atmos|truehd/.test(d);
+    const remux = {url: ffUrl(u, h, 'copy'), mode: 'native', ff: {u, h, v: 'copy'}, probe: px(u, h)};
+    const trans = {url: ffUrl(u, h, 'h264'), mode: 'native', ff: {u, h, v: 'h264'}, probe: px(u, h)};
+    if (tough && !isHls) out.unshift(remux); else out.push(remux);   // MKV/AC3: convertir primero
+    out.push(trans);
+  }
   return out;
 }
 // Revisa en pocos segundos si el link responde (para no esperar en links caídos)
@@ -1380,7 +1393,20 @@ async function probe(url, isHls) {
     return r.ok || r.status === 206 ? 'ok' : 'bad';
   } catch (e) { return e.message === 'tiempo' ? 'bad' : 'unknown'; }
 }
-let vodTry = 0;
+let vodTry = 0, vodFF = null, ffSeekT = null, ffTarget = null;
+// Adelantar / retroceder un video convertido: se vuelve a pedir desde el segundo elegido
+function ffSeek(delta) {
+  const cur = ffTarget ?? (vodFF.offset + (video.currentTime || 0));
+  ffTarget = Math.max(0, vodFF.dur ? Math.min(vodFF.dur - 5, cur + delta) : cur + delta);
+  hint((delta < 0 ? '◀◀  ' : '▶▶  ') + fmt(ffTarget) + (vodFF.dur ? ' / ' + fmt(vodFF.dur) : ''));
+  clearTimeout(ffSeekT);
+  ffSeekT = setTimeout(() => {
+    const t = ffTarget; ffTarget = null; vodFF.offset = t;
+    msg('Moviendo a ' + fmt(t) + '…', null, true);
+    video.onplaying = () => msg('');
+    video.src = ffUrl(vodFF.u, vodFF.h, vodFF.v, t); video.play().catch(() => {});
+  }, 800);
+}
 function tryPlay(a, ms) {
   return new Promise((resolve) => {
     const my = ++vodTry;
@@ -1389,7 +1415,13 @@ function tryPlay(a, ms) {
     let done = false;
     const end = (ok) => { if (done) return; done = true; clearTimeout(tm); resolve(ok && my === vodTry); };
     const tm = setTimeout(() => end(false), ms);
-    video.onplaying = () => { if (my === vodTry) { msg(''); end(true); } };
+    // "Reproduciendo" no basta: se revisa que de verdad se vea imagen (si no, el navegador no lee ese video)
+    video.onplaying = () => { if (my !== vodTry) return; setTimeout(() => {
+      if (my !== vodTry || done) return;
+      const q = video.getVideoPlaybackQuality ? video.getVideoPlaybackQuality() : null;
+      if (!video.videoWidth || (q && q.totalVideoFrames === 0)) return end(false);
+      msg(''); end(true);
+    }, 1500); };
     if (a.mode === 'hls' && window.Hls && Hls.isSupported()) {
       hls = new Hls({maxBufferLength: 30}); hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) end(false); });
       hls.loadSource(a.url); hls.attachMedia(video);
@@ -1402,9 +1434,15 @@ async function playStream(s, sess) {
   const tries = attemptsFor(s), checked = new Map();
   for (const a of tries) {
     if (sess !== vodSess) return false;
-    if (!checked.has(a.url)) checked.set(a.url, await probe(a.url, a.mode === 'hls'));
-    if (checked.get(a.url) === 'bad') continue;
-    if (await tryPlay(a, 12000)) return true;
+    const pu = a.probe || a.url;
+    if (!checked.has(pu)) checked.set(pu, await probe(pu, a.mode === 'hls'));
+    if (checked.get(pu) === 'bad') continue;
+    if (a.ff) msg(a.ff.v === 'h264' ? 'Convirtiendo el video para tu navegador… (puede tardar unos segundos)' : 'Preparando el video…', null, true);
+    vodFF = null;
+    if (await tryPlay(a, a.ff ? 30000 : 12000)) {
+      if (a.ff) { vodFF = {...a.ff, offset: 0, dur: 0}; fetch(PROXY_BASE + '/lz-proxy/info?u=' + encodeURIComponent(a.ff.u)).then((r) => r.json()).then((j) => { if (vodFF) vodFF.dur = j.duration || 0; }).catch(() => {}); }
+      return true;
+    }
   }
   return false;
 }
@@ -1605,7 +1643,7 @@ function buildSettings() {
   w.append(bA);
   // Intermediario
   const bP = el('div', 'box'); bP.append(el('h2', 'disp', 'Servidor intermedio'));
-  bP.append(el('p', 'note', PROXY ? 'Estado: conectado ✓ — tus servidores, listas y videos se abren a través de él.' : 'Estado: no conectado. Sin él, muchos servidores Xtream, listas y videos no dejan abrirse desde el navegador.'),
+  bP.append(el('p', 'note', PROXY ? 'Estado: conectado ✓ — tus servidores, listas y videos se abren a través de él.' + (PROXY_FF ? ' Conversión de video (FFmpeg) activa ✓' : ' Sin conversión de video: abre la app con INICIAR-LZ-PLUS.bat para instalar FFmpeg.') : 'Estado: no conectado. Sin él, muchos servidores Xtream, listas y videos no dejan abrirse desde el navegador.'),
     el('p', 'note', 'Lo mejor: en el navegador de la TV escribe la dirección que muestra la ventana de LZ-PLUS en tu computadora (por ejemplo http://192.168.1.10:8080). Así la app se abre desde ahí y se conecta sola, sin escribir nada aquí.'));
   const pi = el('input'); pi.placeholder = 'Dirección (si la app se abre desde otro lugar), ej. http://192.168.1.10:8080'; pi.value = S.proxy || '';
   const pb2 = el('div', 'btns');

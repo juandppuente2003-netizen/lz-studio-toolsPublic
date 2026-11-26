@@ -11,6 +11,17 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { Readable } = require('stream');
+const { spawn, execFileSync } = require('child_process');
+
+// ---------- FFmpeg: convierte al vuelo los videos que el navegador no abre (MKV, AC3, HEVC) ----------
+function findFfmpeg() {
+  const cands = [process.env.FFMPEG];
+  try { cands.push(require(path.join(__dirname, 'node_modules', 'ffmpeg-static'))); } catch {}
+  cands.push('ffmpeg');
+  for (const c of cands.filter(Boolean)) { try { execFileSync(c, ['-version'], { stdio: 'ignore' }); return c; } catch {} }
+  return null;
+}
+const FFMPEG = findFfmpeg();
 
 const PORT = Number(process.env.PORT) || 8080;
 const APP = path.join(__dirname, 'lz-plus.html');
@@ -66,11 +77,60 @@ async function proxy(req, res, q) {
   Readable.fromWeb(up.body).on('error', () => res.destroy()).pipe(res);
 }
 
+function ffInput(q, level = 'error') {
+  const args = ['-hide_banner', '-loglevel', level, '-user_agent', q.get('a') || UA];
+  if (q.get('r')) args.push('-headers', 'Referer: ' + q.get('r') + '\r\n');
+  args.push('-reconnect', '1', '-reconnect_streamed', '1', '-reconnect_delay_max', '5');
+  return args;
+}
+// Duración y códecs (para la barra de tiempo y decidir si hay que convertir la imagen)
+function info(req, res, q) {
+  cors(res);
+  const target = q.get('u');
+  if (!FFMPEG || !/^https?:\/\//i.test(target || '')) { res.writeHead(400); return res.end('{}'); }
+  const p = spawn(FFMPEG, [...ffInput(q, 'info'), '-i', target]);
+  let err = '';
+  p.stderr.on('data', (d) => { err += d; if (err.length > 200000) p.kill('SIGKILL'); });
+  const t = setTimeout(() => p.kill('SIGKILL'), 15000);
+  p.on('close', () => {
+    clearTimeout(t);
+    const m = err.match(/Duration: (\d+):(\d+):(\d+(?:\.\d+)?)/);
+    const v = (err.match(/Video: (\w+)/) || [])[1] || '';
+    const a = (err.match(/Audio: (\w+)/) || [])[1] || '';
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ duration: m ? (+m[1]) * 3600 + (+m[2]) * 60 + parseFloat(m[3]) : 0, video: v, audio: a }));
+  });
+  req.on('close', () => p.kill('SIGKILL'));
+}
+// Video convertido a MP4 en vivo. v=copy (rápido, solo cambia el empaque) o v=h264 (convierte la imagen; usa más CPU)
+function mp4(req, res, q) {
+  cors(res);
+  const target = q.get('u');
+  if (!FFMPEG || !/^https?:\/\//i.test(target || '')) { res.writeHead(400); return res.end('Sin FFmpeg'); }
+  const args = ffInput(q);
+  const t = parseFloat(q.get('t') || '0');
+  if (t > 0) args.push('-ss', String(t));
+  args.push('-i', target, '-map', '0:v:0', '-map', '0:a:0?', '-sn', '-dn');
+  if (q.get('v') === 'h264') args.push('-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22', '-pix_fmt', 'yuv420p', '-vf', "scale='min(1920,iw)':-2");
+  else args.push('-c:v', 'copy');
+  args.push('-c:a', 'aac', '-ac', '2', '-b:a', '192k', '-f', 'mp4', '-movflags', 'frag_keyframe+empty_moov+default_base_moof', 'pipe:1');
+  const p = spawn(FFMPEG, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+  let started = false, err = '';
+  p.stderr.on('data', (d) => { err = (err + d).slice(-2000); });
+  p.stdout.once('data', () => { started = true; });
+  res.writeHead(200, { 'Content-Type': 'video/mp4', 'Cache-Control': 'no-cache' });
+  p.stdout.pipe(res);
+  p.on('close', (code) => { if (!started && code) console.log('  FFmpeg no pudo abrir un video:', err.trim().split('\n').pop()); res.end(); });
+  req.on('close', () => p.kill('SIGKILL'));
+}
+
 http.createServer((req, res) => {
   const u = new URL(req.url, 'http://x');
   if (req.method === 'OPTIONS') { cors(res); res.writeHead(204); return res.end(); }
   if (u.pathname === '/prueba') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); return res.end('<body style="font:32px sans-serif;background:#06080F;color:#fff;display:grid;place-items:center;height:90vh"><div>✅ LZ-PLUS funciona en esta red.<br><a style="color:#F5B84B" href="/">Abrir la app</a></div></body>'); }
-  if (u.pathname === '/lz-proxy/ping') { cors(res); res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end('{"lzproxy":true}'); }
+  if (u.pathname === '/lz-proxy/ping') { cors(res); res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ lzproxy: true, ffmpeg: !!FFMPEG })); }
+  if (u.pathname === '/lz-proxy/info') return info(req, res, u.searchParams);
+  if (u.pathname === '/lz-proxy/mp4') return mp4(req, res, u.searchParams);
   if (u.pathname === PREFIX) return proxy(req, res, u.searchParams).catch(() => { try { res.destroy(); } catch {} });
   if (u.pathname === '/' || u.pathname === '/index.html' || u.pathname === '/lz-plus.html') {
     fs.readFile(APP, (err, data) => {
@@ -84,7 +144,7 @@ http.createServer((req, res) => {
   // La IP de la red de tu casa va primero; las de programas virtuales (VirtualBox, WSL, etc.) al final
   const rank = (name, ip) => (/virtual|vmware|vbox|wsl|hyper-v|vethernet|docker|loopback|tailscale|zerotier|bluetooth/i.test(name) ? 10 : 0) + (/^192\.168\./.test(ip) ? 0 : /^10\./.test(ip) ? 1 : /^172\.(1[6-9]|2\d|3[01])\./.test(ip) ? 3 : 5) + (/^192\.168\.56\./.test(ip) ? 10 : 0);
   const ips = Object.entries(os.networkInterfaces()).flatMap(([name, l]) => (l || []).filter((i) => i.family === 'IPv4' && !i.internal).map((i) => ({ip: i.address, r: rank(name, i.address)}))).sort((a, b) => a.r - b.r).map((x) => x.ip);
-  console.log('\n  LZ-PLUS está listo.\n');
+  console.log('\n  LZ-PLUS está listo.' + (FFMPEG ? '  (FFmpeg activo: abre MKV, HEVC y AC3)' : '  (Sin FFmpeg: algunos videos no abrirán)') + '\n');
   if (ips.length) {
     console.log('  >>> En el navegador de tu TV escribe:   http://' + ips[0] + ':' + PORT + '   <<<\n');
     console.log('  Para comprobar la conexión desde la TV: http://' + ips[0] + ':' + PORT + '/prueba');
