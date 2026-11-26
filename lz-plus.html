@@ -116,6 +116,9 @@
   .chrow b{display:block;font-size:1.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .chrow small{color:var(--mut);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
   .chrow .st{color:var(--accent);font-size:1.1rem}
+  .chrow.dead{opacity:.42}
+  .chrow .sig{width:.65rem;height:.65rem;border-radius:50%;flex-shrink:0;background:var(--ok);box-shadow:0 0 .4rem rgba(110,231,160,.6)}
+  .chrow .sig.bad{background:#5A6378;box-shadow:none}
   .chrow.on{background:var(--card2);box-shadow:inset 0 0 0 2px rgba(245,184,75,.55)}
   .chrow:focus,body:not(.kbd) .chrow:hover{background:#fff;color:#111}
   .chrow:focus small,.chrow:focus .no,body:not(.kbd) .chrow:hover small,body:not(.kbd) .chrow:hover .no{color:#444}
@@ -348,9 +351,11 @@ let unlocked = false;
 let toastT;
 function toast(msg, ms = 3800) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms); }
 const cache = new Map();
-function J(url) {
+function J(url, ms = 20000) {
   if (cache.has(url)) return cache.get(url);
-  const p = fetch(url).then((r) => { if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; } return r.json(); });
+  const get = (u) => withTimeout(fetch(u), ms).then((r) => { if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; } return r.json(); });
+  // Si el complemento no deja conectarse directo, se reintenta a través del intermediario
+  const p = get(url).catch((e) => PROXY && !url.startsWith(PROXY_BASE) && (e.message === 'Failed to fetch' || e.status === 403 || e.status === 429) ? get(px(url)) : Promise.reject(e));
   cache.set(url, p); p.catch(() => cache.delete(url));
   return p;
 }
@@ -408,7 +413,7 @@ async function isAvailable(it) {
   try {
     const x = await checkId(it);
     if (x?.id) {
-      const res = await Promise.allSettled(streamAddons().map(async (a) => ((await J(addonBase(a) + '/stream/' + x.type + '/' + g(x.id) + '.json')).streams || []).some(playable)));
+      const res = await Promise.allSettled(streamAddons().map(async (a) => (await getStreams(a, x.type, x.id)).some(playable)));
       ok = res.some((r) => r.status === 'fulfilled' && r.value);
     }
   } catch {}
@@ -653,6 +658,7 @@ function mediaCard(it, spot) {
   if (it.year) b.append(el('span', 'sub', [it.year, TYPE_ES[it.type]].join(' · ')));
   b.onclick = () => openDetail(it);
   if (spot) { b.onfocus = () => setSpot(spot, it); b.onmouseenter = () => setSpot(spot, it); }
+  b.addEventListener('focus', () => { clearTimeout(mediaCard.t); mediaCard.t = setTimeout(() => { if (document.activeElement === b && streamAddons().length) checkId(it).then((x) => x && prefetchStreams(x.type, x.id)).catch(() => {}); }, 900); });
   return b;
 }
 function chCard(c, list, i) {
@@ -801,6 +807,7 @@ async function openDetail(it) {
   try { x = await getDetail(it); } catch { x = {...it}; inn.lastChild.textContent = 'No se pudo cargar la información completa.'; }
   if ($('det').hidden) return;
   detData = x;
+  { const v = vodId(x, x.type === 'movie' || x.mt === 'movie' ? null : x.firstEp); prefetchStreams(v.type, v.id); }
   if (x.backdrop) bg.style.backgroundImage = 'url("' + x.backdrop + '")';
   const title = x.logo ? (() => { const i = img(x.logo, x.title, () => i.replaceWith(el('h1', 'disp', x.title))); i.className = 'det-logo'; return i; })() : el('h1', 'disp', x.title);
   const meta = el('div', 'meta');
@@ -945,8 +952,23 @@ const withTimeout = (p, ms) => Promise.race([p, new Promise((_, r) => setTimeout
 // Primero las que el navegador abre mejor (mp4/m3u8); al final MKV, HEVC y http sin intermediario
 function streamScore(s) {
   const u = (s.url || '').toLowerCase(), d = ((s.name || '') + ' ' + (s.title || '') + ' ' + (s.description || '')).toLowerCase();
-  return (/\.mkv(\?|$)/.test(u) || /\bmkv\b/.test(d) ? 3 : 0) + (/hevc|x265|h\.?265|10bit|dolby vision|\bdv\b|hdr/.test(d) ? 2 : 0) + (u.startsWith('http:') && !PROXY ? 1 : 0);
+  const gb = parseFloat((d.match(/(\d+(?:\.\d+)?)\s*gb/) || [])[1] || 0);
+  return (NATIVE ? 0 : (/\.mkv(\?|$)/.test(u) || /\bmkv\b/.test(d) ? 2 : 0) + (/hevc|x265|h\.?265|10bit|dolby vision|\bdv\b|hdr/.test(d) ? 2 : 0))
+    + (/2160p|\b4k\b|uhd/.test(d) ? 2 : 0) + (gb > 10 ? 1 : 0) - (/1080p|720p/.test(d) ? 1 : 0) + (u.startsWith('http:') && !PROXY && !NATIVE ? 2 : 0);
 }
+// Las opciones de video se guardan 6 horas: la segunda vez abre al instante
+const SC_KEY = 'lzplus.streams', SC_TTL = 6 * 3600 * 1000;
+let SC = {}; try { SC = JSON.parse(localStorage.getItem(SC_KEY) || '{}'); } catch {}
+let scT; const saveSC = () => { clearTimeout(scT); scT = setTimeout(() => { try { const k = Object.keys(SC); if (k.length > 300) k.sort((a, b) => SC[a].t - SC[b].t).slice(0, k.length - 300).forEach((x) => delete SC[x]); localStorage.setItem(SC_KEY, JSON.stringify(SC)); } catch {} }, 1000); };
+function getStreams(a, type, id) {
+  const url = addonBase(a) + '/stream/' + type + '/' + g(id) + '.json', c = SC[url];
+  if (c && Date.now() - c.t < SC_TTL && c.s.length) return Promise.resolve(c.s);
+  return J(url, 20000).then((j) => {
+    const s = (j.streams || []).map((x) => ({url: x.url, name: x.name, title: (x.title || '').slice(0, 200), description: (x.description || '').slice(0, 200), behaviorHints: x.behaviorHints?.proxyHeaders ? {proxyHeaders: x.behaviorHints.proxyHeaders} : undefined, infoHash: x.infoHash}));
+    SC[url] = {t: Date.now(), s}; saveSC(); return s;
+  });
+}
+function prefetchStreams(type, id) { if (id) streamAddons().forEach((a) => getStreams(a, type, id).catch(() => {})); }
 // Reproducir: empieza en cuanto encuentra la primera opción que funciona
 async function playVod(x, ep) {
   lastVod = {x, ep};
@@ -970,14 +992,21 @@ async function playVod(x, ep) {
   let pending = adds.length, busy = false, playing = false;
   const pump = () => {
     if (sess !== vodSess || busy || playing) return;
-    const s = vodOpts.find((o) => !vodFailed.has(o));
-    if (!s) { if (!pending) vodAllFailed(); return; }
+    const left = vodOpts.filter((o) => !vodFailed.has(o) && o._p !== 'bad');
+    const s = left.find((o) => o._p === 'ok') || left.find((o) => o._p === 'unknown') || (left.every((o) => o._p === 'pending') ? null : left[0]);
+    if (!s) { if (!pending && !left.length) vodAllFailed(); return; }   // si todas siguen revisándose, se espera a la primera respuesta
     busy = true;
     msg('Abriendo opción ' + (vodOpts.indexOf(s) + 1) + (pending ? '' : ' de ' + vodOpts.length) + '…', null, true);
     playStream(s, sess).then((ok) => { busy = false; if (sess !== vodSess) return; if (ok) playing = true; else { vodFailed.add(s); pump(); } });
   };
-  adds.forEach((a) => withTimeout(J(addonBase(a) + '/stream/' + type + '/' + g(id) + '.json'), 20000)
-    .then((j) => { if (sess !== vodSess) return; vodOpts.push(...(j.streams || []).filter(playable).map((s) => ({...s, addon: a.name}))); vodOpts.sort((p, q) => streamScore(p) - streamScore(q)); })
+  // Cada opción nueva se revisa enseguida y en paralelo; se arranca con la primera que responde
+  const check = (s) => {
+    const hdr = s.behaviorHints?.proxyHeaders?.request || {}, h = {ref: hdr.Referer || hdr.referer, ua: hdr['User-Agent'] || hdr['user-agent']};
+    s._pu = PROXY ? px(s.url, h) : s.url; s._p = 'pending';
+    limit(() => probe(s._pu, /\.m3u8(\?|$)/i.test(s.url))).then((r) => { s._p = r; if (sess === vodSess) pump(); });
+  };
+  adds.forEach((a) => getStreams(a, type, id)
+    .then((list) => { if (sess !== vodSess) return; const add = list.filter(playable).map((s) => ({...s, addon: a.name})); add.forEach(check); vodOpts.push(...add); vodOpts.sort((p, q) => streamScore(p) - streamScore(q)); })
     .catch(() => {}).finally(() => { pending--; if (sess === vodSess) pump(); }));
   addSubtitles({type, id});
 }
@@ -991,8 +1020,8 @@ async function nativeVod(x, ep, adds, type, id) {
   await new Promise((resolve) => {
     let pending = adds.length;
     const timer = setTimeout(resolve, 15000);
-    adds.forEach((a) => withTimeout(J(addonBase(a) + '/stream/' + type + '/' + g(id) + '.json'), 15000)
-      .then((j) => { (j.streams || []).filter((s) => /^https?:\/\//.test(s.url || '')).forEach((s) => opts.push(s));
+    adds.forEach((a) => withTimeout(getStreams(a, type, id), 15000)
+      .then((list) => { list.filter((s) => /^https?:\/\//.test(s.url || '')).forEach((s) => opts.push(s)); opts.sort((p, q) => streamScore(p) - streamScore(q));
         if (opts.length && !firstAt) { firstAt = Date.now(); setTimeout(resolve, 2500); } })   // con la primera respuesta, espera 2.5 s más y arranca
       .catch(() => {}).finally(() => { if (--pending === 0) { clearTimeout(timer); resolve(); } }));
   });
@@ -1207,6 +1236,10 @@ function renderGroups() {
   box.append(gb('', 'Todos', liveAll.length));
   if (favN) box.append(gb('★', '★ Favoritos', favN));
   [...count.entries()].sort((a, b) => b[1] - a[1]).forEach(([k, n]) => box.append(gb(k, k, n)));
+  const hd = el('button', 'gbtn'); hd.type = 'button';
+  hd.append(el('span', null, 'Canales sin señal'), el('small', null, S.hideDead === false ? 'Mostrar' : 'Ocultar'));
+  hd.onclick = () => { S.hideDead = S.hideDead === false; save(); renderGroups(); renderChannels(); toast(S.hideDead === false ? 'Se muestran todos los canales' : 'Se ocultan los canales sin señal'); };
+  hd.style.marginTop = '1rem'; box.append(hd);
 }
 const isFav = (c) => S.favs.some((f) => f.url === c.url);
 function chRow(c, list, onPick) {
@@ -1227,6 +1260,7 @@ function moreChannels() {
   const box = $('clist'); box.querySelector('.more')?.remove();
   const next = liveView.slice(liveShown, liveShown + 150); liveShown += next.length;
   box.append(...next.map((c) => chRow(c, liveView, (ch, l) => { if (curCh && curCh.url === ch.url && pvMode === 'live') goFull(); else playChannel(ch, l); })));
+  next.forEach(paintRows); checkChannels(next);
   if (liveShown < liveView.length) box.append(btn('more', 'Mostrar más canales (' + (liveView.length - liveShown) + ')', moreChannels));
   if (!liveView.length) box.append(el('p', 'note', 'No hay canales aquí.'));
 }
@@ -1285,13 +1319,52 @@ function playUrl(url, onFail) {
   } else { video.src = url; video.onerror = onFail; }
   video.play().catch(() => {});
 }
+const CHK_KEY = 'lzplus.chk', CHK_TTL = 6 * 3600 * 1000;
+let CHK = {}; try { CHK = JSON.parse(localStorage.getItem(CHK_KEY) || '{}'); } catch {}
+let chkT; const saveCHK = () => { clearTimeout(chkT); chkT = setTimeout(() => { try { const k = Object.keys(CHK); if (k.length > 3000) k.sort((a, b) => CHK[a].t - CHK[b].t).slice(0, k.length - 3000).forEach((x) => delete CHK[x]); localStorage.setItem(CHK_KEY, JSON.stringify(CHK)); } catch {} }, 1500); };
+const chState = (c) => { const x = CHK[c.url]; return x && Date.now() - x.t < CHK_TTL ? x.ok : null; };
+const setCh = (c, ok) => { CHK[c.url] = {ok, t: Date.now()}; saveCHK(); paintRows(c); };
+function paintRows(c) {
+  document.querySelectorAll('.chrow').forEach((r) => {
+    if (r.dataset.url !== c.url) return;
+    const st = chState(c); r.classList.toggle('dead', st === false);
+    let s = r.querySelector('.sig'); if (st === null) { s?.remove(); return; }
+    if (!s) { s = el('span', 'sig'); r.append(s); } s.classList.toggle('bad', !st); s.title = st ? 'Con señal' : 'Sin señal';
+    if (st === false && S.hideDead !== false && r.closest('#clist') && !r.classList.contains('on') && r !== document.activeElement) r.hidden = true;
+  });
+  const box = $('clist');
+  if (box && liveView.length && ![...box.querySelectorAll('.chrow')].some((r) => !r.hidden) && !box.querySelector('.alldead')) {
+    const n = el('div', 'alldead'); n.append(el('p', 'note', 'Todos los canales de aquí están sin señal ahora mismo.'), btn('btn sm', 'Mostrarlos de todos modos', () => { S.hideDead = false; save(); renderGroups(); renderChannels(); }));
+    box.prepend(n);
+  }
+}
+function checkChannels(list) {
+  list.forEach((c) => { if (chState(c) !== null) return paintRows(c);
+    limit(() => probe(PROXY && (c.via || c.hdr || c.url.startsWith('http:')) ? px(c.url, c) : c.url, true)).then((r) => { if (r !== 'unknown') setCh(c, r === 'ok'); }); });
+}
+// Formas de abrir un canal: directo → por el intermediario → convertido con FFmpeg
+function liveAttempts(c) {
+  const out = [], h = {ref: c.ref, ua: c.ua};
+  const needs = c.hdr || (location.protocol === 'https:' && c.url.startsWith('http:'));
+  if (!needs && !(PROXY && c.via)) out.push(c.url);
+  if (PROXY) out.push(px(c.url, h));
+  if (PROXY_FF) out.push(ffUrl(c.url, h, 'copy'));
+  if (!out.length) out.push(c.url);
+  return out;
+}
 const nativeChannel = (c) => window.LZ.play(JSON.stringify({title: c.name, opts: [{url: c.url, ref: c.ref || '', ua: c.ua || ''}]}));
 function playChannel(c, list) {
   if (NATIVE && c.hdr && !PROXY) { curCh = c; liveList = list || [c]; return nativeChannel(c); }
   pvMode = 'live'; curCh = c; liveList = list || [c];
   video.controls = false;
   msg('Cargando ' + c.name + '…', null, true);
-  playUrl(PROXY && (c.via || c.hdr || c.url.startsWith('http:')) ? px(c.url, c) : c.url, () => NATIVE ? (msg('Este canal no abrió aquí.', [btn('btn pri', 'Abrir con el reproductor de la app', () => nativeChannel(c))]), isFull() && setTimeout(() => focusEl($('pvMsg').querySelector('button')), 50)) : msg('Este canal no está disponible ahora.', isFull() ? null : [btn('btn sm', 'Probar el siguiente ▶', () => zap(1))]) || (isFull() && hint('▲ ▼  Cambia de canal')));
+  const tries = liveAttempts(c); let ti = 0;
+  const attempt = () => {
+    playUrl(tries[ti], () => { if (curCh !== c) return; if (++ti < tries.length) return attempt(); setCh(c, false); onLiveFail(); });
+    video.onplaying = () => { msg(''); if (curCh === c && chState(c) !== true) setCh(c, true); };
+  };
+  attempt();
+  function onLiveFail() { ( NATIVE ? (msg('Este canal no abrió aquí.', [btn('btn pri', 'Abrir con el reproductor de la app', () => nativeChannel(c))]), isFull() && setTimeout(() => focusEl($('pvMsg').querySelector('button')), 50)) : msg('Este canal no tiene señal ahora.', isFull() ? null : [btn('btn sm', 'Probar el siguiente ▶', () => zap(1))]) || (isFull() && hint('▲ ▼  Cambia de canal'))); }
   document.querySelectorAll('.chrow').forEach((r) => r.classList.toggle('on', r.dataset.url === c.url));
   S.recents = [c, ...S.recents.filter((r) => r.url !== c.url)].slice(0, 15).map((x) => ({name: x.name, logo: x.logo, url: x.url, group: x.group, quality: x.quality, tags: x.tags || [], srcName: x.srcName, via: x.via, hdr: x.hdr, ref: x.ref, ua: x.ua}));
   save(); built.inicio = false;
@@ -1300,8 +1373,12 @@ function playChannel(c, list) {
 }
 function zap(d) {
   if (!liveList.length) return;
-  const i = liveList.findIndex((c) => c.url === curCh?.url);
-  playChannel(liveList[(i + d + liveList.length) % liveList.length], liveList);
+  let i = liveList.findIndex((c) => c.url === curCh?.url);
+  for (let n = 0; n < liveList.length; n++) {   // salta los canales que ya se sabe que no tienen señal
+    i = (i + d + liveList.length) % liveList.length;
+    if (chState(liveList[i]) !== false || n === liveList.length - 1) break;
+  }
+  playChannel(liveList[i], liveList);
 }
 function showOsd() {
   if (!isFull() || pvMode !== 'live' || !curCh) return;
@@ -1432,6 +1509,7 @@ function tryPlay(a, ms) {
 }
 async function playStream(s, sess) {
   const tries = attemptsFor(s), checked = new Map();
+  if (s._pu && s._p && s._p !== 'pending') checked.set(s._pu, s._p);
   for (const a of tries) {
     if (sess !== vodSess) return false;
     const pu = a.probe || a.url;

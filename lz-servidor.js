@@ -110,6 +110,7 @@ function mp4(req, res, q) {
   const args = ffInput(q);
   const t = parseFloat(q.get('t') || '0');
   if (t > 0) args.push('-ss', String(t));
+  args.push('-probesize', '5M', '-analyzeduration', '3M', '-fflags', '+genpts');   // arranca más rápido
   args.push('-i', target, '-map', '0:v:0', '-map', '0:a:0?', '-sn', '-dn');
   if (q.get('v') === 'h264') args.push('-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22', '-pix_fmt', 'yuv420p', '-vf', "scale='min(1920,iw)':-2");
   else args.push('-c:v', 'copy');
