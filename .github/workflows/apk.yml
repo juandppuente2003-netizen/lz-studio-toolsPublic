@@ -23,9 +23,14 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Copiar la app web dentro del APK
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Copiar la app web dentro del APK (compatible con TVs viejas)
         run: |
-          cp lz-plus.html android/app/src/main/assets/index.html
+          npm install --no-save --no-audit --no-fund esbuild@0.28.2
+          node tools/preparar-tv.js lz-plus.html android/app/src/main/assets/index.html
           curl -sSfL https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js -o android/app/src/main/assets/hls.min.js
           sed -i 's#https://cdn.jsdelivr.net/npm/hls.js@1#hls.min.js#' android/app/src/main/assets/index.html
 

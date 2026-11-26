@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        WebView.setWebContentsDebuggingEnabled(true);   // permite revisar errores desde una computadora
         web = new WebView(this);
         web.setBackgroundColor(Color.rgb(6, 8, 15));
         WebSettings s = web.getSettings();
