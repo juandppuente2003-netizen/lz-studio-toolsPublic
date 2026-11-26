@@ -137,7 +137,8 @@ function mp4(req, res, q) {
   req.on('close', () => p.kill('SIGKILL'));
 }
 
-http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
+  if (req.url === '/lz-proxy/salir' && /^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress)) { res.end('ok'); setTimeout(() => process.exit(0), 100); return; }
   const u = new URL(req.url, 'http://x');
   if (req.method === 'OPTIONS') { cors(res); res.writeHead(204); return res.end(); }
   if (u.pathname === '/prueba') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); return res.end('<body style="font:32px sans-serif;background:#06080F;color:#fff;display:grid;place-items:center;height:90vh"><div>✅ LZ-PLUS funciona en esta red.<br><a style="color:#F5B84B" href="/">Abrir la app</a></div></body>'); }
@@ -153,7 +154,31 @@ http.createServer((req, res) => {
     return;
   }
   res.writeHead(404); res.end();
-}).listen(PORT, '0.0.0.0', () => {
+});
+// Si ya hay otro LZ-PLUS abierto en el mismo puerto, se cierra solo y arranca este
+let retried = false;
+server.on('error', async (e) => {
+  if (e.code !== 'EADDRINUSE' || retried) { console.log('\n  No se pudo abrir el puerto ' + PORT + ': ' + e.message + '\n'); process.exit(1); }
+  retried = true;
+  console.log('  Ya había un LZ-PLUS abierto. Cerrándolo para abrir la versión nueva…');
+  try { await fetch('http://127.0.0.1:' + PORT + '/lz-proxy/salir'); } catch {}
+  await new Promise((r) => setTimeout(r, 800));
+  if (process.platform === 'win32') {
+    try {   // versiones viejas no saben cerrarse solas: se cierra el programa que ocupa el puerto (solo si es Node)
+      const lines = execFileSync('netstat', ['-ano', '-p', 'tcp'], { encoding: 'utf8' }).split(/\r?\n/).filter((l) => /LISTENING/i.test(l) && new RegExp(':' + PORT + '\\s').test(l));
+      for (const pid of new Set(lines.map((l) => l.trim().split(/\s+/).pop()))) {
+        if (!pid || pid === String(process.pid)) continue;
+        const info = execFileSync('tasklist', ['/FI', 'PID eq ' + pid, '/FO', 'CSV', '/NH'], { encoding: 'utf8' });
+        if (/node\.exe/i.test(info)) execFileSync('taskkill', ['/PID', pid, '/F'], { stdio: 'ignore' });
+        else console.log('  El puerto ' + PORT + ' lo usa otro programa: ' + info.split(',')[0] + '. Ciérralo o cambia el puerto.');
+      }
+    } catch {}
+    await new Promise((r) => setTimeout(r, 800));
+  }
+  server.listen(PORT, '0.0.0.0');
+});
+server.listen(PORT, '0.0.0.0');
+server.on('listening', () => {
   // La IP de la red de tu casa va primero; las de programas virtuales (VirtualBox, WSL, etc.) al final
   const rank = (name, ip) => (/virtual|vmware|vbox|wsl|hyper-v|vethernet|docker|loopback|tailscale|zerotier|bluetooth/i.test(name) ? 10 : 0) + (/^192\.168\./.test(ip) ? 0 : /^10\./.test(ip) ? 1 : /^172\.(1[6-9]|2\d|3[01])\./.test(ip) ? 3 : 5) + (/^192\.168\.56\./.test(ip) ? 10 : 0);
   const ips = Object.entries(os.networkInterfaces()).flatMap(([name, l]) => (l || []).filter((i) => i.family === 'IPv4' && !i.internal).map((i) => ({ip: i.address, r: rank(name, i.address)}))).sort((a, b) => a.r - b.r).map((x) => x.ip);
