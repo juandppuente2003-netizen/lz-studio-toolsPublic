@@ -41,6 +41,7 @@ public class PlayerActivity extends Activity {
     private int index = 0;
     private String sub, subLang;
     private long startMs = 0;
+    private String audioLang = "es";
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable startWatchdog = new Runnable() {
         public void run() {
@@ -59,6 +60,7 @@ public class PlayerActivity extends Activity {
             sub = d.optString("sub", null);
             subLang = d.optString("subLang", null);
             startMs = d.optLong("start", 0) * 1000L;
+            audioLang = d.optString("audioLang", "es");
             setTitle(d.optString("title", "LZ-PLUS"));
         } catch (Exception e) { opts = new JSONArray(); }
 
@@ -73,10 +75,11 @@ public class PlayerActivity extends Activity {
                 .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
         player = new ExoPlayer.Builder(this, renderers).build();
         view.setPlayer(player);
-        if (subLang != null && subLang.length() > 0) {
-            player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon()
-                    .setPreferredTextLanguage(subLang).setPreferredAudioLanguages("es", "spa", "lat").build());
-        }
+        // Audio en español si la película lo trae (o el idioma original si así lo elegiste)
+        androidx.media3.common.TrackSelectionParameters.Builder tsp = player.getTrackSelectionParameters().buildUpon();
+        if (audioLang != null && audioLang.length() > 0) tsp.setPreferredAudioLanguages("es", "es-419", "es-MX", "spa", "lat");
+        if (subLang != null && subLang.length() > 0) tsp.setPreferredTextLanguage(subLang);
+        player.setTrackSelectionParameters(tsp.build());
         player.addListener(new Player.Listener() {
             @Override
             public void onPlayerError(PlaybackException error) { next(error.getErrorCodeName()); }

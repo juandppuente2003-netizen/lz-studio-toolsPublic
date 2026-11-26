@@ -1160,7 +1160,7 @@ async function nativeVod(x, ep, adds, type, id, startAt) {
     }
   }
   closePick();
-  window.LZ.play(JSON.stringify({title: label, sub, subLang, start: Math.floor(startAt || 0), opts: opts.slice(0, 30).map((s) => {
+  window.LZ.play(JSON.stringify({title: label, sub, subLang, audioLang: S.audioEs === false ? '' : 'es', start: Math.floor(startAt || 0), opts: opts.slice(0, 30).map((s) => {
     const h = s.behaviorHints?.proxyHeaders?.request || {};
     return {url: s.url, ref: h.Referer || h.referer || '', ua: h['User-Agent'] || h['user-agent'] || ''};
   })}));
@@ -1683,6 +1683,11 @@ function toFF(au) {
 }
 async function afterStart(s, sess) {
   vodCur = s;
+  // Segunda revisión: si a los 4 s no se ha decodificado nada de audio, se convierte
+  setTimeout(() => {
+    if (sess !== vodSess || vodCur !== s || vodFF || !PROXY_FF || video.paused) return;
+    if (typeof video.webkitAudioDecodedByteCount === 'number' && video.webkitAudioDecodedByteCount === 0 && !(vodInfo && vodInfo.audios && !vodInfo.audios.length)) { toast('Ajustando el audio para que se escuche…'); toFF(0); }
+  }, 4000);
   if (vodResume > 5) { const t = vodResume; vodResume = 0; if (vodFF) ffReload(t); else video.currentTime = t; } else applySub();
   if (!PROXY_FF) return;
   try {
@@ -1690,6 +1695,11 @@ async function afterStart(s, sess) {
     const j = await (await fetch(PROXY_BASE + '/lz-proxy/info?u=' + encodeURIComponent(u))).json();
     if (sess !== vodSess || vodCur !== s) return;
     vodInfo = j; if (vodFF) vodFF.dur = j.duration || 0;
+    // El navegador no suena audio AC3/Dolby/DTS: se convierte el audio (sin perder el minuto)
+    const auds0 = j.audios || [], esI = Math.max(0, auds0.findIndex(isEs));
+    if (!vodFF && auds0.length && /^(ac3|eac3|dts|truehd|mlp|dca)$/i.test((auds0[0] || {}).codec || '')) {
+      toast('Ajustando el audio para que se escuche…'); toFF(S.audioEs !== false ? esI : 0); return;
+    }
     // Si trae varias pistas de audio y la primera no es español, se pone la de español
     const auds = j.audios || [], es = auds.findIndex(isEs);
     if (auds.length > 1 && es > 0 && !isEs(auds[0]) && S.audioEs !== false) {
@@ -1937,6 +1947,10 @@ function buildSettings() {
     chips(IDIOMAS, S.lang, (k) => { S.lang = k; save(); resetMeta(); toast('Idioma cambiado'); }),
     el('p', 'note', useTmdb() ? 'Los títulos, sinopsis y carátulas se mostrarán en este idioma.' : 'Para ver títulos, sinopsis y carátulas en este idioma necesitas la clave de TMDB (abajo). Sin ella se usan los catálogos de Stremio, que vienen en inglés.'));
   w.append(b1);
+  const bAu = el('div', 'box'); bAu.append(el('h2', 'disp', 'Audio preferido'),
+    chips([['es', 'Español / Latino'], ['orig', 'Idioma original']], S.audioEs === false ? 'orig' : 'es', (k) => { S.audioEs = k === 'es'; save(); toast('Guardado'); }),
+    el('p', 'note', 'Si la película trae varios audios, se pone este solo. Siempre puedes cambiarlo en el reproductor con ▲ → Audio.'));
+  w.append(bAu);
   const b2 = el('div', 'box'); b2.append(el('h2', 'disp', 'Idioma de subtítulos'), chips(SUBS, S.subLang, (k) => { S.subLang = k; save(); toast('Guardado'); }),
     el('p', 'note', 'Se activan solos al ver una película o serie si tienes un complemento de subtítulos configurado.'));
   w.append(b2);
