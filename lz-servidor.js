@@ -16,7 +16,9 @@ const { spawn, execFileSync } = require('child_process');
 // ---------- FFmpeg: convierte al vuelo los videos que el navegador no abre (MKV, AC3, HEVC) ----------
 function findFfmpeg() {
   const cands = [process.env.FFMPEG];
-  try { cands.push(require(path.join(__dirname, 'node_modules', 'ffmpeg-static'))); } catch {}
+  const fix = (p) => p && p.replace('app.asar' + path.sep, 'app.asar.unpacked' + path.sep);   // dentro de la app de Windows
+  try { cands.push(fix(require('ffmpeg-static'))); } catch {}
+  try { cands.push(fix(require(path.join(__dirname, 'node_modules', 'ffmpeg-static')))); } catch {}
   cands.push('ffmpeg');
   for (const c of cands.filter(Boolean)) { try { execFileSync(c, ['-version'], { stdio: 'ignore' }); return c; } catch {} }
   return null;
@@ -24,7 +26,7 @@ function findFfmpeg() {
 let FFMPEG = findFfmpeg();
 // Si no hay FFmpeg, se instala solo la primera vez (paquete ffmpeg-static de npm, en esta misma carpeta)
 function installFfmpeg() {
-  if (FFMPEG) return;
+  if (FFMPEG || process.env.LZ_EMBEDDED) return;
   console.log('  Instalando FFmpeg por única vez (1-2 minutos). La app ya funciona mientras tanto…');
   const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const p = spawn(npm, ['install', 'ffmpeg-static', '--no-audit', '--no-fund', '--no-save', '--loglevel=error'], { cwd: __dirname, shell: process.platform === 'win32', stdio: 'inherit' });
@@ -147,7 +149,7 @@ function mp4(req, res, q) {
 }
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/lz-proxy/salir' && /^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress)) { res.end('ok'); setTimeout(() => process.exit(0), 100); return; }
+  if (req.url === '/lz-proxy/salir' && /^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(req.socket.remoteAddress)) { if (process.env.LZ_EMBEDDED) { res.end('no'); return; } res.end('ok'); setTimeout(() => process.exit(0), 100); return; }
   const u = new URL(req.url, 'http://x');
   if (req.method === 'OPTIONS') { cors(res); res.writeHead(204); return res.end(); }
   if (u.pathname === '/prueba') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); return res.end('<body style="font:32px sans-serif;background:#06080F;color:#fff;display:grid;place-items:center;height:90vh"><div>✅ LZ-PLUS funciona en esta red.<br><a style="color:#F5B84B" href="/">Abrir la app</a></div></body>'); }
@@ -174,7 +176,7 @@ const server = http.createServer((req, res) => {
 // Si ya hay otro LZ-PLUS abierto en el mismo puerto, se cierra solo y arranca este
 let retried = false;
 server.on('error', async (e) => {
-  if (e.code !== 'EADDRINUSE' || retried) { console.log('\n  No se pudo abrir el puerto ' + PORT + ': ' + e.message + '\n'); process.exit(1); }
+  if (e.code !== 'EADDRINUSE' || retried) { console.log('\n  No se pudo abrir el puerto ' + PORT + ': ' + e.message + '\n'); if (!process.env.LZ_EMBEDDED) process.exit(1); return; }
   retried = true;
   console.log('  Ya había un LZ-PLUS abierto. Cerrándolo para abrir la versión nueva…');
   try { await fetch('http://127.0.0.1:' + PORT + '/lz-proxy/salir'); } catch {}

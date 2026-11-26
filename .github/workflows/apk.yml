@@ -57,3 +57,39 @@ jobs:
             https://github.com/${{ github.repository }}/releases/download/lz-plus-tv/LZ-PLUS.apk
           files: LZ-PLUS.apk
           make_latest: false
+
+  windows:
+    needs: apk
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Preparar la app de Windows
+        shell: bash
+        run: |
+          cp lz-plus.html lz-servidor.js windows/
+          cd windows
+          npm install --no-audit --no-fund
+
+      - name: Compilar instalador y versión portátil
+        working-directory: windows
+        run: npx electron-builder --win --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LZ-PLUS-Windows
+          path: |
+            windows/dist/LZ-PLUS-Windows-instalador.exe
+            windows/dist/LZ-PLUS-Windows-portable.exe
+
+      - name: Publicar descarga directa
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: lz-plus-tv
+          files: |
+            windows/dist/LZ-PLUS-Windows-instalador.exe
+            windows/dist/LZ-PLUS-Windows-portable.exe

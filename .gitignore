@@ -6,3 +6,7 @@ android/app/src/main/assets/index.html
 android/app/src/main/assets/hls.min.js
 lz-config.json
 node_modules/
+windows/node_modules/
+windows/dist/
+windows/lz-plus.html
+windows/lz-servidor.js
