@@ -10,3 +10,5 @@ windows/node_modules/
 windows/dist/
 windows/lz-plus.html
 windows/lz-servidor.js
+android/lz-plus.p12
+*.p12

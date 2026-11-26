@@ -34,8 +34,16 @@ jobs:
           curl -sSfL https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js -o android/app/src/main/assets/hls.min.js
           sed -i 's#https://cdn.jsdelivr.net/npm/hls.js@1#hls.min.js#' android/app/src/main/assets/index.html
 
+      - name: Llave de firma (secreto privado del repositorio)
+        env:
+          KS: ${{ secrets.LZ_KEYSTORE }}
+        run: |
+          if [ -n "$KS" ]; then echo "$KS" | base64 -d > android/lz-plus.p12; echo "Usando la llave fija"; else echo "Sin llave fija: se usa una temporal"; fi
+
       - name: Compilar APK
         working-directory: android
+        env:
+          LZ_KEY_PASS: ${{ secrets.LZ_KEY_PASS }}
         run: gradle assembleDebug --no-daemon
 
       - name: Renombrar

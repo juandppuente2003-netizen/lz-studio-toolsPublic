@@ -11,11 +11,13 @@
   :root{--bg:#06080F;--rail:#0A0E18;--card:#121828;--card2:#1A2238;--line:#1E2740;--tx:#F3F5FA;--mut:#9AA4BA;--accent:#F5B84B;--ok:#6EE7A0;--bad:#FF8A7A}
   *{box-sizing:border-box}
   [hidden]{display:none!important}
-  html{font-size:clamp(12px,.95vw,26px)}
+  html{font-size:calc(clamp(12px,.95vw,26px) * var(--ui,1))}
+  body{padding:var(--safe,0)}
+  #app{height:calc(100vh - 2 * var(--safe,0px)) !important}
   body{margin:0;background:var(--bg);color:var(--tx);font-family:Manrope,system-ui,sans-serif;overflow:hidden}
   a{color:var(--accent)}
   .disp{font-family:'Big Shoulders Display',sans-serif;font-weight:800;letter-spacing:.01em}
-  #app{display:flex;height:100vh}
+  #app{display:flex;height:100vh;overflow:hidden}
 
   /* ---------- Menú lateral ---------- */
   #rail{width:16rem;flex-shrink:0;background:linear-gradient(180deg,#0B1122,#070A12);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:1.8rem .9rem;gap:.35rem;transition:width .18s ease;z-index:5;overflow:hidden}
@@ -106,7 +108,7 @@
 
   /* ---------- TV (estilo televisión: video al centro, canales a la derecha) ---------- */
   #v-vivo{padding-bottom:0}
-  .tvl{display:grid;grid-template-columns:minmax(0,1fr) 25rem;gap:1.4rem;padding:4.6rem 1.8rem 1.4rem 1.6rem;height:100vh}
+  .tvl{display:grid;grid-template-columns:minmax(0,1fr) 25rem;gap:1.4rem;padding:4.6rem 1.8rem 1.4rem 1.6rem;height:calc(100vh - 2 * var(--safe,0px))}
   .tvmain{display:flex;flex-direction:column;gap:1rem;min-width:0;min-height:0}
   .tvmain .slot{flex:1;min-height:0;aspect-ratio:auto;border-radius:1rem;outline:none}
   .tvmain .slot:focus{box-shadow:0 0 0 .25rem var(--accent)}
@@ -433,6 +435,12 @@ async function findPc(onStep) {
     }
   }
   return null;
+}
+async function importFromUrl(u, quiet) {
+  const r = await withTimeout(fetch(u + (u.includes('?') ? '&' : '?') + 't=' + Date.now()), 10000);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  applyCfg(await r.json()); S.cfgUrl = u; S.cfgImported = true; save();
+  if (!quiet) toast('Configuración traída del link ✓');
 }
 async function importFromPc(host) {
   const r = await withTimeout(fetch('http://' + host + ':8080/lz-proxy/config'), 6000);
@@ -1681,10 +1689,12 @@ function goFull() {
   if (isFull()) return;
   fullPrevFocus = document.activeElement;
   const playing = !video.paused;
-  if (pv.parentElement !== document.body) document.body.append(pv);
+  // En la vista TV el video solo se agranda (moverlo traba al reproductor de algunas TVs)
+  const inPlace = view === 'vivo' && $('slot').contains(pv) && pvMode === 'live';
+  if (!inPlace && pv.parentElement !== document.body) document.body.append(pv);
   pv.classList.add('full'); $('panel').hidden = true;
   $('pvList').textContent = pvMode === 'live' ? '☰ Canales' : '☰ Opciones'; $('pvList').hidden = pvMode === 'trailer';
-  if (playing || pvMode === 'live') video.play().catch(() => {});
+  if (!inPlace && (playing || pvMode === 'live')) video.play().catch(() => {});
   pv.focus();
   if (pvMode === 'live' && !NATIVE && $('pvMsg').querySelector('button')) msg('Este canal no está disponible ahora.');
   if (pvMode === 'live') { showOsd(); hint('▲ ▼  Cambiar canal   ·   OK  Lista de canales   ·   Regresar  Salir'); }
@@ -1695,8 +1705,9 @@ function exitFull() {
   setTimeout(pump, 500);
   pv.classList.remove('full'); $('panel').hidden = true; $('osd').classList.remove('show');
   if (pvMode !== 'live' || view !== 'vivo') { if (pvMode !== 'live' || view !== 'vivo') stopPlayback(); }
-  $('slot').append(pv);
-  if (pvMode === 'live') video.play().catch(() => {});
+  const moved = pv.parentElement !== $('slot');
+  if (moved) $('slot').append(pv);
+  if (moved && pvMode === 'live') video.play().catch(() => {});
   const onRow = pvMode === 'live' && view === 'vivo' && $('clist').querySelector('.chrow.on');
   if (onRow) focusEl(onRow); else if (fullPrevFocus && visible(fullPrevFocus)) focusEl(fullPrevFocus); else focusEl(firstContent(cands()));
   video.controls = false;
@@ -2052,6 +2063,11 @@ function buildSettings() {
   const b2 = el('div', 'box'); b2.append(el('h2', 'disp', 'Idioma de subtítulos'), chips(SUBS, S.subLang, (k) => { S.subLang = k; save(); toast('Guardado'); }),
     el('p', 'note', 'Se activan solos al ver una película o serie si tienes un complemento de subtítulos configurado.'));
   w.append(b2);
+  // Pantalla
+  const bS = el('div', 'box'); bS.append(el('h2', 'disp', 'Pantalla'), el('p', 'note', 'Si la app se ve muy grande, muy chica o se corta en las orillas (pasa en proyectores), ajústalo aquí.'),
+    el('h3', null, 'Tamaño'), chips([['0.8', '80%'], ['0.9', '90%'], ['1', 'Normal'], ['1.1', '110%'], ['1.2', '120%']], String(S.ui || 1), (k) => { S.ui = +k; save(); applyScreen(); }),
+    el('h3', null, 'Margen en las orillas'), chips([['0', 'Sin margen'], ['2', 'Poco'], ['4', 'Medio'], ['6', 'Mucho']], String(S.safe || 0), (k) => { S.safe = +k; save(); applyScreen(); }));
+  w.append(bS);
   // Solo disponibles
   const bA = el('div', 'box'); bA.append(el('h2', 'disp', 'Mostrar solo lo que se puede ver'),
     chips([['1', 'Sí, solo disponibles'], ['0', 'No, mostrar todo']], S.onlyAvail === false ? '0' : '1', (k) => { S.onlyAvail = k === '1'; save(); ['inicio', 'peliculas', 'series', 'anime', 'buscar'].forEach((x) => built[x] = false); toast('Guardado'); }),
@@ -2123,6 +2139,15 @@ function buildSettings() {
   tb.append(btn('btn', 'Pegar código', () => { const ta = el('textarea'); ta.style.cssText = 'width:100%;min-height:8rem;background:var(--card);color:var(--tx);border-radius:.8rem;border:2px solid var(--line);padding:1rem;font:inherit';
     openPick('Pega el código', [ta, btn('btn pri', 'Importar', () => { try { applyCfg(dec(ta.value.trim())); closePick(); toast('Configuración importada ✓'); buildSettings(); } catch { toast('Ese código no es válido'); } })]); }));
   bT.append(ipIn, tb); w.append(bT);
+  // Desde un link: cualquier TV con la app trae tu configuración, sin tu computadora
+  const bL = el('div', 'box'); bL.append(el('h2', 'disp', 'Mi configuración en un link'),
+    el('p', 'note', '1) En la computadora descarga tu archivo de configuración. 2) Súbelo a un lugar que dé un link directo (por ejemplo un archivo en tu GitHub o tu sitio). 3) En cada TV pega ese link aquí. Si cambias el archivo, las TVs se actualizan solas al abrir.'));
+  const lb2 = el('div', 'btns');
+  lb2.append(btn('btn', 'Descargar mi archivo de configuración', () => { const a = el('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(cfgData(), null, 1)], {type: 'application/json'})); a.download = 'lz-config.json'; document.body.append(a); a.click(); a.remove(); toast('Se descargó lz-config.json'); }));
+  const lin = el('input'); lin.placeholder = 'Link directo a tu lz-config.json'; lin.value = S.cfgUrl || '';
+  lb2.append(btn('btn pri', 'Traer desde el link', async () => { const u = lin.value.trim(); if (!/^https?:\/\//.test(u)) return toast('Pega un link que empiece con https://'); try { await importFromUrl(u.replace(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\//, 'https://raw.githubusercontent.com/$1/$2/')); buildSettings(); } catch (e) { toast('No se pudo leer ese link (' + e.message + ')'); } }));
+  if (S.cfgUrl) lb2.append(btn('btn danger', 'Dejar de usar el link', () => { S.cfgUrl = ''; save(); buildSettings(); }));
+  bL.append(lin, lb2); w.append(bL);
   const b5 = el('div', 'box'); b5.append(el('h2', 'disp', 'Restablecer'), el('p', 'note', 'Borra servidores, favoritos, clave y PIN de este aparato.'));
   b5.append(btn('btn danger', 'Borrar todo', () => confirmBox('¿Borrar todo?', 'No se puede deshacer.', 'Borrar todo', () => { localStorage.removeItem(KEY); location.reload(); })));
   w.append(b5);
@@ -2132,6 +2157,8 @@ function buildSettings() {
 //  Arranque
 // =====================================================================
 load();
+function applyScreen() { const r = document.documentElement.style; r.setProperty('--ui', S.ui || 1); r.setProperty('--safe', (S.safe || 0) + 'vh'); }
+applyScreen();
 if (NATIVE) document.body.classList.add('lite');
 if (S.cue) document.documentElement.style.setProperty('--cue', S.cue);
 clock(); setInterval(clock, 15000);
@@ -2139,6 +2166,7 @@ clock(); setInterval(clock, 15000);
 const proxyReady = detectProxy();
 Promise.race([proxyReady, sleep(1800)]).then(() => { netState(); built.vivo = true; buildLive(); });
 Promise.allSettled([proxyReady, loadTmdbGenres()]).then(async () => {
+  if (S.cfgUrl) { try { await importFromUrl(S.cfgUrl, true); refreshAddons(); } catch {} }
   if (NATIVE && !S.cfgImported && !streamAddons().length) {   // primera vez en la TV: trae tus complementos de la computadora (por detrás)
     try { const h = await withTimeout(findPc(), 30000); if (h) { await importFromPc(h); toast('Tus complementos se trajeron de tu computadora ✓'); refreshAddons(); if (view === 'vivo') { renderSources(); openSource(S.src); } } }
     catch {}

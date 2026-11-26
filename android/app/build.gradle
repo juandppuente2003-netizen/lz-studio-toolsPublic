@@ -14,6 +14,23 @@ android {
         versionName '1.' + (System.getenv('GITHUB_RUN_NUMBER') ?: '0')
     }
 
+    // Llave fija (guardada como secreto en GitHub): las actualizaciones se instalan encima sin borrar tu configuración
+    def lzKey = rootProject.file('lz-plus.p12')
+    signingConfigs {
+        lz {
+            if (lzKey.exists()) {
+                storeFile lzKey
+                storePassword System.getenv('LZ_KEY_PASS') ?: ''
+                keyAlias 'lzplus'
+                keyPassword System.getenv('LZ_KEY_PASS') ?: ''
+                storeType 'pkcs12'
+            }
+        }
+    }
+    buildTypes {
+        debug { if (lzKey.exists()) signingConfig signingConfigs.lz }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

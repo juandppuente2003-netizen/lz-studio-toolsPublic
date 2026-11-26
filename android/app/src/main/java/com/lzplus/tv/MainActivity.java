@@ -41,6 +41,9 @@ public class MainActivity extends Activity {
         s.setAllowUniversalAccessFromFileURLs(true);   // sin bloqueos de CORS
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         s.setUserAgentString(s.getUserAgentString() + " LZPLUS-TV/1.0");
+        s.setTextZoom(100);              // ignora el tamaño de letra del sistema (si no, la app se sale de la pantalla)
+        s.setUseWideViewPort(true);
+        s.setLoadWithOverviewMode(true);
 
         web.addJavascriptInterface(new Bridge(), "LZ");
         web.setWebChromeClient(new WebChromeClient());
