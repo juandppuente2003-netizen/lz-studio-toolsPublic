@@ -442,17 +442,22 @@ async function importFromUrl(u, quiet) {
   applyCfg(await r.json()); S.cfgUrl = u; S.cfgImported = true; save();
   if (!quiet) toast('Configuración traída del link ✓');
 }
-const fixLink = (u) => u.trim().replace(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\//, 'https://raw.githubusercontent.com/$1/$2/').replace(/^(?!https?:\/\/)/, 'https://');
+// Código de configuración: un número corto que apunta a tu archivo en la carpeta "configs" de tu GitHub
+const CODE_BASE = 'https://raw.githubusercontent.com/juandppuente2003-netizen/lz-studio-toolsPublic/lz-plus-tv/configs/';
+const isCode = (v) => /^[A-Za-z0-9_-]{3,20}$/.test(v.trim()) && !/\./.test(v);
+const codeUrl = (c) => CODE_BASE + c.trim().toUpperCase() + '.json';
+const fixLink = (u) => isCode(u) ? codeUrl(u) : u.trim().replace(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\//, 'https://raw.githubusercontent.com/$1/$2/').replace(/^(?!https?:\/\/)/, 'https://');
 // Bienvenida: la primera vez pide el link de tu configuración (complementos, servidores, idioma…)
 function welcome() {
-  const info = el('p', 'note', 'Pega el link de tu configuración y la app se llena sola con tus complementos y servidores. Solo se hace una vez: después se actualiza sola cada vez que abres la app.');
-  const inp = el('input'); inp.placeholder = 'https://…/lz-config.json'; inp.dataset.auto = '1'; inp.autocomplete = 'off';
+  const info = el('p', 'note', 'Escribe tu código (o pega tu link) y la app se llena sola con tus complementos y servidores. Solo se hace una vez: después se actualiza sola cada vez que abres la app.');
+  const inp = el('input'); inp.placeholder = 'Tu código, ej. 482913'; inp.inputMode = 'numeric'; inp.dataset.auto = '1'; inp.autocomplete = 'off';
   const st = el('p', 'note');
-  const go1 = btn('btn pri', 'Traer mi configuración', async () => {
-    const u = fixLink(inp.value); if (u.length < 12) { st.textContent = 'Escribe el link primero.'; return; }
+  const go1 = btn('btn pri', 'Entrar', async () => {
+    if (inp.value.trim().length < 3) { st.textContent = 'Escribe tu código primero.'; return; }
+    const u = fixLink(inp.value);
     st.textContent = 'Leyendo tu configuración…';
     try { await importFromUrl(u, true); S.welcomed = true; save(); closePick(); toast('¡Listo! Tus complementos ya están en la app ✓'); refreshAddons(); if (view === 'vivo') { renderSources(); openSource(S.src); } }
-    catch (e) { st.textContent = 'No se pudo leer ese link (' + e.message + '). Revisa que esté completo y que lleve a tu archivo lz-config.json.'; }
+    catch (e) { st.textContent = isCode(inp.value) ? 'No encontré ese código. Revisa los números (y que el archivo ya esté subido a GitHub; tarda unos minutos en aparecer).' : 'No se pudo leer ese link (' + e.message + ').'; }
   });
   const b = el('div', 'btns'); b.append(go1);
   if (NATIVE) b.append(btn('btn', 'Buscar mi computadora', async () => {
@@ -2168,8 +2173,17 @@ function buildSettings() {
     el('p', 'note', '1) En la computadora descarga tu archivo de configuración. 2) Súbelo a un lugar que dé un link directo (por ejemplo un archivo en tu GitHub o tu sitio). 3) En cada TV pega ese link aquí. Si cambias el archivo, las TVs se actualizan solas al abrir.'));
   const lb2 = el('div', 'btns');
   lb2.append(btn('btn', 'Descargar mi archivo de configuración', () => { const a = el('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(cfgData(), null, 1)], {type: 'application/json'})); a.download = 'lz-config.json'; document.body.append(a); a.click(); a.remove(); toast('Se descargó lz-config.json'); }));
-  const lin = el('input'); lin.placeholder = 'Link directo a tu lz-config.json'; lin.value = S.cfgUrl || '';
-  lb2.append(btn('btn pri', 'Traer desde el link', async () => { const u = lin.value.trim(); if (u.length < 8) return toast('Pega el link primero'); try { await importFromUrl(fixLink(u)); buildSettings(); } catch (e) { toast('No se pudo leer ese link (' + e.message + ')'); } }));
+  lb2.append(btn('btn pri', 'Crear mi código', () => {
+    const code = S.myCode || String(Math.floor(100000 + Math.random() * 900000)); S.myCode = code; save();
+    const a = el('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(cfgData(), null, 1)], {type: 'application/json'})); a.download = code + '.json'; document.body.append(a); a.click(); a.remove();
+    openPick('Tu código: ' + code, [el('p', 'note', 'Se descargó el archivo ' + code + '.json. Súbelo a tu GitHub así:'),
+      el('p', 'note', '1. Abre github.com/juandppuente2003-netizen/lz-studio-toolsPublic y cambia a la rama “lz-plus-tv”.'),
+      el('p', 'note', '2. Add file → Upload files. Arriba, en el nombre, escribe configs/ y suelta el archivo ' + code + '.json. Dale “Commit changes”.'),
+      el('p', 'note', '3. En cada TV, en la bienvenida (o en Ajustes) escribe el código ' + code + '. Si cambias algo, vuelve a crear y subir el archivo con el mismo código.'),
+      el('p', 'note', 'Ojo: quien tenga el código puede ver tus complementos (incluida tu cuenta de Torrentio).')]);
+  }));
+  const lin = el('input'); lin.placeholder = 'Tu código o el link de tu lz-config.json'; lin.value = S.cfgUrl ? (S.cfgUrl.startsWith(CODE_BASE) ? S.cfgUrl.slice(CODE_BASE.length).replace('.json', '') : S.cfgUrl) : '';
+  lb2.append(btn('btn', 'Traer con código o link', async () => { const u = lin.value.trim(); if (u.length < 8) return toast('Pega el link primero'); try { await importFromUrl(fixLink(u)); buildSettings(); } catch (e) { toast('No se pudo leer ese link (' + e.message + ')'); } }));
   if (S.cfgUrl) lb2.append(btn('btn danger', 'Dejar de usar el link', () => { S.cfgUrl = ''; save(); buildSettings(); }));
   bL.append(lin, lb2); w.append(bL);
   const b5 = el('div', 'box'); b5.append(el('h2', 'disp', 'Restablecer'), el('p', 'note', 'Borra servidores, favoritos, clave y PIN de este aparato.'));
