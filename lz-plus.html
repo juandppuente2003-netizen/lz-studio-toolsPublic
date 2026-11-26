@@ -18,23 +18,27 @@
   #app{display:flex;height:100vh}
 
   /* ---------- Menú lateral ---------- */
-  #rail{width:6rem;flex-shrink:0;background:linear-gradient(180deg,#0B1122,#070A12);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:1.8rem .9rem;gap:.35rem;transition:width .18s ease;z-index:5;overflow:hidden}
-  #rail:focus-within,body:not(.kbd) #rail:hover{width:17rem}
+  #rail{width:16rem;flex-shrink:0;background:linear-gradient(180deg,#0B1122,#070A12);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:1.8rem .9rem;gap:.35rem;transition:width .18s ease;z-index:5;overflow:hidden}
+
   .brand{display:flex;align-items:center;gap:.9rem;height:3.4rem;padding-left:.35rem;margin-bottom:1.6rem;white-space:nowrap;font-size:1.9rem}
   .logo{width:3.2rem;height:3.2rem;flex-shrink:0;border-radius:.9rem;background:var(--accent);color:#0A0E18;display:grid;place-items:center;font-size:1.5rem}
   .brand b{color:var(--accent)}
   .nav{all:unset;cursor:pointer;display:flex;align-items:center;gap:1.1rem;height:3.4rem;padding:0 1.05rem;border-radius:.9rem;color:var(--mut);font-weight:700;font-size:1.15rem;white-space:nowrap}
   .nav svg{width:1.7rem;height:1.7rem;flex-shrink:0}
-  .nav span,.brand span{opacity:0;transition:opacity .15s}
-  #rail:focus-within .nav span,body:not(.kbd) #rail:hover .nav span,#rail:focus-within .brand span,body:not(.kbd) #rail:hover .brand span{opacity:1}
-  .nav.on{color:#fff;background:rgba(255,255,255,.06)}.nav.on svg{color:var(--accent)}
+  .nav{text-transform:uppercase;letter-spacing:.04em;font-size:1.05rem}
+  .nav.on{color:#111;background:var(--accent)}.nav.on svg{color:#111}
   .nav:focus{background:var(--accent);color:#111}.nav:focus svg{color:#111}
   .rail-sp{flex:1}
 
   main{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;position:relative}
   main::-webkit-scrollbar{width:0}
   .view{display:none;padding-bottom:4rem}.view.on{display:block}
-  .clock{position:fixed;top:1.5rem;right:2.4rem;z-index:6;font-weight:800;font-size:1.35rem;text-shadow:0 2px 10px #000;pointer-events:none}
+  .topbar{position:fixed;top:1rem;right:1.6rem;z-index:6;display:flex;align-items:center;gap:.4rem}
+  .tbtn{all:unset;cursor:pointer;width:2.8rem;height:2.8rem;border-radius:50%;display:grid;place-items:center;color:#DCE2EC}
+  .tbtn svg,.tnet svg{width:1.45rem;height:1.45rem}
+  .tbtn:focus,body:not(.kbd) .tbtn:hover{background:var(--accent);color:#111}
+  .tnet{width:2.4rem;display:grid;place-items:center;color:#DCE2EC}.tnet.off{color:var(--bad)}
+  .clock{font-weight:800;font-size:1.35rem;padding:0 .4rem;text-shadow:0 2px 10px #000}
   .head{padding:2.6rem 3rem 1.2rem;display:flex;align-items:flex-end;gap:1.6rem;flex-wrap:wrap}
   .head h1{margin:0;font-size:3.6rem;line-height:1}
   .head p{margin:0;color:var(--mut);font-size:1.05rem}
@@ -99,6 +103,31 @@
   input{height:3.3rem;width:100%;min-width:0;font:inherit;font-size:1.15rem;border-radius:.8rem;border:2px solid var(--line);background:var(--card);color:var(--tx);padding:0 1.1rem}
   input:focus{border-color:var(--accent);outline:0}
   label.f{display:flex;flex-direction:column;gap:.45rem;font-size:.85rem;color:var(--mut);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+
+  /* ---------- TV (estilo televisión: video al centro, canales a la derecha) ---------- */
+  #v-vivo{padding-bottom:0}
+  .tvl{display:grid;grid-template-columns:minmax(0,1fr) 25rem;gap:1.4rem;padding:4.6rem 1.8rem 1.4rem 1.6rem;height:100vh}
+  .tvmain{display:flex;flex-direction:column;gap:1rem;min-width:0;min-height:0}
+  .tvmain .slot{flex:1;min-height:0;aspect-ratio:auto;border-radius:1rem;outline:none}
+  .tvmain .slot:focus{box-shadow:0 0 0 .25rem var(--accent)}
+  .tvname{position:absolute;left:1.4rem;bottom:1.1rem;font-weight:800;font-size:1.4rem;text-shadow:0 2px 8px #000;pointer-events:none;max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tvfull{position:absolute;right:1.2rem;bottom:1rem;color:#fff;opacity:.85;pointer-events:none}
+  .tvfull svg{width:1.8rem;height:1.8rem}
+  .mutehint{position:absolute;top:1rem;left:1rem;background:rgba(0,0,0,.7);padding:.5rem .9rem;border-radius:.6rem;font-weight:700;pointer-events:none}
+  #pv.full~.tvname{display:none}
+  .tvbar{display:flex;align-items:center;gap:.8rem;flex-shrink:0;padding-left:.4rem}
+  .ibtn{all:unset;cursor:pointer;height:3.2rem;padding:0 1rem;border-radius:.8rem;display:inline-flex;align-items:center;gap:.6rem;color:#DCE2EC;font-weight:700}
+  .ibtn svg{width:1.6rem;height:1.6rem}
+  .ibtn:focus,body:not(.kbd) .ibtn:hover{background:var(--accent);color:#111}
+  .tvinfo{margin-left:auto;color:var(--mut);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tvside{display:flex;flex-direction:column;min-height:0;background:rgba(255,255,255,.03);border-radius:1rem;padding:.4rem}
+  .tvside .arrow{text-align:center;color:#DCE2EC;font-size:.9rem;padding:.3rem;flex-shrink:0}
+  .tvside .col{flex:1}
+  .tvside .chrow{min-height:4.4rem;gap:.9rem}
+  .tvside .chrow .no{display:none}
+  .tvside .lg{width:3.8rem;height:3.8rem;border-radius:.6rem;background:#1A2238}
+  .tvside .chrow small{display:none}
+  .tvside .chrow b{font-size:1.15rem}
 
   /* ---------- En vivo ---------- */
   .srcs{display:flex;gap:.6rem;overflow-x:auto;padding:.3rem 0}
@@ -236,29 +265,36 @@
 <div id="app">
   <nav id="rail" aria-label="Menú principal">
     <div class="brand disp"><span class="logo">LZ</span><span>LZ<b>-PLUS</b></span></div>
-    <button class="nav" data-view="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Buscar</span></button>
-    <button class="nav on" data-view="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></button>
-    <button class="nav" data-view="vivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 2l4 4 4-4"/></svg><span>En vivo</span></button>
+    <button class="nav on" data-view="vivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 2l4 4 4-4"/></svg><span>TV</span></button>
+    <button class="nav" data-view="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v11H3V10zM7 10l4-8a3 3 0 0 1 3 3v4h5.5a2 2 0 0 1 2 2.3l-1.2 8A2 2 0 0 1 18.3 21H7"/></svg><span>Destacados</span></button>
     <button class="nav" data-view="peliculas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></svg><span>Películas</span></button>
-    <button class="nav" data-view="series"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>Series</span></button>
-    <button class="nav" data-view="anime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7z"/></svg><span>Anime</span></button>
+    <button class="nav" data-view="series"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>Series</span></button>
+    <button class="nav" data-view="kids"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M9.5 15.5c1.4 1.2 3.6 1.2 5 0M9.5 11.5h.01M14.5 11.5h.01"/></svg><span>Kids</span></button>
+    <button class="nav" data-view="anime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 3 7 6 7 10a7 7 0 0 1-14 0c0-4 3-7 7-10z"/><path d="M12 13l2.5 2.5"/></svg><span>Anime</span></button>
+    <button class="nav" data-view="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Explorar</span></button>
     <div class="rail-sp"></div>
     <button class="nav" data-view="servidores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg><span>Servidores</span></button>
     <button class="nav" data-view="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
   </nav>
 
   <main id="main">
-    <div class="clock" id="clock"></div>
+    <div class="topbar" id="topbar">
+      <button class="tbtn" data-go="buscar" title="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+      <button class="tbtn" id="tbHist" title="Continuar viendo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></button>
+      <button class="tbtn" id="tbFav" title="Favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7z"/></svg></button>
+      <button class="tbtn" data-go="ajustes" title="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+      <span class="tnet" id="tnet" title="Conexión"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0M12 20h.01"/></svg></span>
+      <span class="clock" id="clock"></span>
+    </div>
 
-    <section class="view on" id="v-inicio"></section>
+    <section class="view" id="v-inicio"></section>
+    <section class="view" id="v-kids"></section>
     <section class="view" id="v-buscar"></section>
-    <section class="view" id="v-vivo">
-      <div class="head"><h1 class="disp">En vivo</h1><div class="srcs" id="srcs"></div></div>
-      <div class="live">
-        <div class="col" id="groups"></div>
-        <div class="col" id="clist"></div>
-        <div class="col prev">
-          <div class="slot" id="slot">
+    <section class="view on" id="v-vivo">
+      <div class="srcs" id="srcs" hidden></div><div id="groups" hidden></div>
+      <div class="tvl">
+        <div class="tvmain">
+          <div class="slot" id="slot" tabindex="0" title="OK: pantalla completa">
             <div id="pv" tabindex="-1">
               <video id="video" playsinline></video>
               <div id="yt"></div>
@@ -268,8 +304,22 @@
               <div class="panel" id="panel" hidden><h3 class="disp" id="panelTitle">Canales</h3><div class="plist" id="plist"></div></div>
               <div class="pv-top"><button class="btn sm" id="pvList" type="button">☰ Canales</button><button class="btn sm" id="pvClose" type="button">✕ Salir</button></div>
             </div>
+            <div class="tvname" id="tvName"></div>
+            <span class="tvfull"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></span>
+            <div class="mutehint" id="muteHint" hidden>🔇 Pulsa OK para activar el sonido</div>
           </div>
-          <div class="pinfo" id="pinfo"></div>
+          <div class="tvbar">
+            <button class="ibtn" id="tvCats" title="Categorías"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Categorías</span></button>
+            <button class="ibtn" id="tvFav" title="Favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7z"/></svg><span>Favoritos</span></button>
+            <button class="ibtn" data-go="buscar" title="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Buscar</span></button>
+            <span class="tvinfo" id="tvInfo"></span>
+          </div>
+          <div class="pinfo" id="pinfo" hidden></div>
+        </div>
+        <div class="tvside">
+          <div class="arrow">▲</div>
+          <div class="col" id="clist"></div>
+          <div class="arrow">▼</div>
         </div>
       </div>
     </section>
@@ -576,7 +626,7 @@ function goBack() {
   if (!$('det').hidden) return closeDetail();
   const a = document.activeElement;
   if (!a || !a.closest('#rail')) return focusEl(document.querySelector('.nav.on'));
-  if (view !== 'inicio') go('inicio');
+  if (view !== 'vivo') go('vivo');
   else if (NATIVE) confirmBox('¿Salir de LZ-PLUS?', 'Puedes volver cuando quieras desde el inicio de tu TV.', 'Salir', () => window.LZ.exit());
 }
 window.lzBack = () => goBack();
@@ -584,7 +634,7 @@ window.lzBack = () => goBack();
 // =====================================================================
 //  Secciones
 // =====================================================================
-let view = 'inicio';
+let view = 'vivo';
 const built = {};
 function go(v, focus = false) {
   if (v === 'vivo' || view === 'vivo') { if (!isFull() && pvMode === 'live' && v !== 'vivo') stopPlayback(); }
@@ -592,10 +642,21 @@ function go(v, focus = false) {
   document.querySelectorAll('.nav').forEach((n) => n.classList.toggle('on', n.dataset.view === v));
   document.querySelectorAll('.view').forEach((s) => s.classList.toggle('on', s.id === 'v-' + v));
   $('main').scrollTop = 0;
-  if (!built[v] || v === 'servidores' || v === 'ajustes') { built[v] = true; ({inicio: buildHome, buscar: buildSearch, vivo: buildLive, peliculas: () => buildCatalog('peliculas'), series: () => buildCatalog('series'), anime: () => buildCatalog('anime'), servidores: buildServers, ajustes: buildSettings})[v](); }
+  if (!built[v] || v === 'servidores' || v === 'ajustes') { built[v] = true; ({inicio: buildHome, kids: () => buildCatalog('kids'), buscar: buildSearch, vivo: buildLive, peliculas: () => buildCatalog('peliculas'), series: () => buildCatalog('series'), anime: () => buildCatalog('anime'), servidores: buildServers, ajustes: buildSettings})[v](); }
   if (focus) setTimeout(() => focusEl(firstContent(cands())), 60);
 }
 document.querySelectorAll('.nav').forEach((n) => { n.onclick = () => go(n.dataset.view, true); });
+document.querySelectorAll('[data-go]').forEach((n) => { n.onclick = () => go(n.dataset.go, true); });
+$('tbHist').onclick = () => { go('inicio', true); };
+$('tbFav').onclick = $('tvFav').onclick = () => { if (view !== 'vivo') go('vivo'); liveGroup = '★'; if (liveAll.length) { renderChannels(); focusEl($('clist').querySelector('.chrow')); } toast(S.favs.length ? 'Tus canales favoritos' : 'Aún no tienes favoritos: en un canal, entra a Categorías → ★'); };
+$('tvCats').onclick = () => openCats();
+$('slot').onclick = (e) => { if (!isFull() && curCh) goFull(); };
+$('slot').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !isFull() && document.activeElement === $('slot')) { e.preventDefault(); curCh ? goFull() : focusEl($('clist').querySelector('.chrow')); } });
+const netState = () => $('tnet').classList.toggle('off', !navigator.onLine);
+addEventListener('online', netState); addEventListener('offline', netState);
+// Si el navegador no deja sonar al abrir, se arranca en silencio y se activa al primer botón
+document.addEventListener('keydown', () => { if (video.muted && pvMode === 'live') { video.muted = false; $('muteHint').hidden = true; } }, true);
+document.addEventListener('click', () => { if (video.muted) { video.muted = false; $('muteHint').hidden = true; } }, true);
 // En TV, con solo pasar por el menú no se cambia de sección: hay que pulsar OK.
 
 // =====================================================================
@@ -657,6 +718,10 @@ function baseRows(v) {
        ...[18, 35, 80, 10765, 9648, 10759, 10766, 10764, 99].map((id) => R(gname(id), () => tmList('/discover/tv?with_genres=' + id + '&sort_by=popularity.desc', 'series', 'tv')))]
     : [R('Populares', () => cineList('series', 'top')), R('Destacadas', () => cineList('series', 'imdbRating')), R('Nuevas ' + YEAR, () => cineList('series', 'year/genre=' + YEAR)),
        ...['Drama', 'Comedy', 'Crime', 'Sci-Fi', 'Mystery', 'Action', 'Reality-TV', 'Animation', 'Documentary'].map((x) => R(GEN_ES[x], () => cineList('series', 'top/genre=' + g(x))))];
+  if (v === 'kids') return tm
+    ? [R('Películas para niños', () => tmList('/discover/movie?with_genres=10751,16&sort_by=popularity.desc', 'movie', 'movie')), R('Series infantiles', () => tmList('/discover/tv?with_genres=10762&sort_by=popularity.desc', 'series', 'tv')),
+       R('Animación', () => tmList('/discover/movie?with_genres=16&sort_by=popularity.desc', 'movie', 'movie')), R('Para toda la familia', () => tmList('/discover/movie?with_genres=10751&sort_by=vote_average.desc&vote_count.gte=500', 'movie', 'movie'))]
+    : [R('Animación', () => cineList('movie', 'top/genre=Animation')), R('Para toda la familia', () => cineList('movie', 'top/genre=Family')), R('Series animadas', () => cineList('series', 'top/genre=Animation')), R('Series familiares', () => cineList('series', 'top/genre=Family'))];
   if (v === 'anime') {
     const A = '/discover/tv?with_genres=16&with_original_language=ja';
     return tm
@@ -1412,8 +1477,13 @@ async function openSource(id) {
   try {
     const r = await loadSource(id);
     if (S.src !== id) return;
-    liveAll = r.channels; liveHidden = r.hidden; liveGroup = '';
+    liveAll = r.channels; liveHidden = r.hidden; if (liveGroup !== '★') liveGroup = '';
     renderGroups(); renderChannels();
+    // Al abrir: se pone solo el último canal que viste (o el primero)
+    if (!curCh && view === 'vivo' && !isFull() && $('det').hidden) {
+      const c = liveView.find((x) => x.url === S.lastCh) || liveView.find((x) => chState(x) !== false) || liveView[0];
+      if (c) { playChannel(c, liveView); const row = $('clist').querySelector('.chrow[data-url="' + CSS.escape(c.url) + '"]'); if (row && (!document.activeElement || document.activeElement === document.body || document.activeElement.closest('#v-vivo'))) { focusEl(row); row.scrollIntoView({block: 'center'}); } }
+    }
   } catch (e) {
     if (S.src !== id) return;
     liveAll = [];
@@ -1421,6 +1491,27 @@ async function openSource(id) {
     const m = e.message === 'Failed to fetch' ? NO_CONN() : e.message.replace(/\.?$/, '.');
     $('clist').replaceChildren(el('p', 'note', 'No se pudo conectar: ' + m), btn('btn sm', 'Reintentar', () => openSource(id)));
   }
+}
+function openCats() {
+  const s1 = el('div', 'msec'); s1.append(el('h3', null, 'Lista de canales'));
+  const c1 = el('div', 'chips');
+  liveSources().forEach((s) => c1.append(btn('chip' + (s.id === S.src ? ' on' : ''), s.name, () => { closePick(); openSource(s.id); })));
+  c1.append(btn('chip', '🌎 Otro país o tema', () => { closePick(); pickList(); }));
+  s1.append(c1);
+  const s2 = el('div', 'msec'); s2.append(el('h3', null, 'Categorías'));
+  const c2 = el('div', 'chips');
+  const count = new Map(); liveAll.forEach((c) => count.set(c.group, (count.get(c.group) || 0) + 1));
+  const ch = (k, n, num) => { const b = btn('chip' + (liveGroup === k ? ' on' : ''), n + '  ' + num, () => { liveGroup = k; closePick(); renderChannels(); focusEl($('clist').querySelector('.chrow')); }); if (liveGroup === k) b.dataset.auto = '1'; return b; };
+  c2.append(ch('', 'Todos', liveAll.length));
+  const favN = liveAll.filter(isFav).length; if (favN) c2.append(ch('★', '★ Favoritos', favN));
+  [...count.entries()].sort((a, b) => b[1] - a[1]).forEach(([k, n]) => c2.append(ch(k, k, n)));
+  s2.append(c2);
+  const s3 = el('div', 'msec'); s3.append(el('h3', null, 'Este canal y la lista'));
+  const c3 = el('div', 'chips');
+  if (curCh) c3.append(btn('chip', isFav(curCh) ? '★ Quitar de favoritos' : '☆ Agregar a favoritos', () => { toggleFav(curCh); closePick(); }));
+  c3.append(btn('chip', S.hideDead === false ? 'Ocultar canales sin señal' : 'Mostrar canales sin señal', () => { S.hideDead = S.hideDead === false; save(); closePick(); renderChannels(); }));
+  s3.append(c3);
+  openPick('Categorías', [s2, s1, s3]);
 }
 function renderGroups() {
   const count = new Map(); liveAll.forEach((c) => count.set(c.group, (count.get(c.group) || 0) + 1));
@@ -1459,6 +1550,8 @@ function moreChannels() {
   if (!liveView.length) box.append(el('p', 'note', 'No hay canales aquí.'));
 }
 function renderInfo() {
+  $('tvName').textContent = curCh ? (curCh.no ? curCh.no + '  ' : '') + curCh.name : '';
+  $('tvInfo').textContent = curCh ? [curCh.srcName, curCh.group, curCh.quality].filter(Boolean).join(' · ') : (liveAll.length ? liveAll.length + ' canales' + (liveGroup ? ' · ' + (liveGroup === '★' ? 'Favoritos' : liveGroup) : '') : '');
   const p = $('pinfo'); p.replaceChildren();
   if (!curCh) {
     p.append(el('p', 'note', liveAll.length ? liveAll.length + ' canales' + (liveHidden ? ' · ' + liveHidden + ' ocultos porque solo funcionan en apps' : '') : ''),
@@ -1512,7 +1605,7 @@ function playUrl(url, onFail) {
     hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) onFail(); });
     hls.loadSource(url); hls.attachMedia(video);
   } else { video.src = url; video.onerror = onFail; }
-  video.play().catch(() => {});
+  video.play().catch((e) => { if (e && e.name === 'NotAllowedError') { video.muted = true; $('muteHint').hidden = false; video.play().catch(() => {}); } });
 }
 const CHK_KEY = 'lzplus.chk', CHK_TTL = 6 * 3600 * 1000;
 let CHK = {}; try { CHK = JSON.parse(localStorage.getItem(CHK_KEY) || '{}'); } catch {}
@@ -1549,6 +1642,7 @@ function liveAttempts(c) {
 }
 const nativeChannel = (c) => window.LZ.play(JSON.stringify({title: c.name, opts: [{url: c.url, ref: c.ref || '', ua: c.ua || ''}]}));
 function playChannel(c, list) {
+  if (S.lastCh !== c.url) { S.lastCh = c.url; }
   if (NATIVE && c.hdr && !PROXY) { curCh = c; liveList = list || [c]; return nativeChannel(c); }
   pvMode = 'live'; curCh = c; liveList = list || [c];
   video.controls = false;
@@ -2041,16 +2135,18 @@ load();
 if (NATIVE) document.body.classList.add('lite');
 if (S.cue) document.documentElement.style.setProperty('--cue', S.cue);
 clock(); setInterval(clock, 15000);
-Promise.allSettled([detectProxy(), loadTmdbGenres()]).then(async () => {
-  if (NATIVE && !S.cfgImported && !streamAddons().length) {
-    toast('Buscando tu computadora para traer tus complementos…', 20000);
-    try { const h = await withTimeout(findPc(), 25000); if (h) { await importFromPc(h); toast('Tus complementos se trajeron de tu computadora ✓'); } else toast('No encontré tu computadora. Puedes intentarlo en Ajustes → Buscar mi computadora.', 6000); }
-    catch { $('toast').classList.remove('show'); }
+// La TV arranca casi de inmediato (solo espera un instante a ver si hay intermediario)
+const proxyReady = detectProxy();
+Promise.race([proxyReady, sleep(1800)]).then(() => { netState(); built.vivo = true; buildLive(); });
+Promise.allSettled([proxyReady, loadTmdbGenres()]).then(async () => {
+  if (NATIVE && !S.cfgImported && !streamAddons().length) {   // primera vez en la TV: trae tus complementos de la computadora (por detrás)
+    try { const h = await withTimeout(findPc(), 30000); if (h) { await importFromPc(h); toast('Tus complementos se trajeron de tu computadora ✓'); refreshAddons(); if (view === 'vivo') { renderSources(); openSource(S.src); } } }
+    catch {}
   }
   syncToPc();
-  await Promise.race([refreshAddons(), sleep(2500)]); built.inicio = true; buildHome();
+  refreshAddons();
 });
-setTimeout(() => { if (!document.activeElement || document.activeElement === document.body) focusEl(document.querySelector('#v-inicio .card:not(.sk)') || document.querySelector('.nav.on')); }, 2500);
+setTimeout(() => { if (!document.activeElement || document.activeElement === document.body) focusEl($('clist').querySelector('.chrow.on') || $('clist').querySelector('.chrow') || document.querySelector('.nav.on')); }, 3500);
 </script>
 </body>
 </html>
