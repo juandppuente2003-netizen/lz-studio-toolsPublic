@@ -1,0 +1,54 @@
+name: Compilar LZ-PLUS para Android TV
+
+on:
+  push:
+    branches: [main, lz-plus-tv]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Copiar la app web dentro del APK
+        run: |
+          cp lz-plus.html android/app/src/main/assets/index.html
+          curl -sSfL https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js -o android/app/src/main/assets/hls.min.js
+          sed -i 's#https://cdn.jsdelivr.net/npm/hls.js@1#hls.min.js#' android/app/src/main/assets/index.html
+
+      - name: Compilar APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+
+      - name: Renombrar
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk LZ-PLUS.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LZ-PLUS-apk
+          path: LZ-PLUS.apk
+
+      - name: Publicar descarga directa
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: lz-plus-tv
+          target_commitish: ${{ github.sha }}
+          name: LZ-PLUS para Android TV
+          body: |
+            Descarga directa para la TV (app Downloader):
+            https://github.com/${{ github.repository }}/releases/download/lz-plus-tv/LZ-PLUS.apk
+          files: LZ-PLUS.apk
+          make_latest: false
