@@ -21,7 +21,19 @@ function findFfmpeg() {
   for (const c of cands.filter(Boolean)) { try { execFileSync(c, ['-version'], { stdio: 'ignore' }); return c; } catch {} }
   return null;
 }
-const FFMPEG = findFfmpeg();
+let FFMPEG = findFfmpeg();
+// Si no hay FFmpeg, se instala solo la primera vez (paquete ffmpeg-static de npm, en esta misma carpeta)
+function installFfmpeg() {
+  if (FFMPEG) return;
+  console.log('  Instalando FFmpeg por única vez (1-2 minutos). La app ya funciona mientras tanto…');
+  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  const p = spawn(npm, ['install', 'ffmpeg-static', '--no-audit', '--no-fund', '--no-save', '--loglevel=error'], { cwd: __dirname, shell: process.platform === 'win32', stdio: 'inherit' });
+  p.on('close', () => {
+    try { delete require.cache[require.resolve(path.join(__dirname, 'node_modules', 'ffmpeg-static'))]; } catch {}
+    FFMPEG = findFfmpeg();
+    console.log(FFMPEG ? '\n  ✓ FFmpeg instalado: ya se pueden ver videos MKV, HEVC y AC3. Recarga la app en el navegador.\n' : '\n  No se pudo instalar FFmpeg. Revisa tu conexión a internet y vuelve a abrir este programa.\n');
+  });
+}
 
 const PORT = Number(process.env.PORT) || 8080;
 const APP = path.join(__dirname, 'lz-plus.html');
@@ -155,4 +167,5 @@ http.createServer((req, res) => {
   console.log('\n  Si la TV no abre la dirección: haz doble clic en PERMITIR-EN-RED.bat (abre el Firewall de Windows)');
   console.log('  y revisa que la TV y la computadora estén en el mismo Wi-Fi.');
   console.log('\n  Deja esta ventana abierta mientras usas la app.\n');
+  installFfmpeg();
 });

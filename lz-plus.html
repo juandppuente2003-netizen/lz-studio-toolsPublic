@@ -406,38 +406,43 @@ async function checkId(it) {
   const d = await getDetail(it); const v = (d._videos || [])[0];
   return v?.id ? {type: it.stype || 'series', id: v.id} : d.imdb ? {type: 'series', id: d.imdb + ':1:1'} : null;
 }
+// true = tiene video, false = el complemento respondió que no hay, null = no se supo (lento o con error: se deja visible)
 async function isAvailable(it) {
   const key = it.src + ':' + it.id, c = AV[key];
   if (c && Date.now() - c.t < AV_TTL) return c.ok;
-  let ok = false;
+  let ok = null;
   try {
-    const x = await checkId(it);
-    if (x?.id) {
-      const res = await Promise.allSettled(streamAddons().map(async (a) => (await getStreams(a, x.type, x.id)).some(playable)));
-      ok = res.some((r) => r.status === 'fulfilled' && r.value);
+    const x = await withTimeout(checkId(it), 10000);
+    if (!x?.id) ok = false;
+    else {
+      const res = await Promise.allSettled(streamAddons().map((a) => withTimeout(getStreams(a, x.type, x.id), 15000).then((l) => l.some(playable))));
+      if (res.some((r) => r.status === 'fulfilled' && r.value)) ok = true;
+      else if (res.some((r) => r.status === 'fulfilled')) ok = false;
     }
   } catch {}
-  AV[key] = {ok, t: Date.now()}; saveAV();
+  if (ok !== null) { AV[key] = {ok, t: Date.now()}; saveAV(); }
   return ok;
 }
-async function fillFiltered(row, items, mk, spot, firstToSpot) {
+// Las carátulas salen de inmediato; la revisión sigue por detrás: se quitan las que no tienen video y se marcan las que sí
+function fillFiltered(row, items, mk, spot, firstToSpot) {
   const h = row.querySelector('h3'); let note = h.querySelector('small');
   if (!note) { note = el('small'); h.append(note); }
-  note.textContent = 'Buscando lo que sí se puede ver…';
-  row._strip.replaceChildren(...skeleton(4));
-  let shown = 0;
-  await Promise.allSettled(items.map((it, i) => limit(() => isAvailable(it)).then((ok) => {
-    if (!ok || !row.isConnected) return;
-    if (!shown) row._strip.replaceChildren();
-    shown++;
-    const card = mk(it); card._i = i; card.querySelector('.pi')?.append(el('span', 'ok-b', '✓ Disponible'));
-    const after = [...row._strip.children].find((c) => c._i > i);
-    row._strip.insertBefore(card, after || null);
-    note.textContent = shown + (shown === 1 ? ' disponible' : ' disponibles');
-    if (firstToSpot && spot && (!spot._it || spot._it._placeholder)) setSpot(spot, it, true);
-  })));
-  if (!shown) row.remove();
-  return shown;
+  const cards = items.map((it) => mk(it));
+  row._strip.replaceChildren(...cards);
+  if (firstToSpot && spot && (!spot._it || spot._it._placeholder)) setSpot(spot, items[0], true);
+  let done = 0, yes = 0;
+  const upd = () => { note.textContent = done < items.length ? 'Revisando cuáles se pueden ver… ' + done + '/' + items.length : yes + (yes === 1 ? ' disponible' : ' disponibles'); };
+  upd();
+  items.forEach((it, i) => limit(() => isAvailable(it)).then((ok) => {
+    done++; const card = cards[i];
+    if (ok === true) { yes++; card.querySelector('.pi')?.append(el('span', 'ok-b', '✓ Disponible')); }
+    else if (ok === false && card !== document.activeElement) {
+      const strip = row._strip; if (strip._last === card) strip._last = null;
+      card.remove();
+      if (!strip.querySelector('.card') && row.isConnected) row.remove();
+    }
+    upd();
+  }));
 }
 
 function clock() { const d = new Date(); $('clock').textContent = d.toLocaleTimeString('es-MX', {hour: '2-digit', minute: '2-digit'}); }
@@ -695,7 +700,7 @@ function buildHome() {
   const v = $('v-inicio'); v.replaceChildren(); v.classList.add('cat');
   const spot = makeSpot(); const rows = el('div', 'rows');
   v.append(spot, rows);
-  setSpot(spot, {title: 'Bienvenido a LZ-PLUS', type: '', _placeholder: true, overview: filterOn() ? 'Revisando en tus complementos qué películas y series se pueden ver…' : 'Películas, series, anime y canales en vivo. Usa las flechas del control para moverte y OK para elegir.', backdrop: null}, true);
+  setSpot(spot, {title: 'Bienvenido a LZ-PLUS', type: '', _placeholder: true, overview: 'Películas, series, anime y canales en vivo. Usa las flechas del control para moverte y OK para elegir.', backdrop: null}, true);
   spot._it = null;
   // Canales: seguir viendo y favoritos
   const live = (title, list) => { if (!list.length) return; const r = makeRow(title); r._strip.replaceChildren(...list.map((c, i) => chCard(c, list, i))); rows.append(r); };
