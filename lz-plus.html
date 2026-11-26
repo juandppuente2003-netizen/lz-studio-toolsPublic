@@ -220,6 +220,9 @@
   #toast{position:fixed;left:50%;bottom:2.4rem;transform:translate(-50%,1rem);background:#fff;color:#111;font-weight:700;font-size:1.1rem;padding:1rem 1.6rem;border-radius:.9rem;max-width:min(46rem,90vw);text-align:center;opacity:0;transition:all .25s;z-index:70;pointer-events:none;box-shadow:0 1rem 2rem rgba(0,0,0,.5)}
   #toast.show{opacity:1;transform:translate(-50%,0)}
 
+  body.lite *{transition:none!important;animation-duration:0s!important}
+  body.lite .spot .bg.fade{opacity:1}
+  body.lite .card:focus .pi{box-shadow:0 0 0 .22rem var(--accent)}
   @media (max-width:900px){
     html{font-size:13px}
     .live{grid-template-columns:1fr;height:auto}
@@ -349,7 +352,43 @@ function load() {
     save();
   }
 }
-function save() { try { localStorage.setItem(KEY, enc(S)); } catch {} }
+function save() { try { localStorage.setItem(KEY, enc(S)); } catch {} syncToPc(); }
+// En la computadora: cada cambio se guarda también en lz-servidor (para que la TV lo traiga sola)
+let syncT;
+function syncToPc() {
+  if (typeof PROXY_BASE === 'undefined' || !PROXY_BASE || NATIVE) return;
+  clearTimeout(syncT);
+  syncT = setTimeout(() => { fetch(PROXY_BASE + '/lz-proxy/config', {method: 'POST', body: JSON.stringify(cfgData())}).catch(() => {}); }, 3000);
+}
+const cfgData = () => ({v: 1, servers: S.servers, favs: S.favs, lib: S.lib, watch: S.watch, lang: S.lang, subLang: S.subLang, tmdb: S.tmdb, iptv: S.iptv, cue: S.cue, onlyAvail: S.onlyAvail});
+const applyCfg = (c) => { if (!c || !Array.isArray(c.servers)) throw new Error('vacía');
+    const have = new Set(S.servers.map((s) => s.url || s.host + s.user));
+    c.servers.forEach((s) => { if (!have.has(s.url || s.host + s.user)) S.servers.push({...s, id: newId()}); });
+    ['favs', 'lib'].forEach((k) => { const seen = new Set((S[k] || []).map((x) => x.url || keyOf(x))); (c[k] || []).forEach((x) => { if (!seen.has(x.url || keyOf(x))) (S[k] = S[k] || []).push(x); }); });
+    S.watch = {...(c.watch || {}), ...(S.watch || {})};
+    ['lang', 'subLang', 'iptv', 'cue'].forEach((k) => { if (c[k]) S[k] = c[k]; }); if (c.tmdb && !S.tmdb) S.tmdb = c.tmdb; if (c.onlyAvail != null) S.onlyAvail = c.onlyAvail;
+    save(); AV = {}; saveAV(); cache.clear(); Object.keys(built).forEach((k) => built[k] = false); };
+// En la TV: busca tu computadora en la red de tu casa y trae tu configuración
+async function findPc(onStep) {
+  const tryHost = async (h) => { try { const r = await withTimeout(fetch('http://' + h + ':8080/lz-proxy/ping'), 1500); const j = await r.json(); return j.lzproxy ? h : null; } catch { return null; } };
+  const known = (S.proxy || '').replace(/^https?:\/\//, '').replace(/:\d+\/?$/, '');
+  if (known && await tryHost(known)) return known;
+  const nets = ['192.168.100', '192.168.1', '192.168.0', '192.168.18', '192.168.10', '192.168.2', '192.168.68', '192.168.8', '192.168.15', '192.168.31', '192.168.88', '192.168.20', '192.168.50', '10.0.0', '10.0.1'];
+  for (const n of nets) {
+    if (onStep) onStep(n);
+    const ips = Array.from({length: 254}, (_, i) => n + '.' + (i + 1));
+    for (let i = 0; i < ips.length; i += 64) {
+      const found = (await Promise.all(ips.slice(i, i + 64).map(tryHost))).find(Boolean);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+async function importFromPc(host) {
+  const r = await withTimeout(fetch('http://' + host + ':8080/lz-proxy/config'), 6000);
+  if (!r.ok) throw new Error('sin configuración');
+  applyCfg(await r.json()); S.proxy = 'http://' + host + ':8080'; S.cfgImported = true; save();
+}
 function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 let unlocked = false;
 
@@ -397,7 +436,7 @@ let avSaveT; const saveAV = () => { clearTimeout(avSaveT); avSaveT = setTimeout(
 const filterOn = () => S.onlyAvail !== false && streamAddons().length > 0;
 const queue = []; let running = 0;
 function limit(fn) { return new Promise((res, rej) => { queue.push([fn, res, rej]); pump(); }); }
-function pump() { while (running < 6 && queue.length) { const [fn, res, rej] = queue.shift(); running++; fn().then(res, rej).finally(() => { running--; pump(); }); } }
+function pump() { while (running < (NATIVE ? 3 : 6) && queue.length) { const [fn, res, rej] = queue.shift(); running++; fn().then(res, rej).finally(() => { running--; pump(); }); } }
 const playable = (s) => /^https?:\/\//.test(s.url || '') && (PROXY || !s.behaviorHints?.proxyHeaders?.request);
 async function checkId(it) {
   const series = it.type !== 'movie' && it.mt !== 'movie' && it.stype !== 'movie';
@@ -475,9 +514,10 @@ function focusEl(e) {
   if (!e) return;
   e.focus({preventScroll: true});
   const strip = e.closest('.strip'); if (strip) strip._last = e;
-  e.scrollIntoView({block: 'nearest', inline: 'nearest', behavior: 'smooth'});
+  const bh = NATIVE ? 'auto' : 'smooth';
+  e.scrollIntoView({block: 'nearest', inline: 'nearest', behavior: bh});
   const row = e.closest('.view.cat .rows .row');   // en portadas, la fila elegida queda arriba
-  if (row) row.scrollIntoView({block: 'start', behavior: 'smooth'});
+  if (row) row.scrollIntoView({block: 'start', behavior: bh});
 }
 function gap(a1, a2, b1, b2) { return a2 < b1 ? b1 - a2 : b2 < a1 ? a1 - b2 : 0; }
 function nav(dir) {
@@ -730,6 +770,11 @@ function makeRow(title, sub) {
   const s = el('div', 'strip'); s.append(...skeleton());
   r.append(h, s); r._strip = s; return r;
 }
+const rowIO = window.IntersectionObserver ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting && e.target._go) { const f = e.target._go; e.target._go = null; rowIO.unobserve(e.target); f(); } }), {rootMargin: '700px 0px'}) : null;
+function lazyRow(row, loader, spot, first) {
+  if (first || !rowIO) return fillRow(row, loader, spot, first);
+  row._go = () => fillRow(row, loader, spot, false); rowIO.observe(row);
+}
 async function fillRow(row, loader, spot, firstToSpot) {
   try {
     const items = await loader();
@@ -761,7 +806,7 @@ function buildHome() {
   live('Canales favoritos', S.favs);
   if (cont.length) setSpot(spot, cont[0], true);
   const defs = rowsFor('inicio');
-  defs.forEach((d, i) => { const r = makeRow(d.title); rows.append(r); fillRow(r, d.load, spot, i === 0); });
+  defs.forEach((d, i) => { const r = makeRow(d.title); rows.append(r); lazyRow(r, d.load, spot, i === 0); });
   const lr = makeRow('En vivo ahora', 'iptv-org · ' + listName(S.iptv)); rows.append(lr);
   loadSource('iptv').then(({channels}) => { const l = channels.slice(0, 30); l.length ? lr._strip.replaceChildren(...l.map((c, i) => chCard(c, l, i))) : lr.remove(); }).catch(() => lr.remove());
   if (!useTmdb()) {
@@ -773,7 +818,7 @@ function buildCatalog(v) {
   const s = $('v-' + v); s.replaceChildren(); s.classList.add('cat');
   const spot = makeSpot(); const rows = el('div', 'rows');
   s.append(spot, rows);
-  rowsFor(v).forEach((d, i) => { const r = makeRow(d.title); rows.append(r); fillRow(r, d.load, spot, i === 0); });
+  rowsFor(v).forEach((d, i) => { const r = makeRow(d.title); rows.append(r); lazyRow(r, d.load, spot, i === 0); });
 }
 
 // =====================================================================
@@ -1944,20 +1989,19 @@ function buildSettings() {
   // Pasar configuración a otro aparato (sin publicarla en internet)
   const bT = el('div', 'box'); bT.append(el('h2', 'disp', 'Pasar mi configuración a la TV'),
     el('p', 'note', 'Copia tus complementos, servidores, favoritos, Mi lista e idioma a otro aparato de tu casa. No se publica en ningún lado.'));
-  const cfgData = () => ({v: 1, servers: S.servers, favs: S.favs, lib: S.lib, watch: S.watch, lang: S.lang, subLang: S.subLang, tmdb: S.tmdb, iptv: S.iptv, cue: S.cue, onlyAvail: S.onlyAvail});
-  const applyCfg = (c) => { if (!c || !Array.isArray(c.servers)) throw new Error('vacía');
-    const have = new Set(S.servers.map((s) => s.url || s.host + s.user));
-    c.servers.forEach((s) => { if (!have.has(s.url || s.host + s.user)) S.servers.push({...s, id: newId()}); });
-    ['favs', 'lib'].forEach((k) => { const seen = new Set((S[k] || []).map((x) => x.url || keyOf(x))); (c[k] || []).forEach((x) => { if (!seen.has(x.url || keyOf(x))) (S[k] = S[k] || []).push(x); }); });
-    S.watch = {...(c.watch || {}), ...(S.watch || {})};
-    ['lang', 'subLang', 'iptv', 'cue'].forEach((k) => { if (c[k]) S[k] = c[k]; }); if (c.tmdb && !S.tmdb) S.tmdb = c.tmdb; if (c.onlyAvail != null) S.onlyAvail = c.onlyAvail;
-    save(); AV = {}; saveAV(); cache.clear(); Object.keys(built).forEach((k) => built[k] = false); };
   const tb = el('div', 'btns');
   if (PROXY && !NATIVE) tb.append(btn('btn pri', 'Guardar en esta computadora', async () => {
     try { const r = await fetch(PROXY_BASE + '/lz-proxy/config', {method: 'POST', body: JSON.stringify(cfgData())}); if (!r.ok) throw 0;
       openPick('Listo ✓', [el('p', 'note', 'Tu configuración quedó guardada en la computadora. En la TV, abre LZ-PLUS → Ajustes → “Traer de la computadora” y escribe:'), el('h2', 'disp', PROXY_BASE.replace(/^https?:\/\//, '').replace('localhost', 'IP de tu computadora'))]); }
     catch { toast('No se pudo guardar. Actualiza lz-servidor.js.'); } }));
   const ipIn = el('input'); ipIn.placeholder = 'IP de la computadora, ej. 192.168.100.26'; ipIn.value = (S.proxy || '').replace(/^https?:\/\//, '');
+  tb.append(btn('btn pri', 'Buscar mi computadora', async () => {
+    const st = el('p', 'note', 'Buscando…'); openPick('Buscando tu computadora', [el('div', 'spin'), st]);
+    const h = await findPc((n) => { st.textContent = 'Buscando en ' + n + '.x …'; });
+    if (!h) { closePick(); return toast('No la encontré. Revisa que LZ-PLUS esté abierto en la computadora y en el mismo Wi-Fi.'); }
+    try { await importFromPc(h); closePick(); toast('Configuración traída de ' + h + ' ✓'); buildSettings(); }
+    catch { closePick(); toast('Encontré tu computadora (' + h + ') pero no tiene configuración guardada. Abre la app ahí una vez.'); }
+  }));
   tb.append(btn('btn', 'Traer de la computadora', async () => {
     let v = ipIn.value.trim() || (PROXY_BASE || ''); if (!v) return toast('Escribe la IP de la computadora');
     if (!/^https?:\/\//.test(v)) v = 'http://' + v; if (!/:\d+\/?$/.test(v)) v = v.replace(/\/+$/, '') + ':8080';
@@ -1976,9 +2020,18 @@ function buildSettings() {
 //  Arranque
 // =====================================================================
 load();
+if (NATIVE) document.body.classList.add('lite');
 if (S.cue) document.documentElement.style.setProperty('--cue', S.cue);
 clock(); setInterval(clock, 15000);
-Promise.allSettled([detectProxy(), loadTmdbGenres()]).then(async () => { await Promise.race([refreshAddons(), sleep(2500)]); built.inicio = true; buildHome(); });
+Promise.allSettled([detectProxy(), loadTmdbGenres()]).then(async () => {
+  if (NATIVE && !S.cfgImported && !streamAddons().length) {
+    toast('Buscando tu computadora para traer tus complementos…', 20000);
+    try { const h = await withTimeout(findPc(), 25000); if (h) { await importFromPc(h); toast('Tus complementos se trajeron de tu computadora ✓'); } else toast('No encontré tu computadora. Puedes intentarlo en Ajustes → Buscar mi computadora.', 6000); }
+    catch { $('toast').classList.remove('show'); }
+  }
+  syncToPc();
+  await Promise.race([refreshAddons(), sleep(2500)]); built.inicio = true; buildHome();
+});
 setTimeout(() => { if (!document.activeElement || document.activeElement === document.body) focusEl(document.querySelector('#v-inicio .card:not(.sk)') || document.querySelector('.nav.on')); }, 2500);
 </script>
 </body>
