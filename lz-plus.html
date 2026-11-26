@@ -442,6 +442,30 @@ async function importFromUrl(u, quiet) {
   applyCfg(await r.json()); S.cfgUrl = u; S.cfgImported = true; save();
   if (!quiet) toast('Configuración traída del link ✓');
 }
+const fixLink = (u) => u.trim().replace(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\//, 'https://raw.githubusercontent.com/$1/$2/').replace(/^(?!https?:\/\/)/, 'https://');
+// Bienvenida: la primera vez pide el link de tu configuración (complementos, servidores, idioma…)
+function welcome() {
+  const info = el('p', 'note', 'Pega el link de tu configuración y la app se llena sola con tus complementos y servidores. Solo se hace una vez: después se actualiza sola cada vez que abres la app.');
+  const inp = el('input'); inp.placeholder = 'https://…/lz-config.json'; inp.dataset.auto = '1'; inp.autocomplete = 'off';
+  const st = el('p', 'note');
+  const go1 = btn('btn pri', 'Traer mi configuración', async () => {
+    const u = fixLink(inp.value); if (u.length < 12) { st.textContent = 'Escribe el link primero.'; return; }
+    st.textContent = 'Leyendo tu configuración…';
+    try { await importFromUrl(u, true); S.welcomed = true; save(); closePick(); toast('¡Listo! Tus complementos ya están en la app ✓'); refreshAddons(); if (view === 'vivo') { renderSources(); openSource(S.src); } }
+    catch (e) { st.textContent = 'No se pudo leer ese link (' + e.message + '). Revisa que esté completo y que lleve a tu archivo lz-config.json.'; }
+  });
+  const b = el('div', 'btns'); b.append(go1);
+  if (NATIVE) b.append(btn('btn', 'Buscar mi computadora', async () => {
+    st.textContent = 'Buscando tu computadora en la red…';
+    const h = await findPc((n) => { st.textContent = 'Buscando en ' + n + '.x …'; });
+    if (!h) { st.textContent = 'No la encontré. Usa el link.'; return; }
+    try { await importFromPc(h); S.welcomed = true; save(); closePick(); toast('Configuración traída de tu computadora ✓'); refreshAddons(); if (view === 'vivo') { renderSources(); openSource(S.src); } }
+    catch { st.textContent = 'Encontré tu computadora pero no tiene configuración guardada.'; }
+  }));
+  b.append(btn('btn', 'Ahora no', () => { S.welcomed = true; save(); closePick(); toast('Puedes hacerlo después en Ajustes → Mi configuración en un link'); }));
+  openPick('Bienvenido a LZ-PLUS', [info, inp, b, st]);
+  inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); go1.click(); } };
+}
 async function importFromPc(host) {
   const r = await withTimeout(fetch('http://' + host + ':8080/lz-proxy/config'), 6000);
   if (!r.ok) throw new Error('sin configuración');
@@ -2145,7 +2169,7 @@ function buildSettings() {
   const lb2 = el('div', 'btns');
   lb2.append(btn('btn', 'Descargar mi archivo de configuración', () => { const a = el('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(cfgData(), null, 1)], {type: 'application/json'})); a.download = 'lz-config.json'; document.body.append(a); a.click(); a.remove(); toast('Se descargó lz-config.json'); }));
   const lin = el('input'); lin.placeholder = 'Link directo a tu lz-config.json'; lin.value = S.cfgUrl || '';
-  lb2.append(btn('btn pri', 'Traer desde el link', async () => { const u = lin.value.trim(); if (!/^https?:\/\//.test(u)) return toast('Pega un link que empiece con https://'); try { await importFromUrl(u.replace(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\//, 'https://raw.githubusercontent.com/$1/$2/')); buildSettings(); } catch (e) { toast('No se pudo leer ese link (' + e.message + ')'); } }));
+  lb2.append(btn('btn pri', 'Traer desde el link', async () => { const u = lin.value.trim(); if (u.length < 8) return toast('Pega el link primero'); try { await importFromUrl(fixLink(u)); buildSettings(); } catch (e) { toast('No se pudo leer ese link (' + e.message + ')'); } }));
   if (S.cfgUrl) lb2.append(btn('btn danger', 'Dejar de usar el link', () => { S.cfgUrl = ''; save(); buildSettings(); }));
   bL.append(lin, lb2); w.append(bL);
   const b5 = el('div', 'box'); b5.append(el('h2', 'disp', 'Restablecer'), el('p', 'note', 'Borra servidores, favoritos, clave y PIN de este aparato.'));
@@ -2167,6 +2191,7 @@ const proxyReady = detectProxy();
 Promise.race([proxyReady, sleep(1800)]).then(() => { netState(); built.vivo = true; buildLive(); });
 Promise.allSettled([proxyReady, loadTmdbGenres()]).then(async () => {
   if (S.cfgUrl) { try { await importFromUrl(S.cfgUrl, true); refreshAddons(); } catch {} }
+  else if (!S.welcomed && !streamAddons().length && !(PROXY && !NATIVE && S.servers.length > 1)) { setTimeout(welcome, 1200); return; }
   if (NATIVE && !S.cfgImported && !streamAddons().length) {   // primera vez en la TV: trae tus complementos de la computadora (por detrás)
     try { const h = await withTimeout(findPc(), 30000); if (h) { await importFromPc(h); toast('Tus complementos se trajeron de tu computadora ✓'); refreshAddons(); if (view === 'vivo') { renderSources(); openSource(S.src); } } }
     catch {}
