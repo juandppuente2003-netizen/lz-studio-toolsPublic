@@ -435,8 +435,9 @@ let AV = {}; try { AV = JSON.parse(localStorage.getItem(AV_KEY) || '{}'); } catc
 let avSaveT; const saveAV = () => { clearTimeout(avSaveT); avSaveT = setTimeout(() => { try { localStorage.setItem(AV_KEY, JSON.stringify(AV)); } catch {} }, 800); };
 const filterOn = () => S.onlyAvail !== false && streamAddons().length > 0;
 const queue = []; let running = 0;
-function limit(fn) { return new Promise((res, rej) => { queue.push([fn, res, rej]); pump(); }); }
-function pump() { while (running < (NATIVE ? 3 : 6) && queue.length) { const [fn, res, rej] = queue.shift(); running++; fn().then(res, rej).finally(() => { running--; pump(); }); } }
+// hi = prioridad (lo que estás reproduciendo); lo demás espera mientras ves una ficha o un video
+function limit(fn, hi) { return new Promise((res, rej) => { const job = [fn, res, rej, hi]; hi ? queue.unshift(job) : queue.push(job); pump(); }); }
+function pump() { const busy = !$('det').hidden || (typeof isFull === 'function' && isFull()); while (running < (NATIVE ? 2 : 6) + (busy ? 4 : 0) && queue.length && (!busy || queue[0][3])) { const [fn, res, rej] = queue.shift(); running++; fn().then(res, rej).finally(() => { running--; pump(); }); } }
 const playable = (s) => /^https?:\/\//.test(s.url || '') && (PROXY || !s.behaviorHints?.proxyHeaders?.request);
 async function checkId(it) {
   const series = it.type !== 'movie' && it.mt !== 'movie' && it.stype !== 'movie';
@@ -907,8 +908,9 @@ async function openDetail(it) {
   d.append(bg, inn);
   const close = btn('btn sm', '◀ Regresar', closeDetail); close.style.cssText = 'position:absolute;top:2rem;left:4rem';
   d.append(close);
+  focusEl(close);   // el control remoto queda en la ficha desde el primer momento
   let x;
-  try { x = await getDetail(it); } catch { x = {...it}; inn.lastChild.textContent = 'No se pudo cargar la información completa.'; }
+  try { x = await withTimeout(getDetail(it), 9000); } catch { x = {...it, seasons: null}; }
   if ($('det').hidden) return;
   detData = x;
   { const v = vodId(x, x.type === 'movie' || x.mt === 'movie' ? null : x.firstEp); prefetchStreams(v.type, v.id); }
@@ -960,7 +962,7 @@ async function loadEps(x, n, row) {
     }));
   } catch { row._strip.replaceChildren(el('p', 'empty', 'No se pudieron cargar los episodios.')); }
 }
-function closeDetail() { $('det').hidden = true; $('det').replaceChildren(); detData = null; if (detPrevFocus && visible(detPrevFocus)) focusEl(detPrevFocus); }
+function closeDetail() { setTimeout(pump, 300); $('det').hidden = true; $('det').replaceChildren(); detData = null; if (detPrevFocus && visible(detPrevFocus)) focusEl(detPrevFocus); }
 function pickTrailer(vs) {
   const yt = (vs || []).filter((v) => v.site === 'YouTube');
   const l = S.lang.slice(0, 2);
@@ -1082,12 +1084,13 @@ function streamScore(s) {
 // Las opciones de video se guardan 6 horas: la segunda vez abre al instante
 const SC_KEY = 'lzplus.streams', SC_TTL = 6 * 3600 * 1000;
 let SC = {}; try { SC = JSON.parse(localStorage.getItem(SC_KEY) || '{}'); } catch {}
-let scT; const saveSC = () => { clearTimeout(scT); scT = setTimeout(() => { try { const k = Object.keys(SC); if (k.length > 300) k.sort((a, b) => SC[a].t - SC[b].t).slice(0, k.length - 300).forEach((x) => delete SC[x]); localStorage.setItem(SC_KEY, JSON.stringify(SC)); } catch {} }, 1000); };
+let scT; const saveSC = () => { clearTimeout(scT); scT = setTimeout(() => { try { const max = NATIVE ? 60 : 150, k = Object.keys(SC); if (k.length > max) k.sort((a, b) => SC[a].t - SC[b].t).slice(0, k.length - max).forEach((x) => delete SC[x]); localStorage.setItem(SC_KEY, JSON.stringify(SC)); } catch {} }, NATIVE ? 8000 : 1500); };
 function getStreams(a, type, id) {
   const url = addonBase(a) + '/stream/' + type + '/' + g(id) + '.json', c = SC[url];
   if (c && Date.now() - c.t < SC_TTL && c.s.length) return Promise.resolve(c.s);
   return J(url, 20000).then((j) => {
-    const s = (j.streams || []).map((x) => ({url: x.url, name: x.name, title: (x.title || '').slice(0, 200), description: (x.description || '').slice(0, 200), behaviorHints: x.behaviorHints?.proxyHeaders ? {proxyHeaders: x.behaviorHints.proxyHeaders} : undefined, infoHash: x.infoHash}));
+    const all = (j.streams || []).map((x) => ({url: x.url, name: (x.name || '').slice(0, 60), title: (x.title || '').slice(0, 140), description: (x.description || '').slice(0, 140), behaviorHints: x.behaviorHints?.proxyHeaders ? {proxyHeaders: x.behaviorHints.proxyHeaders} : undefined}));
+    const s = all.filter((x) => /^https?:\/\//.test(x.url || '')).sort((p, q) => streamScore(p) - streamScore(q)).slice(0, NATIVE ? 20 : 40);
     SC[url] = {t: Date.now(), s}; saveSC(); return s;
   });
 }
@@ -1127,7 +1130,7 @@ async function playVod(x, ep, startAt) {
   const check = (s) => {
     const hdr = s.behaviorHints?.proxyHeaders?.request || {}, h = {ref: hdr.Referer || hdr.referer, ua: hdr['User-Agent'] || hdr['user-agent']};
     s._pu = PROXY ? px(s.url, h) : s.url; s._p = 'pending';
-    limit(() => probe(s._pu, /\.m3u8(\?|$)/i.test(s.url))).then((r) => { s._p = r; if (sess === vodSess) pump(); });
+    limit(() => probe(s._pu, /\.m3u8(\?|$)/i.test(s.url)), true).then((r) => { s._p = r; if (sess === vodSess) pump(); });
   };
   adds.forEach((a) => getStreams(a, type, id)
     .then((list) => { if (sess !== vodSess) return; const add = list.filter(playable).map((s) => ({...s, addon: a.name})); add.forEach(check); vodOpts.push(...add); vodOpts.sort((p, q) => streamScore(p) - streamScore(q)); })
@@ -1595,6 +1598,7 @@ function goFull() {
   else hint('Regresar  Salir');
 }
 function exitFull() {
+  setTimeout(pump, 500);
   pv.classList.remove('full'); $('panel').hidden = true; $('osd').classList.remove('show');
   if (pvMode !== 'live' || view !== 'vivo') { if (pvMode !== 'live' || view !== 'vivo') stopPlayback(); }
   $('slot').append(pv);
