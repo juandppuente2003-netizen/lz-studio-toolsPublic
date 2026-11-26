@@ -71,6 +71,8 @@
   .card .sub{font-size:.85rem;color:#6D7894;margin-top:-.4rem;padding:0 .1rem}
   .card:focus .pi,body:not(.kbd) .card:hover .pi{transform:scale(1.08);box-shadow:0 0 0 .22rem var(--accent),0 1rem 2.4rem rgba(0,0,0,.65)}
   .card:focus .ct{color:#fff}
+  .card .prog{position:absolute;left:0;right:0;bottom:0;height:.35rem;background:rgba(255,255,255,.18)}
+  .card .prog i{display:block;height:100%;background:var(--accent)}
   .card .ok-b{position:absolute;left:.5rem;bottom:.5rem;background:rgba(10,40,24,.88);color:var(--ok);font-weight:800;font-size:.75rem;padding:.2rem .5rem;border-radius:.4rem}
   .card .badge-r{position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.75);color:var(--accent);font-weight:800;font-size:.8rem;padding:.2rem .5rem;border-radius:.4rem}
   .card.wide{width:17rem}.card.wide .pi{aspect-ratio:16/9}
@@ -134,6 +136,10 @@
   #pv{position:absolute;inset:0;background:#000;outline:none}
   #pv.full{position:fixed;inset:0;z-index:50}
   #pv video{width:100%;height:100%;display:block;background:#000}
+  #pv video::cue{font-family:Manrope,system-ui,sans-serif;font-size:var(--cue,2.2rem);font-weight:600;color:#fff;background:rgba(0,0,0,.62);line-height:1.35}
+  .msec{display:flex;flex-direction:column;gap:.7rem}
+  .msec h3{margin:0;font-size:1.5rem;color:var(--mut)}
+  .opt.cur{outline:2px solid var(--accent)}
   #yt,#yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   .pv-msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:2rem;color:#D3DAE7;font-size:1.25rem;background:rgba(0,0,0,.5)}
   .pv-msg .btns{justify-content:center}
@@ -323,7 +329,7 @@ const GRUPOS_ES = {News:'Noticias', Sports:'Deportes', Movies:'Películas', Musi
 
 // ---------------- Estado guardado (los links se guardan codificados, nunca se muestran) ----------------
 const KEY = 'lzplus.tv';
-const DEF = {lang: 'es-MX', subLang: 'spa', tmdb: '', pin: '', iptv: 'countries/mx', src: 'iptv', servers: [], recents: [], favs: [], init: false, onlyAvail: true, proxy: ''};
+const DEF = {lang: 'es-MX', subLang: 'spa', tmdb: '', pin: '', iptv: 'countries/mx', src: 'iptv', servers: [], recents: [], favs: [], init: false, onlyAvail: true, proxy: '', watch: {}, lib: []};
 let S;
 const enc = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).split('').reverse().join('');
 const dec = (s) => JSON.parse(decodeURIComponent(escape(atob(s.split('').reverse().join('')))));
@@ -380,7 +386,7 @@ async function detectProxy() {
   PROXY = null; PROXY_BASE = null; PROXY_FF = false; return false;
 }
 // Video convertido por el intermediario (FFmpeg): v = 'copy' (rápido) o 'h264' (convierte la imagen)
-const ffUrl = (u, h, v, t) => PROXY_BASE + '/lz-proxy/mp4?u=' + encodeURIComponent(u) + (h.ref ? '&r=' + encodeURIComponent(h.ref) : '') + (h.ua ? '&a=' + encodeURIComponent(h.ua) : '') + '&v=' + v + (t ? '&t=' + Math.floor(t) : '');
+const ffUrl = (u, h, v, t, au) => PROXY_BASE + '/lz-proxy/mp4?u=' + encodeURIComponent(u) + (h.ref ? '&r=' + encodeURIComponent(h.ref) : '') + (h.ua ? '&a=' + encodeURIComponent(h.ua) : '') + '&v=' + v + (t ? '&t=' + Math.floor(t) : '') + (au ? '&au=' + au : '');
 const px = (url, h = {}) => PROXY ? PROXY + '?u=' + encodeURIComponent(url) + (h.ref ? '&r=' + encodeURIComponent(h.ref) : '') + (h.ua ? '&a=' + encodeURIComponent(h.ua) : '') : url;
 const NO_CONN = () => PROXY || NATIVE ? 'El servidor no responde.' : 'El servidor no deja conectarse desde el navegador. Abre LZ-PLUS con el servidor intermedio (Ajustes → Servidor intermedio).';
 
@@ -654,11 +660,55 @@ function setSpot(spot, it, now) {
 }
 
 // ---------------- Filas de carátulas ----------------
+// ---------- Biblioteca (como Stremio): continuar viendo y mi lista ----------
+const keyOf = (it) => it.src + ':' + it.id;
+const mini = (it) => ({src: it.src, id: it.id, mt: it.mt, type: it.type, stype: it.stype, addon: it.addon, title: it.title, poster: it.poster, backdrop: it.backdrop, year: it.year, rating: it.rating, genres: (it.genres || []).slice(0, 3), overview: (it.overview || '').slice(0, 400)});
+const inLib = (it) => (S.lib || []).some((x) => keyOf(x) === keyOf(it));
+function toggleLib(it) {
+  if (inLib(it)) { S.lib = S.lib.filter((x) => keyOf(x) !== keyOf(it)); toast('Quitado de Mi lista'); }
+  else { S.lib = [mini(it), ...(S.lib || [])].slice(0, 200); toast('Agregado a Mi lista ✓'); }
+  save(); built.inicio = false;
+}
+const watchOf = (it) => (S.watch || {})[keyOf(it)];
+let vodItem = null, lastSaveT = 0;
+function saveProgress(force) {
+  if (!vodItem || pvMode !== 'vod') return;
+  const t = curTime(), d = (vodFF && vodFF.dur) || (isFinite(video.duration) ? video.duration : 0);
+  if (t < 20 && !force) return;
+  if (!force && Date.now() - lastSaveT < 10000) return;
+  lastSaveT = Date.now();
+  S.watch = S.watch || {};
+  const k = keyOf(vodItem.x);
+  if (d && t / d > 0.93) { if (vodItem.ep) S.watch[k] = {it: mini(vodItem.x), ep: {s: vodItem.ep.s, e: vodItem.ep.e + 1}, t: 0, d: 0, at: Date.now(), next: true}; else delete S.watch[k]; }
+  else S.watch[k] = {it: mini(vodItem.x), ep: vodItem.ep ? {s: vodItem.ep.s, e: vodItem.ep.e} : null, t: Math.floor(t), d: Math.floor(d), at: Date.now()};
+  const keys = Object.keys(S.watch).sort((a, b) => S.watch[b].at - S.watch[a].at); keys.slice(40).forEach((x) => delete S.watch[x]);
+  save(); built.inicio = false;
+}
+video.addEventListener('timeupdate', () => saveProgress(false));
+video.addEventListener('pause', () => saveProgress(true));
+// Al terminar un episodio, pasa solo al siguiente
+video.addEventListener('ended', () => {
+  if (pvMode !== 'vod' || !vodItem) return;
+  saveProgress(true);
+  if (!vodItem.ep) return;
+  const {x, ep} = vodItem, nx = {s: ep.s, e: ep.e + 1};
+  let n = 8; const b = btn('btn pri', 'Siguiente episodio ▶', () => { clearInterval(tm); playVod(x, nx); });
+  const tm = setInterval(() => { n--; b.textContent = 'Siguiente episodio en ' + n + ' ▶'; if (n <= 0) { clearInterval(tm); if (pvMode === 'vod' && vodItem && vodItem.x === x) playVod(x, nx); } }, 1000);
+  msg('Terminó el episodio ' + ep.e + '.', [b, btn('btn', 'Regresar', () => { clearInterval(tm); exitFull(); })]);
+  setTimeout(() => focusEl(b), 50);
+});
+// La app de TV avisa hasta dónde se vio en el reproductor nativo
+window.lzProgress = (pos, dur) => { if (!vodItem) return; const k = keyOf(vodItem.x); S.watch = S.watch || {};
+  if (dur && pos / dur > 0.93) { if (vodItem.ep) S.watch[k] = {it: mini(vodItem.x), ep: {s: vodItem.ep.s, e: vodItem.ep.e + 1}, t: 0, d: 0, at: Date.now(), next: true}; else delete S.watch[k]; }
+  else if (pos > 20) S.watch[k] = {it: mini(vodItem.x), ep: vodItem.ep ? {s: vodItem.ep.s, e: vodItem.ep.e} : null, t: Math.floor(pos), d: Math.floor(dur), at: Date.now()};
+  save(); built.inicio = false; if (view === 'inicio' && $('det').hidden) go('inicio'); };
+
 function mediaCard(it, spot) {
   const b = el('button', 'card'); b.type = 'button';
   const pi = el('div', 'pi');
   pi.append(img(it.poster, '', () => pi.replaceChildren(el('div', 'ph', it.title))));
   if (it.rating) pi.append(el('span', 'badge-r', '★ ' + it.rating));
+  const w = watchOf(it); if (w && w.d) { const pr = el('span', 'prog'); const i = el('i'); i.style.width = Math.min(100, Math.round(w.t / w.d * 100)) + '%'; pr.append(i); pi.append(pr); }
   b.append(pi, el('span', 'ct', it.title));
   if (it.year) b.append(el('span', 'sub', [it.year, TYPE_ES[it.type]].join(' · ')));
   b.onclick = () => openDetail(it);
@@ -704,8 +754,12 @@ function buildHome() {
   spot._it = null;
   // Canales: seguir viendo y favoritos
   const live = (title, list) => { if (!list.length) return; const r = makeRow(title); r._strip.replaceChildren(...list.map((c, i) => chCard(c, list, i))); rows.append(r); };
+  const cont = Object.values(S.watch || {}).sort((a, b) => b.at - a.at).map((w) => w.it);
+  if (cont.length) { const r = makeRow('Continuar viendo'); r._strip.replaceChildren(...cont.map((it) => mediaCard(it, spot))); rows.append(r); }
+  if ((S.lib || []).length) { const r = makeRow('Mi lista'); r._strip.replaceChildren(...S.lib.map((it) => mediaCard(it, spot))); rows.append(r); }
   live('Seguir viendo · En vivo', S.recents);
   live('Canales favoritos', S.favs);
+  if (cont.length) setSpot(spot, cont[0], true);
   const defs = rowsFor('inicio');
   defs.forEach((d, i) => { const r = makeRow(d.title); rows.append(r); fillRow(r, d.load, spot, i === 0); });
   const lr = makeRow('En vivo ahora', 'iptv-org · ' + listName(S.iptv)); rows.append(lr);
@@ -819,9 +873,16 @@ async function openDetail(it) {
   [[TYPE_ES[x.type], 'tag'], [x.year], [x.runtime], [x.rating && '★ ' + x.rating, 'r']].filter((m) => m[0]).forEach(([t, c]) => meta.append(el('span', c, t)));
   (x.genres || []).slice(0, 4).forEach((gg) => meta.append(el('span', 'tag', gg)));
   const btns = el('div', 'btns');
-  const play = btn('btn pri', '▶  Reproducir', () => playVod(x, x.firstEp)); play.dataset.auto = '1';
+  const w = watchOf(x);
+  const play = w && (w.t > 20 || w.next)
+    ? btn('btn pri', w.next ? '▶  Ver T' + w.ep.s + ' E' + w.ep.e : '▶  Continuar ' + (w.ep ? 'T' + w.ep.s + ' E' + w.ep.e + ' · ' : '') + fmt(w.t), () => playVod(x, w.ep || x.firstEp, w.t))
+    : btn('btn pri', '▶  Reproducir', () => playVod(x, x.firstEp));
+  play.dataset.auto = '1';
   btns.append(play);
+  if (w && w.t > 20) btns.append(btn('btn', 'Desde el inicio', () => playVod(x, w.ep || x.firstEp, 0)));
+  const lb = btn('btn', inLib(x) ? '✓  En mi lista' : '＋  Mi lista', () => { toggleLib(x); lb.textContent = inLib(x) ? '✓  En mi lista' : '＋  Mi lista'; });
   if (x.trailer) btns.append(btn('btn', 'Ver tráiler', () => playTrailer(x.trailer, x.title)));
+  btns.append(lb);
   inn.replaceChildren(title, meta, el('p', null, x.overview || 'Sin descripción.'));
   if (x.cast?.length) inn.append(el('div', 'cast', 'Reparto: ' + x.cast.join(', ')));
   inn.append(btns);
@@ -955,11 +1016,23 @@ function vodId(x, ep) {
 let lastVod = null, vodSess = 0, vodOpts = [], vodFailed = new Set(), vodLabel = '';
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error('tiempo')), ms))]);
 // Primero las que el navegador abre mejor (mp4/m3u8); al final MKV, HEVC y http sin intermediario
+// Puntaje: menor = mejor. Prefiere Latino/Español, 1080p/720p, archivos ligeros y formatos fáciles
 function streamScore(s) {
   const u = (s.url || '').toLowerCase(), d = ((s.name || '') + ' ' + (s.title || '') + ' ' + (s.description || '')).toLowerCase();
   const gb = parseFloat((d.match(/(\d+(?:\.\d+)?)\s*gb/) || [])[1] || 0);
-  return (NATIVE ? 0 : (/\.mkv(\?|$)/.test(u) || /\bmkv\b/.test(d) ? 2 : 0) + (/hevc|x265|h\.?265|10bit|dolby vision|\bdv\b|hdr/.test(d) ? 2 : 0))
-    + (/2160p|\b4k\b|uhd/.test(d) ? 2 : 0) + (gb > 10 ? 1 : 0) - (/1080p|720p/.test(d) ? 1 : 0) + (u.startsWith('http:') && !PROXY && !NATIVE ? 2 : 0);
+  let sc = 0;
+  if (/latino|lat\b|español|espanol|castellano|spanish|\bspa\b|\besp\b|dual/.test(d)) sc -= 4;
+  if (/1080p/.test(d)) sc -= 2; else if (/720p/.test(d)) sc -= 1.5; else if (/480p|360p/.test(d)) sc += 1;
+  if (/2160p|\b4k\b|uhd/.test(d)) sc += NATIVE ? 1 : 3;
+  if (/\bcam\b|hdcam|telesync|\bts\b|camrip/.test(d)) sc += 6;
+  if (gb > 15) sc += 2; else if (gb > 6) sc += 1;
+  if (!NATIVE) {
+    if (/hevc|x265|h\.?265|10bit|dolby vision|\bdv\b|hdr/.test(d)) sc += PROXY_FF ? 1 : 3;
+    if (/\.mkv(\?|$)/.test(u) || /\bmkv\b/.test(d)) sc += PROXY_FF ? 0.5 : 2;
+    if (/\.mp4(\?|$)/.test(u) || /\.m3u8(\?|$)/.test(u)) sc -= 1;
+    if (u.startsWith('http:') && !PROXY) sc += 3;
+  }
+  return sc;
 }
 // Las opciones de video se guardan 6 horas: la segunda vez abre al instante
 const SC_KEY = 'lzplus.streams', SC_TTL = 6 * 3600 * 1000;
@@ -975,7 +1048,7 @@ function getStreams(a, type, id) {
 }
 function prefetchStreams(type, id) { if (id) streamAddons().forEach((a) => getStreams(a, type, id).catch(() => {})); }
 // Reproducir: empieza en cuanto encuentra la primera opción que funciona
-async function playVod(x, ep) {
+async function playVod(x, ep, startAt) {
   lastVod = {x, ep};
   if (x.type === 'movie' || x.mt === 'movie') ep = null;
   const adds = streamAddons();
@@ -986,7 +1059,8 @@ async function playVod(x, ep) {
   }
   const {type, id} = vodId(x, ep);
   if (!id) return toast('Este título no tiene un código para buscar videos.');
-  if (NATIVE) return nativeVod(x, ep, adds, type, id);
+  vodItem = {x, ep}; lastSaveT = 0;
+  if (NATIVE) return nativeVod(x, ep, adds, type, id, startAt);
   const sess = ++vodSess;
   vodOpts = []; vodFailed = new Set(); vodLabel = x.title + (ep ? ' · T' + ep.s + ' E' + ep.e : '');
   if (hls) { hls.destroy(); hls = null; }
@@ -1013,10 +1087,11 @@ async function playVod(x, ep) {
   adds.forEach((a) => getStreams(a, type, id)
     .then((list) => { if (sess !== vodSess) return; const add = list.filter(playable).map((s) => ({...s, addon: a.name})); add.forEach(check); vodOpts.push(...add); vodOpts.sort((p, q) => streamScore(p) - streamScore(q)); })
     .catch(() => {}).finally(() => { pending--; if (sess === vodSess) pump(); }));
-  addSubtitles({type, id});
+  vodCtx = {type, id}; vodCur = null; vodInfo = null; vodSub = null; vodSubList = null; vodResume = startAt || 0;
+  addSubtitles(vodCtx);
 }
 // En la TV: junta las opciones y las pasa al reproductor nativo (abre MKV, HEVC, AC3…)
-async function nativeVod(x, ep, adds, type, id) {
+async function nativeVod(x, ep, adds, type, id, startAt) {
   const label = x.title + (ep ? ' · T' + ep.s + ' E' + ep.e : '');
   const body = el('div'); body.append(el('div', 'spin'), el('p', 'note', 'Buscando video en tus complementos…'));
   openPick(label, [body]);
@@ -1040,7 +1115,7 @@ async function nativeVod(x, ep, adds, type, id) {
     }
   }
   closePick();
-  window.LZ.play(JSON.stringify({title: label, sub, subLang, opts: opts.slice(0, 30).map((s) => {
+  window.LZ.play(JSON.stringify({title: label, sub, subLang, start: Math.floor(startAt || 0), opts: opts.slice(0, 30).map((s) => {
     const h = s.behaviorHints?.proxyHeaders?.request || {};
     return {url: s.url, ref: h.Referer || h.referer || '', ua: h['User-Agent'] || h['user-agent'] || ''};
   })}));
@@ -1059,29 +1134,95 @@ function openVodPick() {
     const o = btn('opt'); const tx = el('div');
     tx.append(el('div', null, (s.name || s.addon || 'Opción ' + (i + 1)).replace(/\n/g, ' ')), el('small', null, (s.title || s.description || '').replace(/\n/g, ' · ')));
     o.append(tx, el('span', null, vodFailed.has(s) ? '✗' : '▶')); if (!i) o.dataset.auto = '1';
-    o.onclick = () => { closePick(); const sess = ++vodSess; vodFailed.delete(s); msg('Abriendo opción ' + (i + 1) + '…', null, true);
+    o.onclick = () => { closePick(); vodResume = vodCur ? curTime() : 0; const sess = ++vodSess; vodFailed.delete(s); msg('Abriendo opción ' + (i + 1) + '…', null, true);
       playStream(s, sess).then((ok) => { if (sess === vodSess && !ok) { vodFailed.add(s); vodAllFailed(); } }); };
     body.append(o);
   });
   openPick('Opciones de video', vodOpts.length ? [body] : [el('p', 'note', 'Todavía no hay opciones.')]);
 }
 function toVTT(t) { return /^﻿?WEBVTT/.test(t) ? t : 'WEBVTT\n\n' + t.replace(/\r/g, '').replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2'); }
+// Junta todos los subtítulos de tus complementos y pone el de tu idioma
 async function addSubtitles(ctx) {
-  if (!S.subLang) return;
-  for (const a of subAddons()) {
-    try {
-      const j = await J(addonBase(a) + '/subtitles/' + ctx.type + '/' + g(ctx.id) + '.json');
-      const subs = (j.subtitles || []).filter((s) => (s.lang || '').startsWith(S.subLang.slice(0, 2)));
-      for (const sub of subs.slice(0, 2)) {
-        const r = await fetch(sub.url); if (!r.ok) continue;
-        const tr = el('track'); tr.kind = 'subtitles'; tr.label = LANG[sub.lang] || sub.lang; tr.srclang = (sub.lang || '').slice(0, 2);
-        tr.src = URL.createObjectURL(new Blob([toVTT(await r.text())], {type: 'text/vtt'}));
-        video.append(tr);
-        setTimeout(() => { [...video.textTracks].forEach((t, i) => t.mode = i === 0 ? 'showing' : 'disabled'); }, 80);
-        toast('Subtítulos en ' + tr.label + ' activados'); return;
-      }
-    } catch {}
+  const all = [];
+  await Promise.allSettled(subAddons().map(async (a) => { const j = await withTimeout(J(addonBase(a) + '/subtitles/' + ctx.type + '/' + g(ctx.id) + '.json'), 12000); (j.subtitles || []).forEach((s) => s.url && all.push({...s, addon: a.name})); }));
+  if (vodCtx !== ctx) return;
+  vodSubList = all;
+  if (!S.subLang || vodSub) return;
+  const pref = all.filter((s) => (s.lang || '').startsWith(S.subLang.slice(0, 2)) || (S.subLang === 'spa' && /^(spa|es|spn|lat)/.test(s.lang || '')));
+  for (const sub of pref.slice(0, 3)) if (await loadSub(sub, true)) return;
+}
+async function loadSub(sub, quiet) {
+  try {
+    const r = await withTimeout(fetch(sub.url), 12000); if (!r.ok) return false;
+    vodSub = {text: toVTT(await r.text()), label: LANG[sub.lang] || sub.lang || 'Subtítulos', lang: (sub.lang || '').slice(0, 2), id: sub.id || sub.url};
+    applySub(); toast('Subtítulos: ' + vodSub.label); return true;
+  } catch { if (!quiet) toast('No se pudo cargar ese subtítulo'); return false; }
+}
+// Pone el subtítulo en el video; si el video convertido empieza a la mitad, se recorren los tiempos
+function shiftVTT(vtt, off) {
+  if (!off) return vtt;
+  const ts = (x) => { const p = x.split(':').map(Number); return p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p[0] * 60 + p[1]; };
+  const out = (n) => { n = Math.max(0, n); const h = Math.floor(n / 3600), m = Math.floor(n / 60) % 60, s = (n % 60).toFixed(3).padStart(6, '0'); return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + s; };
+  return vtt.split(/\n\n+/).map((b) => {
+    const m = b.match(/([\d:.]+)\s*-->\s*([\d:.]+)(.*)/); if (!m) return b;
+    const a = ts(m[1]) - off, z = ts(m[2]) - off; if (z <= 0) return '';
+    return b.replace(m[0], out(a) + ' --> ' + out(z) + m[3]);
+  }).filter(Boolean).join('\n\n');
+}
+function applySub() {
+  video.querySelectorAll('track').forEach((tr) => tr.remove());
+  if (!vodSub) return;
+  const tr = el('track'); tr.kind = 'subtitles'; tr.label = vodSub.label; tr.srclang = vodSub.lang; tr.default = true;
+  tr.src = URL.createObjectURL(new Blob([shiftVTT(vodSub.text, vodFF ? vodFF.offset : 0)], {type: 'text/vtt'}));
+  video.append(tr);
+  setTimeout(() => { [...video.textTracks].forEach((x) => x.mode = x.label === vodSub?.label ? 'showing' : 'disabled'); }, 80);
+}
+
+// ---- Menú de opciones del reproductor: subtítulos, audio, calidad
+const qLabel = (s) => { const d = ((s.name || '') + ' ' + (s.title || '') + ' ' + (s.description || '')).replace(/\n/g, ' ');
+  const q = (d.match(/2160p|4k|1080p|720p|576p|480p|360p/i) || [''])[0].toUpperCase().replace('4K', '2160P');
+  const gb = (d.match(/(\d+(?:\.\d+)?)\s*gb/i) || [])[1];
+  return {q: q ? q.replace('P', 'p') : 'Calidad normal', extra: [/hevc|x265|h\.?265/i.test(d) && 'HEVC', /hdr|dolby vision/i.test(d) && 'HDR', gb && gb + ' GB', s.addon].filter(Boolean).join(' · ')}; };
+function openVodMenu() {
+  const sections = [];
+  // Subtítulos
+  const s1 = el('div', 'msec'); s1.append(el('h3', null, 'Subtítulos'));
+  const c1 = el('div', 'chips');
+  const off = btn('chip' + (!vodSub ? ' on' : ''), 'Desactivados', () => { vodSub = null; applySub(); closePick(); toast('Subtítulos desactivados'); }); c1.append(off);
+  if (vodSubList === null) c1.append(el('span', 'note', 'Buscando subtítulos…'));
+  else if (!vodSubList.length) c1.append(el('span', 'note', subAddons().length ? 'No se encontraron subtítulos para este título.' : 'Agrega un complemento de subtítulos en Servidores.'));
+  else {
+    const byLang = new Map(); vodSubList.forEach((s) => { const k = s.lang || '?'; if (!byLang.has(k)) byLang.set(k, []); byLang.get(k).push(s); });
+    const order = [...byLang.keys()].sort((a, b) => (/^(spa|es|spn)/.test(b) ? 1 : 0) - (/^(spa|es|spn)/.test(a) ? 1 : 0) || (/^en/.test(b) ? 1 : 0) - (/^en/.test(a) ? 1 : 0));
+    order.slice(0, 14).forEach((k) => byLang.get(k).slice(0, 3).forEach((s, i) => {
+      const lbl = (LANG[k] || k) + (byLang.get(k).length > 1 ? ' ' + (i + 1) : '');
+      c1.append(btn('chip' + (vodSub && vodSub.id === (s.id || s.url) ? ' on' : ''), lbl, async () => { closePick(); toast('Cargando subtítulos…'); await loadSub(s); }));
+    }));
   }
+  const size = el('div', 'chips');
+  [['1.7rem', 'Pequeños'], ['2.2rem', 'Normales'], ['2.9rem', 'Grandes'], ['3.6rem', 'Muy grandes']].forEach(([v, n]) => size.append(btn('chip' + ((S.cue || '2.2rem') === v ? ' on' : ''), n, (e) => { S.cue = v; save(); document.documentElement.style.setProperty('--cue', v); size.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === e.currentTarget)); })));
+  s1.append(c1, el('h3', null, 'Tamaño de letra'), size); sections.push(s1);
+  // Audio
+  const auds = vodInfo?.audios || [];
+  if (auds.length > 1) {
+    const s2 = el('div', 'msec'); s2.append(el('h3', null, 'Audio'));
+    const c2 = el('div', 'chips'); const cur = vodFF ? vodFF.au : 0;
+    auds.forEach((a, i) => c2.append(btn('chip' + (i === cur ? ' on' : ''), audioName(a), () => { closePick(); vodFF ? ffReload(curTime(), i) : toFF(i); toast('Audio: ' + audioName(a)); })));
+    s2.append(c2); sections.push(s2);
+  }
+  // Calidad / fuente
+  const s3 = el('div', 'msec'); s3.append(el('h3', null, 'Calidad y fuente'));
+  vodOpts.forEach((s, i) => {
+    const {q, extra} = qLabel(s);
+    const o = btn('opt' + (s === vodCur ? ' cur' : '')); const tx = el('div'); tx.append(el('div', null, q + (s === vodCur ? '  ·  viendo ahora' : '')), el('small', null, extra || (s.name || '').replace(/\n/g, ' ')));
+    o.append(tx, el('span', null, vodFailed.has(s) ? '✗' : s === vodCur ? '✓' : '▶'));
+    o.onclick = () => { closePick(); if (s === vodCur) return; vodResume = curTime(); const sess = ++vodSess; vodFailed.delete(s); msg('Cambiando a ' + q + '…', null, true);
+      playStream(s, sess).then((ok) => { if (sess === vodSess && !ok) { vodFailed.add(s); vodAllFailed(); } }); };
+    s3.append(o);
+  });
+  sections.push(s3);
+  openPick('Opciones', sections);
+  setTimeout(() => focusEl(sections[0].querySelector('.chip.on') || sections[0].querySelector('.chip')), 40);
 }
 
 // =====================================================================
@@ -1293,7 +1434,8 @@ function toggleFav(c) {
 // =====================================================================
 let hls = null, pvMode = null, curCh = null, liveList = [], osdT, hintT, fullPrevFocus = null;
 function stopPlayback() {
-  vodTry++; vodSess++; vodFF = null;
+  if (pvMode === 'vod') saveProgress(true);
+  vodTry++; vodSess++; vodFF = null; vodCur = null; vodSub = null;
   if (hls) { hls.destroy(); hls = null; }
   video.pause(); video.removeAttribute('src'); video.load();
   video.querySelectorAll('track').forEach((t) => t.remove());
@@ -1404,7 +1546,7 @@ function goFull() {
   pv.focus();
   if (pvMode === 'live' && !NATIVE && $('pvMsg').querySelector('button')) msg('Este canal no está disponible ahora.');
   if (pvMode === 'live') { showOsd(); hint('▲ ▼  Cambiar canal   ·   OK  Lista de canales   ·   Regresar  Salir'); }
-  else if (pvMode === 'vod') hint('OK  Pausa   ·   ◀ ▶  -10 s / +10 s   ·   ▲  Opciones   ·   Regresar  Salir');
+  else if (pvMode === 'vod') hint('OK  Pausa   ·   ◀ ▶  Retroceder / Adelantar   ·   ▲  Subtítulos, audio y calidad   ·   Regresar  Salir');
   else hint('Regresar  Salir');
 }
 function exitFull() {
@@ -1441,7 +1583,7 @@ function playerKey(e) {
     if (vodFF && (k === 'ArrowRight' || k === 'MediaFastForward')) { ffSeek(30); return true; }
     if (k === 'ArrowLeft' || k === 'MediaRewind') { video.currentTime = Math.max(0, video.currentTime - 10); hint('◀◀  -10 s'); return true; }
     if (k === 'ArrowRight' || k === 'MediaFastForward') { video.currentTime += 10; hint('▶▶  +10 s'); return true; }
-    if (k === 'ArrowUp') { focusEl($('pvList')); return true; }
+    if (k === 'ArrowUp' || k === 'ContextMenu' || k === 'Menu') { openVodMenu(); return true; }
     if (k === 'ArrowDown') { const t = (vodFF ? vodFF.offset : 0) + video.currentTime, d = vodFF ? vodFF.dur : video.duration; hint(fmt(t) + (isFinite(d) ? ' / ' + fmt(d) : '')); return true; }
   } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(k)) return true;
   return false;
@@ -1470,12 +1612,48 @@ function attemptsFor(s) {
 // Revisa en pocos segundos si el link responde (para no esperar en links caídos)
 async function probe(url, isHls) {
   try {
-    const r = await withTimeout(fetch(url, {headers: isHls ? {} : {Range: 'bytes=0-1'}}), 6000);
+    const r = await withTimeout(fetch(url, {headers: isHls ? {} : {Range: 'bytes=0-1'}}), 8000);
     try { r.body?.cancel(); } catch {}
     return r.ok || r.status === 206 ? 'ok' : 'bad';
-  } catch (e) { return e.message === 'tiempo' ? 'bad' : 'unknown'; }
+  } catch (e) { return 'unknown'; }   // lento o sin respuesta: se intenta igual (solo un error real lo descarta)
 }
 let vodTry = 0, vodFF = null, ffSeekT = null, ffTarget = null;
+let vodCtx = null, vodCur = null, vodInfo = null, vodSub = null, vodSubList = null, vodResume = 0;
+const curTime = () => (vodFF ? vodFF.offset : 0) + (video.currentTime || 0);
+const isEs = (x) => /^(spa|es|lat|esp)/i.test(x.lang || '') || /latino|español|espanol|castellano|spanish/i.test(x.title || '');
+const hdrOf = (s) => { const hd = s.behaviorHints?.proxyHeaders?.request || {}; return {ref: hd.Referer || hd.referer, ua: hd['User-Agent'] || hd['user-agent']}; };
+// Recarga el video convertido desde el segundo t (y con la pista de audio au)
+function ffReload(t, au) {
+  vodFF.offset = Math.max(0, t || 0); if (au != null) vodFF.au = au;
+  msg('Cargando…', null, true);
+  video.onplaying = () => msg('');
+  video.src = ffUrl(vodFF.u, vodFF.h, vodFF.v, vodFF.offset, vodFF.au); video.play().catch(() => {});
+  applySub();
+}
+// Pasar un video que se ve directo a modo convertido (para poder elegir audio)
+function toFF(au) {
+  const s = vodCur; if (!s || !PROXY_FF) return;
+  const t = curTime(); vodFF = {u: s.url, h: hdrOf(s), v: 'copy', offset: 0, dur: vodInfo?.duration || 0, au: 0};
+  ffReload(t, au);
+}
+async function afterStart(s, sess) {
+  vodCur = s;
+  if (vodResume > 5) { const t = vodResume; vodResume = 0; if (vodFF) ffReload(t); else video.currentTime = t; } else applySub();
+  if (!PROXY_FF) return;
+  try {
+    const u = vodFF ? vodFF.u : s.url;
+    const j = await (await fetch(PROXY_BASE + '/lz-proxy/info?u=' + encodeURIComponent(u))).json();
+    if (sess !== vodSess || vodCur !== s) return;
+    vodInfo = j; if (vodFF) vodFF.dur = j.duration || 0;
+    // Si trae varias pistas de audio y la primera no es español, se pone la de español
+    const auds = j.audios || [], es = auds.findIndex(isEs);
+    if (auds.length > 1 && es > 0 && !isEs(auds[0]) && S.audioEs !== false) {
+      vodFF ? ffReload(curTime(), es) : toFF(es);
+      toast('Audio en ' + audioName(auds[es]));
+    }
+  } catch {}
+}
+const audioName = (a) => (a.title && !/^(track|audio)\s*\d*$/i.test(a.title) ? a.title : (LANG[a.lang] || a.lang || 'Pista ' + (a.n + 1))) + (a.codec ? ' · ' + a.codec.toUpperCase() : '') + (a.ch ? ' ' + a.ch : '');
 // Adelantar / retroceder un video convertido: se vuelve a pedir desde el segundo elegido
 function ffSeek(delta) {
   const cur = ffTarget ?? (vodFF.offset + (video.currentTime || 0));
@@ -1483,10 +1661,8 @@ function ffSeek(delta) {
   hint((delta < 0 ? '◀◀  ' : '▶▶  ') + fmt(ffTarget) + (vodFF.dur ? ' / ' + fmt(vodFF.dur) : ''));
   clearTimeout(ffSeekT);
   ffSeekT = setTimeout(() => {
-    const t = ffTarget; ffTarget = null; vodFF.offset = t;
-    msg('Moviendo a ' + fmt(t) + '…', null, true);
-    video.onplaying = () => msg('');
-    video.src = ffUrl(vodFF.u, vodFF.h, vodFF.v, t); video.play().catch(() => {});
+    const t = ffTarget; ffTarget = null;
+    ffReload(t);
   }, 800);
 }
 function tryPlay(a, ms) {
@@ -1523,7 +1699,8 @@ async function playStream(s, sess) {
     if (a.ff) msg(a.ff.v === 'h264' ? 'Convirtiendo el video para tu navegador… (puede tardar unos segundos)' : 'Preparando el video…', null, true);
     vodFF = null;
     if (await tryPlay(a, a.ff ? 30000 : 12000)) {
-      if (a.ff) { vodFF = {...a.ff, offset: 0, dur: 0}; fetch(PROXY_BASE + '/lz-proxy/info?u=' + encodeURIComponent(a.ff.u)).then((r) => r.json()).then((j) => { if (vodFF) vodFF.dur = j.duration || 0; }).catch(() => {}); }
+      if (a.ff) vodFF = {...a.ff, offset: 0, dur: 0, au: 0};
+      afterStart(s, sess);
       return true;
     }
   }
@@ -1549,7 +1726,7 @@ function playTrailer(key, title) {
   goFull();
 }
 $('pvClose').onclick = () => exitFull();
-$('pvList').onclick = () => pvMode === 'live' ? openPanel() : pvMode === 'vod' ? openVodPick() : null;
+$('pvList').onclick = () => pvMode === 'live' ? openPanel() : pvMode === 'vod' ? openVodMenu() : null;
 pv.addEventListener('dblclick', () => isFull() ? exitFull() : goFull());
 
 // =====================================================================
@@ -1764,6 +1941,32 @@ function buildSettings() {
   else pb.append(btn('btn', 'Cambiar PIN', () => askPin('PIN nuevo', (p) => { S.pin = p; save(); toast('PIN cambiado'); }, {create: true})), btn('btn danger', 'Quitar PIN', () => { S.pin = ''; save(); toast('PIN quitado'); buildSettings(); }), btn('btn', 'Bloquear ahora', () => { unlocked = false; go('inicio', true); toast('Bloqueado'); }));
   b4.append(pb); w.append(b4);
   // Restablecer
+  // Pasar configuración a otro aparato (sin publicarla en internet)
+  const bT = el('div', 'box'); bT.append(el('h2', 'disp', 'Pasar mi configuración a la TV'),
+    el('p', 'note', 'Copia tus complementos, servidores, favoritos, Mi lista e idioma a otro aparato de tu casa. No se publica en ningún lado.'));
+  const cfgData = () => ({v: 1, servers: S.servers, favs: S.favs, lib: S.lib, watch: S.watch, lang: S.lang, subLang: S.subLang, tmdb: S.tmdb, iptv: S.iptv, cue: S.cue, onlyAvail: S.onlyAvail});
+  const applyCfg = (c) => { if (!c || !Array.isArray(c.servers)) throw new Error('vacía');
+    const have = new Set(S.servers.map((s) => s.url || s.host + s.user));
+    c.servers.forEach((s) => { if (!have.has(s.url || s.host + s.user)) S.servers.push({...s, id: newId()}); });
+    ['favs', 'lib'].forEach((k) => { const seen = new Set((S[k] || []).map((x) => x.url || keyOf(x))); (c[k] || []).forEach((x) => { if (!seen.has(x.url || keyOf(x))) (S[k] = S[k] || []).push(x); }); });
+    S.watch = {...(c.watch || {}), ...(S.watch || {})};
+    ['lang', 'subLang', 'iptv', 'cue'].forEach((k) => { if (c[k]) S[k] = c[k]; }); if (c.tmdb && !S.tmdb) S.tmdb = c.tmdb; if (c.onlyAvail != null) S.onlyAvail = c.onlyAvail;
+    save(); AV = {}; saveAV(); cache.clear(); Object.keys(built).forEach((k) => built[k] = false); };
+  const tb = el('div', 'btns');
+  if (PROXY && !NATIVE) tb.append(btn('btn pri', 'Guardar en esta computadora', async () => {
+    try { const r = await fetch(PROXY_BASE + '/lz-proxy/config', {method: 'POST', body: JSON.stringify(cfgData())}); if (!r.ok) throw 0;
+      openPick('Listo ✓', [el('p', 'note', 'Tu configuración quedó guardada en la computadora. En la TV, abre LZ-PLUS → Ajustes → “Traer de la computadora” y escribe:'), el('h2', 'disp', PROXY_BASE.replace(/^https?:\/\//, '').replace('localhost', 'IP de tu computadora'))]); }
+    catch { toast('No se pudo guardar. Actualiza lz-servidor.js.'); } }));
+  const ipIn = el('input'); ipIn.placeholder = 'IP de la computadora, ej. 192.168.100.26'; ipIn.value = (S.proxy || '').replace(/^https?:\/\//, '');
+  tb.append(btn('btn', 'Traer de la computadora', async () => {
+    let v = ipIn.value.trim() || (PROXY_BASE || ''); if (!v) return toast('Escribe la IP de la computadora');
+    if (!/^https?:\/\//.test(v)) v = 'http://' + v; if (!/:\d+\/?$/.test(v)) v = v.replace(/\/+$/, '') + ':8080';
+    try { const r = await withTimeout(fetch(v.replace(/\/+$/, '') + '/lz-proxy/config'), 6000); if (!r.ok) throw 0; applyCfg(await r.json()); toast('Configuración copiada ✓'); buildSettings(); }
+    catch { toast('No se encontró una configuración guardada en ' + v + '. Primero guárdala desde la computadora.'); } }));
+  tb.append(btn('btn', 'Copiar como código', async () => { const code = enc(cfgData()); try { await navigator.clipboard.writeText(code); toast('Código copiado'); } catch { openPick('Tu código', [el('textarea', null, code)]); } }));
+  tb.append(btn('btn', 'Pegar código', () => { const ta = el('textarea'); ta.style.cssText = 'width:100%;min-height:8rem;background:var(--card);color:var(--tx);border-radius:.8rem;border:2px solid var(--line);padding:1rem;font:inherit';
+    openPick('Pega el código', [ta, btn('btn pri', 'Importar', () => { try { applyCfg(dec(ta.value.trim())); closePick(); toast('Configuración importada ✓'); buildSettings(); } catch { toast('Ese código no es válido'); } })]); }));
+  bT.append(ipIn, tb); w.append(bT);
   const b5 = el('div', 'box'); b5.append(el('h2', 'disp', 'Restablecer'), el('p', 'note', 'Borra servidores, favoritos, clave y PIN de este aparato.'));
   b5.append(btn('btn danger', 'Borrar todo', () => confirmBox('¿Borrar todo?', 'No se puede deshacer.', 'Borrar todo', () => { localStorage.removeItem(KEY); location.reload(); })));
   w.append(b5);
@@ -1773,6 +1976,7 @@ function buildSettings() {
 //  Arranque
 // =====================================================================
 load();
+if (S.cue) document.documentElement.style.setProperty('--cue', S.cue);
 clock(); setInterval(clock, 15000);
 Promise.allSettled([detectProxy(), loadTmdbGenres()]).then(async () => { await Promise.race([refreshAddons(), sleep(2500)]); built.inicio = true; buildHome(); });
 setTimeout(() => { if (!document.activeElement || document.activeElement === document.body) focusEl(document.querySelector('#v-inicio .card:not(.sk)') || document.querySelector('.nav.on')); }, 2500);

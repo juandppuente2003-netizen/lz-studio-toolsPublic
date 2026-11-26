@@ -40,6 +40,7 @@ public class PlayerActivity extends Activity {
     private JSONArray opts = new JSONArray();
     private int index = 0;
     private String sub, subLang;
+    private long startMs = 0;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable startWatchdog = new Runnable() {
         public void run() {
@@ -57,6 +58,7 @@ public class PlayerActivity extends Activity {
             if (opts == null) opts = new JSONArray();
             sub = d.optString("sub", null);
             subLang = d.optString("subLang", null);
+            startMs = d.optLong("start", 0) * 1000L;
             setTitle(d.optString("title", "LZ-PLUS"));
         } catch (Exception e) { opts = new JSONArray(); }
 
@@ -123,6 +125,7 @@ public class PlayerActivity extends Activity {
         }
         MediaSource source = new DefaultMediaSourceFactory(http).createMediaSource(b.build());
         player.setMediaSource(source);
+        if (startMs > 0) player.seekTo(startMs);   // continuar donde te quedaste
         player.prepare();
         player.setPlayWhenReady(true);
         if (opts.length() > 1) Toast.makeText(this, "Opción " + (index + 1) + " de " + opts.length(), Toast.LENGTH_SHORT).show();
@@ -132,6 +135,19 @@ public class PlayerActivity extends Activity {
     private void next(String why) {
         if (isFinishing()) return;
         playIndex(index + 1);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Avisa a la app hasta dónde se vio (para "Continuar viendo")
+        if (player != null) {
+            android.content.Intent r = new android.content.Intent();
+            r.putExtra("pos", Math.max(0, player.getCurrentPosition() / 1000));
+            long d = player.getDuration();
+            r.putExtra("dur", d > 0 ? d / 1000 : 0);
+            setResult(RESULT_OK, r);
+        }
     }
 
     @Override

@@ -65,6 +65,15 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 7 && data != null) {
+            long pos = data.getLongExtra("pos", 0), dur = data.getLongExtra("dur", 0);
+            web.evaluateJavascript("window.lzProgress && lzProgress(" + pos + "," + dur + ")", null);
+        }
+    }
+
+    @Override
     protected void onPause() { super.onPause(); web.onPause(); }
 
     @Override
@@ -103,7 +112,7 @@ public class MainActivity extends Activity {
                 public void run() {
                     Intent i = new Intent(MainActivity.this, PlayerActivity.class);
                     i.putExtra("data", json);
-                    startActivity(i);
+                    startActivityForResult(i, 7);
                 }
             });
         }

@@ -67,8 +67,9 @@ async function proxy(req, res, q) {
   req.on('close', () => ctrl.abort());
   let up;
   try { up = await fetch(target, { headers, redirect: 'follow', signal: ctrl.signal }); }
-  catch (e) { cors(res); res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8' }); return res.end('No se pudo conectar: ' + (e.cause?.code || e.message)); }
+  catch (e) { if (e.name !== 'AbortError') console.log('  ✗ No responde: ' + new URL(target).host + ' (' + (e.cause?.code || e.message) + ')'); cors(res); res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8' }); return res.end('No se pudo conectar: ' + (e.cause?.code || e.message)); }
   cors(res);
+  if (up.status >= 400) console.log('  ✗ ' + up.status + ' en ' + new URL(target).host + ' (esa opción no está disponible)');
   const type = up.headers.get('content-type') || '';
   const finalUrl = up.url || target;
   const isHls = /mpegurl/i.test(type) || /\.m3u8(\?|$)/i.test(finalUrl);
@@ -108,9 +109,16 @@ function info(req, res, q) {
     clearTimeout(t);
     const m = err.match(/Duration: (\d+):(\d+):(\d+(?:\.\d+)?)/);
     const v = (err.match(/Video: (\w+)/) || [])[1] || '';
-    const a = (err.match(/Audio: (\w+)/) || [])[1] || '';
+    // Pistas de audio y subtítulos con su idioma y título
+    const audios = [], subs = []; let last = null;
+    for (const line of err.split(/\r?\n/)) {
+      const s = line.match(/Stream #\d+:\d+(?:\[\w+\])?(?:\((\w+)\))?: (Audio|Subtitle): (\w+)(.*)/);
+      if (s) { const list = s[2] === 'Audio' ? audios : subs; last = { n: list.length, lang: s[1] || '', codec: s[3], ch: (s[4].match(/(mono|stereo|5\.1|7\.1)/) || [])[1] || '', title: '' }; list.push(last); continue; }
+      const tt = line.match(/^\s+title\s*:\s*(.+)$/); if (tt && last) { last.title = tt[1].trim(); continue; }
+      if (/Stream #/.test(line)) last = null;
+    }
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ duration: m ? (+m[1]) * 3600 + (+m[2]) * 60 + parseFloat(m[3]) : 0, video: v, audio: a }));
+    res.end(JSON.stringify({ duration: m ? (+m[1]) * 3600 + (+m[2]) * 60 + parseFloat(m[3]) : 0, video: v, audio: audios[0]?.codec || '', audios, subs }));
   });
   req.on('close', () => p.kill('SIGKILL'));
 }
@@ -123,7 +131,8 @@ function mp4(req, res, q) {
   const t = parseFloat(q.get('t') || '0');
   if (t > 0) args.push('-ss', String(t));
   args.push('-probesize', '5M', '-analyzeduration', '3M', '-fflags', '+genpts');   // arranca más rápido
-  args.push('-i', target, '-map', '0:v:0', '-map', '0:a:0?', '-sn', '-dn');
+  const au = Math.max(0, parseInt(q.get('au') || '0', 10) || 0);   // pista de audio elegida (Latino, Inglés…)
+  args.push('-i', target, '-map', '0:v:0', '-map', '0:a:' + au + '?', '-sn', '-dn');
   if (q.get('v') === 'h264') args.push('-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22', '-pix_fmt', 'yuv420p', '-vf', "scale='min(1920,iw)':-2");
   else args.push('-c:v', 'copy');
   args.push('-c:a', 'aac', '-ac', '2', '-b:a', '192k', '-f', 'mp4', '-movflags', 'frag_keyframe+empty_moov+default_base_moof', 'pipe:1');
@@ -144,6 +153,13 @@ const server = http.createServer((req, res) => {
   if (u.pathname === '/prueba') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); return res.end('<body style="font:32px sans-serif;background:#06080F;color:#fff;display:grid;place-items:center;height:90vh"><div>✅ LZ-PLUS funciona en esta red.<br><a style="color:#F5B84B" href="/">Abrir la app</a></div></body>'); }
   if (u.pathname === '/lz-proxy/ping') { cors(res); res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ lzproxy: true, ffmpeg: !!FFMPEG })); }
   if (u.pathname === '/lz-proxy/info') return info(req, res, u.searchParams);
+  // Configuración para pasarla a la TV (se guarda solo en esta computadora)
+  if (u.pathname === '/lz-proxy/config') {
+    cors(res);
+    const file = path.join(__dirname, 'lz-config.json');
+    if (req.method === 'POST') { let b = ''; req.on('data', (d) => { b += d; if (b.length > 5e6) req.destroy(); }); req.on('end', () => { try { JSON.parse(b); fs.writeFileSync(file, b); res.writeHead(200); res.end('ok'); console.log('  ✓ Configuración guardada para pasarla a la TV'); } catch { res.writeHead(400); res.end('mal'); } }); return; }
+    return fs.readFile(file, (err, data) => { if (err) { res.writeHead(404); return res.end('{}'); } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(data); });
+  }
   if (u.pathname === '/lz-proxy/mp4') return mp4(req, res, u.searchParams);
   if (u.pathname === PREFIX) return proxy(req, res, u.searchParams).catch(() => { try { res.destroy(); } catch {} });
   if (u.pathname === '/' || u.pathname === '/index.html' || u.pathname === '/lz-plus.html') {
